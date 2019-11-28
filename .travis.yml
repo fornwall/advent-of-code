@@ -1,0 +1,16 @@
+language: rust
+before_script:
+- rustup component add clippy rustfmt
+script:
+- cargo fmt --all -- --check
+- cargo clippy --all-targets --all-features -- -D warnings
+- cargo test
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: beta
+    - rust: nightly
+  fast_finish: true
