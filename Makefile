@@ -14,3 +14,5 @@ docker-image: static-linux-executable
 publish-docker: docker-image
 	docker push fredrikfornwall/advent-of-code-2019-rs
 
+install-wasm-target:
+	rustup target add wasm32-unknown-unknown

@@ -8,8 +8,8 @@ cargo build \
 	--lib \
 	--target wasm32-unknown-unknown
 
-BUILT_WASM=target/wasm32-unknown-unknown/release/advent_of_code_rs.wasm
-OPTIMIZED_WASM=target/wasm32-unknown-unknown/release/advent_of_code_rs-optimized.wasm
+BUILT_WASM=target/wasm32-unknown-unknown/release/advent_of_code_2019.wasm
+OPTIMIZED_WASM=target/wasm32-unknown-unknown/release/advent_of_code_2019-optimized.wasm
 
 echo "After building:"
 ls -lha $BUILT_WASM
