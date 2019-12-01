@@ -10,5 +10,5 @@ document.getElementById("run_button").addEventListener("click", function() {
    const input = input_element.value;
 
    const solution = wasm.solve(day, part, input);
-   alert(solution);
+   document.getElementById('output').textContent = solution;
 });

@@ -16,3 +16,14 @@ publish-docker: docker-image
 
 install-wasm-target:
 	rustup target add wasm32-unknown-unknown
+
+create-html:
+	wasm-pack build --target browser --out-dir target/browser
+	cd wasm/html && \
+		rm -Rf node_modules package-lock.json && \
+		npm install && \
+		webpack --config webpack.config.js
+	@echo wasm/html/dist/ has been created
+
+serve-html: create-html
+	cd wasm/html/dist && python3 -m http.server
