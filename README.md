@@ -35,7 +35,7 @@ As another proof of concept the solution can run inside the browser at https://f
 # Days
 | Puzzle                                         | Solution                     | Alternatives |
 | ---------------------------------------------- | ---------------------------- | ------------ |
-| [Day 1](https://adventofcode.com/2019/day/1)   | [src/day1.rs](src/day1.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_1_solutions/)
+| [Day 1](https://adventofcode.com/2019/day/1)   | [src/day1.rs](src/day1.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e4axxe/2019_day_1_solutions/)
 | [Day 2](https://adventofcode.com/2019/day/2)   | [src/day2.rs](src/day2.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_2_solutions/)
 | [Day 3](https://adventofcode.com/2019/day/3)   | [src/day3.rs](src/day3.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_3_solutions/)
 | [Day 4](https://adventofcode.com/2019/day/4)   | [src/day4.rs](src/day4.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_4_solutions/)
