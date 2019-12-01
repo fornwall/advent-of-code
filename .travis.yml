@@ -11,16 +11,15 @@ matrix:
     - rust: nightly
   fast_finish: true
 
-before_install:
-- if [[ "$TRAVIS_RUST_VERSION" != nightly ]]; then
+before_install: |
+  if [[ "$TRAVIS_RUST_VERSION" != nightly ]]; then
     rustup component add clippy
     rustup component add rustfmt
   fi
 
-script:
-- if [[ "$TRAVIS_RUST_VERSION" != nightly ]]; then
+script: |
+  if [[ "$TRAVIS_RUST_VERSION" != nightly ]]; then
     cargo fmt --all -- --check
     cargo clippy --all-targets --all-features -- -D warnings
   fi
-- cargo test
-
+  cargo test
