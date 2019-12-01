@@ -16,9 +16,8 @@ There is also a Docker image published for running the tests:
 
     docker run -i fredrikfornwall/advent-of-code-2019-rs:latest <day> <part> < path/to/input.txt
 
-    # Example
-    curl https://public.infinisil.com/aoc18/day2/10000.txt | \
-        docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 2 2
+    # Example:
+    docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input.txt
 
 # Running using Node.js
 As a proof of concept, an [npm module](https://www.npmjs.com/package/advent_of_code_rs) is available which uses WebAssembly to execute the solution:
