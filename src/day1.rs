@@ -10,17 +10,13 @@ pub fn part1(input_string: &str) -> String {
 pub fn part2(input_string: &str) -> String {
     input_string
         .lines()
-        .map(|line| line.parse::<i32>().unwrap())
-        .map(|mass| (mass / 3) - 2)
-        .map(|mut additional_fuel| {
-            let mut total_fuel = 0;
-            while additional_fuel > 0 {
-                total_fuel += additional_fuel;
-                additional_fuel = additional_fuel / 3 - 2;
-            }
-            total_fuel
+        .map(|line| line.parse::<u32>().unwrap())
+        .map(|mass| {
+            std::iter::successors(Some(mass), |fuel| (fuel / 3).checked_sub(2))
+                .skip(1)
+                .sum::<u32>()
         })
-        .sum::<i32>()
+        .sum::<u32>()
         .to_string()
 }
 
