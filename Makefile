@@ -12,6 +12,7 @@ docker-image: static-linux-executable
 	docker build -t fredrikfornwall/advent-of-code-2019-rs .
 
 publish-docker: docker-image
+	docker login
 	docker push fredrikfornwall/advent-of-code-2019-rs
 
 install-wasm-target:
@@ -27,3 +28,6 @@ create-html:
 
 serve-html: create-html
 	cd wasm/html/dist && python3 -m http.server
+
+publish-html:
+	scp -r wasm/html/dist/* fornwall.net:www/advent-of-code-2019/
