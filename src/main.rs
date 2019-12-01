@@ -4,7 +4,7 @@ use std::env;
 use std::io::Read;
 
 #[cfg(not(target_arch = "wasm32"))]
-use advent_of_code_2019::get_problem_set;
+use advent_of_code_rs::get_problem_set;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
