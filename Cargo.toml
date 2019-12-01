@@ -3,7 +3,7 @@ name = "advent_of_code_2019"
 version = "2019.12.0"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code-2019-rs"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 description = "Solutions to Advent of Code 2019 written in Rust"
 edition = "2018"
 
