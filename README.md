@@ -3,7 +3,7 @@
 # Advent of Code 2019 in Rust
 This repository contains solutions to [Advent of Code 2019](https://adventofcode.com/2019) problems in Rust.
 
-# Running the solutions against a file
+# Running the tests
 [Install rust](https://www.rust-lang.org/tools/install) if necessary, then run tests with:
 
     cargo test
