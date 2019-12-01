@@ -1,23 +1,25 @@
-pub fn part1(input_string: &str) -> String {
+fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> String {
     input_string
         .lines()
         .map(|line| line.parse::<u32>().unwrap())
-        .map(|mass| (mass / 3) - 2)
+        .map(fuel_calculator)
         .sum::<u32>()
         .to_string()
 }
 
+pub fn part1(input_string: &str) -> String {
+    sum_required_fuel(input_string, |mass| mass / 3 - 2)
+}
+
 pub fn part2(input_string: &str) -> String {
-    input_string
-        .lines()
-        .map(|line| line.parse::<u32>().unwrap())
-        .map(|mass| {
-            std::iter::successors(Some(mass), |fuel| (fuel / 3).checked_sub(2))
-                .skip(1)
-                .sum::<u32>()
-        })
-        .sum::<u32>()
-        .to_string()
+    fn required_fuel(mass: u32) -> u32 {
+        match (mass / 3).checked_sub(2) {
+            Some(fuel) => fuel + required_fuel(fuel),
+            None => 0,
+        }
+    }
+
+    sum_required_fuel(input_string, required_fuel)
 }
 
 #[test]
