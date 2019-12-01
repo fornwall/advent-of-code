@@ -1,15 +1,21 @@
 [![Build Status](https://travis-ci.org/fornwall/advent-of-code-2019-rs.svg?branch=master)](https://travis-ci.org/fornwall/advent-of-code-2019-rs)
 
 # Advent of Code 2019 in Rust
-These are solutions to the problems in [Advent of Code 2019](https://adventofcode.com/2019) in Rust.
+This repository contains solutions to [Advent of Code 2019](https://adventofcode.com/2019) problems in Rust.
 
 # Running the solutions against a file
-The test can be run to read from stdin:
+[Install rust](https://www.rust-lang.org/tools/install) if necessary, then run tests with:
+
+    cargo test
+
+# Running the solutions against custom input
+To run a solution against given input on stdin:
 
     cargo run <day> <part> < path/to/input.txt
 
-    # Example:
+    # Examples:
     cargo run 2 1 < path/to/input_day2_part1.txt
+    curl https://example.com/example-input | cargo run 2 1
 
 # Running using Docker
 There is also a Docker image published for running the tests:
