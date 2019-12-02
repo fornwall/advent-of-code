@@ -1,6 +1,6 @@
 struct Program {
     values: Vec<u64>,
-    instruction_pointer: usize
+    instruction_pointer: usize,
 }
 
 impl Program {
@@ -10,7 +10,7 @@ impl Program {
                 .split(',')
                 .map(|s| s.parse::<u64>().unwrap())
                 .collect(),
-            instruction_pointer: 0
+            instruction_pointer: 0,
         }
     }
 
@@ -21,7 +21,7 @@ impl Program {
     fn run(&mut self) -> u64 {
         loop {
             if !self.evaluate() {
-                break self.values[0]
+                break self.values[0];
             }
         }
     }
@@ -30,27 +30,25 @@ impl Program {
         let opcode = self.values[self.instruction_pointer];
         match opcode {
             99 => false,
-            1|2 => {
-                let op1_location = self.values[self.instruction_pointer + 1] as usize;
-                let op2_location = self.values[self.instruction_pointer + 2] as usize;
+            1 | 2 => {
+                let parameter1_address = self.values[self.instruction_pointer + 1] as usize;
+                let parameter2_location = self.values[self.instruction_pointer + 2] as usize;
                 let output_location = self.values[self.instruction_pointer + 3] as usize;
-                let op1 = self.values[op1_location];
-                let op2 = self.values[op2_location];
+                let parameter1 = self.values[parameter1_address];
+                let parameter2 = self.values[parameter2_location];
                 self.values[output_location] = if opcode == 1 {
-                    op1 + op2
+                    parameter1 + parameter2
                 } else {
-                    op1 * op2
+                    parameter1 * parameter2
                 };
                 self.instruction_pointer += 4;
                 true
-            },
+            }
             _ => {
                 panic!("Invalid opcode: {}", opcode);
             }
-
         }
     }
-
 }
 
 pub fn part1(input_string: &str) -> String {
@@ -69,8 +67,18 @@ pub fn part1_patch(input_string: &str, patch: bool) -> String {
     program.run().to_string()
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
+pub fn part2(input_string: &str) -> String {
+    for noun in 0..=99 {
+        for verb in 0..=99 {
+            let mut program = Program::parse(input_string);
+            program.patch(1, noun);
+            program.patch(2, verb);
+            if program.run() == 19_690_720 {
+                return (100 * noun + verb).to_string();
+            }
+        }
+    }
+    "ERROR".to_string()
 }
 
 #[test]
@@ -86,7 +94,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!("", part2(""));
-
-    assert_eq!("", part2(include_str!("day2_input.txt")));
+    assert_eq!("5485", part2(include_str!("day2_input.txt")));
 }
