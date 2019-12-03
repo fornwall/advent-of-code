@@ -14,7 +14,10 @@ cargo test
 To run a solution against given input on stdin:
 
 ```sh
+# Debug mode:
 cargo run -q <day> <part> < path/to/input.txt
+# Release mode:
+cargo run -q --release <day> <part> < path/to/input.txt
 
 # Examples:
 cargo run 2 1 < path/to/input_day2_part1.txt
