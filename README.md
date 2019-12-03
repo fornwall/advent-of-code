@@ -31,7 +31,7 @@ docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input
 ```
 
 # Running using Node.js
-As a proof of concept, an [npm module](https://www.npmjs.com/package/advent_of_code_rs) is available which uses WebAssembly to execute the solution:
+As a demo, an [npm module](https://www.npmjs.com/package/advent_of_code_rs) is available which uses WebAssembly to execute the solutions:
 
 ```sh
 # To install or update:
@@ -42,7 +42,7 @@ advent-of-code-rs <day> <part> < path/to/input.txt
 ```
 
 # Running in the browser
-As another proof of concept the solution can run inside the browser at https://fornwall.net/advent-of-code-2019/.
+The solutions can run inside the browser at https://fornwall.net/advent-of-code-2019/.
 
 # Days
 | Puzzle                                         | Solution                     | Alternatives |
