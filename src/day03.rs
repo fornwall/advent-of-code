@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ops;
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
 struct Point {
     x: i32,
     y: i32,
@@ -49,7 +49,7 @@ where
         let direction = Point::direction(word.chars().next().unwrap());
         let steps = word[1..].parse::<i32>().unwrap();
 
-        for _i in 0..steps {
+        for _ in 0..steps {
             current_step += 1;
             current_position += direction;
             on_visit(current_position, current_step);
@@ -58,39 +58,39 @@ where
 }
 
 pub fn part1(input_string: &str) -> String {
-    let lines: Vec<&str> = input_string.lines().collect();
+    let mut lines = input_string.lines();
     let mut first_wire_points = HashSet::new();
 
-    parse_wire_points(lines[0], |point, _| {
+    parse_wire_points(lines.next().unwrap(), |point, _| {
         first_wire_points.insert(point);
     });
 
-    let mut best_distance = std::u32::MAX;
-    parse_wire_points(lines[1], |point, _| {
+    let mut closest_distance = std::u32::MAX;
+    parse_wire_points(lines.next().unwrap(), |point, _| {
         if first_wire_points.contains(&point) {
-            best_distance = cmp::min(best_distance, point.distance_from_origin());
+            closest_distance = cmp::min(closest_distance, point.distance_from_origin());
         }
     });
 
-    best_distance.to_string()
+    closest_distance.to_string()
 }
 
 pub fn part2(input_string: &str) -> String {
-    let lines: Vec<&str> = input_string.lines().collect();
+    let mut lines = input_string.lines();
     let mut first_wire_points = HashMap::new();
 
-    parse_wire_points(lines[0], |point, step| {
-        first_wire_points.insert(point, step);
+    parse_wire_points(lines.next().unwrap(), |point, step| {
+        first_wire_points.entry(point).or_insert(step);
     });
 
-    let mut best_steps = std::u32::MAX;
-    parse_wire_points(lines[1], |point, step| {
+    let mut fewest_steps = std::u32::MAX;
+    parse_wire_points(lines.next().unwrap(), |point, step| {
         if let Some(&value) = first_wire_points.get(&point) {
-            best_steps = cmp::min(best_steps, step + value);
+            fewest_steps = cmp::min(fewest_steps, step + value);
         }
     });
 
-    best_steps.to_string()
+    fewest_steps.to_string()
 }
 
 #[test]
