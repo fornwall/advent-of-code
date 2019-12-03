@@ -89,10 +89,10 @@ pub fn tests_part1() {
     assert_eq!("2", part1_patch("2,4,4,5,99,0", false));
     assert_eq!("30", part1_patch("1,1,1,4,99,5,6,0,99", false));
 
-    assert_eq!("4570637", part1(include_str!("day2_input.txt")));
+    assert_eq!("4570637", part1(include_str!("day02_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("5485", part2(include_str!("day2_input.txt")));
+    assert_eq!("5485", part2(include_str!("day02_input.txt")));
 }

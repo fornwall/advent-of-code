@@ -29,7 +29,7 @@ pub fn tests_part1() {
     assert_eq!("654", part1("1969"));
     assert_eq!("33583", part1("100756"));
 
-    assert_eq!("3262358", part1(include_str!("day1_input.txt")));
+    assert_eq!("3262358", part1(include_str!("day01_input.txt")));
 }
 
 #[test]
@@ -38,5 +38,5 @@ fn tests_part2() {
     assert_eq!("966", part2("1969"));
     assert_eq!("50346", part2("100756"));
 
-    assert_eq!("4890696", part2(include_str!("day1_input.txt")));
+    assert_eq!("4890696", part2(include_str!("day01_input.txt")));
 }
