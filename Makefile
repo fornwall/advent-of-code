@@ -29,5 +29,5 @@ create-html:
 serve-html: create-html
 	cd wasm/html/dist && python3 -m http.server
 
-publish-html:
+publish-html: create-html
 	scp -r wasm/html/dist/* fornwall.net:www/advent-of-code-2019/
