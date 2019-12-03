@@ -42,7 +42,7 @@ As another proof of concept the solution can run inside the browser at https://f
 | ---------------------------------------------- | ---------------------------- | ------------ |
 | [Day 1](https://adventofcode.com/2019/day/1)   | [src/day01.rs](src/day01.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e4axxe/2019_day_1_solutions/)
 | [Day 2](https://adventofcode.com/2019/day/2)   | [src/day02.rs](src/day02.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e4u0rw/2019_day_2_solutions/)
-| [Day 3](https://adventofcode.com/2019/day/3)   | [src/day03.rs](src/day03.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_3_solutions/)
+| [Day 3](https://adventofcode.com/2019/day/3)   | [src/day03.rs](src/day03.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e5bz2w/2019_day_3_solutions/)
 | [Day 4](https://adventofcode.com/2019/day/4)   | [src/day04.rs](src/day04.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_4_solutions/)
 | [Day 5](https://adventofcode.com/2019/day/5)   | [src/day05.rs](src/day05.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_5_solutions/)
 | [Day 6](https://adventofcode.com/2019/day/6)   | [src/day06.rs](src/day06.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_6_solutions/)
