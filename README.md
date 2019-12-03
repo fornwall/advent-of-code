@@ -6,33 +6,40 @@ This repository contains solutions to [Advent of Code 2019](https://adventofcode
 # Running the tests
 [Install rust](https://www.rust-lang.org/tools/install) if necessary, then run tests with:
 
-    cargo test
+```
+cargo test
+```
 
 # Running the solutions against custom input
 To run a solution against given input on stdin:
 
-    cargo run <day> <part> < path/to/input.txt
+```sh
+cargo run -q <day> <part> < path/to/input.txt
 
-    # Examples:
-    cargo run 2 1 < path/to/input_day2_part1.txt
-    curl https://example.com/example-input | cargo run 2 1
+# Examples:
+cargo run 2 1 < path/to/input_day2_part1.txt
+```
 
 # Running using Docker
 There is also a Docker image published for running the tests:
 
-    docker run -i fredrikfornwall/advent-of-code-2019-rs:latest <day> <part> < path/to/input.txt
+```sh
+docker run -i fredrikfornwall/advent-of-code-2019-rs:latest <day> <part> < path/to/input.txt
 
-    # Example:
-    docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input.txt
+# Example:
+docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input.txt
+```
 
 # Running using Node.js
 As a proof of concept, an [npm module](https://www.npmjs.com/package/advent_of_code_rs) is available which uses WebAssembly to execute the solution:
 
-    # Installation:
-    npm install advent_of_code_rs_bin -g
+```sh
+# To install or update:
+npm install advent_of_code_rs_bin -g
 
-    # Invocation:
-    advent-of-code-rs <day> <part> < path/to/input.txt
+# Invocation:
+advent-of-code-rs <day> <part> < path/to/input.txt
+```
 
 # Running in the browser
 As another proof of concept the solution can run inside the browser at https://fornwall.net/advent-of-code-2019/.
