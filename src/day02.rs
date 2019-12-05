@@ -1,3 +1,4 @@
+#[derive(Clone)]
 struct Program {
     values: Vec<u64>,
     instruction_pointer: usize,
@@ -68,9 +69,11 @@ pub fn part1_patch(input_string: &str, patch: bool) -> String {
 }
 
 pub fn part2(input_string: &str) -> String {
+    let initial_program = Program::parse(input_string);
+
     for noun in 0..=99 {
         for verb in 0..=99 {
-            let mut program = Program::parse(input_string);
+            let mut program = initial_program.clone();
             program.patch(1, noun);
             program.patch(2, verb);
             if program.run() == 19_690_720 {
