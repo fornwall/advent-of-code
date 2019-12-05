@@ -2,10 +2,11 @@ struct Program {
     memory: Vec<i64>,
     instruction_pointer: usize,
     last_output: i64,
+    input_value: i64,
 }
 
 impl Program {
-    fn parse(input: &str) -> Program {
+    fn parse(input: &str, input_value: i64) -> Program {
         Program {
             memory: input
                 .split(',')
@@ -13,6 +14,7 @@ impl Program {
                 .collect(),
             instruction_pointer: 0,
             last_output: 0,
+            input_value,
         }
     }
 
@@ -58,7 +60,7 @@ impl Program {
             3 => {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
                 let save_address = self.memory[self.instruction_pointer + 1];
-                self.memory[save_address as usize] = 1; // Input to be specified.
+                self.memory[save_address as usize] = self.input_value;
                 self.instruction_pointer += 2;
                 true
             }
@@ -66,6 +68,41 @@ impl Program {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
                 self.last_output = self.parameter_value(opcode_and_parameter_modes, 1);
                 self.instruction_pointer += 2;
+                true
+            }
+            5 | 6 => {
+                // Opcode 5 is is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the
+                // value from the second parameter. Otherwise, it does nothing.
+                // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer
+                // to the value from the second parameter. Otherwise, it does nothing.
+                let jump_if = opcode == 5;
+                let parameter_1_true = self.parameter_value(opcode_and_parameter_modes, 1) != 0;
+                if parameter_1_true == jump_if {
+                    self.instruction_pointer =
+                        self.parameter_value(opcode_and_parameter_modes, 2) as usize;
+                } else {
+                    self.instruction_pointer += 3;
+                }
+                true
+            }
+            7 | 8 => {
+                // Opcode 7 is less than: if the first parameter is less than the second parameter,
+                // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+                // Opcode 8 is equals: if the first parameter is equal to the second parameter,
+                // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+                let parameter_1 = self.parameter_value(opcode_and_parameter_modes, 1);
+                let parameter_2 = self.parameter_value(opcode_and_parameter_modes, 2);
+                let output_value = if (opcode == 7 && (parameter_1 < parameter_2))
+                    || (opcode == 8 && (parameter_1 == parameter_2))
+                {
+                    1
+                } else {
+                    0
+                };
+
+                let save_address = self.memory[self.instruction_pointer + 3];
+                self.memory[save_address as usize] = output_value;
+                self.instruction_pointer += 4;
                 true
             }
             _ => {
@@ -76,13 +113,15 @@ impl Program {
 }
 
 pub fn part1(input_string: &str) -> String {
-    let mut program = Program::parse(input_string);
+    let mut program = Program::parse(input_string, 1);
     program.run();
     program.last_output.to_string()
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
+pub fn part2(input_string: &str) -> String {
+    let mut program = Program::parse(input_string, 5);
+    program.run();
+    program.last_output.to_string()
 }
 
 #[test]
@@ -92,7 +131,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(""), "");
-
-    // assert_eq!(part2(include_str!("day05_input.txt")), "");
+    assert_eq!(part2(include_str!("day05_input.txt")), "1558663");
 }
