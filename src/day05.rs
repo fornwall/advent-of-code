@@ -19,11 +19,8 @@ impl Program {
     }
 
     fn run(&mut self) -> i64 {
-        loop {
-            if !self.evaluate() {
-                break self.memory[0];
-            }
-        }
+        while self.evaluate() {}
+        self.memory[0]
     }
 
     fn is_immediate(opcode_and_parameter_modes: i64, position: u32) -> bool {
