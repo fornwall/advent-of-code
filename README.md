@@ -55,7 +55,7 @@ The solutions can run inside the browser at https://fornwall.net/advent-of-code-
 | [Day 3](https://adventofcode.com/2019/day/3)   | [src/day03.rs](src/day03.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e5bz2w/2019_day_3_solutions/)
 | [Day 4](https://adventofcode.com/2019/day/4)   | [src/day04.rs](src/day04.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e5u5fv/2019_day_4_solutions/)
 | [Day 5](https://adventofcode.com/2019/day/5)   | [src/day05.rs](src/day05.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e6carb/2019_day_5_solutions/)
-| [Day 6](https://adventofcode.com/2019/day/6)   | [src/day06.rs](src/day06.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_6_solutions/)
+| [Day 6](https://adventofcode.com/2019/day/6)   | [src/day06.rs](src/day06.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/e6tyva/2019_day_6_solutions/)
 | [Day 7](https://adventofcode.com/2019/day/7)   | [src/day07.rs](src/day07.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_7_solutions/)
 | [Day 8](https://adventofcode.com/2019/day/8)   | [src/day08.rs](src/day08.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_8_solutions/)
 | [Day 9](https://adventofcode.com/2019/day/9)   | [src/day09.rs](src/day09.rs)   | [Reddit](https://www.reddit.com/r/adventofcode/comments/XXX/2019_day_9_solutions/)
