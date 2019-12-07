@@ -28,6 +28,7 @@ mod day22;
 mod day23;
 mod day24;
 mod day25;
+mod int_code;
 
 pub fn get_problem_set(day: u8, part: u8) -> Option<fn(&str) -> String> {
     struct Solutions(fn(&str) -> String, fn(&str) -> String);
