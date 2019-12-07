@@ -1,4 +1,4 @@
-.PHONY: static-linux-executable docker-image publish-docker
+.PHONY: check static-linux-executable docker-image publish-docker publish-html publish-npm publish-all
 
 check:
 	cargo fmt --all
@@ -31,3 +31,9 @@ serve-html: create-html
 
 publish-html: create-html
 	scp -r wasm/html/dist/* fornwall.net:www/advent-of-code-2019/
+
+publish-npm:
+	./wasm/publish-npm-module.sh
+
+publish-all: publish-docker publish-html publish-npm
+	@echo Everything published
