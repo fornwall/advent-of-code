@@ -2,16 +2,16 @@ use crate::int_code::Program;
 
 pub fn part1(input_string: &str) -> String {
     let mut program = Program::parse(input_string);
-    program.input_values.push_back(1);
+    program.input(1);
     program.run();
-    program.last_output.to_string()
+    program.output_values.last().unwrap().to_string()
 }
 
 pub fn part2(input_string: &str) -> String {
     let mut program = Program::parse(input_string);
-    program.input_values.push_back(5);
+    program.input(5);
     program.run();
-    program.last_output.to_string()
+    program.output_values.last().unwrap().to_string()
 }
 
 #[test]
