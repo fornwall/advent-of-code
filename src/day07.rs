@@ -1,37 +1,12 @@
 use crate::int_code::Program;
-
-/// Generate all permutations of a sequence using Heap's algorithm.
-fn all_permutations<F>(sequence: &mut Vec<i64>, size: usize, n: usize, on_permutation: &mut F)
-where
-    F: FnMut(&Vec<i64>),
-{
-    if size == 1 {
-        on_permutation(sequence);
-        return;
-    }
-
-    for i in 0..size {
-        all_permutations(sequence, size - 1, n, on_permutation);
-
-        if size % 2 == 1 {
-            // If size is odd, swap first and last element.
-            sequence.swap(0, size - 1);
-        } else {
-            // If size is even, swap ith and last element.
-            sequence.swap(i, size - 1);
-        }
-    }
-}
+use crate::permutation::all_permutations;
 
 pub fn part1(input_string: &str) -> String {
     let program = Program::parse(input_string);
     let mut phase_settings = vec![0, 1, 2, 3, 4];
     let mut strongest_signal = 0;
 
-    let size = phase_settings.len();
-    all_permutations(&mut phase_settings, size, size, &mut |permutation: &Vec<
-        i64,
-    >| {
+    all_permutations(&mut phase_settings, &mut |permutation: &Vec<i64>| {
         let mut signal = 0;
         for &phase in permutation.iter() {
             let mut amplifier_program = program.clone();
@@ -54,10 +29,7 @@ pub fn part2(input_string: &str) -> String {
     let mut phase_settings = vec![5, 6, 7, 8, 9];
     let mut strongest_signal = 0;
 
-    let size = phase_settings.len();
-    all_permutations(&mut phase_settings, size, size, &mut |permutation: &Vec<
-        i64,
-    >| {
+    all_permutations(&mut phase_settings, &mut |permutation: &Vec<i64>| {
         let mut amplifier_programs = Vec::new();
         for &phase in permutation.iter() {
             let mut new_program = program.clone();
@@ -73,12 +45,13 @@ pub fn part2(input_string: &str) -> String {
                 let current_program = &mut amplifier_programs[i];
                 current_program.run();
 
-                if i == 4 && !current_program.output_values.is_empty() {
-                    last_signal_output = *current_program.output_values.last().unwrap();
-                }
-
-                if i == 4 && current_program.is_halted() {
-                    break 'outer;
+                if i == 4 {
+                    if !current_program.output_values.is_empty() {
+                        last_signal_output = *current_program.output_values.last().unwrap();
+                    }
+                    if current_program.is_halted() {
+                        break 'outer;
+                    }
                 }
 
                 let current_output = current_program.output_values.clone(); // XXX: Avoid clone()?
