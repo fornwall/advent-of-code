@@ -1,5 +1,6 @@
 use crate::int_code::Program;
 use crate::permutation::all_permutations;
+use std::cell::RefCell;
 
 pub fn part1(input_string: &str) -> String {
     let program = Program::parse(input_string);
@@ -34,15 +35,15 @@ pub fn part2(input_string: &str) -> String {
         for &phase in permutation.iter() {
             let mut new_program = program.clone();
             new_program.input(phase);
-            amplifier_programs.push(new_program);
+            amplifier_programs.push(RefCell::new(new_program));
         }
 
-        amplifier_programs[0].input(0);
+        amplifier_programs[0].borrow_mut().input(0);
 
         let mut last_signal_output = 0;
         'outer: loop {
             for i in 0..5 {
-                let current_program = &mut amplifier_programs[i];
+                let mut current_program = amplifier_programs[i].borrow_mut();
                 current_program.run();
 
                 if i == 4 {
@@ -54,13 +55,12 @@ pub fn part2(input_string: &str) -> String {
                     }
                 }
 
-                let current_output = current_program.output_values.clone(); // XXX: Avoid clone()?
-                current_program.output_values.clear();
-
-                let next_program = &mut amplifier_programs[(i + 1) % 5];
-                for &value in current_output.iter() {
+                let mut next_program = amplifier_programs[(i + 1) % 5].borrow_mut();
+                for &value in current_program.output_values.iter() {
                     next_program.input(value);
                 }
+
+                current_program.output_values.clear();
             }
         }
 
