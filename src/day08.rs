@@ -47,19 +47,22 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> String {
                 });
         });
 
-    let image = image
-        .chunks(width as usize)
-        .fold(Vec::<u8>::new(), |mut acc, layer| {
-            acc.extend_from_slice(layer);
-            acc.push(b'\n');
-            acc
-        });
-
     str::from_utf8(&image)
         .unwrap()
         .replace('1', "█")
         .replace('0', " ")
-        .to_string()
+        .chars()
+        .enumerate()
+        .flat_map(|(i, c)| {
+            if i != 0 && i % (width as usize) == 0 {
+                Some('\n')
+            } else {
+                None
+            }
+            .into_iter()
+            .chain(std::iter::once(c))
+        })
+        .collect::<String>()
 }
 
 #[test]
@@ -69,8 +72,8 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2_sized("0222112222120000", 2, 2), " █\n█ \n");
+    assert_eq!(part2_sized("0222112222120000", 2, 2), " █\n█ ");
 
     assert_eq!(part2(include_str!("day08_input.txt")),
-"███   ██  ███  ████ ███  \n█  █ █  █ █  █    █ █  █ \n███  █    █  █   █  ███  \n█  █ █    ███   █   █  █ \n█  █ █  █ █    █    █  █ \n███   ██  █    ████ ███  \n");
+"███   ██  ███  ████ ███  \n█  █ █  █ █  █    █ █  █ \n███  █    █  █   █  ███  \n█  █ █    ███   █   █  █ \n█  █ █  █ █    █    █  █ \n███   ██  █    ████ ███  ");
 }
