@@ -9,8 +9,8 @@ pub fn part1_patch(input_string: &str, patch: bool) -> String {
 
     if patch {
         // To do this, before running the program, replace position 1 with the value 12 and replace position 2 with the value 2.
-        program.patch(1, 12);
-        program.patch(2, 2);
+        program.write_memory(1, 12);
+        program.write_memory(2, 2);
     }
 
     program.run().to_string()
@@ -22,8 +22,8 @@ pub fn part2(input_string: &str) -> String {
     for noun in 0..=99 {
         for verb in 0..=99 {
             let mut program = initial_program.clone();
-            program.patch(1, noun);
-            program.patch(2, verb);
+            program.write_memory(1, noun);
+            program.write_memory(2, verb);
             if program.run() == 19_690_720 {
                 return (100 * noun + verb).to_string();
             }

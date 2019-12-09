@@ -1,13 +1,14 @@
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone, Debug)]
 pub struct Program {
-    memory: Vec<i64>,
+    memory: HashMap<usize, i64>,
     instruction_pointer: usize,
     pub output_values: Vec<i64>,
     input_values: VecDeque<i64>,
     halted: bool,
     requires_input_to: Option<usize>,
+    relative_base: i64,
 }
 
 impl Program {
@@ -16,12 +17,14 @@ impl Program {
             memory: input
                 .split(',')
                 .map(|s| s.parse::<i64>().unwrap())
+                .enumerate()
                 .collect(),
             instruction_pointer: 0,
             output_values: Vec::new(),
             input_values: VecDeque::new(),
             halted: false,
             requires_input_to: None,
+            relative_base: 0,
         }
     }
 
@@ -37,64 +40,69 @@ impl Program {
         while !self.halted && self.requires_input_to == None {
             self.evaluate();
         }
-        self.memory[0]
+        self.read_memory(0)
     }
 
     pub fn input(&mut self, input_value: i64) {
         if let Some(save_address) = self.requires_input_to {
-            self.memory[save_address] = input_value;
+            self.write_memory(save_address, input_value);
             self.requires_input_to = None;
         } else {
             self.input_values.push_back(input_value);
         }
     }
 
-    pub fn patch(&mut self, index: usize, value: i64) {
-        self.memory[index] = value;
+    fn parameter_mode(opcode_and_parameter_modes: i64, position: u32) -> u8 {
+        let divider = 10_i64.pow(position + 1);
+        ((opcode_and_parameter_modes / divider) % 10) as u8
     }
 
     fn parameter_value(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> i64 {
-        fn is_immediate(opcode_and_parameter_modes: i64, position: u32) -> bool {
-            let divider = 10_i64.pow(position + 1);
-            (opcode_and_parameter_modes / divider) % 10 == 1
-        }
-
-        let parameter = self.memory[self.instruction_pointer + parameter_position as usize];
-        if is_immediate(opcode_and_parameter_modes, parameter_position) {
-            parameter
-        } else {
-            self.memory[parameter as usize]
+        let parameter = self.read_memory(self.instruction_pointer + parameter_position as usize);
+        let mode = Program::parameter_mode(opcode_and_parameter_modes, parameter_position);
+        match mode {
+            1 => parameter,
+            2 => self.read_memory((parameter + self.relative_base) as usize),
+            _ => self.read_memory(parameter as usize),
         }
     }
 
     fn evaluate(&mut self) {
-        let opcode_and_parameter_modes = self.memory[self.instruction_pointer];
+        let opcode_and_parameter_modes = self.read_memory(self.instruction_pointer);
         let opcode = opcode_and_parameter_modes % 100;
         match opcode {
             1 | 2 => {
                 let parameter1 = self.parameter_value(opcode_and_parameter_modes, 1);
                 let parameter2 = self.parameter_value(opcode_and_parameter_modes, 2);
-                let output_location = self.memory[self.instruction_pointer + 3] as usize;
-                self.memory[output_location] = if opcode == 1 {
-                    parameter1 + parameter2
-                } else {
-                    parameter1 * parameter2
-                };
+                let mut output_location = self.read_memory(self.instruction_pointer + 3);
+                if Program::parameter_mode(opcode_and_parameter_modes, 3) == 2 {
+                    output_location += self.relative_base;
+                }
+                self.write_memory(
+                    output_location as usize,
+                    if opcode == 1 {
+                        parameter1 + parameter2
+                    } else {
+                        parameter1 * parameter2
+                    },
+                );
                 self.instruction_pointer += 4;
             }
             3 => {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
-                let save_address = self.memory[self.instruction_pointer + 1];
-                if self.input_values.is_empty() {
-                    self.requires_input_to = Some(save_address as usize);
+                let mut save_address = self.read_memory(self.instruction_pointer + 1);
+                if Program::parameter_mode(opcode_and_parameter_modes, 1) == 2 {
+                    save_address += self.relative_base;
+                }
+                if let Some(input_value) = self.input_values.pop_front() {
+                    self.write_memory(save_address as usize, input_value);
                 } else {
-                    self.memory[save_address as usize] =
-                        self.input_values.pop_front().expect("No available input");
+                    self.requires_input_to = Some(save_address as usize);
                 }
                 self.instruction_pointer += 2;
             }
             4 => {
-                // Takes a single integer as input and saves it to the address given by its only parameter.
+                // Opcode 4 outputs the value of its only parameter.
                 self.output_values
                     .push(self.parameter_value(opcode_and_parameter_modes, 1));
                 self.instruction_pointer += 2;
@@ -128,9 +136,16 @@ impl Program {
                     0
                 };
 
-                let save_address = self.memory[self.instruction_pointer + 3];
-                self.memory[save_address as usize] = output_value;
+                let mut save_address = self.read_memory(self.instruction_pointer + 3);
+                if Program::parameter_mode(opcode_and_parameter_modes, 3) == 2 {
+                    save_address += self.relative_base;
+                }
+                self.write_memory(save_address as usize, output_value);
                 self.instruction_pointer += 4;
+            }
+            9 => {
+                self.relative_base += self.parameter_value(opcode_and_parameter_modes, 1);
+                self.instruction_pointer += 2;
             }
             99 => {
                 self.halted = true;
@@ -139,5 +154,17 @@ impl Program {
                 panic!("Invalid opcode: {}", opcode);
             }
         }
+    }
+
+    fn read_memory(&self, address: usize) -> i64 {
+        if let Some(&value) = self.memory.get(&address) {
+            value
+        } else {
+            0
+        }
+    }
+
+    pub fn write_memory(&mut self, address: usize, value: i64) {
+        self.memory.insert(address, value);
     }
 }
