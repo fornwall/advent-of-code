@@ -11,6 +11,11 @@ pub struct Program {
     relative_base: i64,
 }
 
+enum Parameter {
+    Value(i64),
+    Address(usize),
+}
+
 impl Program {
     pub fn parse(input: &str) -> Program {
         Program {
@@ -52,18 +57,34 @@ impl Program {
         }
     }
 
-    fn parameter_mode(opcode_and_parameter_modes: i64, position: u32) -> u8 {
-        let divider = 10_i64.pow(position + 1);
-        ((opcode_and_parameter_modes / divider) % 10) as u8
+    fn parameter_mode(
+        &self,
+        opcode_and_parameter_modes: i64,
+        parameter_position: u32,
+    ) -> Parameter {
+        let parameter = self.read_memory(self.instruction_pointer + parameter_position as usize);
+        let divider = 10_i64.pow(parameter_position + 1);
+        let mode = ((opcode_and_parameter_modes / divider) % 10) as u8;
+        match mode {
+            1 => Parameter::Value(parameter),
+            2 => Parameter::Address((parameter + self.relative_base) as usize),
+            _ => Parameter::Address(parameter as usize),
+        }
+    }
+
+    fn output_location(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> usize {
+        if let Parameter::Address(location) =
+            self.parameter_mode(opcode_and_parameter_modes, parameter_position)
+        {
+            return location;
+        }
+        panic!("Output is not by address");
     }
 
     fn parameter_value(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> i64 {
-        let parameter = self.read_memory(self.instruction_pointer + parameter_position as usize);
-        let mode = Program::parameter_mode(opcode_and_parameter_modes, parameter_position);
-        match mode {
-            1 => parameter,
-            2 => self.read_memory((parameter + self.relative_base) as usize),
-            _ => self.read_memory(parameter as usize),
+        match self.parameter_mode(opcode_and_parameter_modes, parameter_position) {
+            Parameter::Value(value) => value,
+            Parameter::Address(location) => self.read_memory(location),
         }
     }
 
@@ -74,10 +95,7 @@ impl Program {
             1 | 2 => {
                 let parameter1 = self.parameter_value(opcode_and_parameter_modes, 1);
                 let parameter2 = self.parameter_value(opcode_and_parameter_modes, 2);
-                let mut output_location = self.read_memory(self.instruction_pointer + 3);
-                if Program::parameter_mode(opcode_and_parameter_modes, 3) == 2 {
-                    output_location += self.relative_base;
-                }
+                let output_location = self.output_location(opcode_and_parameter_modes, 3);
                 self.write_memory(
                     output_location as usize,
                     if opcode == 1 {
@@ -90,14 +108,11 @@ impl Program {
             }
             3 => {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
-                let mut save_address = self.read_memory(self.instruction_pointer + 1);
-                if Program::parameter_mode(opcode_and_parameter_modes, 1) == 2 {
-                    save_address += self.relative_base;
-                }
+                let output_location = self.output_location(opcode_and_parameter_modes, 1);
                 if let Some(input_value) = self.input_values.pop_front() {
-                    self.write_memory(save_address as usize, input_value);
+                    self.write_memory(output_location as usize, input_value);
                 } else {
-                    self.requires_input_to = Some(save_address as usize);
+                    self.requires_input_to = Some(output_location as usize);
                 }
                 self.instruction_pointer += 2;
             }
@@ -136,11 +151,8 @@ impl Program {
                     0
                 };
 
-                let mut save_address = self.read_memory(self.instruction_pointer + 3);
-                if Program::parameter_mode(opcode_and_parameter_modes, 3) == 2 {
-                    save_address += self.relative_base;
-                }
-                self.write_memory(save_address as usize, output_value);
+                let output_location = self.output_location(opcode_and_parameter_modes, 3);
+                self.write_memory(output_location as usize, output_value);
                 self.instruction_pointer += 4;
             }
             9 => {
