@@ -16,12 +16,9 @@ pub fn parse_points(input_string: &str) -> Vec<(usize, usize)> {
         .flat_map(|(row, line)| {
             line.chars()
                 .enumerate()
-                .filter_map(move |(col, character)| {
-                    if character == '#' {
-                        Some((col, row))
-                    } else {
-                        None
-                    }
+                .filter_map(move |(col, character)| match character {
+                    '#' => Some((col, row)),
+                    _ => None,
                 })
         })
         .collect::<Vec<(usize, usize)>>()
