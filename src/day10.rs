@@ -21,7 +21,7 @@ pub fn parse_points(input_string: &str) -> Vec<(usize, usize)> {
                     _ => None,
                 })
         })
-        .collect::<Vec<(usize, usize)>>()
+        .collect()
 }
 
 /// Return (max_seen, (x, y)) of station.
