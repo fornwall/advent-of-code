@@ -13,6 +13,7 @@ crate-type = ["cdylib", "rlib"]
 [profile.release]
 lto = true
 panic = 'abort'
+codegen-units = 1
 
 [dependencies]
 bytecount = "*"
