@@ -98,18 +98,23 @@ pub fn part2_nth(input_string: &str, nth: u32) -> (i64, i64) {
 
     let mut destroyed_count = 0;
     loop {
-        if let Some(result) = points_grouped_by_direction.iter_mut().find_map(|points| {
-            if let Some(destroyed) = points.pop() {
-                destroyed_count += 1;
-                if destroyed_count == nth {
-                    let result_x = destroyed.0 + base_location.0 as i64;
-                    let result_y = destroyed.1 + base_location.1 as i64;
-                    return Some((result_x, result_y));
-                }
+        let mut i = 0;
+        while i != points_grouped_by_direction.len() {
+            let points = &mut points_grouped_by_direction[i];
+
+            let destroyed = points.pop().unwrap();
+            destroyed_count += 1;
+            if destroyed_count == nth {
+                let result_x = destroyed.0 + base_location.0 as i64;
+                let result_y = destroyed.1 + base_location.1 as i64;
+                return (result_x, result_y);
             }
-            None
-        }) {
-            break result;
+
+            if points.is_empty() {
+                points_grouped_by_direction.remove(i);
+            } else {
+                i += 1;
+            }
         }
     }
 }
