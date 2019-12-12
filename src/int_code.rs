@@ -169,11 +169,7 @@ impl Program {
     }
 
     fn read_memory(&self, address: usize) -> i64 {
-        if let Some(&value) = self.memory.get(&address) {
-            value
-        } else {
-            0
-        }
+        *self.memory.get(&address).unwrap_or(&0i64)
     }
 
     pub fn write_memory(&mut self, address: usize, value: i64) {
