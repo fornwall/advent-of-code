@@ -1,6 +1,22 @@
 use crate::int_code::Program;
 use std::collections::HashMap;
 
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+enum Color {
+    Black = 0,
+    White = 1,
+}
+
+impl Color {
+    fn from(value: i64) -> Color {
+        match value {
+            0 => Color::Black,
+            1 => Color::White,
+            _ => panic!("Invalid value: {}", value),
+        }
+    }
+}
+
 enum Direction {
     Up,
     Right,
@@ -9,7 +25,7 @@ enum Direction {
 }
 
 impl Direction {
-    fn turn_right(&self) -> Direction {
+    fn turn_right(self) -> Direction {
         match self {
             Direction::Up => Direction::Right,
             Direction::Right => Direction::Down,
@@ -18,7 +34,7 @@ impl Direction {
         }
     }
 
-    fn turn_left(&self) -> Direction {
+    fn turn_left(self) -> Direction {
         match self {
             Direction::Up => Direction::Left,
             Direction::Right => Direction::Up,
@@ -28,41 +44,34 @@ impl Direction {
     }
 }
 
-fn run(input_string: &str, initial_color: u8) -> HashMap<(i32, i32), u8> {
+fn run(input_string: &str, initial_color: Color) -> HashMap<(i32, i32), Color> {
     let mut program = Program::parse(input_string);
-    let mut painted: HashMap<(i32, i32), u8> = HashMap::new();
+    let mut painted: HashMap<(i32, i32), Color> = HashMap::new();
     let mut position = (0, 0);
     let mut current_direction = Direction::Up;
 
-    if initial_color == 1 {
+    if initial_color == Color::White {
         painted.insert(position, initial_color);
     }
 
     loop {
-        let current_color = if let Some(&color) = painted.get(&position) {
-            color
-        } else {
-            0
-        };
-
-        program.input(current_color as i64);
+        program.input(*painted.get(&position).unwrap_or(&Color::Black) as i64);
         program.run();
 
         if program.is_halted() {
             break;
         }
 
-        let painted_color = program.output_values[0];
+        let painted_color = Color::from(program.output_values[0]);
         let turn_direction = program.output_values[1];
         program.output_values.clear();
 
-        assert!(painted_color == 0 || painted_color == 1);
-        painted.insert(position, painted_color as u8);
+        painted.insert(position, painted_color);
 
         current_direction = match turn_direction {
             0 => current_direction.turn_left(),
             1 => current_direction.turn_right(),
-            _ => panic!("Invalid direction"),
+            _ => panic!("Invalid direction: {}", turn_direction),
         };
 
         match current_direction {
@@ -77,11 +86,11 @@ fn run(input_string: &str, initial_color: u8) -> HashMap<(i32, i32), u8> {
 }
 
 pub fn part1(input_string: &str) -> String {
-    run(input_string, 0).len().to_string()
+    run(input_string, Color::Black).len().to_string()
 }
 
 pub fn part2(input_string: &str) -> String {
-    let painted = run(input_string, 1);
+    let painted = run(input_string, Color::White);
     let mut min_x = std::i32::MAX;
     let mut max_x = std::i32::MIN;
     let mut min_y = std::i32::MAX;
@@ -96,7 +105,7 @@ pub fn part2(input_string: &str) -> String {
     let mut result = String::new();
     for y in (min_y..=max_y).rev() {
         for x in min_x..=max_x {
-            result.push(if let Some(&1) = painted.get(&(x, y)) {
+            result.push(if let Some(&Color::White) = painted.get(&(x, y)) {
                 '█'
             } else {
                 ' '
