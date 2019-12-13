@@ -62,9 +62,9 @@ impl Moons {
             }
         }
 
-        for i in 0..4 {
-            for k in 0..3 {
-                self.positions[i][k] += self.velocities[i][k];
+        for (i, position) in self.positions.iter_mut().enumerate() {
+            for (k, p) in position.iter_mut().enumerate() {
+                *p += self.velocities[i][k];
             }
         }
     }
@@ -96,7 +96,7 @@ pub fn part2(input_string: &str) -> String {
     let mut cycles: [Option<usize>; 3] = [None; 3];
 
     let mut step = 0;
-    while cycles.iter().filter(|x| x.is_none()).count() > 0 {
+    while cycles.iter().any(|x| x.is_none()) {
         moons.step();
         step += 1;
 
