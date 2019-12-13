@@ -1,17 +1,18 @@
 use crate::int_code::Program;
 
-pub fn part1(input_string: &str) -> String {
+fn run_with_input(input_string: &str, input: i64) -> String {
     let mut program = Program::parse(input_string);
-    program.input(1);
+    program.input(input);
     program.run();
     program.output_values.last().unwrap().to_string()
 }
 
+pub fn part1(input_string: &str) -> String {
+    run_with_input(input_string, 1)
+}
+
 pub fn part2(input_string: &str) -> String {
-    let mut program = Program::parse(input_string);
-    program.input(5);
-    program.run();
-    program.output_values.last().unwrap().to_string()
+    run_with_input(input_string, 5)
 }
 
 #[test]
