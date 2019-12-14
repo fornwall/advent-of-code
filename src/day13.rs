@@ -16,6 +16,8 @@ pub fn part1(input_string: &str) -> String {
 }
 
 fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
+    let mut output = String::new();
+    output.push_str("\x1b[2J\x1b[H");
     let mut min_x = std::i64::MAX;
     let mut max_x = std::i64::MIN;
     let mut min_y = std::i64::MAX;
@@ -27,7 +29,7 @@ fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
         max_y = std::cmp::max(max_y, y);
     }
 
-    println!("Score: {}", current_score);
+    output.push_str(format!("Score: {}\n", current_score).as_str());
     for y in min_y..=max_y {
         for x in min_x..=max_x {
             let character = match tiles.get(&(x, y)) {
@@ -37,11 +39,12 @@ fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
                 Some(4) => '○',
                 _ => ' ',
             };
-            print!("{}", character);
+            output.push(character);
         }
-        println!();
+        output.push('\n');
     }
-    println!();
+    println!("{}", output);
+    std::thread::sleep(std::time::Duration::from_millis(10));
 }
 
 pub fn part2(input_string: &str) -> String {
