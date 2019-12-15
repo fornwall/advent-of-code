@@ -1,41 +1,65 @@
-const fs = require('fs');
-const https = require('https')
+const isDeno = typeof Deno === 'object';
 
-const day = parseInt(process.argv[2]);
-const part = parseInt(process.argv[3]);
-if (!(day >= 1 && day <= 25)) {
-    console.log('Invalid day - must be integer between 1 and 25');
-    process.exit(1);
-} else if (!(part >= 1 && part <= 2)) {
-    console.log('Invalid part - must be 1 or 2');
-    process.exit(1);
+function exitProcess(message) {
+	console.log(message);
+	if (isDeno) {
+		Deno.exit(1);
+	} else {
+		process.exit(1);
+	}
 }
 
-const input = fs.readFileSync(0, 'utf8');
+function getArgv() {
+	if (isDeno) {
+		return Deno.argv;
+	} else {
+		return process.argv;
+	}
+}
+
+function readStdin() {
+	if (isDeno) {
+		return Deno.readSync(Deno.stdin.rid);
+	} else {
+		const fs = require('fs');
+		return fs.readFileSync(0, 'utf8');
+	}
+}
+
+const argv = getArgv();
+const day = parseInt(argv[2]);
+const part = parseInt(argv[3]);
+if (!(day >= 1 && day <= 25)) {
+    exitProcess('Invalid day - must be integer between 1 and 25');
+} else if (!(part >= 1 && part <= 2)) {
+    exitProcess('Invalid part - must be 1 or 2');
+}
+
+const input = readStdin();
 
 function solve(wasmCodeBuffer, day, part, input_buffer) {
     const wasmModule = new WebAssembly.Module(wasmCodeBuffer);
     const wasmInstance = new WebAssembly.Instance(wasmModule);
     const wasm = wasmInstance.exports;
 
-    const retptr = 8;
-      const inputLength = Buffer.byteLength(input);
-      const inputPointer = wasm.__wbindgen_malloc(inputLength);
-      Buffer.from(wasm.memory.buffer).write(input, inputPointer, inputLength);
-      const ret = wasm.solve(retptr, day, part, inputPointer, inputLength);
+    const outputPointer = 8;
+    const inputLength = Buffer.byteLength(input);
+    const inputPointer = wasm.__wbindgen_malloc(inputLength);
+    Buffer.from(wasm.memory.buffer).write(input, inputPointer, inputLength);
+    wasm.solve(outputPointer, day, part, inputPointer, inputLength);
 
-      const memi32 = new Int32Array(wasm.memory.buffer);
-      const ptr = memi32[retptr / 4 + 0];
-      const len = memi32[retptr / 4 + 1];
-      const v0 = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true })
+    const memi32 = new Int32Array(wasm.memory.buffer);
+    const ptr = memi32[outputPointer / 4 + 0];
+    const len = memi32[outputPointer / 4 + 1];
+    const outputString = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true })
         .decode(new Uint8Array(wasm.memory.buffer).subarray(ptr, ptr + len))
         .slice();
-      wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
+    // wasm.__wbindgen_free(memi32[outputPointer / 4 + 0], memi32[outputPointer / 4 + 1] * 1);
 
-      console.log(v0);
+    console.log(outputString);
 }
 
-
+const https = require('https')
 const req = https.request({
   hostname: 'fornwall.net',
   port: 443,
