@@ -6,8 +6,8 @@ const solve = require('advent_of_code_rs').solve;
 const day = parseInt(process.argv[2]);
 const part = parseInt(process.argv[3]);
 
-if (!(day >= 1 && day <= 24)) {
-    console.log('Invalid day - must be integer between 1 and 24');
+if (!(day >= 1 && day <= 25)) {
+    console.log('Invalid day - must be integer between 1 and 25');
     process.exit(1);
 } else if (!(part >= 1 && part <= 2)) {
     console.log('Invalid part - must be 1 or 2');
