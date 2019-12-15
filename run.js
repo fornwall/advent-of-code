@@ -1,7 +1,5 @@
-const https = require('https')
 const fs = require('fs');
-
-const encoder = new TextEncoder()
+const https = require('https')
 
 const day = parseInt(process.argv[2]);
 const part = parseInt(process.argv[3]);
@@ -15,26 +13,12 @@ if (!(day >= 1 && day <= 25)) {
 
 const input = fs.readFileSync(0, 'utf8');
 
-const options = {
-  hostname: 'fornwall.net',
-  port: 443,
-  path: '/advent-of-code-2019/571fb931d982e3ea292d.module.wasm',
-  method: 'GET'
-}
-
-var data = [];
-
-const req = https.request(options, res => {
-  res.on('data', chunk => {
-    data.push(chunk);
-  }).on('end', function() {
-    const wasmCode = Buffer.concat(data);
-    const wasmModule = new WebAssembly.Module(wasmCode);
+function solve(wasmCodeBuffer, day, part, input_buffer) {
+    const wasmModule = new WebAssembly.Module(wasmCodeBuffer);
     const wasmInstance = new WebAssembly.Instance(wasmModule);
     const wasm = wasmInstance.exports;
 
     const retptr = 8;
-    try {
       const inputLength = Buffer.byteLength(input);
       const inputPointer = wasm.__wbindgen_malloc(inputLength);
       Buffer.from(wasm.memory.buffer).write(input, inputPointer, inputLength);
@@ -49,16 +33,22 @@ const req = https.request(options, res => {
       wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
 
       console.log(v0);
-    } catch (e) {
-		console.log(e);
-    }
+}
+
+
+const req = https.request({
+  hostname: 'fornwall.net',
+  port: 443,
+  path: '/advent-of-code-2019/571fb931d982e3ea292d.module.wasm',
+  method: 'GET'
+}, res => {
+  const data = [];
+  res.on('data', chunk => {
+    data.push(chunk);
+  }).on('end', function() {
+    const wasmCode = Buffer.concat(data);
+    solve(wasmCode, day, part, input);
   });
 })
 
-
-req.on("error", (err) => {
-  console.log("Request problem", err);
-});
-
 req.end();
-
