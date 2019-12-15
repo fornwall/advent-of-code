@@ -22,26 +22,6 @@ const options = {
   method: 'GET'
 }
 
-function getStringFromWasm(wasm, ptr, len) {
-    return new TextDecoder('utf-8', { ignoreBOM: true, fatal: true })
-        .decode(new Uint8Array(wasm.memory.buffer).subarray(ptr, ptr + len));
-}
-let cachegetNodeBufferMemory = null;
-function getNodeBufferMemory(wasm) {
-    if (cachegetNodeBufferMemory === null || cachegetNodeBufferMemory.buffer !== wasm.memory.buffer) {
-        cachegetNodeBufferMemory = Buffer.from(wasm.memory.buffer);
-    }
-    return cachegetNodeBufferMemory;
-}
-let WASM_VECTOR_LEN = 0;
-function passStringToWasm(wasm, arg) {
-    const len = Buffer.byteLength(arg);
-    const ptr = wasm.__wbindgen_malloc(len);
-    getNodeBufferMemory(wasm).write(arg, ptr, len);
-    WASM_VECTOR_LEN = len;
-    return ptr;
-}
-
 var data = [];
 
 const req = https.request(options, res => {
@@ -51,13 +31,21 @@ const req = https.request(options, res => {
     const wasmCode = Buffer.concat(data);
     const wasmModule = new WebAssembly.Module(wasmCode);
     const wasmInstance = new WebAssembly.Instance(wasmModule);
+    const wasm = wasmInstance.exports;
+
+    const retptr = 8;
     try {
-      const wasm = wasmInstance.exports;
-      const retptr = 8;
-      const ret = wasm.solve(retptr, day, part, passStringToWasm(wasm, input), WASM_VECTOR_LEN);
+      const inputLength = Buffer.byteLength(input);
+      const inputPointer = wasm.__wbindgen_malloc(inputLength);
+      Buffer.from(wasm.memory.buffer).write(input, inputPointer, inputLength);
+      const ret = wasm.solve(retptr, day, part, inputPointer, inputLength);
 
       const memi32 = new Int32Array(wasm.memory.buffer);
-      const v0 = getStringFromWasm(wasm, memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
+      const ptr = memi32[retptr / 4 + 0];
+      const len = memi32[retptr / 4 + 1];
+      const v0 = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true })
+        .decode(new Uint8Array(wasm.memory.buffer).subarray(ptr, ptr + len))
+        .slice();
       wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
 
       console.log(v0);
