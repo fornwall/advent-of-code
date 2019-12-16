@@ -21,7 +21,7 @@ install-wasm-target:
 create-html:
 	wasm-pack build --target browser --out-dir target/browser
 	cd wasm/html && \
-		rm -Rf node_modules package-lock.json && \
+		rm -Rf dist node_modules package-lock.json && \
 		npm install && \
 		webpack --config webpack.config.js
 	@echo wasm/html/dist/ has been created
@@ -31,6 +31,7 @@ serve-html: create-html
 
 publish-html: create-html
 	scp -r wasm/html/dist/* fornwall.net:www/advent-of-code-2019/
+	scp wasm/html/dist/*.wasm fornwall.net:www/advent-of-code-2019/solution.wasm
 
 publish-npm:
 	./wasm/publish-npm-module.sh
