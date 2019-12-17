@@ -42,6 +42,39 @@ pub fn tests_part1() {
     assert_eq!(part1(include_str!("day16_input.txt")), "37153056");
 }
 
+/// Length of input: 650
+/// We now repeat it 10000 times, so length is 6,500,000 (six and a half millions).
+/// "The first seven digits of your initial input signal also represent the message offset."
+/// Offset: 5,973,431
+///
+/// Matrix is _diagonal_:
+/// 1  0 -1  0 [0  0  1  1  0  0  -1 -1] [repeating and extending]
+/// 0  1  1  0  0 -1 -1  0  0  [..]
+/// 0  0  1  1  1  0  0  0 -1 -1 -1 [...
+///
+/// The offset is huge, so simple pattern at end:
+/// 5,973,430 zeros, 5,973,431 ones.
+/// - Simplifying: Diagonal (so only depends on later digits)
+/// - Just ones: So simple sum (and mod 10) on later digits.
+/// - Repeating: Input is repeated every 650 digits.
+///   Every time input is repeated just adds one digit: sum(digits)%650.
+///   Last 650 digits easy to compute (just matrix multiply 100 times).
+///
+/// 1 1 1 1 1 1   d1
+/// 0 1 1 1 1 1   d2
+/// 0 0 1 1 1 1 * d3
+/// 0 0 0 1 1 1   d4
+/// 0 0 0 0 1 1   d5
+/// 0 0 0 0 0 1   d6
+/// [...]
+///
+/// First time:
+/// repeated_digits={...} // Array of 650 digits.
+/// REPEAT_LENGTH=650
+/// LENGTH=6,500,000
+/// OFFSET=5,973,431
+/// digits[OFFSET]    = sum(650_digits) * (LENGTH-OFFSET)/REPEAT_LENGTH + SUM(digits[0..(OFFSET%REPEAT_LENGTH)])
+/// digits[OFFSET+1] =
 #[test]
 fn tests_part2() {
     assert_eq!(part2(""), "");
