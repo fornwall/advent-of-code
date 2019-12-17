@@ -57,6 +57,12 @@ impl Program {
         }
     }
 
+    pub fn input_string(&mut self, input_string: &str) {
+        input_string.chars().for_each(|c| {
+            self.input(c as i64);
+        });
+    }
+
     fn parameter_mode(
         &self,
         opcode_and_parameter_modes: i64,
