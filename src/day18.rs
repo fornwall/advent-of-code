@@ -1,9 +1,40 @@
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 
+#[derive(Copy, Clone, Eq, PartialEq)]
+struct State {
+    steps: usize,
+    gathered_keys: u32,
+    position: u8,
+}
+
+impl Ord for State {
+    fn cmp(&self, other: &State) -> Ordering {
+        other
+            .steps
+            .cmp(&self.steps)
+            .then_with(|| self.gathered_keys.cmp(&other.gathered_keys))
+            .then_with(|| self.position.cmp(&other.position))
+    }
+}
+
+impl PartialOrd for State {
+    fn partial_cmp(&self, other: &State) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+struct Edge {
+    steps: usize,
+    needed_keys: u32,
+    other_key: u8,
+}
+
 pub fn part1(input_string: &str) -> String {
     let mut map: HashMap<(i32, i32), char> = HashMap::new();
+    let mut key_positions: HashMap<u8, (i32, i32)> = HashMap::new();
     // (position_x, position_y, bitset_of_keys):
     let mut position: (i32, i32, u32) = (0, 0, 0);
     let mut highest_key = 'a';
@@ -13,10 +44,12 @@ pub fn part1(input_string: &str) -> String {
             let char_to_insert = match c {
                 '@' => {
                     position = (x as i32, y as i32, 0);
+                    key_positions.insert(c as u8, (x as i32, y as i32));
                     '.'
                 }
                 'a'..='z' => {
                     highest_key = std::cmp::max(highest_key, c);
+                    key_positions.insert(c as u8, (x as i32, y as i32));
                     c
                 }
                 '#' => {
@@ -37,55 +70,144 @@ pub fn part1(input_string: &str) -> String {
         highest_key, all_keys_bitset
     );
 
-    let mut to_visit = VecDeque::new();
-    let mut visited = HashSet::new();
-    to_visit.push_back((position, 0));
-    visited.insert(position);
+    // Mapping to (other_key, needed_keys_to_reach, steps):
+    let mut key_edges: HashMap<u8, Vec<Edge>> = HashMap::new();
+    let mut positions_of_interest: Vec<u8> = (b'a'..=(highest_key as u8)).collect();
+    positions_of_interest.push(b'@');
+    for this_key in positions_of_interest {
+        // Find path from this key to all other keys.
+        let this_key_position = *key_positions.get(&this_key).unwrap();
 
-    while let Some(((position_x, position_y, taken_keys_bitset), steps)) = to_visit.pop_front() {
-        //println!("Visiting {}, {}, bitset={:b}, steps={}", position_x, position_y, taken_keys_bitset, steps);
-        'direction_loop: for &direction in DIRECTIONS.iter() {
-            let mut new_taken_keys_bitset = taken_keys_bitset;
-            let new_position = (position_x + direction.0, position_y + direction.1);
-            match map.get(&new_position) {
-                Some(&char_at_position) if char_at_position >= 'A' && char_at_position <= 'Z' => {
-                    // Check if door open (=key taken).
-                    let bit_value = 1 << (char_at_position as u8 - b'A');
-                    if bit_value & taken_keys_bitset == bit_value {
-                        // Has key.
-                        //println!("Yes - can enter door {} with bitset {:b}, steps={}", char_at_position, taken_keys_bitset, steps + 1);
-                    } else {
-                        //println!("NO - cannot enter door {} with bitset {:b}", char_at_position, taken_keys_bitset);
-                        continue 'direction_loop;
+        let mut to_visit = VecDeque::new();
+        let mut visited = HashSet::new();
+        // (position, bitset_of_needed_keys, steps):
+        to_visit.push_back((this_key_position, 0 as u32, 0 as u32));
+        visited.insert(this_key_position);
+
+        while let Some((position, needed_keys, steps)) = to_visit.pop_front() {
+            'key_direction_loop: for direction in DIRECTIONS.iter() {
+                let new_position = (position.0 + direction.0, position.1 + direction.1);
+                let mut new_needed_keys = needed_keys;
+                let mut found_key = None;
+                match map.get(&new_position) {
+                    Some(&char_at_position)
+                        if char_at_position >= 'A' && char_at_position <= 'Z' =>
+                    {
+                        let bit_value = 1 << (char_at_position as u8 - b'A');
+                        new_needed_keys |= bit_value;
+                    }
+                    Some(&char_at_position)
+                        if char_at_position >= 'a' && char_at_position <= 'z' =>
+                    {
+                        if char_at_position as u8 != this_key {
+                            found_key = Some(char_at_position as u8);
+                        }
+                    }
+                    Some('.') | Some('@') => {
+                        // Free to enter.
+                    }
+                    Some('#') | None => {
+                        continue 'key_direction_loop;
+                    }
+                    Some(c) => {
+                        panic!("Invalid map entry: {}", c);
                     }
                 }
-                Some(&char_at_position) if char_at_position >= 'a' && char_at_position <= 'z' => {
-                    // Add key.
-                    let bit_value = 1 << (char_at_position as u8 - b'a');
-                    new_taken_keys_bitset |= bit_value;
-                    if new_taken_keys_bitset == all_keys_bitset {
-                        return (steps + 1).to_string();
-                    }
-                    //println!("After key={}, bitset={:b}, steps={}", char_at_position, taken_keys_bitset, steps+1);
-                }
-                Some('.') => {
-                    // Free to enter.
-                }
-                Some(c) => {
-                    panic!("Invalid map entry: {}", c);
-                }
-                None => {
-                    continue 'direction_loop;
-                }
-            }
 
-            let new_state = (new_position.0, new_position.1, new_taken_keys_bitset);
-            if visited.insert(new_state) {
-                to_visit.push_back((new_state, steps + 1));
+                let new_steps = steps + 1;
+                let new_state = (new_position, new_needed_keys, new_steps);
+                if visited.insert(new_position) {
+                    to_visit.push_back(new_state);
+
+                    if let Some(other_key) = found_key {
+                        key_edges
+                            .entry(this_key)
+                            .or_insert_with(Vec::new)
+                            .push(Edge {
+                                steps: new_steps as usize,
+                                needed_keys: new_needed_keys,
+                                other_key,
+                            });
+                    }
+                }
             }
         }
     }
-    String::from("")
+
+    /*
+    for (key, value) in key_edges {
+        println!("{}", key as char);
+        for &(other_key, needed_keys, steps) in value.iter() {
+            println!("  To reach {} at {} steps, these keys are needed: {:b}", other_key as char, steps, needed_keys);
+        }
+    }
+    */
+
+    shortest_path(&key_edges, b'@', all_keys_bitset)
+        .unwrap()
+        .to_string()
+}
+
+fn shortest_path(adj_list: &HashMap<u8, Vec<Edge>>, start: u8, all_keys: u32) -> Option<usize> {
+    // From (key_at_position, gathered_keys) to steps required to reach here.
+    let mut cost_for_state: HashMap<(u8, u32), usize> = HashMap::new();
+    let mut heap = BinaryHeap::new();
+
+    // We're at `start`, with a zero cost
+    heap.push(State {
+        steps: 0,
+        position: start,
+        gathered_keys: 0,
+    });
+
+    // Examine the frontier with lower cost nodes first (min-heap)
+    while let Some(State {
+        steps,
+        gathered_keys,
+        position,
+    }) = heap.pop()
+    {
+        // Alternatively we could have continued to find all shortest paths
+        if gathered_keys == all_keys {
+            return Some(steps);
+        }
+
+        // Important as we may have already found a better way
+        //FIXME: needed??? if steps > dist[position] { continue; }
+
+        // For each node we can reach, see if we can find a way with
+        // a lower cost going through this node
+        if let Some(edges) = adj_list.get(&position) {
+            for edge in edges {
+                if edge.other_key == b'@' {
+                    // Never visit starting position again.
+                    continue;
+                }
+
+                let next = State {
+                    steps: steps + edge.steps,
+                    position: edge.other_key,
+                    gathered_keys: gathered_keys | (1 << ((edge.other_key - b'a') as u32)),
+                };
+
+                if let Some(&existing_cost) =
+                    cost_for_state.get(&(edge.other_key, next.gathered_keys))
+                {
+                    if existing_cost <= next.steps {
+                        continue;
+                    }
+                }
+                if edge.needed_keys & gathered_keys == edge.needed_keys {
+                    heap.push(next);
+                    // Relaxation, we have now found a better way
+                    cost_for_state.insert((edge.other_key, next.gathered_keys), next.steps);
+                }
+            }
+        }
+    }
+
+    // Goal not reachable
+    None
 }
 
 pub fn part2(_input_string: &str) -> String {
@@ -97,8 +219,8 @@ pub fn tests_part1() {
     assert_eq!(
         part1(
             "#########
-#b.A.@.a#
-#########"
+    #b.A.@.a#
+    #########"
         ),
         "8"
     );
