@@ -32,16 +32,6 @@ pub fn part1(input_string: &str) -> String {
         .collect()
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
-}
-
-#[test]
-pub fn tests_part1() {
-    assert_eq!(part1("80871224585914546619083218645595"), "24176176");
-    assert_eq!(part1(include_str!("day16_input.txt")), "37153056");
-}
-
 /// Length of input: 650
 /// We now repeat it 10000 times, so length is 6,500,000 (six and a half millions).
 /// "The first seven digits of your initial input signal also represent the message offset."
@@ -68,16 +58,44 @@ pub fn tests_part1() {
 /// 0 0 0 0 0 1   d6
 /// [...]
 ///
-/// First time:
-/// repeated_digits={...} // Array of 650 digits.
-/// REPEAT_LENGTH=650
-/// LENGTH=6,500,000
-/// OFFSET=5,973,431
-/// digits[OFFSET]    = sum(650_digits) * (LENGTH-OFFSET)/REPEAT_LENGTH + SUM(digits[0..(OFFSET%REPEAT_LENGTH)])
-/// digits[OFFSET+1] =
+/// Starting from the end, the last element is always the same.
+/// The next element (second latest) is itself plus last element.
+/// The next element (third latest) is itself plus second latest and last element=itself + previous element!
+pub fn part2(input_string: &str) -> String {
+    let offset = input_string[0..7].parse::<usize>().unwrap();
+    let digits: Vec<i32> = input_string.bytes().map(|b| (b - 48) as i32).collect();
+
+    let times_to_repeat = 10000;
+    let end_sequence_length = input_string.len() * times_to_repeat - offset as usize;
+
+    let mut end_sequence: Vec<i32> = digits
+        .into_iter()
+        .cycle()
+        .skip(offset)
+        .take(end_sequence_length)
+        .collect();
+
+    for _ in 0..100 {
+        for i in 0..(end_sequence.len() - 1) {
+            let index = end_sequence_length - i - 1;
+            end_sequence[index - 1] = (end_sequence[index - 1] + end_sequence[index]) % 10;
+        }
+    }
+
+    end_sequence
+        .iter()
+        .take(8)
+        .map(|&b| ((b + 48) as u8) as char)
+        .collect()
+}
+
+#[test]
+pub fn tests_part1() {
+    assert_eq!(part1("80871224585914546619083218645595"), "24176176");
+    assert_eq!(part1(include_str!("day16_input.txt")), "37153056");
+}
+
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(""), "");
-
-    // assert_eq!(part2(include_str!("day16_input.txt")), "");
+    assert_eq!(part2(include_str!("day16_input.txt")), "60592199");
 }
