@@ -31,19 +31,20 @@ struct Edge {
     needed_keys: u32,
     other_key: u8,
 }
-
 pub fn part1(input_string: &str) -> String {
+    part1_usize(input_string).to_string()
+}
+
+pub fn part1_usize(input_string: &str) -> usize {
     let mut map: HashMap<(i32, i32), char> = HashMap::new();
     let mut key_positions: HashMap<u8, (i32, i32)> = HashMap::new();
-    // (position_x, position_y, bitset_of_keys):
-    let mut position: (i32, i32, u32) = (0, 0, 0);
+    //let mut position: (i32, i32, u32) = (0, 0, 0);
     let mut highest_key = 'a';
 
     input_string.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
             let char_to_insert = match c {
                 '@' => {
-                    position = (x as i32, y as i32, 0);
                     key_positions.insert(c as u8, (x as i32, y as i32));
                     '.'
                 }
@@ -65,10 +66,6 @@ pub fn part1(input_string: &str) -> String {
     for c in b'a'..=(highest_key as u8) {
         all_keys_bitset |= 1 << (c as usize - 'a' as usize);
     }
-    println!(
-        "highest key={}, all_keys_bitset={:b}",
-        highest_key, all_keys_bitset
-    );
 
     // Mapping to (other_key, needed_keys_to_reach, steps):
     let mut key_edges: HashMap<u8, Vec<Edge>> = HashMap::new();
@@ -143,9 +140,7 @@ pub fn part1(input_string: &str) -> String {
     }
     */
 
-    shortest_path(&key_edges, b'@', all_keys_bitset)
-        .unwrap()
-        .to_string()
+    shortest_path(&key_edges, b'@', all_keys_bitset).unwrap()
 }
 
 fn shortest_path(adj_list: &HashMap<u8, Vec<Edge>>, start: u8, all_keys: u32) -> Option<usize> {
@@ -210,8 +205,48 @@ fn shortest_path(adj_list: &HashMap<u8, Vec<Edge>>, start: u8, all_keys: u32) ->
     None
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
+pub fn part2(input_string: &str) -> String {
+    let mut map_top_left = String::new();
+    let mut map_top_right = String::new();
+    let mut map_bottom_left = String::new();
+    let mut map_bottom_right = String::new();
+
+    let num_rows = input_string.lines().count();
+    let num_columns = input_string.lines().next().unwrap().len();
+    let center_y = num_rows / 2;
+    let center_x = num_columns / 2;
+
+    input_string.lines().enumerate().for_each(|(y, line)| {
+        line.chars().enumerate().for_each(|(x, c)| {
+            if y <= center_y {
+                if x <= center_x {
+                    &mut map_top_left
+                } else {
+                    &mut map_top_right
+                }
+            } else if x <= center_x {
+                &mut map_bottom_left
+            } else {
+                &mut map_bottom_right
+            }
+            .push(c);
+        });
+        map_top_left.push('\n');
+        map_top_right.push('\n');
+        map_bottom_left.push('\n');
+        map_bottom_right.push('\n');
+    });
+
+    println!("top left: {}", map_top_left);
+    println!("top right: {}", map_top_right);
+    println!("bottom left: {}", map_bottom_left);
+    println!("bottom right: {}", map_bottom_right);
+
+    let result = part1_usize(&map_top_left)
+        + part1_usize(&map_top_right)
+        + part1_usize(&map_bottom_left)
+        + part1_usize(&map_bottom_right);
+    result.to_string()
 }
 
 #[test]
@@ -241,7 +276,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(""), "");
-
-    // assert_eq!(part2(include_str!("day18_input.txt")), "");
+    assert_eq!(part2(include_str!("day18_input.txt")), "");
 }
