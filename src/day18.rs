@@ -31,6 +31,7 @@ struct Edge {
     needed_keys: u32,
     other_key: u8,
 }
+
 pub fn part1(input_string: &str) -> String {
     part1_usize(input_string).to_string()
 }
@@ -38,8 +39,7 @@ pub fn part1(input_string: &str) -> String {
 pub fn part1_usize(input_string: &str) -> usize {
     let mut map: HashMap<(i32, i32), char> = HashMap::new();
     let mut key_positions: HashMap<u8, (i32, i32)> = HashMap::new();
-    //let mut position: (i32, i32, u32) = (0, 0, 0);
-    let mut highest_key = 'a';
+    let mut found_keys = HashSet::new();
 
     input_string.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
@@ -49,7 +49,7 @@ pub fn part1_usize(input_string: &str) -> usize {
                     '.'
                 }
                 'a'..='z' => {
-                    highest_key = std::cmp::max(highest_key, c);
+                    found_keys.insert(c as u8);
                     key_positions.insert(c as u8, (x as i32, y as i32));
                     c
                 }
@@ -63,15 +63,14 @@ pub fn part1_usize(input_string: &str) -> usize {
     });
 
     let mut all_keys_bitset = 0 as u32;
-    for c in b'a'..=(highest_key as u8) {
+    for &c in found_keys.iter() {
         all_keys_bitset |= 1 << (c as usize - 'a' as usize);
     }
 
     // Mapping to (other_key, needed_keys_to_reach, steps):
     let mut key_edges: HashMap<u8, Vec<Edge>> = HashMap::new();
-    let mut positions_of_interest: Vec<u8> = (b'a'..=(highest_key as u8)).collect();
-    positions_of_interest.push(b'@');
-    for this_key in positions_of_interest {
+    found_keys.insert(b'@');
+    for &this_key in &found_keys {
         // Find path from this key to all other keys.
         let this_key_position = *key_positions.get(&this_key).unwrap();
 
@@ -90,8 +89,14 @@ pub fn part1_usize(input_string: &str) -> usize {
                     Some(&char_at_position)
                         if char_at_position >= 'A' && char_at_position <= 'Z' =>
                     {
-                        let bit_value = 1 << (char_at_position as u8 - b'A');
-                        new_needed_keys |= bit_value;
+                        let needed_key = char_at_position.to_ascii_lowercase();
+                        if found_keys.contains(&(needed_key as u8)) {
+                            // Only consider door as necessary if key is in quadrant.
+                            // Needed by part 4, where we can wait until key is picked
+                            // up in other quadrant.
+                            let bit_value = 1 << (char_at_position as u8 - b'A');
+                            new_needed_keys |= bit_value;
+                        }
                     }
                     Some(&char_at_position)
                         if char_at_position >= 'a' && char_at_position <= 'z' =>
@@ -131,15 +136,6 @@ pub fn part1_usize(input_string: &str) -> usize {
         }
     }
 
-    /*
-    for (key, value) in key_edges {
-        println!("{}", key as char);
-        for &(other_key, needed_keys, steps) in value.iter() {
-            println!("  To reach {} at {} steps, these keys are needed: {:b}", other_key as char, steps, needed_keys);
-        }
-    }
-    */
-
     shortest_path(&key_edges, b'@', all_keys_bitset).unwrap()
 }
 
@@ -167,18 +163,10 @@ fn shortest_path(adj_list: &HashMap<u8, Vec<Edge>>, start: u8, all_keys: u32) ->
             return Some(steps);
         }
 
-        // Important as we may have already found a better way
-        //FIXME: needed??? if steps > dist[position] { continue; }
-
         // For each node we can reach, see if we can find a way with
         // a lower cost going through this node
         if let Some(edges) = adj_list.get(&position) {
             for edge in edges {
-                if edge.other_key == b'@' {
-                    // Never visit starting position again.
-                    continue;
-                }
-
                 let next = State {
                     steps: steps + edge.steps,
                     position: edge.other_key,
@@ -218,6 +206,12 @@ pub fn part2(input_string: &str) -> String {
 
     input_string.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
+            let replaced_char = match (center_x as i32 - x as i32, center_y as i32 - y as i32) {
+                (0, 0) | (1, 0) | (-1, 0) | (0, 1) | (0, -1) => '#',
+                (1, 1) | (1, -1) | (-1, 1) | (-1, -1) => '@',
+                _ => c,
+            };
+
             if y <= center_y {
                 if x <= center_x {
                     &mut map_top_left
@@ -229,18 +223,16 @@ pub fn part2(input_string: &str) -> String {
             } else {
                 &mut map_bottom_right
             }
-            .push(c);
+            .push(replaced_char);
         });
-        map_top_left.push('\n');
-        map_top_right.push('\n');
-        map_bottom_left.push('\n');
-        map_bottom_right.push('\n');
+        if y <= center_y {
+            map_top_left.push('\n');
+            map_top_right.push('\n');
+        } else {
+            map_bottom_left.push('\n');
+            map_bottom_right.push('\n');
+        }
     });
-
-    println!("top left: {}", map_top_left);
-    println!("top right: {}", map_top_right);
-    println!("bottom left: {}", map_bottom_left);
-    println!("bottom right: {}", map_bottom_right);
 
     let result = part1_usize(&map_top_left)
         + part1_usize(&map_top_right)
@@ -276,5 +268,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day18_input.txt")), "");
+    assert_eq!(part2(include_str!("day18_input.txt")), "1878");
 }
