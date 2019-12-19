@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 pub fn part1(input_string: &str) -> String {
     let mut parts = input_string.trim().split('-');
     let from = parts.next().unwrap().parse::<i32>().unwrap();
@@ -11,10 +13,14 @@ pub fn part1(input_string: &str) -> String {
 
         while divider <= 100_000 {
             let digit = (i / divider) % 10;
-            if digit > last_digit {
-                continue 'outer;
-            } else if digit == last_digit {
-                two_digits_adjacent = true;
+            match digit.cmp(&last_digit) {
+                Ordering::Greater => {
+                    continue 'outer;
+                }
+                Ordering::Equal => {
+                    two_digits_adjacent = true;
+                }
+                _ => {}
             }
 
             last_digit = digit;
@@ -42,15 +48,19 @@ pub fn part2(input_string: &str) -> String {
 
         while divider <= 100_000 {
             let digit = (i / divider) % 10;
-            if digit > last_digit {
-                continue 'outer;
-            } else if digit == last_digit {
-                digits_adjacent_streak += 1;
-            } else {
-                if digits_adjacent_streak == 2 {
-                    two_digits_adjacent = true;
+            match digit.cmp(&last_digit) {
+                Ordering::Greater => {
+                    continue 'outer;
                 }
-                digits_adjacent_streak = 1;
+                Ordering::Equal => {
+                    digits_adjacent_streak += 1;
+                }
+                Ordering::Less => {
+                    if digits_adjacent_streak == 2 {
+                        two_digits_adjacent = true;
+                    }
+                    digits_adjacent_streak = 1;
+                }
             }
 
             last_digit = digit;
