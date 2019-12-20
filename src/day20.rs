@@ -6,7 +6,7 @@ const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 struct Maze {
     cols: usize,
     array: Vec<u8>,
-    portals: HashMap<(i32, i32), (i32, i32)>,
+    portals: HashMap<(i32, i32), ((i32, i32), i32)>,
     start_location: (i32, i32),
     end_location: (i32, i32),
 }
@@ -20,13 +20,13 @@ impl Maze {
     }
 
     fn set_tile(&mut self, x: usize, y: usize, tile: u8) {
-        //println!("setting x={},y={},tile={}, index={}, rows={}", x, y, tile as char, (x + self.rows*y), self.rows);
         self.array[x + self.cols * y] = tile;
     }
 
     fn parse(input: &str) -> Maze {
         let rows = input.chars().filter(|&c| c == '\n').count() + 1;
         let cols = input.lines().map(|line| line.len()).max().unwrap();
+        dbg!(rows, cols);
 
         let array = vec![b' '; rows * cols];
         let mut maze = Maze {
@@ -82,9 +82,20 @@ impl Maze {
 
                     match portal_name_to_location.entry(current_string.clone()) {
                         Entry::Occupied(other_location) => {
+                            let level_difference = if current_location.0 == 2
+                                || current_location.0 == (cols - 3) as i32
+                                || current_location.1 == 2
+                                || current_location.1 == (rows - 3) as i32
+                            {
+                                -1
+                            } else {
+                                1
+                            };
                             let other_location = *other_location.get();
-                            maze.portals.insert(current_location, other_location);
-                            maze.portals.insert(other_location, current_location);
+                            maze.portals
+                                .insert(current_location, (other_location, level_difference));
+                            maze.portals
+                                .insert(other_location, (current_location, -level_difference));
                         }
                         Entry::Vacant(vacant) => {
                             vacant.insert(current_location);
@@ -126,11 +137,13 @@ pub fn part1(input_string: &str) -> String {
         for new_location in DIRECTIONS
             .iter()
             .map(|&(dx, dy)| (visiting.0 + dx, visiting.1 + dy))
-            .chain(if let Some(&new_location) = maze.portals.get(&visiting) {
-                Some(new_location).into_iter()
-            } else {
-                None.into_iter()
-            })
+            .chain(
+                if let Some(&(new_location, _)) = maze.portals.get(&visiting) {
+                    Some(new_location).into_iter()
+                } else {
+                    None.into_iter()
+                },
+            )
         {
             if maze.tile_at(new_location.0, new_location.1) == b'.' && visited.insert(new_location)
             {
@@ -144,8 +157,43 @@ pub fn part1(input_string: &str) -> String {
     "No path found".to_string()
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
+pub fn part2(input_string: &str) -> String {
+    let maze = Maze::parse(input_string);
+
+    let mut to_visit = VecDeque::new();
+    let mut visited = HashSet::new();
+    // Contains ((x,y), distance, level):
+    to_visit.push_back((maze.start_location, 0, 0));
+    // Contains ((x,y), level):
+    visited.insert((maze.start_location, 0));
+
+    while let Some((visiting, distance, level)) = to_visit.pop_front() {
+        let new_distance = distance + 1;
+
+        for (new_location, level_difference) in DIRECTIONS
+            .iter()
+            .map(|&(dx, dy)| ((visiting.0 + dx, visiting.1 + dy), 0))
+            .chain(
+                if let Some(&(new_location, level_difference)) = maze.portals.get(&visiting) {
+                    Some((new_location, level_difference)).into_iter()
+                } else {
+                    None.into_iter()
+                },
+            )
+        {
+            let new_level = level + level_difference;
+            if new_level >= 0
+                && maze.tile_at(new_location.0, new_location.1) == b'.'
+                && visited.insert((new_location, new_level))
+            {
+                if new_location == maze.end_location && new_level == 0 {
+                    return new_distance.to_string();
+                }
+                to_visit.push_back((new_location, new_distance, new_level));
+            }
+        }
+    }
+    "No path found".to_string()
 }
 
 #[test]
@@ -156,7 +204,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(""), "");
-
-    // assert_eq!(part2(include_str!("day20_input.txt")), "");
+    assert_eq!(part2(include_str!("day20_input.txt")), "6362");
 }
