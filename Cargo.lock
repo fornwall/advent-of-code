@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 [[package]]
 name = "advent_of_code_rs"
-version = "2019.12.19"
+version = "2019.12.20"
 dependencies = [
  "bytecount 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-bindgen 0.2.55 (registry+https://github.com/rust-lang/crates.io-index)",
