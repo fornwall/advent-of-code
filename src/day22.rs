@@ -1,9 +1,7 @@
-use std::collections::VecDeque;
-
 pub fn part1(input_string: &str) -> String {
-    let mut deck = VecDeque::new();
+    let mut deck = Vec::new();
     for i in 0..10_007 {
-        deck.push_back(i);
+        deck.push(i);
     }
 
     for line in input_string.lines() {
@@ -16,17 +14,12 @@ pub fn part1(input_string: &str) -> String {
                 .unwrap()
                 .parse::<i32>()
                 .unwrap();
-            if how_many > 0 {
-                for _ in 0..how_many {
-                    let card_at_front = deck.pop_front().unwrap();
-                    deck.push_back(card_at_front);
-                }
+            let how_many = if how_many > 0 {
+                how_many
             } else {
-                for _ in 0..(how_many.abs()) {
-                    let card_at_back = deck.pop_back().unwrap();
-                    deck.push_front(card_at_back);
-                }
-            }
+                (10_007 - how_many.abs())
+            } as usize;
+            deck = [&deck[how_many..], &deck[..how_many]].concat();
         } else if line.starts_with("deal with") {
             let increment = line
                 .split_whitespace()
@@ -34,9 +27,9 @@ pub fn part1(input_string: &str) -> String {
                 .unwrap()
                 .parse::<usize>()
                 .unwrap();
-            let mut old_deck = deck.clone();
+            let old_deck = deck.clone();
             let mut current_index = 0;
-            while let Some(card_at_front) = old_deck.pop_front() {
+            for &card_at_front in old_deck.iter() {
                 deck[current_index] = card_at_front;
                 current_index = (current_index + increment) % deck.len();
             }
