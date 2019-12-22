@@ -12,6 +12,7 @@ document.getElementById("run_button").addEventListener("click", function() {
 
    input_element.addEventListener('input', function() {
       output_element.textContent = '';
+      output_element.classList.remove('blink');
    }, false);
 
 
@@ -23,4 +24,6 @@ document.getElementById("run_button").addEventListener("click", function() {
       message = 'ERROR: Invalid input or bug in solution';
    }
    output_element.textContent = message;
+   output_element.scrollIntoView();
+   output_element.classList.add('blink');
 });
