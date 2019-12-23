@@ -1,23 +1,22 @@
 use crate::int_code::Program;
 use std::collections::VecDeque;
 
-pub fn part1(input_string: &str) -> String {
-    const SIZE: i32 = 50;
-    let program = Program::parse(input_string);
+pub fn run_simulation(input_string: &str, part1: bool) -> String {
+    const SIZE: usize = 50;
 
-    let mut programs = Vec::new();
+    let mut programs = vec![Program::parse(input_string); 50];
     let mut input_queues = Vec::new();
 
-    for i in 0..SIZE {
-        let mut new_program = program.clone();
+    for (i, program) in programs.iter_mut().enumerate() {
         // Assign network address:
-        new_program.input(i as i64);
-        programs.push(new_program);
+        program.input(i as i64);
 
         let new_queue: VecDeque<(i64, i64)> = VecDeque::new();
         input_queues.push(new_queue);
     }
 
+    let mut last_packet_to_nat = (-1, -1);
+    let mut last_emitted_packet_from_nat = (-1, -1);
     loop {
         for i in 0..SIZE {
             let program = &mut programs[i as usize];
@@ -32,29 +31,49 @@ pub fn part1(input_string: &str) -> String {
             }
         }
 
+        let mut network_idle = true;
         for i in 0..SIZE {
             let program = &mut programs[i as usize];
             program.run();
 
             for j in (0..program.output_values.len()).step_by(3) {
+                network_idle = false;
+
                 let destination_address = program.output_values[j];
-                let x = program.output_values[j + 1];
-                let y = program.output_values[j + 2];
+                let packet = (program.output_values[j + 1], program.output_values[j + 2]);
 
                 if destination_address == 255 {
-                    return y.to_string();
+                    if part1 {
+                        return packet.1.to_string();
+                    } else {
+                        last_packet_to_nat = packet;
+                        continue;
+                    }
                 }
 
-                let destination_queue = &mut input_queues[destination_address as usize];
-                destination_queue.push_back((x, y));
+                input_queues[destination_address as usize].push_back(packet);
             }
             program.output_values.clear();
+        }
+
+        if network_idle {
+            if last_packet_to_nat.1 == last_emitted_packet_from_nat.1 {
+                return last_packet_to_nat.1.to_string();
+            }
+
+            last_emitted_packet_from_nat = last_packet_to_nat;
+
+            input_queues[0].push_back(last_packet_to_nat);
         }
     }
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
+pub fn part1(input_string: &str) -> String {
+    run_simulation(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> String {
+    run_simulation(input_string, false)
 }
 
 #[test]
@@ -64,5 +83,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    //assert_eq!(part2(include_str!("day23_input.txt")), "");
+    assert_eq!(part2(include_str!("day23_input.txt")), "11462");
 }
