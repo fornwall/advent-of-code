@@ -2,24 +2,19 @@ use crate::int_code::Program;
 use std::collections::VecDeque;
 
 pub fn run_simulation(input_string: &str, part1: bool) -> String {
-    const SIZE: usize = 50;
-
     let mut programs = vec![Program::parse(input_string); 50];
-    let mut input_queues = Vec::new();
+    let mut input_queues = vec![VecDeque::<(i64, i64)>::new(); 50];
 
+    // Assign network addresses:
     for (i, program) in programs.iter_mut().enumerate() {
-        // Assign network address:
         program.input(i as i64);
-
-        let new_queue: VecDeque<(i64, i64)> = VecDeque::new();
-        input_queues.push(new_queue);
     }
 
     let mut last_packet_to_nat = (-1, -1);
     let mut last_emitted_packet_from_nat = (-1, -1);
+
     loop {
-        for i in 0..SIZE {
-            let program = &mut programs[i as usize];
+        for (i, program) in programs.iter_mut().enumerate() {
             let input_queue = &mut input_queues[i as usize];
             if input_queue.is_empty() {
                 program.input(-1);
@@ -32,8 +27,7 @@ pub fn run_simulation(input_string: &str, part1: bool) -> String {
         }
 
         let mut network_idle = true;
-        for i in 0..SIZE {
-            let program = &mut programs[i as usize];
+        for program in programs.iter_mut() {
             program.run();
 
             for j in (0..program.output_values.len()).step_by(3) {
@@ -62,7 +56,6 @@ pub fn run_simulation(input_string: &str, part1: bool) -> String {
             }
 
             last_emitted_packet_from_nat = last_packet_to_nat;
-
             input_queues[0].push_back(last_packet_to_nat);
         }
     }
