@@ -3,9 +3,8 @@ use std::slice::Iter;
 
 pub fn part1(input_string: &str) -> String {
     let mut program = Program::parse(input_string);
-    program.run();
     let map: String = program
-        .output_values
+        .run_for_output()
         .iter()
         .map(|&b| (b as u8) as char)
         .collect();
@@ -102,10 +101,9 @@ pub fn part2(input_string: &str) -> String {
     let mut program = Program::parse(input_string);
 
     program.write_memory(0, 2);
-    program.run();
 
     let map: String = program
-        .output_values
+        .run_for_output()
         .iter()
         .map(|&b| (b as u8) as char)
         .collect();
@@ -225,20 +223,19 @@ pub fn part2(input_string: &str) -> String {
                         .replace(function_c, "C");
                     let main_routine = &main_routine[0..main_routine.len() - 1];
 
-                    for &mut input in
-                        vec![main_routine, function_a, function_b, function_c, "n"].iter_mut()
-                    {
-                        program.input_string(input);
-                        program.input_string("\n");
-                        program.output_values.clear();
-                        program.run();
-                    }
-                    let result = program
-                        .output_values
+                    return vec![main_routine, function_a, function_b, function_c, "n"]
+                        .iter_mut()
+                        .map(|input| {
+                            program.input_string(input);
+                            program.input_string("\n");
+                            program.run_for_output()
+                        })
+                        .last()
+                        .unwrap()
                         .iter()
                         .find(|&&value| value > 255)
-                        .unwrap();
-                    return result.to_string();
+                        .unwrap()
+                        .to_string();
                 }
             }
         }

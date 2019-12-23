@@ -56,15 +56,14 @@ fn run(input_string: &str, initial_color: Color) -> HashMap<(i32, i32), Color> {
 
     loop {
         program.input(*painted.get(&position).unwrap_or(&Color::Black) as i64);
-        program.run();
+        let output = program.run_for_output();
 
         if program.is_halted() {
             break;
         }
 
-        let painted_color = Color::from(program.output_values[0]);
-        let turn_direction = program.output_values[1];
-        program.output_values.clear();
+        let painted_color = Color::from(output[0]);
+        let turn_direction = output[1];
 
         painted.insert(position, painted_color);
 

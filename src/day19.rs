@@ -4,8 +4,7 @@ fn check(program: &Program, x: i32, y: i32) -> bool {
     let mut program_copy = program.clone();
     program_copy.input(x as i64);
     program_copy.input(y as i64);
-    program_copy.run();
-    program_copy.output_values[0] == 1
+    program_copy.run_for_output()[0] == 1
 }
 
 pub fn part1(input_string: &str) -> String {

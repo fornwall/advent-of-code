@@ -4,7 +4,7 @@ use std::collections::{HashMap, VecDeque};
 pub struct Program {
     memory: HashMap<usize, i64>,
     instruction_pointer: usize,
-    pub output_values: Vec<i64>,
+    output_values: Vec<i64>,
     input_values: VecDeque<i64>,
     halted: bool,
     requires_input_to: Option<usize>,
@@ -37,7 +37,7 @@ impl Program {
         self.halted
     }
 
-    pub fn run(&mut self) -> i64 {
+    pub fn run_for_register0(&mut self) -> i64 {
         if self.requires_input_to != None {
             panic!("Cannot run program requiring input");
         } else if self.halted {
@@ -48,6 +48,13 @@ impl Program {
             self.evaluate();
         }
         self.read_memory(0)
+    }
+
+    pub fn run_for_output(&mut self) -> Vec<i64> {
+        self.run_for_register0();
+        let result = self.output_values.clone();
+        self.output_values.clear();
+        result
     }
 
     pub fn input(&mut self, input_value: i64) {

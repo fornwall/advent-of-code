@@ -3,10 +3,9 @@ use crate::int_code::Program;
 fn output_from_input(input_string: &str, input: i64) -> String {
     let mut program = Program::parse(input_string);
     program.input(input);
-    program.run();
 
     program
-        .output_values
+        .run_for_output()
         .iter()
         .map(|&value| value.to_string())
         .collect::<Vec<String>>()

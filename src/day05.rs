@@ -3,8 +3,7 @@ use crate::int_code::Program;
 fn run_with_input(input_string: &str, input: i64) -> String {
     let mut program = Program::parse(input_string);
     program.input(input);
-    program.run();
-    program.output_values.last().unwrap().to_string()
+    program.run_for_output().last().unwrap().to_string()
 }
 
 pub fn part1(input_string: &str) -> String {

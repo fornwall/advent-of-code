@@ -3,10 +3,8 @@ use std::collections::HashMap;
 use std::env;
 
 pub fn part1(input_string: &str) -> String {
-    let mut program = Program::parse(input_string);
-    program.run();
-    program
-        .output_values
+    Program::parse(input_string)
+        .run_for_output()
         .iter()
         .skip(2)
         .step_by(3)
@@ -61,9 +59,7 @@ pub fn part2(input_string: &str) -> String {
     let debug = env::var("ADVENT_DEBUG").is_ok();
 
     loop {
-        program.run();
-
-        program.output_values.chunks(3).for_each(|chunk| {
+        program.run_for_output().chunks(3).for_each(|chunk| {
             let x = chunk[0];
             let y = chunk[1];
             let third = chunk[2];
@@ -88,8 +84,6 @@ pub fn part2(input_string: &str) -> String {
         if program.is_halted() {
             break;
         }
-
-        program.output_values.clear();
 
         program.input(match ball_x {
             _ if ball_x > paddle_x => 1,

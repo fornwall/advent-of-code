@@ -2,27 +2,17 @@ use crate::int_code::Program;
 
 fn run(intcode_program_string: &str, ascii_program_string: &str) -> String {
     let mut intcode_program = Program::parse(intcode_program_string);
-    intcode_program.run();
-    intcode_program.output_values.clear();
-
+    intcode_program.run_for_output();
     intcode_program.input_string(ascii_program_string);
-    intcode_program.run();
 
     if let Some(value) = intcode_program
-        .output_values
+        .run_for_output()
         .iter()
         .find(|&&value| value > 255)
     {
         value.to_string()
     } else {
-        let u8_array: Vec<u8> = intcode_program
-            .output_values
-            .iter()
-            .map(|&value| value as u8)
-            .collect();
-        let result = std::str::from_utf8(&u8_array).unwrap();
-        println!("{}", result);
-        result.to_string()
+        panic!("No non-ASCII value found");
     }
 }
 

@@ -27,9 +27,7 @@ pub fn run_simulation(input_string: &str, part1: bool) -> String {
 
         let mut network_idle = true;
         for program in programs.iter_mut() {
-            program.run();
-
-            for chunk in program.output_values.chunks(3) {
+            for chunk in program.run_for_output().chunks(3) {
                 let (destination_address, packet) = (chunk[0], (chunk[1], chunk[2]));
 
                 if destination_address == 255 {
@@ -43,7 +41,6 @@ pub fn run_simulation(input_string: &str, part1: bool) -> String {
                     input_queues[destination_address as usize].push_back(packet);
                 }
             }
-            program.output_values.clear();
         }
 
         if network_idle {

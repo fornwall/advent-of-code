@@ -13,7 +13,7 @@ pub fn part1_patch(input_string: &str, patch: bool) -> String {
         program.write_memory(2, 2);
     }
 
-    program.run().to_string()
+    program.run_for_register0().to_string()
 }
 
 pub fn part2(input_string: &str) -> String {
@@ -24,7 +24,7 @@ pub fn part2(input_string: &str) -> String {
             let mut program = initial_program.clone();
             program.write_memory(1, noun);
             program.write_memory(2, verb);
-            if program.run() == 19_690_720 {
+            if program.run_for_register0() == 19_690_720 {
                 return (100 * noun + verb).to_string();
             }
         }

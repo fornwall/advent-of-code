@@ -14,9 +14,8 @@ pub fn part1(input_string: &str) -> String {
 
             amplifier_program.input(phase);
             amplifier_program.input(signal);
-            amplifier_program.run();
 
-            signal = *amplifier_program.output_values.last().unwrap();
+            signal = *amplifier_program.run_for_output().last().unwrap();
         }
 
         strongest_signal = std::cmp::max(strongest_signal, signal);
@@ -44,11 +43,11 @@ pub fn part2(input_string: &str) -> String {
         'outer: loop {
             for i in 0..5 {
                 let mut current_program = amplifier_programs[i].borrow_mut();
-                current_program.run();
+                let output = current_program.run_for_output();
 
                 if i == 4 {
-                    if !current_program.output_values.is_empty() {
-                        last_signal_output = *current_program.output_values.last().unwrap();
+                    if !output.is_empty() {
+                        last_signal_output = *output.last().unwrap();
                     }
                     if current_program.is_halted() {
                         break 'outer;
@@ -56,11 +55,9 @@ pub fn part2(input_string: &str) -> String {
                 }
 
                 let mut next_program = amplifier_programs[(i + 1) % 5].borrow_mut();
-                for &value in current_program.output_values.iter() {
+                for &value in output.iter() {
                     next_program.input(value);
                 }
-
-                current_program.output_values.clear();
             }
         }
 

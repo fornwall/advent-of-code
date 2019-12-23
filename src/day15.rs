@@ -38,15 +38,13 @@ where
             if visited.contains(&new_position) {
                 continue;
             }
+            visited.insert(new_position);
             let new_distance = distance + 1;
 
             let mut updated_program = program.clone();
             updated_program.input(instruction_for_direction(direction));
-            updated_program.run();
 
-            visited.insert(new_position);
-
-            match updated_program.output_values[0] {
+            match updated_program.run_for_output()[0] {
                 // 0: The repair droid hit a wall. Its position has not changed.
                 0 => {
                     // Do nothing.
@@ -56,7 +54,6 @@ where
                 // its new position is the location of the oxygen system.
                 val if val == 1 || val == 2 => {
                     on_visit(new_position, val == 2, new_distance);
-                    updated_program.output_values.clear();
                     to_visit.push_back((new_position, new_distance, updated_program.clone()));
                 }
                 other => panic!("Invalid output: {}", other),
