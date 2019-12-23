@@ -14,8 +14,7 @@ pub fn run_simulation(input_string: &str, part1: bool) -> String {
     let mut last_emitted_packet_from_nat = (-1, -1);
 
     loop {
-        for (i, program) in programs.iter_mut().enumerate() {
-            let input_queue = &mut input_queues[i as usize];
+        for (program, input_queue) in programs.iter_mut().zip(input_queues.iter_mut()) {
             if input_queue.is_empty() {
                 program.input(-1);
             } else {
@@ -30,22 +29,19 @@ pub fn run_simulation(input_string: &str, part1: bool) -> String {
         for program in programs.iter_mut() {
             program.run();
 
-            for j in (0..program.output_values.len()).step_by(3) {
-                network_idle = false;
-
-                let destination_address = program.output_values[j];
-                let packet = (program.output_values[j + 1], program.output_values[j + 2]);
+            for chunk in program.output_values.chunks(3) {
+                let (destination_address, packet) = (chunk[0], (chunk[1], chunk[2]));
 
                 if destination_address == 255 {
                     if part1 {
                         return packet.1.to_string();
                     } else {
                         last_packet_to_nat = packet;
-                        continue;
                     }
+                } else {
+                    network_idle = false;
+                    input_queues[destination_address as usize].push_back(packet);
                 }
-
-                input_queues[destination_address as usize].push_back(packet);
             }
             program.output_values.clear();
         }
