@@ -40,6 +40,8 @@ impl Program {
     pub fn run(&mut self) -> i64 {
         if self.requires_input_to != None {
             panic!("Cannot run program requiring input");
+        } else if self.halted {
+            panic!("Cannot run halted program");
         }
 
         while !self.halted && self.requires_input_to == None {
