@@ -1,6 +1,6 @@
 [package]
 name = "advent_of_code_rs"
-version = "2019.12.23"
+version = "2019.12.25"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code-2019-rs"
 license = "MIT"
@@ -18,6 +18,7 @@ codegen-units = 1
 
 [dependencies]
 bytecount = "*"
+mod_exp = "*"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "*"
