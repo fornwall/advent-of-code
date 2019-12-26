@@ -35,10 +35,9 @@ where
     while let Some((position, distance, program)) = to_visit.pop_front() {
         for &direction in DIRECTIONS.iter() {
             let new_position = (position.0 + direction.0, position.1 + direction.1);
-            if visited.contains(&new_position) {
+            if !visited.insert(new_position) {
                 continue;
             }
-            visited.insert(new_position);
             let new_distance = distance + 1;
 
             let mut updated_program = program.clone();

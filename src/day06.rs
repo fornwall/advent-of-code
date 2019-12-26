@@ -55,8 +55,7 @@ pub fn part2(string: &str) -> String {
 
         if let Some(list) = map.get(name) {
             for entry in list.iter() {
-                if !visited.contains(entry) {
-                    visited.insert(entry);
+                if visited.insert(entry) {
                     if *entry == target {
                         return distance.to_string();
                     }
