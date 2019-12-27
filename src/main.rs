@@ -10,7 +10,7 @@ use advent_of_code_rs::get_problem_set;
 fn main() {
     let usage = || {
         println!("Arguments: day part");
-        println!("    where: day is between 1 and 24 and part is 1 or 2");
+        println!("    where: day is between 1 and 25 and part is 1 or 2");
         std::process::exit(1);
     };
 
@@ -34,7 +34,7 @@ fn main() {
         }
     };
 
-    if !(day >= 1 && day <= 24) || !(part == 1 || part == 2) {
+    if !(day >= 1 && day <= 25) || !(part == 1 || part == 2) {
         usage();
     }
 
