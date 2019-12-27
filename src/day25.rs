@@ -83,12 +83,13 @@ fn parse_output(program: &mut Program) -> Room {
             // This takes the second if bounced from "Pressure-Sensitive Floor".
             room_id = line;
         } else if line.starts_with("- ") {
-            match &line[2..] {
+            let item = &line[2..];
+            match item {
                 "north" | "east" | "south" | "west" => {
-                    directions.push(Direction::from_str(&line[2..]));
+                    directions.push(Direction::from_str(item));
                 }
                 _ => {
-                    items.push((&line[2..]).to_string());
+                    items.push(item.to_string());
                 }
             }
         } else if line.starts_with("\"Oh, hello! You should be able to get in by typing") {
@@ -151,15 +152,16 @@ pub fn part1(input_string: &str) -> String {
 
                 let new_room_id = new_room.id.clone();
                 if visited_rooms.insert(new_room_id) {
-                    for item in new_room
-                        .items
-                        .iter()
-                        .filter(|&item| !blacklisted_items.contains(item))
-                    {
-                        execute_command(&mut program, Command::Take(item.clone()));
-                        carried_items.push(item.clone());
-                    }
-
+                    carried_items.extend(
+                        new_room
+                            .items
+                            .iter()
+                            .filter(|&item| !blacklisted_items.contains(item))
+                            .inspect(|&item| {
+                                execute_command(&mut program, Command::Take(item.clone()));
+                            })
+                            .cloned(),
+                    );
                     to_visit.push_back((new_room, new_directions.clone()));
                 }
 
@@ -178,21 +180,26 @@ pub fn part1(input_string: &str) -> String {
         execute_command(&mut program, Command::Move(direction));
     }
 
-    //let all_items = carried_items.clone();
-    // Try all combinations of items:
-    for i in 0..=(1 << carried_items.len()) {
-        let mut items_to_use = Vec::new();
+    // Drop all items:
+    for item in carried_items.iter() {
+        execute_command(&mut program, Command::Drop(item.clone()));
+    }
+
+    // Try all combinations of items using Gray code,
+    // https://en.wikipedia.org/wiki/Gray_code#Constructing_an_n-bit_Gray_code,
+    // to minimize the number of take and drop commands:
+    let mut latest_gray_code = 0;
+    for i in 1..=(1 << carried_items.len()) {
+        let gray_code = i ^ (i >> 1);
         for (j, item) in carried_items.iter().enumerate() {
-            if i & (1 << j) != 0 {
-                items_to_use.push(item.clone());
+            let bit_mask = 1 << j;
+            if gray_code & bit_mask != 0 && latest_gray_code & bit_mask == 0 {
+                execute_command(&mut program, Command::Take(item.clone()));
+            } else if latest_gray_code & bit_mask != 0 && gray_code & bit_mask == 0 {
+                execute_command(&mut program, Command::Drop(item.clone()));
             }
         }
-        for item in carried_items.iter() {
-            execute_command(&mut program, Command::Drop(item.clone()));
-        }
-        for item in items_to_use.iter() {
-            execute_command(&mut program, Command::Take(item.clone()));
-        }
+        latest_gray_code = gray_code;
 
         let new_room = execute_command(
             &mut program,
