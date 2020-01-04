@@ -41,10 +41,10 @@ impl Direction {
     }
 }
 
-enum Command {
+enum Command<'a> {
     Move(Direction),
-    Take(String),
-    Drop(String),
+    Take(&'a str),
+    Drop(&'a str),
 }
 
 struct Room {
@@ -158,7 +158,7 @@ pub fn part1(input_string: &str) -> String {
                             .iter()
                             .filter(|&item| !blacklisted_items.contains(item))
                             .inspect(|&item| {
-                                execute_command(&mut program, Command::Take(item.clone()));
+                                execute_command(&mut program, Command::Take(&item));
                             })
                             .cloned(),
                    );
@@ -182,7 +182,7 @@ pub fn part1(input_string: &str) -> String {
 
     // Drop all items:
     for item in carried_items.iter() {
-        execute_command(&mut program, Command::Drop(item.clone()));
+        execute_command(&mut program, Command::Drop(&item));
     }
 
     // Try all combinations of items using Gray code,
@@ -194,9 +194,9 @@ pub fn part1(input_string: &str) -> String {
         for (j, item) in carried_items.iter().enumerate() {
             let bit_mask = 1 << j;
             if gray_code & bit_mask != 0 && latest_gray_code & bit_mask == 0 {
-                execute_command(&mut program, Command::Take(item.clone()));
+                execute_command(&mut program, Command::Take(&item));
             } else if latest_gray_code & bit_mask != 0 && gray_code & bit_mask == 0 {
-                execute_command(&mut program, Command::Drop(item.clone()));
+                execute_command(&mut program, Command::Drop(&item));
             }
         }
         latest_gray_code = gray_code;
