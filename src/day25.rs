@@ -51,7 +51,7 @@ struct Room {
     id: String,
     directions: Vec<Direction>,
     items: Vec<String>,
-    solution: i32,
+    solution: Option<i32>,
 }
 
 fn execute_command(program: &mut Program, command: Command) -> Room {
@@ -77,7 +77,8 @@ fn parse_output(program: &mut Program) -> Room {
     let mut directions = Vec::new();
     let mut items = Vec::new();
     let mut room_id = "";
-    let mut solution = -1;
+    let mut solution = None;
+
     for line in output.lines() {
         if line.starts_with("== ") {
             // This takes the second if bounced from "Pressure-Sensitive Floor".
@@ -93,12 +94,12 @@ fn parse_output(program: &mut Program) -> Room {
                 }
             }
         } else if line.starts_with("\"Oh, hello! You should be able to get in by typing") {
-            solution = line
+            solution = Some(line
                 .split_whitespace()
                 .nth(11)
                 .unwrap()
                 .parse::<i32>()
-                .unwrap();
+                .unwrap());
         }
     }
 
@@ -205,8 +206,8 @@ pub fn part1(input_string: &str) -> String {
             &mut program,
             Command::Move(direction_to_pressure_sensitive_floor),
         );
-        if new_room.solution != -1 {
-            return new_room.solution.to_string();
+        if let Some(solution) = new_room.solution {
+            return solution.to_string();
         }
     }
 
