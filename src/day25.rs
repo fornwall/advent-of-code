@@ -161,8 +161,8 @@ pub fn part1(input_string: &str) -> String {
                                 execute_command(&mut program, Command::Take(item.clone()));
                             })
                             .cloned(),
-                    );
-                    to_visit.push_back((new_room, new_directions.clone()));
+                   );
+                    to_visit.push_back((new_room, new_directions));
                 }
 
                 execute_command(&mut program, Command::Move(direction.reverse()));
