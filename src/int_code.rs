@@ -52,9 +52,7 @@ impl Program {
 
     pub fn run_for_output(&mut self) -> Vec<i64> {
         self.run_for_register0();
-        let result = self.output_values.clone();
-        self.output_values.clear();
-        result
+        std::mem::replace(&mut self.output_values, Vec::new())
     }
 
     pub fn input(&mut self, input_value: i64) {
