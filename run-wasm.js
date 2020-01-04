@@ -21,7 +21,7 @@ function getArgv() {
 
 function readStdin() {
 	if (isDeno) {
-		return Deno.readAllSync(Deno.stdin.rid);
+		return Deno.readAllSync(Deno.stdin);
 	} else {
 		const fs = require('fs');
 		return fs.readFileSync(0, 'utf8');
@@ -45,11 +45,11 @@ function solve(wasmCodeBuffer, day, part, inputBuffer) {
     const wasm = wasmInstance.exports;
 
     const outputPointer = 8;
-    const inputLength = inputBuffer.length; // Buffer.byteLength(inputBuffer);
+    const inputLength = inputBuffer.length;
     const inputPointer = wasm.__wbindgen_malloc(inputLength);
     if (isDeno) {
-		// FIXME: args meaning??
-        new Buffer(wasm.memory.buffer).write(inputBuffer.slice(inputPointer, inputPointer+inputLength));
+        // TODO?
+        new Deno.Buffer(wasm.memory.buffer).write(inputBuffer, inputPointer, inputLength);
     } else {
         Buffer.from(wasm.memory.buffer).write(inputBuffer, inputPointer, inputLength);
     }
@@ -66,20 +66,22 @@ function solve(wasmCodeBuffer, day, part, inputBuffer) {
     console.log(outputString);
 }
 
-const wasmUrl = 'https://fornwall.net/advent-of-code-2019/571fb931d982e3ea292d.module.wasm';
+const hostname = 'fornwall.net';
+const path = '/advent-of-code-2019/solution.wasm';
 
 if (isDeno) {
+    const wasmUrl = 'https://' + hostname + path;
     fetch(wasmUrl).then(response =>
         response.arrayBuffer()
-    ).then(wasmCode => {
-        solve(wasmCode, day, part, input);
-    });
+    ).then(wasmCode =>
+        solve(wasmCode, day, part, input)
+    );
 } else {
     const https = require('https')
     const req = https.request({
-        hostname: 'fornwall.net',
+        hostname,
         port: 443,
-        path: '/advent-of-code-2019/571fb931d982e3ea292d.module.wasm',
+        path,
         method: 'GET'
     }, res => {
         const data = [];
