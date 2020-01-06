@@ -94,12 +94,13 @@ fn parse_output(program: &mut Program) -> Room {
                 }
             }
         } else if line.starts_with("\"Oh, hello! You should be able to get in by typing") {
-            solution = Some(line
-                .split_whitespace()
-                .nth(11)
-                .unwrap()
-                .parse::<i32>()
-                .unwrap());
+            solution = Some(
+                line.split_whitespace()
+                    .nth(11)
+                    .unwrap()
+                    .parse::<i32>()
+                    .unwrap(),
+            );
         }
     }
 
@@ -162,7 +163,7 @@ pub fn part1(input_string: &str) -> String {
                                 execute_command(&mut program, Command::Take(&item));
                             })
                             .cloned(),
-                   );
+                    );
                     to_visit.push_back((new_room, new_directions));
                 }
 
