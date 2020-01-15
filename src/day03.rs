@@ -20,9 +20,7 @@ impl Point {
             'R' => Point::new(1, 0),
             'D' => Point::new(0, -1),
             'L' => Point::new(-1, 0),
-            _ => {
-                panic!("Invalid direction specifier: {}", specifier);
-            }
+            _ => panic!("Invalid direction specifier: {}", specifier),
         }
     }
 

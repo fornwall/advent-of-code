@@ -51,7 +51,7 @@ where
                 // 1: The repair droid has moved one step in the requested direction.
                 // 2: The repair droid has moved one step in the requested direction;
                 // its new position is the location of the oxygen system.
-                val if val == 1 || val == 2 => {
+                val @ 1..=2 => {
                     on_visit(new_position, val == 2, new_distance);
                     to_visit.push_back((new_position, new_distance, updated_program.clone()));
                 }

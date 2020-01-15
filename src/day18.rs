@@ -86,9 +86,7 @@ pub fn part1_usize(input_string: &str) -> usize {
                 let mut new_needed_keys = needed_keys;
                 let mut found_key = None;
                 match map.get(&new_position) {
-                    Some(&char_at_position)
-                        if char_at_position >= 'A' && char_at_position <= 'Z' =>
-                    {
+                    Some(&char_at_position @ 'A'..='Z') => {
                         let needed_key = char_at_position.to_ascii_lowercase();
                         if found_keys.contains(&(needed_key as u8)) {
                             // Only consider door as necessary if key is in quadrant.
@@ -98,9 +96,7 @@ pub fn part1_usize(input_string: &str) -> usize {
                             new_needed_keys |= bit_value;
                         }
                     }
-                    Some(&char_at_position)
-                        if char_at_position >= 'a' && char_at_position <= 'z' =>
-                    {
+                    Some(&char_at_position @ 'a'..='z') => {
                         if char_at_position as u8 != this_key {
                             found_key = Some(char_at_position as u8);
                         }
