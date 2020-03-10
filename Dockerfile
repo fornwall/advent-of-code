@@ -1,3 +1,9 @@
+FROM fredrikfornwall/rust-static-builder:1.41.1
+ADD . /build/
+RUN /root/build.sh
+RUN ls -lha /build/target/x86_64-unknown-linux-musl
+RUN ls -lha /build/target/x86_64-unknown-linux-musl/release/
+
 FROM scratch
-COPY target/x86_64-unknown-linux-musl/release/advent_of_code_rs /
+COPY --from=0 /build/target/x86_64-unknown-linux-musl/release/advent_of_code_rs /
 ENTRYPOINT ["/advent_of_code_rs"]

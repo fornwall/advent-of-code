@@ -1,15 +1,12 @@
 RUST_VERSION=1.41.1
-.PHONY: check static-linux-executable docker-image publish-docker publish-html publish-npm publish-all
+.PHONY: check docker-image publish-docker publish-html publish-npm publish-all
 
 check:
 	cargo fmt --all
 	cargo clippy --all-targets --all-features -- -D warnings
 	cargo test
 
-static-linux-executable:
-	docker run --rm -v $(PWD):/build fredrikfornwall/rust-static-builder:$(RUST_VERSION)
-
-docker-image: static-linux-executable
+docker-image:
 	docker build -t fredrikfornwall/advent-of-code-2019-rs .
 
 publish-docker: docker-image
