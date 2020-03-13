@@ -19,7 +19,7 @@ pub fn part1(input_string: &str) -> String {
             let how_many = if how_many > 0 {
                 how_many
             } else {
-                (10_007 - how_many.abs())
+                10_007 - how_many.abs()
             } as usize;
             deck = [&deck[how_many..], &deck[..how_many]].concat();
         } else if line.starts_with("deal with") {
