@@ -180,9 +180,8 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
             let current_cost = cost_for_keys
                 .entry((edge.target_key, next.gathered_keys))
                 .or_insert(usize::max_value());
-            let found_improved_path = next.steps < *current_cost;
 
-            if found_improved_path {
+            if next.steps < *current_cost {
                 to_visit.push(next);
                 *current_cost = next.steps;
             }
