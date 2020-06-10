@@ -1,4 +1,4 @@
-FROM fredrikfornwall/rust-static-builder:1.41.1
+FROM fredrikfornwall/rust-static-builder:1.44.0
 ADD . /build/
 RUN /root/build.sh
 RUN ls -lha /build/target/x86_64-unknown-linux-musl

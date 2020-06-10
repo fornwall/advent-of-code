@@ -1,4 +1,4 @@
-RUST_VERSION=1.41.1
+DOCKER_IMAGE_NAME=fredrikfornwall/advent-of-code-2019-rs
 .PHONY: check docker-image publish-docker publish-html publish-npm publish-all
 
 check:
@@ -7,11 +7,11 @@ check:
 	cargo test
 
 docker-image:
-	docker build -t fredrikfornwall/advent-of-code-2019-rs .
+	docker build --no-cache --tag $(DOCKER_IMAGE_NAME) .
 
 publish-docker: docker-image
 	docker login
-	docker push fredrikfornwall/advent-of-code-2019-rs
+	docker push $(DOCKER_IMAGE_NAME)
 
 install-wasm-target:
 	rustup target add wasm32-unknown-unknown
