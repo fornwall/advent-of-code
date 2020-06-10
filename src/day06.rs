@@ -12,13 +12,12 @@ pub fn part1(string: &str) -> String {
     }
 
     fn checksum(map: &HashMap<&str, Vec<&str>>, name: &str, depth: u32) -> u32 {
-        let mut result = depth as u32;
-        if let Some(list) = map.get(name) {
-            for entry in list.iter() {
-                result += checksum(map, entry, depth + 1);
-            }
-        }
-        result
+        depth
+            + map.get(name).map_or(0, |list| {
+                list.iter()
+                    .map(|entry| checksum(map, entry, depth + 1))
+                    .sum::<u32>()
+            })
     }
 
     checksum(&map, "COM", 0).to_string()
