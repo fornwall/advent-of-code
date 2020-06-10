@@ -7,9 +7,12 @@ type Key = u8;
 type KeyBitset = u32;
 
 struct Edge {
-    steps: usize,
-    needed_keys: KeyBitset,
+    // The key at the other end.
     target_key: Key,
+    // Required steps to reach the target key.
+    steps: usize,
+    // The keys needed to traverse this path.
+    needed_keys: KeyBitset,
 }
 
 pub fn part1(input_string: &str) -> String {
