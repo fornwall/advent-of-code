@@ -3,108 +3,89 @@ use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 
-#[derive(Copy, Clone, Eq, PartialEq)]
-struct State {
-    steps: usize,
-    gathered_keys: u32,
-    position: u8,
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &State) -> Ordering {
-        other
-            .steps
-            .cmp(&self.steps)
-            .then_with(|| self.gathered_keys.cmp(&other.gathered_keys))
-            .then_with(|| self.position.cmp(&other.position))
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &State) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
+type Key = u8;
+type KeyBitset = u32;
 
 struct Edge {
     steps: usize,
-    needed_keys: u32,
-    other_key: u8,
+    needed_keys: KeyBitset,
+    target_key: Key,
 }
 
 pub fn part1(input_string: &str) -> String {
-    part1_usize(input_string).to_string()
+    steps_to_gather_all_keys(input_string).to_string()
 }
 
-pub fn part1_usize(input_string: &str) -> usize {
-    let mut map: HashMap<(i32, i32), char> = HashMap::new();
-    let mut key_positions: HashMap<u8, (i32, i32)> = HashMap::new();
-    let mut found_keys = HashSet::new();
+pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
+    type Position = (i32, i32);
+
+    let mut map: HashMap<Position, char> = HashMap::new();
+    let mut found_keys = HashMap::new();
+    let mut all_keys_bitset = 0 as KeyBitset;
 
     input_string.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
+            let current_position = (x as i32, y as i32);
             let char_to_insert = match c {
                 '@' => {
-                    key_positions.insert(c as u8, (x as i32, y as i32));
+                    // The single entrance is represented by '@'.
+                    found_keys.insert(b'@', current_position);
                     '.'
                 }
                 'a'..='z' => {
-                    found_keys.insert(c as u8);
-                    key_positions.insert(c as u8, (x as i32, y as i32));
+                    // Keys are represented by lowercase letters.
+                    let found_key = c as Key;
+                    all_keys_bitset |= 1 << (found_key as usize - 'a' as usize);
+                    found_keys.insert(found_key, current_position);
                     c
                 }
                 '#' => {
+                    // Stone walls are represented as '#'.
                     return;
                 }
                 _ => c,
             };
-            map.insert((x as i32, y as i32), char_to_insert);
+            map.insert(current_position, char_to_insert);
         });
     });
 
-    let mut all_keys_bitset = 0 as u32;
-    for &c in found_keys.iter() {
-        all_keys_bitset |= 1 << (c as usize - 'a' as usize);
-    }
-
     // Mapping to (other_key, needed_keys_to_reach, steps):
-    let mut key_edges: HashMap<u8, Vec<Edge>> = HashMap::new();
-    found_keys.insert(b'@');
-    for &this_key in &found_keys {
-        // Find path from this key to all other keys.
-        let this_key_position = *key_positions.get(&this_key).unwrap();
+    let mut adjacency_list: HashMap<Key, Vec<Edge>> = HashMap::new();
 
-        let mut to_visit = VecDeque::new();
-        let mut visited = HashSet::new();
+    for (&this_key, &this_key_position) in found_keys.iter() {
+        // Find path from this key to all other keys.
+
         // (position, bitset_of_needed_keys, steps):
-        to_visit.push_back((this_key_position, 0 as u32, 0 as u32));
-        visited.insert(this_key_position);
+        let mut to_visit = VecDeque::new();
+        to_visit.push_back((this_key_position, 0u32, 0u32));
+
+        let mut visited_positions = HashSet::new();
+        visited_positions.insert(this_key_position);
 
         while let Some((position, needed_keys, steps)) = to_visit.pop_front() {
             'key_direction_loop: for direction in DIRECTIONS.iter() {
                 let new_position = (position.0 + direction.0, position.1 + direction.1);
                 let mut new_needed_keys = needed_keys;
                 let mut found_key = None;
+
                 match map.get(&new_position) {
                     Some(&char_at_position @ 'A'..='Z') => {
-                        let needed_key = char_at_position.to_ascii_lowercase();
-                        if found_keys.contains(&(needed_key as u8)) {
+                        let needed_key = char_at_position.to_ascii_lowercase() as Key;
+                        if found_keys.contains_key(&needed_key) {
                             // Only consider door as necessary if key is in quadrant.
-                            // Needed by part 4, where we can wait until key is picked
+                            // Needed by part 2, where we can wait until key is picked
                             // up in other quadrant.
-                            let bit_value = 1 << (char_at_position as u8 - b'A');
+                            let bit_value = 1 << (needed_key - b'a');
                             new_needed_keys |= bit_value;
                         }
                     }
                     Some(&char_at_position @ 'a'..='z') => {
-                        if char_at_position as u8 != this_key {
-                            found_key = Some(char_at_position as u8);
-                        }
+                        found_key = Some(char_at_position as Key);
                     }
-                    Some('.') | Some('@') => {
+                    Some('.') => {
                         // Free to enter.
                     }
-                    Some('#') | None => {
+                    None => {
                         continue 'key_direction_loop;
                     }
                     Some(c) => {
@@ -114,17 +95,17 @@ pub fn part1_usize(input_string: &str) -> usize {
 
                 let new_steps = steps + 1;
                 let new_state = (new_position, new_needed_keys, new_steps);
-                if visited.insert(new_position) {
+                if visited_positions.insert(new_position) {
                     to_visit.push_back(new_state);
 
-                    if let Some(other_key) = found_key {
-                        key_edges
+                    if let Some(target_key) = found_key {
+                        adjacency_list
                             .entry(this_key)
                             .or_insert_with(Vec::new)
                             .push(Edge {
                                 steps: new_steps as usize,
                                 needed_keys: new_needed_keys,
-                                other_key,
+                                target_key,
                             });
                     }
                 }
@@ -132,60 +113,80 @@ pub fn part1_usize(input_string: &str) -> usize {
         }
     }
 
-    shortest_path(&key_edges, b'@', all_keys_bitset).unwrap()
+    shortest_path(&adjacency_list, all_keys_bitset).unwrap()
 }
 
-fn shortest_path(adj_list: &HashMap<u8, Vec<Edge>>, start: u8, all_keys: u32) -> Option<usize> {
-    // From (key_at_position, gathered_keys) to steps required to reach here.
-    let mut cost_for_state: HashMap<(u8, u32), usize> = HashMap::new();
-    let mut heap = BinaryHeap::new();
+fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) -> Option<usize> {
+    #[derive(Copy, Clone, Eq, PartialEq)]
+    struct Vertex {
+        at_key: Key,
+        steps: usize,
+        gathered_keys: KeyBitset,
+    }
 
-    // We're at `start`, with a zero cost
-    heap.push(State {
+    impl Ord for Vertex {
+        fn cmp(&self, other: &Vertex) -> Ordering {
+            other
+                .steps
+                .cmp(&self.steps)
+                .then_with(|| self.gathered_keys.cmp(&other.gathered_keys))
+                .then_with(|| self.at_key.cmp(&other.at_key))
+        }
+    }
+
+    impl PartialOrd for Vertex {
+        fn partial_cmp(&self, other: &Vertex) -> Option<Ordering> {
+            Some(self.cmp(other))
+        }
+    }
+
+    // From (key, gathered_keys) to total steps required to reach there.
+    let mut cost_for_keys: HashMap<(Key, KeyBitset), usize> = HashMap::new();
+    let mut to_visit = BinaryHeap::new();
+
+    // We're at `@`, with a zero cost
+    to_visit.push(Vertex {
+        at_key: b'@',
         steps: 0,
-        position: start,
         gathered_keys: 0,
     });
 
     // Examine the frontier with lower cost nodes first (min-heap)
-    while let Some(State {
+    while let Some(Vertex {
+        at_key: position,
         steps,
         gathered_keys,
-        position,
-    }) = heap.pop()
+    }) = to_visit.pop()
     {
-        // Alternatively we could have continued to find all shortest paths
         if gathered_keys == all_keys {
             return Some(steps);
         }
 
-        // For each node we can reach, see if we can find a way with
-        // a lower cost going through this node
-        if let Some(edges) = adj_list.get(&position) {
-            for edge in edges {
-                let next = State {
-                    steps: steps + edge.steps,
-                    position: edge.other_key,
-                    gathered_keys: gathered_keys | (1 << ((edge.other_key - b'a') as u32)),
-                };
+        for edge in adjacency_list.get(&position).unwrap() {
+            if edge.needed_keys & gathered_keys != edge.needed_keys {
+                // It's not possible to visit the target key if not all required keys has been gathered.
+                continue;
+            }
 
-                if let Some(&existing_cost) =
-                    cost_for_state.get(&(edge.other_key, next.gathered_keys))
-                {
-                    if existing_cost <= next.steps {
-                        continue;
-                    }
-                }
-                if edge.needed_keys & gathered_keys == edge.needed_keys {
-                    heap.push(next);
-                    // Relaxation, we have now found a better way
-                    cost_for_state.insert((edge.other_key, next.gathered_keys), next.steps);
-                }
+            let next = Vertex {
+                steps: steps + edge.steps,
+                at_key: edge.target_key,
+                gathered_keys: gathered_keys | (1 << ((edge.target_key - b'a') as KeyBitset)),
+            };
+
+            let current_cost = cost_for_keys
+                .entry((edge.target_key, next.gathered_keys))
+                .or_insert(usize::max_value());
+            let found_improved_path = next.steps < *current_cost;
+
+            if found_improved_path {
+                to_visit.push(next);
+                *current_cost = next.steps;
             }
         }
     }
 
-    // Goal not reachable
+    // If we come here it's not possible to gather all keys.
     None
 }
 
@@ -230,10 +231,10 @@ pub fn part2(input_string: &str) -> String {
         }
     });
 
-    let result = part1_usize(&map_top_left)
-        + part1_usize(&map_top_right)
-        + part1_usize(&map_bottom_left)
-        + part1_usize(&map_bottom_right);
+    let result = steps_to_gather_all_keys(&map_top_left)
+        + steps_to_gather_all_keys(&map_top_right)
+        + steps_to_gather_all_keys(&map_bottom_left)
+        + steps_to_gather_all_keys(&map_bottom_right);
     result.to_string()
 }
 
