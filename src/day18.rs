@@ -3,8 +3,22 @@ use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 
-type Key = u8;
+#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
+struct Key {
+    value: char,
+}
+
 type KeyBitset = u32;
+
+impl Key {
+    fn new(value: char) -> Key {
+        Key { value }
+    }
+
+    fn bit_mask(&self) -> KeyBitset {
+        1 << (self.value as usize - 'a' as usize)
+    }
+}
 
 struct Edge {
     // The key at the other end.
@@ -32,13 +46,13 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
             let char_to_insert = match c {
                 '@' => {
                     // The single entrance is represented by '@'.
-                    found_keys.insert(b'@', current_position);
+                    found_keys.insert(Key::new('@'), current_position);
                     '.'
                 }
                 'a'..='z' => {
                     // Keys are represented by lowercase letters.
-                    let found_key = c as Key;
-                    all_keys_bitset |= 1 << (found_key as usize - 'a' as usize);
+                    let found_key = Key::new(c);
+                    all_keys_bitset |= found_key.bit_mask();
                     found_keys.insert(found_key, current_position);
                     c
                 }
@@ -73,17 +87,16 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
 
                 match map.get(&new_position) {
                     Some(&char_at_position @ 'A'..='Z') => {
-                        let needed_key = char_at_position.to_ascii_lowercase() as Key;
+                        let needed_key = Key::new(char_at_position.to_ascii_lowercase());
                         if found_keys.contains_key(&needed_key) {
                             // Only consider door as necessary if key is in quadrant.
                             // Needed by part 2, where we can wait until key is picked
                             // up in other quadrant.
-                            let bit_value = 1 << (needed_key - b'a');
-                            new_needed_keys |= bit_value;
+                            new_needed_keys |= needed_key.bit_mask();
                         }
                     }
                     Some(&char_at_position @ 'a'..='z') => {
-                        found_key = Some(char_at_position as Key);
+                        found_key = Some(Key::new(char_at_position));
                     }
                     Some('.') => {
                         // Free to enter.
@@ -148,7 +161,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     let mut to_visit = BinaryHeap::new();
 
     to_visit.push(Vertex {
-        at_key: b'@',
+        at_key: Key::new('@'),
         steps: 0,
         gathered_keys: 0,
     });
@@ -167,8 +180,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
             let next = Vertex {
                 steps: current.steps + edge.steps,
                 at_key: edge.target_key,
-                gathered_keys: current.gathered_keys
-                    | (1 << ((edge.target_key - b'a') as KeyBitset)),
+                gathered_keys: current.gathered_keys | edge.target_key.bit_mask(),
             };
 
             let current_cost = cost_for_keys
