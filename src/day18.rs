@@ -147,34 +147,28 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     let mut cost_for_keys: HashMap<(Key, KeyBitset), usize> = HashMap::new();
     let mut to_visit = BinaryHeap::new();
 
-    // We're at `@`, with a zero cost
     to_visit.push(Vertex {
         at_key: b'@',
         steps: 0,
         gathered_keys: 0,
     });
 
-    // Examine the frontier with lower cost nodes first (min-heap)
-    while let Some(Vertex {
-        at_key: position,
-        steps,
-        gathered_keys,
-    }) = to_visit.pop()
-    {
-        if gathered_keys == all_keys {
-            return Some(steps);
+    while let Some(current) = to_visit.pop() {
+        if current.gathered_keys == all_keys {
+            return Some(current.steps);
         }
 
-        for edge in adjacency_list.get(&position).unwrap() {
-            if edge.needed_keys & gathered_keys != edge.needed_keys {
-                // It's not possible to visit the target key if not all required keys has been gathered.
+        for edge in adjacency_list.get(&current.at_key).unwrap() {
+            if edge.needed_keys & current.gathered_keys != edge.needed_keys {
+                // Not possible to visit the target key unless all required keys has been gathered.
                 continue;
             }
 
             let next = Vertex {
-                steps: steps + edge.steps,
+                steps: current.steps + edge.steps,
                 at_key: edge.target_key,
-                gathered_keys: gathered_keys | (1 << ((edge.target_key - b'a') as KeyBitset)),
+                gathered_keys: current.gathered_keys
+                    | (1 << ((edge.target_key - b'a') as KeyBitset)),
             };
 
             let current_cost = cost_for_keys
