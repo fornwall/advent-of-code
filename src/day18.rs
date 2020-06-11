@@ -8,6 +8,7 @@ struct Key {
     value: char,
 }
 
+/// Keys represented as a bit mask where bit 0 is set for 'a', bit 1 is set for 'b' and so on.
 type KeyBitset = u32;
 
 impl Key {
@@ -20,12 +21,13 @@ impl Key {
     }
 }
 
+/// Path between keys (or from starting position to a key).
 struct Edge {
-    // The key at the other end.
+    /// The key at the other end.
     target_key: Key,
-    // Required steps to reach the target key.
+    /// Required steps to reach the target key.
     steps: usize,
-    // The keys needed to traverse this path.
+    /// The keys needed to traverse this path.
     needed_keys: KeyBitset,
 }
 
@@ -34,9 +36,7 @@ pub fn part1(input_string: &str) -> String {
 }
 
 pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
-    type Position = (i32, i32);
-
-    let mut map: HashMap<Position, char> = HashMap::new();
+    let mut map: HashMap<(i32, i32), char> = HashMap::new();
     let mut found_keys = HashMap::new();
     let mut all_keys_bitset = 0 as KeyBitset;
 
@@ -45,19 +45,19 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
             let current_position = (x as i32, y as i32);
             let char_to_insert = match c {
                 '@' => {
-                    // The single entrance is represented by '@'.
+                    // The single entrance.
                     found_keys.insert(Key::new('@'), current_position);
                     '.'
                 }
                 'a'..='z' => {
-                    // Keys are represented by lowercase letters.
+                    // A key.
                     let found_key = Key::new(c);
                     all_keys_bitset |= found_key.bit_mask();
                     found_keys.insert(found_key, current_position);
                     c
                 }
                 '#' => {
-                    // Stone walls are represented as '#'.
+                    // Stone wall.
                     return;
                 }
                 _ => c,
@@ -129,7 +129,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
         }
     }
 
-    shortest_path(&adjacency_list, all_keys_bitset).unwrap()
+    shortest_path(&adjacency_list, all_keys_bitset).expect("Not possible to gather all keys")
 }
 
 fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) -> Option<usize> {
@@ -172,8 +172,9 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
         }
 
         for edge in adjacency_list.get(&current.at_key).unwrap() {
-            if edge.needed_keys & current.gathered_keys != edge.needed_keys {
-                // Not possible to visit the target key unless all required keys has been gathered.
+            let all_needed_keys_gathered =
+                edge.needed_keys & current.gathered_keys == edge.needed_keys;
+            if !all_needed_keys_gathered {
                 continue;
             }
 
@@ -194,7 +195,6 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
         }
     }
 
-    // If we come here it's not possible to gather all keys.
     None
 }
 
