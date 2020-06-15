@@ -1,3 +1,6 @@
+// Example usage:
+// node run-wasm.js 1 1 < src/day01_input.txt
+// deno run --allow-net run-wasm.js 1 1 < src/day01_input.txt
 const isDeno = typeof Deno === 'object';
 
 function exitProcess(message) {
@@ -11,11 +14,9 @@ function exitProcess(message) {
 
 function getArgv() {
 	if (isDeno) {
-		const args = Deno.args.slice();
-		args.unshift('deno');
-		return args;
+		return Deno.args;
 	} else {
-		return process.argv;
+		return process.argv.slice(2);
 	}
 }
 
@@ -29,8 +30,8 @@ function readStdin() {
 }
 
 const argv = getArgv();
-const day = parseInt(argv[2]);
-const part = parseInt(argv[3]);
+const day = parseInt(argv[0]);
+const part = parseInt(argv[1]);
 if (!(day >= 1 && day <= 25)) {
     exitProcess('Invalid day - must be integer between 1 and 25');
 } else if (!(part >= 1 && part <= 2)) {
@@ -48,19 +49,22 @@ function solve(wasmCodeBuffer, day, part, inputBuffer) {
     const inputLength = inputBuffer.length;
     const inputPointer = wasm.__wbindgen_malloc(inputLength);
     if (isDeno) {
-        // TODO?
-        new Deno.Buffer(wasm.memory.buffer).write(inputBuffer, inputPointer, inputLength);
+        var memoryBufferArray = new Uint8Array(wasm.memory.buffer);
+        for (let i = 0; i < inputLength; i++) {
+            memoryBufferArray[i + inputPointer] = inputBuffer[i];
+        }
     } else {
         Buffer.from(wasm.memory.buffer).write(inputBuffer, inputPointer, inputLength);
     }
+
     wasm.solve(outputPointer, day, part, inputPointer, inputLength);
 
     const memi32 = new Int32Array(wasm.memory.buffer);
     const ptr = memi32[outputPointer / 4 + 0];
     const len = memi32[outputPointer / 4 + 1];
     const outputString = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true })
-        .decode(new Uint8Array(wasm.memory.buffer).subarray(ptr, ptr + len))
-        .slice();
+        .decode(new Uint8Array(wasm.memory.buffer).subarray(ptr, ptr + len));
+        //.slice();
     // wasm.__wbindgen_free(memi32[outputPointer / 4 + 0], memi32[outputPointer / 4 + 1] * 1);
 
     console.log(outputString);
