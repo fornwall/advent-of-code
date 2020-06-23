@@ -26,7 +26,6 @@ impl Maze {
     fn parse(input: &str) -> Maze {
         let rows = input.lines().filter(|&line| !line.is_empty()).count();
         let cols = input.lines().map(|line| line.len()).max().unwrap();
-        dbg!(rows, cols);
 
         let array = vec![b' '; rows * cols];
         let mut maze = Maze {
