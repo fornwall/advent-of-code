@@ -24,7 +24,7 @@ impl Maze {
     }
 
     fn parse(input: &str) -> Maze {
-        let rows = input.chars().filter(|&c| c == '\n').count() + 1;
+        let rows = input.lines().filter(|&line| !line.is_empty()).count();
         let cols = input.lines().map(|line| line.len()).max().unwrap();
         dbg!(rows, cols);
 
@@ -200,9 +200,11 @@ pub fn part2(input_string: &str) -> String {
 pub fn tests_part1() {
     assert_eq!(part1(include_str!("day20_example.txt")), "23");
     assert_eq!(part1(include_str!("day20_input.txt")), "580");
+    assert_eq!(part1(include_str!("day20_input_ray.txt")), "552");
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(part2(include_str!("day20_input.txt")), "6362");
+    assert_eq!(part2(include_str!("day20_input_ray.txt")), "6492");
 }
