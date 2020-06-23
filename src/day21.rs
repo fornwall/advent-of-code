@@ -6,17 +6,15 @@ fn run(intcode_program_string: &str, ascii_program_string: &str) -> String {
     intcode_program.input_string(ascii_program_string);
 
     let program_output = intcode_program.run_for_output();
-    if let Some(value) = program_output
-        .iter()
-        .find(|&&value| value > 255)
-    {
+    if let Some(value) = program_output.iter().find(|&&value| value > 255) {
         value.to_string()
     } else {
-        let u8_array: Vec<u8> = program_output
-            .iter()
-            .map(|&value| value as u8)
-            .collect();
-        panic!("No non-ASCII value found - showing last moments:\n{}", std::str::from_utf8(&u8_array).unwrap());
+        let output_bytes: Vec<u8> = program_output.iter().map(|&value| value as u8).collect();
+        let output_string = std::str::from_utf8(&output_bytes).unwrap();
+        panic!(
+            "No non-ASCII value found - showing last moments:\n{}",
+            output_string
+        );
     }
 }
 
