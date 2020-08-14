@@ -22,13 +22,9 @@ function solve(wasmCodeBuffer, day, part, inputBuffer) {
     const outputPointer = 8;
     const inputLength = inputBuffer.length;
     const inputPointer = wasm.__wbindgen_malloc(inputLength);
-    if (isDeno) {
-        var memoryBufferArray = new Uint8Array(wasm.memory.buffer);
-        for (let i = 0; i < inputLength; i++) {
-            memoryBufferArray[i + inputPointer] = inputBuffer[i];
-        }
-    } else {
-        Buffer.from(wasm.memory.buffer).write(inputBuffer, inputPointer, inputLength);
+    var memoryBufferArray = new Uint8Array(wasm.memory.buffer);
+    for (let i = 0; i < inputLength; i++) {
+        memoryBufferArray[i + inputPointer] = inputBuffer[i];
     }
 
     wasm.solve(outputPointer, day, part, inputPointer, inputLength);
