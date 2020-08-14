@@ -45,7 +45,7 @@ advent-of-code-rs <day> <part> < path/to/input.txt
 ```
 
 # Running in the browser
-The solutions can run inside the browser at https://fornwall.net/advent-of-code-2019/.
+The solutions can run inside the browser at https://fornwall.github.io/advent-of-code-2019-rs/.
 
 # Days
 | Puzzle                                         | Solution                     | Alternatives |
