@@ -25,6 +25,7 @@ create-html:
 	rm -Rf docs/
 	mkdir -p docs/
 	cp wasm/html/dist/* docs/
+	cp run.ts docs/
 	cd docs/ && ln -s *.module.wasm module.wasm
 	@echo docs/ folder has been generated
 
