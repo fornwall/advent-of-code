@@ -2,7 +2,6 @@
 **/*.rs.bk
 *.swp
 *.log
-*.wasm
 /.idea/
 dist/
 /bin/
