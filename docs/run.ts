@@ -1,4 +1,4 @@
-function exitProcess(message) {
+function exitProcess(message: string) {
 	console.log(message);
 	Deno.exit(1);
 }
@@ -14,7 +14,7 @@ if (!(day >= 1 && day <= 25)) {
 
 const input = Deno.readAllSync(Deno.stdin);
 
-function solve(wasmCodeBuffer, day, part, inputBuffer) {
+function solve(wasmCodeBuffer: ArrayBuffer, day: number, part: number, inputBuffer: Uint8Array) {
     const wasmModule = new WebAssembly.Module(wasmCodeBuffer);
     const wasmInstance = new WebAssembly.Instance(wasmModule);
     const wasm = wasmInstance.exports;
