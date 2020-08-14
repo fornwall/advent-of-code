@@ -22,14 +22,14 @@ create-html:
 		rm -Rf dist node_modules package-lock.json && \
 		npm install && \
 		webpack --config webpack.config.js
-	@echo wasm/html/dist/ has been created
+	rm -Rf docs/
+	mkdir -p docs/
+	cp wasm/html/dist/* docs/
+	cd docs/ && ln -s *.module.wasm module.wasm
+	@echo docs/ folder has been generated
 
 serve-html: create-html
 	cd wasm/html/dist && python3 -m http.server
-
-publish-html: create-html
-	scp -r wasm/html/dist/* fornwall.net:www/advent-of-code-2019/
-	scp wasm/html/dist/*.wasm fornwall.net:www/advent-of-code-2019/solution.wasm
 
 publish-npm:
 	./wasm/publish-npm-module.sh

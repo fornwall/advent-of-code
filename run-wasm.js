@@ -70,8 +70,8 @@ function solve(wasmCodeBuffer, day, part, inputBuffer) {
     console.log(outputString);
 }
 
-const hostname = 'fornwall.net';
-const path = '/advent-of-code-2019/solution.wasm';
+const hostname = 'fornwall.github.io';
+const path = '/advent-of-code-2019-rs/module.wasm';
 
 if (isDeno) {
     const wasmUrl = 'https://' + hostname + path;
