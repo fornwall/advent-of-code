@@ -38,7 +38,7 @@ publish-npm:
 test-python:
 	cd crates/python && \
 		python3 -m venv env && \
-		source env/bin/activate && \
+		. env/bin/activate && \
 		pip install -r requirements.txt && \
 		python setup.py develop && \
 		python tests/test_solve.py
