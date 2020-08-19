@@ -52,7 +52,7 @@
 /******/ 	function promiseResolve() { return Promise.resolve(); }
 /******/
 /******/ 	var wasmImportObjects = {
-/******/ 		"../../target/browser/advent_of_code_rs_bg.wasm": function() {
+/******/ 		"../../target/browser/advent_of_code_rs_wasm_bg.wasm": function() {
 /******/ 			return {
 /******/
 /******/ 			};
@@ -145,7 +145,7 @@
 /******/
 /******/ 		// Fetch + compile chunk loading for webassembly
 /******/
-/******/ 		var wasmModules = {"0":["../../target/browser/advent_of_code_rs_bg.wasm"]}[chunkId] || [];
+/******/ 		var wasmModules = {"0":["../../target/browser/advent_of_code_rs_wasm_bg.wasm"]}[chunkId] || [];
 /******/
 /******/ 		wasmModules.forEach(function(wasmModuleId) {
 /******/ 			var installedWasmModuleData = installedWasmModules[wasmModuleId];
@@ -155,7 +155,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../../target/browser/advent_of_code_rs_bg.wasm":"c1d6b5ec4d7978400269"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../../target/browser/advent_of_code_rs_wasm_bg.wasm":"00b27a764a0bca8e7f9c"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {

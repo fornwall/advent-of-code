@@ -1,31 +1,12 @@
-[package]
-name = "advent_of_code_rs"
-version = "2019.12.25"
-authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-repository = "https://github.com/fornwall/advent-of-code-2019-rs"
-license = "MIT"
-description = "Solutions to Advent of Code 2019 written in Rust"
-edition = "2018"
-
-[lib]
-crate-type = ["cdylib", "rlib"]
+[workspace]
+members = [
+    "crates/core",
+    "crates/python",
+    "crates/wasm"
+]
 
 [profile.release]
 opt-level = 'z'
 lto = true
 panic = 'abort'
 codegen-units = 1
-
-[dependencies]
-bytecount = "*"
-mod_exp = "*"
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "*"
-
-[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
-wasm-bindgen-test = "*"
-
-[package.metadata.wasm-pack.profile.release]
-# https://github.com/rustwasm/wasm-pack/issues/886
-wasm-opt = ["-Oz", "--enable-mutable-globals"]

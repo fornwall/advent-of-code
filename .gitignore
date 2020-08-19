@@ -1,4 +1,4 @@
-/target
+target/
 **/*.rs.bk
 *.swp
 *.log
@@ -7,7 +7,15 @@ dist/
 /bin/
 node_modules
 
-/wasm/advent_of_code_rs_bin/package.json
-/wasm/advent_of_code_rs_bin/package-lock.json
+/crates/wasm/wasm/advent_of_code_rs_bin/package.json
+package-lock.json
 /wasm/html/dist
 /wasm/html/package-lock.json
+
+/crates/python/env
+
+.pytest_cache/
+__pycache__/
+*.so
+*.egg-info/
+

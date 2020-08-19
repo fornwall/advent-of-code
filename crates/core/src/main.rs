@@ -1,12 +1,8 @@
-#[cfg(not(target_arch = "wasm32"))]
 use std::env;
-#[cfg(not(target_arch = "wasm32"))]
 use std::io::Read;
 
-#[cfg(not(target_arch = "wasm32"))]
 use advent_of_code_rs::get_problem_set;
 
-#[cfg(not(target_arch = "wasm32"))]
 fn main() {
     let usage = || -> ! {
         eprintln!("Arguments: day part");

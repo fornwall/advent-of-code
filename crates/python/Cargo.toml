@@ -1,0 +1,13 @@
+[package]
+name = "advent_of_code_rs_python"
+version = "0.1.0"
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+edition = "2018"
+
+[lib]
+name = "advent_of_code_rs_python"
+crate-type = ["cdylib"]
+
+[dependencies]
+advent_of_code_rs = { path = "../core" }
+pyo3 = { version = "*", features = ["extension-module"] }

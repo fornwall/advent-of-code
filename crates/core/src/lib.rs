@@ -1,8 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-extern crate wasm_bindgen;
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-
 mod day01;
 mod day02;
 mod day03;
@@ -68,18 +63,5 @@ pub fn get_problem_set(day: u8, part: u8) -> Option<fn(&str) -> String> {
         1 => Some(parts.0),
         2 => Some(parts.1),
         _ => None,
-    }
-}
-
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
-pub fn solve(day: u8, part: u8, input: String) -> String {
-    if let Some(solver) = get_problem_set(day, part) {
-        solver(&input)
-    } else {
-        format!(
-            "Day ({}) must be between 1 and 25 and part ({}) either 1 or 2",
-            day, part
-        )
     }
 }
