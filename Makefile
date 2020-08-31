@@ -1,6 +1,12 @@
 DOCKER_IMAGE_NAME=fredrikfornwall/advent-of-code-2019-rs
 .PHONY: check docker-image publish-docker publish-html publish-npm publish-all
 
+ifeq ($(DEBUG),1)
+  wasm_pack_profile=--dev
+else
+  wasm_pack_profile=--release
+endif
+
 check:
 	cargo fmt --all
 	cargo clippy --all-targets --all-features -- -D warnings
@@ -10,14 +16,13 @@ docker-image:
 	docker build --no-cache --tag $(DOCKER_IMAGE_NAME) crates/core
 
 publish-docker: docker-image
-	docker login
 	docker push $(DOCKER_IMAGE_NAME)
 
 install-wasm-target:
 	rustup target add wasm32-unknown-unknown
 
 create-html:
-	cd crates/wasm && wasm-pack build --target browser --out-dir target/browser
+	cd crates/wasm && wasm-pack build $(wasm_pack_profile) --target browser --out-dir target/browser
 	cd crates/wasm/wasm/html && \
 		rm -Rf dist package-lock.json && \
 		npm install && \
