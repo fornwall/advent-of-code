@@ -5,5 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Show rust version
+      run: rustc --version
     - name: Check
       run: make check
