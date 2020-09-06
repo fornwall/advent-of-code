@@ -28,7 +28,7 @@ jobs:
           # The 'ln -s $PWD/../core/ /tmp/core' is needed for the
           # 'advent_of_code_rs = { path = "../core" }' dependency in
           # crates/python/Cargo.toml to work:
-          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && ln -s $PWD/../core/ /tmp/core'
+          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && ln -s $PWD/../core/ /tmp/core && echo Current directory && pwd && echo listing && ls && checking tmp && ls -lha /tmp'
           export CIBW_SKIP='cp27-* cp34-*'
           export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
           python -m cibuildwheel --output-dir wheelhouse
