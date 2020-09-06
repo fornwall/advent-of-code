@@ -39,6 +39,8 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: crates/python/
         continue-on-error: true
+        env:
+          CIBW_BEFORE_BUILD: "python -m pip install setuptools_rust"
         run: |
           choco install rust
           python -m cibuildwheel --output-dir wheelhouse
