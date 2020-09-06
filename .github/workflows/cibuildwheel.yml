@@ -25,10 +25,9 @@ jobs:
       - name: Build wheels
         working-directory: crates/python/
         run: |
-          # The 'ln -s $PWD/../core/ /tmp/core' is needed for the
-          # 'advent_of_code_rs = { path = "../core" }' dependency in
-          # crates/python/Cargo.toml to work:
-          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && ln -s $PWD/../core/ /tmp/core && echo Current directory && pwd && echo listing && ls && checking tmp && ls -lha /tmp'
+          # Fix ../core being outside of the project built by cibuildwheel:
+          sed -i'' 's/..\/core/core/' Cargo.toml && mv ../core .
+          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
           export CIBW_SKIP='cp27-* cp34-*'
           export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
           python -m cibuildwheel --output-dir wheelhouse
