@@ -25,7 +25,7 @@ jobs:
       - name: Build wheels
         working-directory: crates/python/
         run: |
-          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh'
+          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -sSf https://sh.rustup.rs | sh'
           export CIBW_SKIP='cp27-* cp34-*'
           python -m cibuildwheel --output-dir wheelhouse
 
