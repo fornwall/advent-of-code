@@ -34,4 +34,4 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          path: .crates/python/wheelhouse/*.whl
+          path: ./crates/python/wheelhouse/*.whl
