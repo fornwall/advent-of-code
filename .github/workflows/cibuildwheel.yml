@@ -2,13 +2,16 @@ name: cibuildwheel
 
 on: [push, pull_request]
 
+env:
+  CIBW_SKIP: "cp27-* cp34-* cp35-* cp36-* pp* *i686 *win32"
+
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-latest]
+        os: [ubuntu-18.04, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -22,14 +25,26 @@ jobs:
         run: |
           python -m pip install cibuildwheel==1.5.5 setuptools_rust==0.11.3
 
-      - name: Build wheels
+      - name: Build wheels on Linux and macOS
+        if: runner.os != 'Windows'
         working-directory: crates/python/
         run: |
           # Fix ../core being outside of the project built by cibuildwheel:
           perl -p -i -e 's/..\/core/core/' Cargo.toml && mv ../core .
           export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
-          export CIBW_SKIP='cp27-* cp34-* cp35-* cp36-* pp* *i686 *win32'
           export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
+          python -m cibuildwheel --output-dir wheelhouse
+
+      - name: Build wheels on Windows
+        if: runner.os == 'Windows'
+        working-directory: crates/python/
+        continue-on-error: true
+        run: |
+          # Fix ../core being outside of the project built by cibuildwheel:
+          choco install rust
+          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
+          export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
+          perl -p -i -e 's/..\/core/core/' Cargo.toml && mv ../core .
           python -m cibuildwheel --output-dir wheelhouse
 
       - uses: actions/upload-artifact@v2
