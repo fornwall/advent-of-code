@@ -47,6 +47,15 @@ advent-of-code-rs <day> <part> < path/to/input.txt
 # Running in the browser
 The solutions can run inside the browser at https://fornwall.github.io/advent-of-code-2019-rs/.
 
+# Running using python
+As an experiment there is a python extension published at https://pypi.org/project/advent-of-code-rs-python:
+
+```python
+>>> import advent_of_code_rs_python
+>>> advent_of_code_rs_python.solve(1, 1, "12")
+'2'
+```
+
 # Days
 | Puzzle                                         | Solution                     | Alternatives |
 | ---------------------------------------------- | ---------------------------- | ------------ |
