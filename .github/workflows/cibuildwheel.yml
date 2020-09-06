@@ -43,7 +43,7 @@ jobs:
           CIBW_BEFORE_BUILD: "python -m pip install setuptools_rust"
         run: |
           # Fix ../core being outside of the project built by cibuildwheel:
-          perl -i.bak -pe 's/..\/core/core/' Cargo.toml
+          perl -p -i -e 's/..\/core/core/' Cargo.toml
           move ..\core core
           choco install rust
           python -m cibuildwheel --output-dir wheelhouse
