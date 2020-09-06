@@ -23,16 +23,11 @@ install-wasm-target:
 
 create-html:
 	cd crates/wasm && wasm-pack build $(wasm_pack_profile) --target browser --out-dir target/browser
-	cd crates/wasm/wasm/html && \
+	cd crates/wasm/site && \
 		rm -Rf dist package-lock.json && \
 		npm install && \
 		webpack --config webpack.config.js
-	rm -Rf docs/
-	mkdir -p docs/
-	cp crates/wasm/wasm/html/dist/* docs/
-	cp crates/wasm/run.ts docs/
-	cd docs/ && ln -s *.module.wasm module.wasm
-	@echo docs/ folder has been generated
+	cd && ln -f -s *.module.wasm module.wasm
 
 create-node-library:
 	cd crates/wasm && wasm-pack build --target nodejs --out-dir target/nodejs
@@ -41,7 +36,7 @@ publish-node-library: create-node-library
 	cd crates/wasm/target/nodejs && npm publish
 
 serve-html: create-html
-	cd crates/wasm/wasm/html/dist && python3 -m http.server
+	cd crates/wasm/site/dist && python3 -m http.server
 
 publish-npm:
 	cd crates/wasm && ./publish-npm-module.sh
