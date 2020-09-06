@@ -1,0 +1,3 @@
+[build]
+  command = "curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && make create-html"
+  publish = "crates/wasm/wasm/html/dist"
