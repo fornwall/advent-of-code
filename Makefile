@@ -44,7 +44,7 @@ serve-html: create-html
 	cd crates/wasm/wasm/html/dist && python3 -m http.server
 
 publish-npm:
-	./wasm/publish-npm-module.sh
+	cd crates/wasm && ./publish-npm-module.sh
 
 test-python:
 	cd crates/python && \
