@@ -63,11 +63,12 @@ netlify-setup:
 		curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
 		sh /tmp/setup-wasm-pack.sh && \
 		rustup target add wasm32-unknown-unknown && \
-		npm install --save-dev webpack webpack-cli
+		npm install --save-dev webpack webpack-cli &&
+		make create-html
 
 netlify-functions:
 	cd crates/wasm/functions && npm install
 
-netlify: | netlify-setup create-html node-library netlify-functions
+netlify: | netlify-setup node-library netlify-functions
 
 .PHONY: setup-netlify netlify
