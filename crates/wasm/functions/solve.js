@@ -1,14 +1,15 @@
 const solve = require('advent_of_code_rs').solve;
 
 exports.handler = function(event, context, callback) {
+    const parameters = event.queryStringParameters;
+    const day = parseInt(parameters.day || '1');
+    const part = parseInt(parameters.part || '1')
 
-    let day = 1;
-    let part = 1;
     let input = '12';
     const solution = solve(day, part, input);
 
     callback(null, {
         statusCode: 200,
-        body: "Solution: " + solution
+        body: "day=" + day + ", part=" + part + ", Solution: " + solution
     });
 }

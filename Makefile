@@ -22,7 +22,8 @@ install-wasm-target:
 	rustup target add wasm32-unknown-unknown
 
 create-html:
-	cd crates/wasm && wasm-pack build $(wasm_pack_profile) --target browser --out-dir target/browser
+	cd crates/wasm && \
+		wasm-pack build $(wasm_pack_profile) --target browser --out-dir target/browser
 	cd crates/wasm/site && \
 		rm -Rf dist package-lock.json && \
 		npm install && \
@@ -51,3 +52,22 @@ test-python:
 
 publish-all: publish-docker publish-html publish-npm
 	@echo Everything published
+
+home:
+	echo $(HOME)
+
+netlify-setup:
+	curl -sSf -o /tmp/rustup.sh && \
+		sh /tmp/rustup.sh -y && \
+		source $(HOME)/.cargo/env && \
+		curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
+		sh /tmp/setup-wasm-pack.sh && \
+		rustup target add wasm32-unknown-unknown && \
+		npm install --save-dev webpack webpack-cli
+
+netlify-functions:
+	cd crates/wasm/functions && npm install
+
+netlify: | netlify-setup create-html netlify-functions
+
+.PHONY: setup-netlify netlify

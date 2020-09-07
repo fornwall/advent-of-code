@@ -1,5 +1,5 @@
 {
     "dependencies": {
-        "advent_of_code_rs": "*"
+        "advent_of_code_rs": "file:../target/browser"
     }
 }
