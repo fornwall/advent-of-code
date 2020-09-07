@@ -5,6 +5,9 @@ exports.handler = function(event, context, callback) {
     const day = parseInt(parameters.day || '1');
     const part = parseInt(parameters.part || '1')
 
+	console.log('About to log body');
+	console.log(event.body);
+
     let input = '12';
     const solution = solve(day, part, input);
 
