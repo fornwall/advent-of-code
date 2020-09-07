@@ -1,4 +1,4 @@
 [build]
   base = "/"
-  publish = "crates/wasm/site/dist/"
-  command = "curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && source $HOME/.cargo/env && curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && sh /tmp/setup-wasm-pack.sh && rustup target add wasm32-unknown-unknown && npm install --save-dev webpack && make create-html"
+  publish = "crates/wasm/site/netlify-dist/"
+  command = "curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && source $HOME/.cargo/env && curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && sh /tmp/setup-wasm-pack.sh && rustup target add wasm32-unknown-unknown && npm install --save-dev webpack && make create-html && mv crates/wasm/site/dist crates/wasm/site/netlify-dist"
