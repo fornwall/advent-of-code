@@ -56,7 +56,7 @@ publish-all: publish-docker publish-html publish-npm
 home:
 	echo $(HOME)
 
-netlify-setup:
+netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
 		. $(HOME)/.cargo/env && \
@@ -64,11 +64,8 @@ netlify-setup:
 		sh /tmp/setup-wasm-pack.sh && \
 		rustup target add wasm32-unknown-unknown && \
 		npm install --save-dev webpack webpack-cli && \
-		make create-html
+		make create-html && \
+		make node-library && \
+		cd crates/wasm/functions && npm install
 
-netlify-functions:
-	cd crates/wasm/functions && npm install
-
-netlify: | netlify-setup node-library netlify-functions
-
-.PHONY: setup-netlify netlify
+.PHONY: netlify
