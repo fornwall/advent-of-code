@@ -57,7 +57,7 @@ home:
 	echo $(HOME)
 
 netlify-setup:
-	curl -sSf -o /tmp/rustup.sh && \
+	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
 		source $(HOME)/.cargo/env && \
 		curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
