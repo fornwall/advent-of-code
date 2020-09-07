@@ -1,3 +1,4 @@
 [build]
   publish = "crates/wasm/site/dist/"
+  functions = "crates/wasm/functions/"
   command = "curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y && source $HOME/.cargo/env && curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && sh /tmp/setup-wasm-pack.sh && rustup target add wasm32-unknown-unknown && npm install --save-dev webpack webpack-cli && make create-html"
