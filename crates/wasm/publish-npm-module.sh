@@ -10,6 +10,9 @@ cd -
 rm -Rf target/advent_of_code_rs_bin
 mkdir -p target/advent_of_code_rs_bin
 cd target/advent_of_code_rs_bin
+
+cp ../../cli.js .
+
 # Generate package.json to get computed version:
 PACKAGE_VERSION=`jq -r .version < ../../target/nodejs/package.json`
 cat > package.json <<HERE
