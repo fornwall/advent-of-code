@@ -45,7 +45,7 @@ advent-of-code-rs <day> <part> < path/to/input.txt
 ```
 
 # Running in the browser
-The solutions can run inside the browser at https://fornwall.github.io/advent-of-code-2019-rs/.
+The solutions can run inside the browser at https://advent2019.fornwall.net.
 
 # Running using python
 As an experiment there is a python package built using [PyO3](https://pyo3.rs/) and [published on PyPI](https://pypi.org/project/advent-of-code-rs-python):
