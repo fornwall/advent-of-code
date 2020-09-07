@@ -59,7 +59,7 @@ home:
 netlify-setup:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
-		source $(HOME)/.cargo/env && \
+		. $(HOME)/.cargo/env && \
 		curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
 		sh /tmp/setup-wasm-pack.sh && \
 		rustup target add wasm32-unknown-unknown && \
