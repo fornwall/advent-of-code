@@ -30,10 +30,10 @@ create-html:
 		webpack --config webpack.config.js
 	cd && ln -f -s *.module.wasm module.wasm
 
-create-node-library:
+node-library:
 	cd crates/wasm && wasm-pack build --target nodejs --out-dir target/nodejs
 
-publish-node-library: create-node-library
+publish-node-library: node-library
 	cd crates/wasm/target/nodejs && npm publish
 
 serve-html: create-html
@@ -68,6 +68,6 @@ netlify-setup:
 netlify-functions:
 	cd crates/wasm/functions && npm install
 
-netlify: | netlify-setup create-html netlify-functions
+netlify: | netlify-setup create-html node-library netlify-functions
 
 .PHONY: setup-netlify netlify
