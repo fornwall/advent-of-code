@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e -u
+
+if [ "$#" != 2 ]; then
+	echo "usage:\n    ./post-solution <day> <part> # reads input from stdin"
+	echo "example:\n    ./post-solution 23 1 < crates/core/src/day23_input.txt"
+	exit
+fi
+
+DAY=$1
+PART=$2
+
+if [ "$DAY" -ge 26 ] && [ "$PART" -le 0 ]; then
+	echo "Invalid day: $DAY - only 1-25 is allowed"
+	exit 1
+elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
+	echo "Invalid part: $PART - only 1 or 2 is allowed"
+	exit 1
+fi
+
+curl -w '\n'\
+	--data-binary @- \
+	"https://advent2019.fornwall.net/.netlify/functions/solve?day=$DAY&part=$PART"
