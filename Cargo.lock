@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 [[package]]
 name = "advent_of_code_rs"
-version = "2019.12.25"
+version = "2019.12.26"
 dependencies = [
  "bytecount",
  "mod_exp",
@@ -10,7 +10,7 @@ dependencies = [
 
 [[package]]
 name = "advent_of_code_rs_python"
-version = "0.1.0"
+version = "2019.12.26"
 dependencies = [
  "advent_of_code_rs",
  "pyo3",
@@ -18,7 +18,7 @@ dependencies = [
 
 [[package]]
 name = "advent_of_code_rs_wasm"
-version = "2019.12.25"
+version = "2019.12.26"
 dependencies = [
  "advent_of_code_rs",
  "wasm-bindgen",
