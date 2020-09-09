@@ -1,6 +1,6 @@
 [package]
 name = "advent_of_code_rs_wasm"
-version = "2019.12.36"
+version = "2019.12.37"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code-2019-rs"
 license = "MIT"
