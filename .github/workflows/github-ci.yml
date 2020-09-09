@@ -30,9 +30,10 @@ jobs:
       run: make test-python
 
   build-python-wheels:
+    if: ${{ github.ref == 'DISABLED' }}
     env:
       CIBW_SKIP: "cp27-* cp34-* cp35-* cp36-* pp* *i686 *win32"
-    name: Build wheels on ${{ matrix.os }}
+    # name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -88,8 +89,9 @@ jobs:
         docker build --tag ${DOCKER_IMAGE_NAME}:${NEW_VERSION} crates/core
 
   bump-version:
-    needs: [test-rust, test-python, build-docker-image, build-python-wheels]
-    if: ${{ github.ref == 'master' }}
+    # needs: [test-rust, test-python, build-docker-image, build-python-wheels]
+    needs: [test-rust, test-python, build-docker-image]
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -121,3 +123,14 @@ jobs:
         echo "Current version: $CURRENT_VERSION"
         docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
         docker push ${DOCKER_IMAGE_NAME}:${CURRENT_VERSION}
+
+  release-npm-library:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+    - name: Publish npm packages
+      run: make publish-npm
+      env:
+        NPM_TOKEN: ${{secrets.NPM_TOKEN}}
