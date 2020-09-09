@@ -124,10 +124,11 @@ jobs:
     - name: Build and push docker image
       run: |
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
-        IMAGE_NAME=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
-        echo "Version: $NEW_VERSION - about to build and push ${IMAGE_NAME}"
-        docker build --tag ${IMAGE_NAME} crates/core
-        docker push ${IMAGE_NAME}
+        IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
+        docker build --tag ${IMAGE} crates/core
+        docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
+        docker push ${DOCKER_IMAGE_NAME}
 
   release-npm-packages:
     needs: bump-version
@@ -135,6 +136,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
+      with:
+        always-auth: true
     - uses: actions/setup-python@v2
     - name: Install bump2version
       run: pip install bump2version
@@ -167,3 +170,21 @@ jobs:
         CRATES_API_TOKEN: ${{secrets.CRATES_API_TOKEN}}
     - name: Publish crate
       run: cd crates/core && cargo publish --allow-dirty
+
+  release-pypi-package:
+    if: ${{ github.ref == 'DISABLED' }}
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download built wheels
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+    - name: List files
+      run: ls -lha && ls -lha dist
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
