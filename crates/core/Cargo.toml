@@ -8,5 +8,5 @@ description = "Solutions to Advent of Code 2019 written in Rust"
 edition = "2018"
 
 [dependencies]
-bytecount = "*"
-mod_exp = "*"
+bytecount = "0.*"
+mod_exp = "1.*"
