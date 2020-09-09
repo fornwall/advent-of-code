@@ -146,7 +146,9 @@ jobs:
         . ${HOME}/.cargo/env
         make publish-npm
       env:
-        NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+        # It needs to be named 'NODE_AUTH_TOKEN' as it's referenced
+        # by the .npmrc created by setup-node:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
   release-rust-crate:
     needs: bump-version
