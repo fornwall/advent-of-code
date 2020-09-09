@@ -1,3 +1,4 @@
+Hello, world
 [![Build Status](https://travis-ci.org/fornwall/advent-of-code-2019-rs.svg?branch=master)](https://travis-ci.org/fornwall/advent-of-code-2019-rs)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8cb47a76-7cd7-4545-9f10-56ba075c8e41/deploy-status)](https://app.netlify.com/sites/mystifying-blackwell-9e705f/deploys)
 [![Crates.io](https://img.shields.io/crates/v/advent_of_code_rs.svg)](https://crates.io/crates/advent_of_code_rs)
