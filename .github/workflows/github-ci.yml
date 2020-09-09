@@ -119,9 +119,9 @@ jobs:
       run: pip install bump2version
     - name: Login to docker hub
       run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
-    - name: Build and push docker image
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+    - name: Build and push docker image
       run: |
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         IMAGE_NAME=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
