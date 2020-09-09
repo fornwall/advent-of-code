@@ -1,5 +1,9 @@
 [![Build Status](https://travis-ci.org/fornwall/advent-of-code-2019-rs.svg?branch=master)](https://travis-ci.org/fornwall/advent-of-code-2019-rs)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8cb47a76-7cd7-4545-9f10-56ba075c8e41/deploy-status)](https://app.netlify.com/sites/mystifying-blackwell-9e705f/deploys)
+[![Crates.io](https://img.shields.io/crates/v/advent_of_code_rs.svg)](https://crates.io/crates/advent_of_code_rs)
+[![Docker Hub](https://img.shields.io/docker/v/fredrikfornwall/advent-of-code-2019-rs.svg?label=docker)](https://hub.docker.com/repository/docker/fredrikfornwall/advent-of-code-2019-rs/)
+[![npm](https://img.shields.io/npm/v/advent_of_code_rs_wasm.svg)](https://www.npmjs.com/package/advent_of_code_rs_wasm)
+[![PyPi](https://img.shields.io/pypi/v/advent-of-code-rs-python.svg)](https://pypi.org/project/advent-of-code-rs-python/)
 
 # Advent of Code 2019 in Rust
 This repository contains solutions to [Advent of Code 2019](https://adventofcode.com/2019) problems in Rust.
