@@ -41,9 +41,9 @@ docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input
 # Libraries
 The `solve(day, part, input)` library function is published on these package repositories:
 
-- (crates.io)[https://crates.io/crates/advent_of_code_rs] for the Rust library.
-- (npm)[https://www.npmjs.com/package/advent_of_code_rs_wasm] for a Node.js library using WebAssembly built by [wasm-pack](https://rustwasm.github.io/wasm-pack/).
-- (PyPi)[https://pypi.org/project/advent-of-code-rs-python] for a Python library using [PyO3](https://pyo3.rs/) and built with [cibuildwheel](https://cibuildwheel.readthedocs.io/).
+- [crates.io](https://crates.io/crates/advent_of_code_rs) for the Rust library.
+- [npm](https://www.npmjs.com/package/advent_of_code_rs_wasm) for a Node.js library using WebAssembly built by [wasm-pack](https://rustwasm.github.io/wasm-pack/).
+- [PyPi](https://pypi.org/project/advent-of-code-rs-python) for a Python library using [PyO3](https://pyo3.rs/) and built with [cibuildwheel](https://cibuildwheel.readthedocs.io/).
 
 ```rust
 fn todo() {}
