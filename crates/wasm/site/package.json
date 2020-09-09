@@ -1,6 +1,6 @@
 {
   "name": "advent-of-code-wasm",
-  "version": "2019.12.32",
+  "version": "2019.12.33",
   "description": "Using wasm to run Advent of Code 2018 solutions",
   "main": "index.js",
   "scripts": {

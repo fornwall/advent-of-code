@@ -1,6 +1,6 @@
 [package]
 name = "advent_of_code_rs_python"
-version = "2019.12.32"
+version = "2019.12.33"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 edition = "2018"
 
