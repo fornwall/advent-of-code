@@ -127,7 +127,7 @@ jobs:
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
       run: |
-        NEW_VERSION=`bump2version patch --allow-dirty --dry-run --list | grep new_version | cut -d = -f 2`
+        NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         echo "Version: $NEW_VERSION"
         docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
         docker push ${DOCKER_IMAGE_NAME}:${NEW_VERSION}
@@ -138,7 +138,30 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
+    - uses: actions/setup-python@v2
+    - name: Install bump2version
+      run: pip install bump2version
+    - name: Bump version
+      run: bump2version patch
     - name: Publish npm packages
       run: make publish-npm
       env:
         NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  release-rust-create:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    - uses: actions/setup-python@v2
+    - name: Install bump2version
+      run: pip install bump2version
+    - name: Bump version
+      run: bump2version patch
+    - name: Login to cargo
+      run: cargo login ${CRATES_API_TOKEN}
+      env:
+        CRATES_API_TOKEN: ${{secrets.CRATES_API_TOKEN}}
+    - name: Publish crate
+      run: cd crates/core && cargo publish --allow-dirty
