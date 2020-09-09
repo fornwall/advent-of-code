@@ -87,14 +87,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-    - name: Install bump2version
-      run: pip install bump2version
     - name: Build docker image
-      run: |
-        NEW_VERSION=`bump2version --allow-dirty --dry-run --list patch | grep new_version | cut -d = -f 2`
-        echo "New version: $NEW_VERSION - about to build ${DOCKER_IMAGE_NAME}:${NEW_VERSION}"
-        docker build --tag ${DOCKER_IMAGE_NAME}:${NEW_VERSION} crates/core
+      run: docker build --tag throwaway crates/core
 
   bump-version:
     # needs: [test-rust, test-python, build-docker-image, build-python-wheels]
@@ -123,16 +117,19 @@ jobs:
     - uses: actions/setup-python@v2
     - name: Install bump2version
       run: pip install bump2version
-    - name: Push docker image
+    - name: Login to docker hub
+      run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
+    - name: Build and push docker image
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
       run: |
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
-        echo "Version: $NEW_VERSION - about to push ${DOCKER_IMAGE_NAME}:${NEW_VERSION}"
-        docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
-        docker push ${DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        IMAGE_NAME=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        echo "Version: $NEW_VERSION - about to build and push ${IMAGE_NAME}"
+        docker build --tag ${IMAGE_NAME} crates/core
+        docker push ${IMAGE_NAME}
 
-  release-npm-library:
+  release-npm-packages:
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
@@ -146,12 +143,12 @@ jobs:
     - name: Publish npm packages
       run: |
         make netlify
-        . $(HOME)/.cargo/env
+        . ${HOME}/.cargo/env
         make publish-npm
       env:
         NPM_TOKEN: ${{secrets.NPM_TOKEN}}
 
-  release-rust-create:
+  release-rust-crate:
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
