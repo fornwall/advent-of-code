@@ -3,7 +3,7 @@ Solutions to [Advent of Code 2019](https://adventofcode.com/2019).
 
 The solutions are implemented in Rust which is compiled to WebAssembly.
 
-# Usage
+# Usage as a library
 Add dependency:
 
 ```sh
@@ -23,4 +23,14 @@ const solve = require('advent_of_code_rs_wasm').solve;
 
 assert.equal(solve(1, 1, '14'), '2');
 assert.equal(solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
+```
+
+# Usage as a command line tool
+Install:
+
+```sh
+$ npm install -g advent_of_code_rs_wasm
+# [..]
+$ echo 14 | advent-of-code-wasm 1 1
+2
 ```
