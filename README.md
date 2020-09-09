@@ -35,7 +35,7 @@ docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input
 ```
 
 # Running using Node.js
-As a demo, an [npm module](https://www.npmjs.com/package/advent_of_code_rs) is available which uses WebAssembly to execute the solutions:
+An [npm module](https://www.npmjs.com/package/advent_of_code_rs_wasm) is available which uses WebAssembly to execute the solutions:
 
 ```sh
 # To install or update:
