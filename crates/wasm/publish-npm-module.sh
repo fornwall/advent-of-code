@@ -3,6 +3,7 @@ set -e -u
 
 wasm-pack build --target nodejs --out-dir target/nodejs
 
+cp README.md target/nodejs
 cd target/nodejs
 npm publish
 cd -
