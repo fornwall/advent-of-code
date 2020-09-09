@@ -82,9 +82,9 @@ $ echo 14 | advent_of_code_rs 1 1
 
 ## Node tool installable from npm
 ```sh
-$ npm install advent_of_code_rs_bin -g
+$ npm install advent_of_code_rs_wasm -g
 # [..]
-$ echo 14 | advent-of-code-rs 1 1
+$ echo 14 | advent-of-code-wasm 1 1
 2
 ```
 
