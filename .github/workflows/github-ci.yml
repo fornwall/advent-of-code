@@ -30,7 +30,6 @@ jobs:
       run: make test-python
 
   build-python-wheels:
-    if: ${{ github.ref == 'DISABLED' }}
     env:
       CIBW_SKIP: "cp27-* cp34-* cp35-* cp36-* pp* *i686 *win32"
     # name: Build wheels on ${{ matrix.os }}
@@ -83,8 +82,7 @@ jobs:
       run: docker build --tag throwaway crates/core
 
   bump-version:
-    # needs: [test-rust, test-python, build-docker-image, build-python-wheels]
-    needs: [test-rust, test-python, build-docker-image]
+    needs: [test-rust, test-python, build-docker-image, build-python-wheels]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -165,7 +163,6 @@ jobs:
       run: cd crates/core && cargo publish --allow-dirty
 
   release-pypi-package:
-    if: ${{ github.ref == 'DISABLED' }}
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
