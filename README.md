@@ -57,7 +57,7 @@ fn todo() {}
 ```
 
 ```js
-# Node.js with dependency added: npm add advent_of_code_rs_wasm
+// Node.js with dependency added: npm add advent_of_code_rs_wasm
 const assert = require('assert').strict;
 const solve = require('advent_of_code_rs_wasm').solve;
 
