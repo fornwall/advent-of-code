@@ -77,15 +77,13 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
     - name: Install bump2version
       run: pip install bump2version
-    - name: Show bump2version help
-      run: bump2version --help
     - name: Build docker image
       run: |
-        bump2version --allow-dirty --dry-run --list patch
-        bump2version --allow-dirty --dry-run --list patch | grep new_version | cut -d = -f 2
+        NEW_VERSION=`bump2version --allow-dirty --dry-run --list patch | grep new_version | cut -d = -f 2`
         echo "New version: $NEW_VERSION"
         docker build --tag ${DOCKER_IMAGE_NAME}:${NEW_VERSION} crates/core
 
