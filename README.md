@@ -93,7 +93,7 @@ $ echo TODO
 The solutions can run using WebAssembly at https://advent2019.fornwall.net.
 
 # Post to HTTP endpoint
-There is a HTTP endpoint running on netlify functions (using Node.js and WebAssembly) that can be used as follows:
+There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
 
 ```sh
 $ curl --data-binary @crates/core/src/day02_input.txt \
