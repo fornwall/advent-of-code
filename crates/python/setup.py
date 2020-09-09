@@ -12,7 +12,7 @@ setup(
     name="advent_of_code_rs_python",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version="2019.12.37",
+    version="2019.12.38",
     rust_extensions=[
         RustExtension("advent_of_code_rs_python", "Cargo.toml", binding=Binding.PyO3)
     ],
