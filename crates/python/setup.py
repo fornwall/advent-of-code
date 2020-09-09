@@ -3,7 +3,7 @@ from setuptools_rust import Binding, RustExtension
 
 setup(
     name="advent_of_code_rs_python",
-    version="2019.12.35",
+    version="2019.12.36",
     rust_extensions=[
         RustExtension("advent_of_code_rs_python", "Cargo.toml", binding=Binding.PyO3)
     ],
