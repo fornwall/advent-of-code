@@ -74,6 +74,14 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: ./crates/python/wheelhouse/*.whl
+      - name: Publish package
+        # TODO: Move publishing to separate job after version bump, downloading artifacts
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          packages_dir: ./crates/python/wheelhouse/
+
 
   build-docker-image:
     runs-on: ubuntu-latest
@@ -119,17 +127,17 @@ jobs:
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
       run: |
-        CURRENT_VERSION=`bump2version patch --allow-dirty --dry-run --list | grep current_version | cut -d = -f 2`
-        echo "Current version: $CURRENT_VERSION"
+        NEW_VERSION=`bump2version patch --allow-dirty --dry-run --list | grep new_version | cut -d = -f 2`
+        echo "Version: $NEW_VERSION"
         docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
-        docker push ${DOCKER_IMAGE_NAME}:${CURRENT_VERSION}
+        docker push ${DOCKER_IMAGE_NAME}:${NEW_VERSION}
 
   release-npm-library:
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v1
     - name: Publish npm packages
       run: make publish-npm
       env:
