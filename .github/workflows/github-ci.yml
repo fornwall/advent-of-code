@@ -172,7 +172,7 @@ jobs:
         name: artifact
         path: dist
     - name: List files
-      run: ls -lha && ls -lha dist
+      run: ls -lha dist
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:

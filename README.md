@@ -25,7 +25,7 @@ cargo run 2 1 < path/to/input_day2_part1.txt
 ```
 
 # Running using Docker
-There is also a Docker image published for running the tests:
+A published Docker image can be used to run against custom input:
 
 ```sh
 docker run -i fredrikfornwall/advent-of-code-2019-rs:latest <day> <part> < path/to/input.txt
@@ -34,27 +34,70 @@ docker run -i fredrikfornwall/advent-of-code-2019-rs:latest <day> <part> < path/
 docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input.txt
 ```
 
-# Running using Node.js
-An [npm module](https://www.npmjs.com/package/advent_of_code_rs_wasm) is available which uses WebAssembly to execute the solutions:
+# Libraries
+The `solve(day, part, input)` library function is published on these package repositories:
 
-```sh
-# To install or update:
-npm install advent_of_code_rs_bin -g
+- (crates.io)[https://crates.io/crates/advent_of_code_rs] for the Rust library.
+- (npm)[https://www.npmjs.com/package/advent_of_code_rs_wasm] for a Node.js library using WebAssembly built by [wasm-pack](https://rustwasm.github.io/wasm-pack/).
+- (PyPi)[https://pypi.org/project/advent-of-code-rs-python] for a Python library using [PyO3](https://pyo3.rs/) and built with [cibuildwheel](https://cibuildwheel.readthedocs.io/).
 
-# Invocation:
-advent-of-code-rs <day> <part> < path/to/input.txt
+```rust
+fn todo() {}
 ```
 
-# Running in the browser
-The solutions can run inside the browser at https://advent2019.fornwall.net.
-
-# Running using python
-As an experiment there is a python package built using [PyO3](https://pyo3.rs/) and [published on PyPI](https://pypi.org/project/advent-of-code-rs-python):
-
 ```python
+# Python with dependency added: pip install --upgrade advent-of-code-rs-python
 >>> import advent_of_code_rs_python
 >>> advent_of_code_rs_python.solve(1, 1, "12")
 '2'
+```
+
+```js
+# Node.js with dependency added: npm add advent_of_code_rs_wasm
+const assert = require('assert').strict;
+const solve = require('advent_of_code_rs_wasm').solve;
+
+assert.equal(solve(1, 1, '14'), '2');
+assert.equal(solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
+```
+
+# Command line tools
+All tools are invoked with day and part as arguments, and expect input on stdin:
+
+```sh
+$ $TOOL $DAY $PART < $INPUT
+```
+
+## Rust tool installable from crates.io
+```sh
+$ cargo install advent_of_code_rs
+# [..]
+$ echo 14 | advent_of_code_rs 1 1
+2
+```
+
+## Node tool installable from npm
+```sh
+$ npm install advent_of_code_rs_bin -g
+# [..]
+$ echo 14 | advent-of-code-rs 1 1
+2
+```
+
+## Python tool installable from PyPi
+```sh
+$ echo TODO
+```
+
+# Running in the browser
+The solutions can run using WebAssembly at https://advent2019.fornwall.net.
+
+# Post to HTTP endpoint
+There is a HTTP endpoint running on netlify functions (using Node.js and WebAssembly) that can be used as follows:
+
+```sh
+$ curl --data-binary @crates/core/src/day02_input.txt \
+     "https://advent2019.fornwall.net/.netlify/functions/solve?day=2&part=2"
 ```
 
 # Days
