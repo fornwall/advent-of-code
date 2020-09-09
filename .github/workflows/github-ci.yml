@@ -74,14 +74,6 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: ./crates/python/wheelhouse/*.whl
-      - name: Publish package
-        # TODO: Move publishing to separate job after version bump, downloading artifacts
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
-          packages_dir: ./crates/python/wheelhouse/
-
 
   build-docker-image:
     runs-on: ubuntu-latest
@@ -137,7 +129,8 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
-        always-auth: true
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
     - uses: actions/setup-python@v2
     - name: Install bump2version
       run: pip install bump2version
