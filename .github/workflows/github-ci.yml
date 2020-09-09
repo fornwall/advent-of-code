@@ -84,7 +84,8 @@ jobs:
       run: bump2version --help
     - name: Build docker image
       run: |
-        NEW_VERSION=`bump2version --allow-dirty --dry-run --list patch | grep new_version | cut -d = -f 2`
+        bump2version --allow-dirty --dry-run --list patch
+        bump2version --allow-dirty --dry-run --list patch | grep new_version | cut -d = -f 2
         echo "New version: $NEW_VERSION"
         docker build --tag ${DOCKER_IMAGE_NAME}:${NEW_VERSION} crates/core
 
