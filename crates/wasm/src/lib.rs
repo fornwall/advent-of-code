@@ -1,5 +1,5 @@
 extern crate wasm_bindgen;
-use advent_of_code_rs::get_problem_set;
+use advent_of_code::get_problem_set;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const solve = require('advent_of_code_rs_wasm').solve;
+const solve = require('advent-of-code').solve;
 
 const day = parseInt(process.argv[2]);
 const part = parseInt(process.argv[3]);

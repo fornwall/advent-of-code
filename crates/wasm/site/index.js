@@ -1,4 +1,4 @@
-import * as wasm from "advent_of_code_rs";
+import * as wasm from "advent-of-code";
 
 const day_element = document.getElementById('day');
 const part_element = document.getElementById('part');

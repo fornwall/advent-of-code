@@ -1,11 +1,14 @@
 [package]
-name = "advent_of_code_rs"
+name = "advent-of-code"
 version = "2019.12.45"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code-2019-rs"
 license = "MIT"
 description = "Solutions to Advent of Code 2019 written in Rust"
 edition = "2018"
+
+[lib]
+name = "advent_of_code"
 
 [dependencies]
 bytecount = "0.*"

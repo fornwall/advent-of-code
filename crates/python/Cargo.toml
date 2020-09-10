@@ -1,13 +1,13 @@
 [package]
-name = "advent_of_code_rs_python"
+name = "advent-of-code-python"
 version = "2019.12.45"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 edition = "2018"
 
 [lib]
-name = "advent_of_code_rs_python"
+name = "advent_of_code"
 crate-type = ["cdylib"]
 
 [dependencies]
-advent_of_code_rs = { path = "../core" }
+advent-of-code = { path = "../core" }
 pyo3 = { version = "*", features = ["extension-module"] }

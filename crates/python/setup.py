@@ -9,12 +9,12 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="advent_of_code_rs_python",
+    name="advent-of-code",
     long_description=long_description,
     long_description_content_type='text/markdown',
     version="2019.12.45",
     rust_extensions=[
-        RustExtension("advent_of_code_rs_python", "Cargo.toml", binding=Binding.PyO3)
+        RustExtension("advent_of_code", "Cargo.toml", binding=Binding.PyO3)
     ],
     packages=["cli"],
     entry_points={

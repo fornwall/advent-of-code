@@ -1,5 +1,5 @@
 [package]
-name = "advent_of_code_rs_wasm"
+name = "advent-of-code-wasm"
 version = "2019.12.45"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code-2019-rs"
@@ -11,7 +11,7 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-advent_of_code_rs = { path = "../core" }
+advent-of-code = { path = "../core" }
 wasm-bindgen = "*"
 wasm-bindgen-test = "*"
 

@@ -1,7 +1,7 @@
 use std::env;
 use std::io::Read;
 
-use advent_of_code_rs::get_problem_set;
+use advent_of_code::get_problem_set;
 
 fn main() {
     let usage = || -> ! {

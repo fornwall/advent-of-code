@@ -65,3 +65,10 @@ pub fn get_problem_set(day: u8, part: u8) -> Option<fn(&str) -> String> {
         _ => None,
     }
 }
+
+pub fn solve(day: u8, part: u8, input: &str) -> String {
+    match get_problem_set(day, part) {
+        Some(function) => function(input),
+        None => String::from("Invalid solution - day needs to be 1-25, and part 1-2"),
+    }
+}

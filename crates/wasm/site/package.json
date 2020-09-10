@@ -1,5 +1,5 @@
 {
-  "name": "advent-of-code-wasm",
+  "name": "advent-of-code-site",
   "version": "2019.12.45",
   "description": "Using wasm to run Advent of Code 2018 solutions",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "start": "webpack-dev-server"
   },
   "devDependencies": {
-    "advent_of_code_rs": "file:../target/browser",
+    "advent-of-code-wasm": "file:../target/browser",
     "webpack": "^4.16.3",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",

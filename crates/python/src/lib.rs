@@ -1,4 +1,4 @@
-use advent_of_code_rs::get_problem_set;
+use advent_of_code::get_problem_set;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
@@ -30,7 +30,7 @@ pub fn solve(day: u8, part: u8, input: String) -> PyResult<String> {
 /// >>> sum_as_string(1, 2)
 /// '4'
 #[pymodule]
-fn advent_of_code_rs_python(_py: Python, m: &PyModule) -> PyResult<()> {
+fn advent_of_code(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(solve))?;
 
     Ok(())

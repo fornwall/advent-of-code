@@ -1,4 +1,4 @@
-from advent_of_code_rs_python import solve
+from advent_of_code import solve
 import sys
 
 

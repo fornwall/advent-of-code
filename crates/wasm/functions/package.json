@@ -1,5 +1,5 @@
 {
     "dependencies": {
-        "advent_of_code_rs": "file:../target/nodejs"
+        "advent-of-code-rs-wasm": "file:../target/nodejs"
     }
 }

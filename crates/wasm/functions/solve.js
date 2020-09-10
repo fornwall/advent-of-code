@@ -1,4 +1,4 @@
-const solve = require('advent_of_code_rs').solve;
+const solve = require('advent-of-code-rs-wasm').solve;
 
 exports.handler = function(event, context, callback) {
   if (event.httpMethod !== 'POST') {
