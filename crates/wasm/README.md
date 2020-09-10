@@ -30,7 +30,6 @@ Install:
 
 ```sh
 $ npm install -g advent-of-code-wasm
-# [..]
 $ echo 14 | advent-of-code-wasm 1 1
 2
 ```
