@@ -36,7 +36,7 @@ exports.handler = function(event, context, callback) {
 
   try {
     const input = event.body;
-    const solution = solve(day, part, input);
+    const solution = solve(year, day, part, input);
     return callback(null, {
       statusCode: 200,
       body: solution

@@ -1,16 +1,20 @@
 #!/bin/sh
 set -e -u
 
-if [ "$#" != 2 ]; then
-	echo "usage:\n    ./post-solution <day> <part> # reads input from stdin"
-	echo "example:\n    ./post-solution 23 1 < crates/core/src/day23_input.txt"
+if [ "$#" != 3 ]; then
+	echo "usage:\n    ./post-solution <year> <day> <part> # reads input from stdin"
+	echo "example:\n    ./post-solution 2019 23 1 < crates/core/src/year2019/day23_input.txt"
 	exit
 fi
 
-DAY=$1
-PART=$2
+YEAR=$1
+DAY=$2
+PART=$3
 
-if [ "$DAY" -ge 26 ] && [ "$PART" -le 0 ]; then
+if [ "$YEAR" -ge 2020 ] && [ "$PART" -le 2017 ]; then
+	echo "Invalid year: $YEAR - only 2018-2019 is allowed"
+	exit 1
+elif [ "$DAY" -ge 26 ] && [ "$PART" -le 0 ]; then
 	echo "Invalid day: $DAY - only 1-25 is allowed"
 	exit 1
 elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
@@ -20,4 +24,4 @@ fi
 
 curl -w '\n'\
 	--data-binary @- \
-	"https://advent2019.fornwall.net/.netlify/functions/solve?day=$DAY&part=$PART"
+	"https://aoc.fornwall.net/.netlify/functions/solve?year=$YEAR&day=$DAY&part=$PART"
