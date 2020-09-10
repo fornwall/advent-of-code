@@ -20,6 +20,6 @@ try {
     const output = solve(day, part, input);
     console.log(output);
 } catch (e) {
-    console.error("Incorrect input (or bug in code");
+    console.error("ERROR: Invalid input");
 }
 

@@ -27,11 +27,18 @@ exports.handler = function(event, context, callback) {
     });
   }
 
-  const input = event.body;
-  const solution = solve(day, part, input);
 
-  return callback(null, {
-    statusCode: 200,
-    body: solution
-  });
+  try {
+    const input = event.body;
+    const solution = solve(day, part, input);
+    return callback(null, {
+      statusCode: 200,
+      body: solution
+    });
+  } catch (e) {
+    return callback(null, {
+      statusCode: 400,
+      body: "Invalid input"
+    });
+  }
 }

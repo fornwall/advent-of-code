@@ -10,5 +10,8 @@ def main():
     part = int(sys.argv[2])
     problem_input = sys.stdin.read()
 
-    problem_output = solve(day, part, problem_input)
-    print(problem_output)
+    try:
+        problem_output = solve(day, part, problem_input)
+        print(problem_output)
+    except BaseException:
+        sys.exit("ERROR: Invalid input")
