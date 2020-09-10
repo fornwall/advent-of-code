@@ -42,8 +42,11 @@ The solutions can be run client-side in a browser using WebAssembly at https://a
 There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
 
 ```sh
+$ curl --data-binary 14 "https://advent2019.fornwall.net/.netlify/functions/solve?day=1&part=1"
+14
 $ curl --data-binary @crates/core/src/day02_input.txt \
      "https://advent2019.fornwall.net/.netlify/functions/solve?day=2&part=2"
+5485
 ```
 
 # Command line tools
