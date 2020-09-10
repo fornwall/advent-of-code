@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code"
-version = "2019.12.45"
+version = "2019.12.46"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code-2019-rs"
 license = "MIT"
