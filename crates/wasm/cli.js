@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const solve = require('advent_of_code_rs').solve;
+const solve = require('advent_of_code_rs_wasm').solve;
 
 const day = parseInt(process.argv[2]);
 const part = parseInt(process.argv[3]);
@@ -16,5 +16,10 @@ if (!(day >= 1 && day <= 25)) {
 
 const input = fs.readFileSync(0, 'utf8');
 
-console.log(solve(day, part, input));
+try {
+    const output = solve(day, part, input);
+    console.log(output);
+} catch (e) {
+    console.error("Incorrect input (or bug in code");
+}
 

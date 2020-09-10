@@ -8,6 +8,7 @@ cp cli.js target/nodejs/
 
 cd target/nodejs
 
-jq -s add <(echo '{"bin":{ "advent-of-code-wasm": "./cli.js" }}') package.json
+cp package.json old-package.json
+jq -s add <(echo '{"bin":{ "advent-of-code-wasm": "./cli.js" }}') old-package.json > package.json
 
 npm publish

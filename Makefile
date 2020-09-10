@@ -33,9 +33,6 @@ create-html:
 node-library:
 	cd crates/wasm && wasm-pack build --target nodejs --out-dir target/nodejs
 
-publish-node-library: node-library
-	cd crates/wasm/target/nodejs && npm publish --access public
-
 serve-html: create-html
 	cd crates/wasm/site/dist && python3 -m http.server
 
