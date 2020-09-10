@@ -3,8 +3,8 @@ use advent_of_code::get_problem_set;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn solve(day: u8, part: u8, input: String) -> String {
-    if let Some(solver) = get_problem_set(day, part) {
+pub fn solve(year: u16, day: u8, part: u8, input: String) -> String {
+    if let Some(solver) = get_problem_set(year, day, part) {
         solver(&input)
     } else {
         format!(

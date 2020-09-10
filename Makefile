@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME=fredrikfornwall/advent-of-code-2019-rs
+DOCKER_IMAGE_NAME=fredrikfornwall/advent-of-code
 .PHONY: check docker-image publish-docker publish-html publish-npm publish-all
 
 ifeq ($(DEBUG),1)

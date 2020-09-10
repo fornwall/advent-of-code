@@ -4,8 +4,8 @@ use pyo3::wrap_pyfunction;
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
-pub fn solve(day: u8, part: u8, input: String) -> PyResult<String> {
-    if let Some(solver) = get_problem_set(day, part) {
+pub fn solve(year: u16, day: u8, part: u8, input: String) -> PyResult<String> {
+    if let Some(solver) = get_problem_set(year, day, part) {
         Ok(solver(&input))
     } else {
         Ok(format!(

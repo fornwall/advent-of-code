@@ -1,4 +1,4 @@
-use crate::int_code::Program;
+use super::int_code::Program;
 
 fn run(intcode_program_string: &str, ascii_program_string: &str) -> String {
     let mut intcode_program = Program::parse(intcode_program_string);

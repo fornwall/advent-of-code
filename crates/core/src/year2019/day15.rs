@@ -1,4 +1,4 @@
-use crate::int_code::Program;
+use super::int_code::Program;
 use std::collections::{HashSet, VecDeque};
 
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];

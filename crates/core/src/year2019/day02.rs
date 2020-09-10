@@ -1,4 +1,4 @@
-use crate::int_code::Program;
+use super::int_code::Program;
 
 pub fn part1(input_string: &str) -> String {
     part1_patch(input_string, true)

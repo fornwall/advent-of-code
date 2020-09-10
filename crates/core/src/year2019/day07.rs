@@ -1,5 +1,5 @@
-use crate::int_code::Program;
-use crate::permutation::all_permutations;
+use super::int_code::Program;
+use super::permutation::all_permutations;
 use std::cell::RefCell;
 
 pub fn part1(input_string: &str) -> String {

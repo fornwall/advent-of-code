@@ -10,6 +10,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="advent-of-code",
+    url="https://github.com/fornwall/advent-of-code",
     long_description=long_description,
     long_description_content_type='text/markdown',
     version="2019.12.48",

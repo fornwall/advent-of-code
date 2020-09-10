@@ -1,4 +1,4 @@
-use crate::int_code::Program;
+use super::int_code::Program;
 use std::collections::VecDeque;
 
 pub fn run_simulation(input_string: &str, part1: bool) -> String {

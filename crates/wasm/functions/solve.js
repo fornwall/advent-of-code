@@ -12,10 +12,16 @@ exports.handler = function(event, context, callback) {
   }
 
   const parameters = event.queryStringParameters;
+  const year = parseInt(parameters.year || '0');
   const day = parseInt(parameters.day || '1');
   const part = parseInt(parameters.part || '1')
 
-  if (!(day >= 1 && day <= 25)) {
+  if (!(year >= 2018 && year <= 2019)) {
+    return callback(null, {
+      statusCode: 400,
+      body: 'Invalid year - must be integer between 2018 and 2019'
+    });
+  } else if (!(day >= 1 && day <= 25)) {
     return callback(null, {
       statusCode: 400,
       body: 'Invalid day - must be integer between 1 and 25'

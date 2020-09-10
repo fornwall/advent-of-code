@@ -1,4 +1,4 @@
-use crate::int_code::Program;
+use super::int_code::Program;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]

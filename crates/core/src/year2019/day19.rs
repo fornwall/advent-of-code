@@ -1,4 +1,4 @@
-use crate::int_code::Program;
+use super::int_code::Program;
 
 fn check(program: &Program, x: i32, y: i32) -> bool {
     let mut program_copy = program.clone();

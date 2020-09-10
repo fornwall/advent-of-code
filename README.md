@@ -1,12 +1,12 @@
-[![Build](https://github.com/fornwall/advent-of-code-2019-rs/workflows/Github%20CI/badge.svg)](https://github.com/fornwall/advent-of-code-2019-rs/actions?query=workflow%3A%22Github+CI%22)
+[![Build](https://github.com/fornwall/advent-of-code/workflows/Github%20CI/badge.svg)](https://github.com/fornwall/advent-of-code/actions?query=workflow%3A%22Github+CI%22)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8cb47a76-7cd7-4545-9f10-56ba075c8e41/deploy-status)](https://app.netlify.com/sites/mystifying-blackwell-9e705f/deploys)
 [![Crates.io](https://img.shields.io/crates/v/advent-of-code.svg)](https://crates.io/crates/advent-of-code)
-[![Docker Hub](https://img.shields.io/docker/v/fredrikfornwall/advent-of-code-2019-rs.svg?label=docker)](https://hub.docker.com/repository/docker/fredrikfornwall/advent-of-code-2019-rs/)
+[![Docker Hub](https://img.shields.io/docker/v/fredrikfornwall/advent-of-code.svg?label=docker)](https://hub.docker.com/repository/docker/fredrikfornwall/advent-of-code/)
 [![npm](https://img.shields.io/npm/v/advent-of-code-wasm.svg)](https://www.npmjs.com/package/advent-of-code-wasm)
 [![PyPi](https://img.shields.io/pypi/v/advent-of-code.svg)](https://pypi.org/project/advent-of-code/)
 
-# Advent of Code 2019 in Rust
-This repository contains solutions to [Advent of Code 2019](https://adventofcode.com/2019) problems in Rust.
+# Advent of Code solutions in Rust
+This repository contains solutions to [Advent of Code](https://adventofcode.com/) problems in Rust.
 
 # Libraries
 The `solve(day, part, input)` library function is published on these package repositories:
@@ -36,16 +36,16 @@ assert.equal(solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
 ```
 
 # Running in the browser
-The solutions can be run client-side in a browser using WebAssembly at https://advent2019.fornwall.net.
+The solutions can be run client-side in a browser using WebAssembly at https://aoc.fornwall.net.
 
 # Post to HTTP endpoint
 There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
 
 ```sh
-$ curl --data-binary 14 "https://advent2019.fornwall.net/.netlify/functions/solve?day=1&part=1"
+$ curl --data-binary 14 "https://aoc.fornwall.net/.netlify/functions/solve?day=1&part=1"
 14
 $ curl --data-binary @crates/core/src/day02_input.txt \
-     "https://advent2019.fornwall.net/.netlify/functions/solve?day=2&part=2"
+     "https://aoc.fornwall.net/.netlify/functions/solve?day=2&part=2"
 5485
 ```
 
@@ -58,8 +58,8 @@ $ $TOOL $DAY $PART < $INPUT
 
 ## Docker image on Docker Hub
 ```sh
-$ docker pull fredrikfornwall/advent-of-code-2019-rs:latest
-$ echo 14 | docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1
+$ docker pull fredrikfornwall/advent-of-code:latest
+$ echo 14 | docker run -i fredrikfornwall/advent-of-code:latest 1 1
 2
 ```
 

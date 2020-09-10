@@ -2,9 +2,9 @@
 name = "advent-of-code"
 version = "2019.12.48"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-repository = "https://github.com/fornwall/advent-of-code-2019-rs"
+repository = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
-description = "Solutions to Advent of Code 2019 written in Rust"
+description = "Solutions to Advent of Code written in Rust"
 edition = "2018"
 
 [lib]
