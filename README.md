@@ -9,11 +9,11 @@
 This repository contains solutions to [Advent of Code](https://adventofcode.com/) problems in Rust.
 
 # Libraries
-The `solve(day, part, input)` library function is published on these package repositories:
+The `solve(year, day, part, input)` library function is published on these package repositories:
 
 - [crates.io](https://crates.io/crates/advent-of-code) for the Rust library.
-- [npm](https://www.npmjs.com/package/advent-of-code-wasm) for a Node.js library using WebAssembly built by [wasm-pack](https://rustwasm.github.io/wasm-pack/).
-- [PyPi](https://pypi.org/project/advent-of-code) for a Python library using [PyO3](https://pyo3.rs/) and built with [cibuildwheel](https://cibuildwheel.readthedocs.io/).
+- [npm](https://www.npmjs.com/package/advent-of-code-wasm) for a Node.js library using WebAssembly built with [wasm-pack](https://rustwasm.github.io/wasm-pack/).
+- [PyPi](https://pypi.org/project/advent-of-code) for a Python library using [PyO3](https://pyo3.rs/) built with [cibuildwheel](https://cibuildwheel.readthedocs.io/).
 
 ```rust
 fn todo() {}
@@ -22,7 +22,7 @@ fn todo() {}
 ```python
 # Python with dependency added: pip install --upgrade advent-of-code
 >>> import advent_of_code
->>> advent_of_code.solve(1, 1, "12")
+>>> advent_of_code.solve(2019, 1, 1, "12")
 '2'
 ```
 
@@ -31,8 +31,8 @@ fn todo() {}
 const assert = require('assert').strict;
 const solve = require('advent-of-code-wasm').solve;
 
-assert.equal(solve(1, 1, '14'), '2');
-assert.equal(solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
+assert.equal(solve(2019, 1, 1, '14'), '2');
+assert.equal(solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
 ```
 
 # Running in the browser
@@ -42,10 +42,10 @@ The solutions can be run client-side in a browser using WebAssembly at https://a
 There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
 
 ```sh
-$ curl --data-binary 14 "https://aoc.fornwall.net/.netlify/functions/solve?day=1&part=1"
+$ curl --data-binary 14 "https://aoc.fornwall.net/.netlify/functions/solve?year=2019&day=1&part=1"
 14
 $ curl --data-binary @crates/core/src/day02_input.txt \
-     "https://aoc.fornwall.net/.netlify/functions/solve?day=2&part=2"
+     "https://aoc.fornwall.net/.netlify/functions/solve?year=2019&day=2&part=2"
 5485
 ```
 
@@ -53,13 +53,13 @@ $ curl --data-binary @crates/core/src/day02_input.txt \
 All tools are invoked with day and part as arguments, and expect input on stdin:
 
 ```sh
-$ $TOOL $DAY $PART < $INPUT
+$ $TOOL $YEAR $DAY $PART < $INPUT
 ```
 
 ## Docker image on Docker Hub
 ```sh
 $ docker pull fredrikfornwall/advent-of-code:latest
-$ echo 14 | docker run -i fredrikfornwall/advent-of-code:latest 1 1
+$ echo 14 | docker run -i fredrikfornwall/advent-of-code:latest 2019 1 1
 2
 ```
 
@@ -68,28 +68,28 @@ To run a solution against given input on stdin:
 
 ```sh
 $ cd crates/core
-$ echo 14 | cargo run -q 1 1
+$ echo 14 | cargo run -q 2019 1 1
 2
 ```
 
 ## Rust tool installable from crates.io
 ```sh
 $ cargo install advent-of-code
-$ echo 14 | advent-of-code 1 1
+$ echo 14 | advent-of-code 2019 1 1
 2
 ```
 
 ## Node tool installable from npm
 ```sh
 $ npm install advent-of-code-wasm -g
-$ echo 14 | advent-of-code-wasm 1 1
+$ echo 14 | advent-of-code-wasm 2019 1 1
 2
 ```
 
 ## Python tool installable from PyPi
 ```sh
 $ pip install --upgrade advent-of-code
-$ echo 14 | advent-of-code-py 1 1
+$ echo 14 | advent-of-code-py 2019 1 1
 2
 ```
 
