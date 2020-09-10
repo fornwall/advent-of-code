@@ -8,36 +8,6 @@
 # Advent of Code 2019 in Rust
 This repository contains solutions to [Advent of Code 2019](https://adventofcode.com/2019) problems in Rust.
 
-# Running the tests
-[Install rust](https://www.rust-lang.org/tools/install) if necessary, then run tests with:
-
-```
-cargo test
-```
-
-# Running the solutions against custom input
-To run a solution against given input on stdin:
-
-```sh
-# Debug mode:
-cargo run -q <day> <part> < path/to/input.txt
-# Release mode:
-cargo run -q --release <day> <part> < path/to/input.txt
-
-# Examples:
-cargo run 2 1 < path/to/input_day2_part1.txt
-```
-
-# Running using Docker
-A published Docker image can be used to run against custom input:
-
-```sh
-docker run -i fredrikfornwall/advent-of-code-2019-rs:latest <day> <part> < path/to/input.txt
-
-# Example:
-docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1 < src/day1_input.txt
-```
-
 # Libraries
 The `solve(day, part, input)` library function is published on these package repositories:
 
@@ -65,11 +35,38 @@ assert.equal(solve(1, 1, '14'), '2');
 assert.equal(solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
 ```
 
+# Running in the browser
+The solutions can be run client-side in a browser using WebAssembly at https://advent2019.fornwall.net.
+
+# Post to HTTP endpoint
+There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
+
+```sh
+$ curl --data-binary @crates/core/src/day02_input.txt \
+     "https://advent2019.fornwall.net/.netlify/functions/solve?day=2&part=2"
+```
+
 # Command line tools
 All tools are invoked with day and part as arguments, and expect input on stdin:
 
 ```sh
 $ $TOOL $DAY $PART < $INPUT
+```
+
+## Docker image on Docker Hub
+```sh
+$ docker pull fredrikfornwall/advent-of-code-2019-rs:latest
+$ echo 14 | docker run -i fredrikfornwall/advent-of-code-2019-rs:latest 1 1
+2
+```
+
+## Running a checkout of this code
+To run a solution against given input on stdin:
+
+```sh
+$ cd crates/core
+$ echo 14 | cargo run -q 1 1
+2
 ```
 
 ## Rust tool installable from crates.io
@@ -91,17 +88,6 @@ $ echo 14 | advent-of-code-wasm 1 1
 $ pip install --upgrade advent-of-code-rs-python
 $ echo 14 | advent-of-code-py 1 1
 2
-```
-
-# Running in the browser
-The solutions can run using WebAssembly at https://advent2019.fornwall.net.
-
-# Post to HTTP endpoint
-There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
-
-```sh
-$ curl --data-binary @crates/core/src/day02_input.txt \
-     "https://advent2019.fornwall.net/.netlify/functions/solve?day=2&part=2"
 ```
 
 # Days
