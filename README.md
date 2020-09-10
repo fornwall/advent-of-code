@@ -75,7 +75,6 @@ $ $TOOL $DAY $PART < $INPUT
 ## Rust tool installable from crates.io
 ```sh
 $ cargo install advent_of_code_rs
-# [..]
 $ echo 14 | advent_of_code_rs 1 1
 2
 ```
@@ -83,14 +82,15 @@ $ echo 14 | advent_of_code_rs 1 1
 ## Node tool installable from npm
 ```sh
 $ npm install advent_of_code_rs_wasm -g
-# [..]
 $ echo 14 | advent-of-code-wasm 1 1
 2
 ```
 
 ## Python tool installable from PyPi
 ```sh
-$ echo TODO
+$ pip install --upgrade advent-of-code-rs-python
+$ echo 14 | advent-of-code-py 1 1
+2
 ```
 
 # Running in the browser
