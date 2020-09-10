@@ -74,8 +74,8 @@ $ echo 14 | cargo run -q 1 1
 
 ## Rust tool installable from crates.io
 ```sh
-$ cargo install advent_of_code_rs
-$ echo 14 | advent_of_code_rs 1 1
+$ cargo install advent-of-code
+$ echo 14 | advent-of-code 1 1
 2
 ```
 
