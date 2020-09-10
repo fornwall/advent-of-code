@@ -16,6 +16,10 @@ setup(
     rust_extensions=[
         RustExtension("advent_of_code_rs_python", "Cargo.toml", binding=Binding.PyO3)
     ],
+    packages=["cli"],
+    entry_points={
+        'console_scripts': ['advent-of-code-py=cli.main:main'],
+    },
     test_suite="tests",
     zip_safe=False,
 )
