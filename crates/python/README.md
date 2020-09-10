@@ -1,4 +1,4 @@
-# advent-of-code-rs-python
+# advent-of-code
 Solutions to [Advent of Code 2019](https://adventofcode.com/2019).
 
 The solutions are implemented in Rust which is compiled to WebAssembly.
