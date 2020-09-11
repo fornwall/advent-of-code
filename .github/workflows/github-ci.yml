@@ -3,7 +3,7 @@ name: Github CI
 on: push
 
 env:
-  DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-2019-rs
+  DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
 
 jobs:
   test-rust:
