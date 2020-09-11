@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-python"
-version = "2019.12.50"
+version = "2019.12.51"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 edition = "2018"
 
