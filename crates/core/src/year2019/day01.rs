@@ -7,23 +7,6 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Str
         .to_string()
 }
 
-fn sum_required_fuel_result(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Result<String, String> {
-    let mut total_fuel: u32 = 0;
-    for (line_number, line) in input_string
-        .lines()
-        .enumerate() {
-        match line.parse::<u32>() {
-            Ok(value) => {
-                total_fuel += fuel_calculator(value);
-            },
-            Err(error) => {
-                return Err(format!("Could not parse input on line {}", line_number));
-            }
-        }
-    }
-    return Ok(total_fuel);
-}
-
 pub fn part1(input_string: &str) -> String {
     sum_required_fuel(input_string, |mass| mass / 3 - 2)
 }
