@@ -21,9 +21,10 @@ fn todo() {}
 
 ```python
 # Python with dependency added: pip install --upgrade advent-of-code
->>> import advent_of_code
->>> advent_of_code.solve(2019, 1, 1, "12")
-'2'
+from advent_of_code import solve
+
+assert solve(2019, 1, 1, "14") == "2"
+assert solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4") == "30"
 ```
 
 ```js
