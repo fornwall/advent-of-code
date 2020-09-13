@@ -5,6 +5,9 @@ authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
 description = "Solutions to Advent of Code written in Rust"
+documentation = "https://github.com/fornwall/advent-of-code"
+homepage = "https://github.com/fornwall/advent-of-code"
+readme = "../../README.md"
 edition = "2018"
 
 [lib]
