@@ -4,7 +4,11 @@ use super::int_code::Word;
 fn run_with_input(input_string: &str, input: Word) -> Result<Word, String> {
     let mut program = Program::try_parse(input_string)?;
     program.input(input);
-    program.run_for_output().last().ok_or("No output produced".to_string()).map(|word| *word)
+    program
+        .run_for_output()
+        .last()
+        .ok_or("No output produced".to_string())
+        .map(|word| *word)
 }
 
 pub fn part1(input_string: &str) -> Result<Word, String> {

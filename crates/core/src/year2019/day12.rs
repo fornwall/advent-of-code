@@ -117,7 +117,11 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
         }
     }
 
-    Ok(lcd3(cycles[0].unwrap(), cycles[1].unwrap(), cycles[2].unwrap()))
+    Ok(lcd3(
+        cycles[0].unwrap(),
+        cycles[1].unwrap(),
+        cycles[2].unwrap(),
+    ))
 }
 
 #[test]

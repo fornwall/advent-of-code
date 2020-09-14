@@ -22,7 +22,10 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1("104,1125899906842624,99").unwrap(), "1125899906842624");
+    assert_eq!(
+        part1("104,1125899906842624,99").unwrap(),
+        "1125899906842624"
+    );
     assert_eq!(
         part1("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99").unwrap(),
         "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
@@ -32,7 +35,10 @@ pub fn tests_part1() {
         "1219070632396864"
     );
 
-    assert_eq!(part1(include_str!("day09_input.txt")).unwrap(), "3601950151");
+    assert_eq!(
+        part1(include_str!("day09_input.txt")).unwrap(),
+        "3601950151"
+    );
 }
 
 #[test]

@@ -25,6 +25,8 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String
         (2019, 5, 2) => to_stringer(year2019::day05::part2, input),
         (2019, 6, 1) => to_stringer(year2019::day06::part1, input),
         (2019, 6, 2) => to_stringer(year2019::day06::part2, input),
+        (2019, 7, 1) => to_stringer(year2019::day07::part1, input),
+        (2019, 7, 2) => to_stringer(year2019::day07::part2, input),
         (2019, 9, 1) => to_stringer(year2019::day09::part1, input),
         (2019, 9, 2) => to_stringer(year2019::day09::part2, input),
         (2019, 11, 1) => to_stringer(year2019::day11::part1, input),

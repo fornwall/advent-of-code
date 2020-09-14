@@ -4,7 +4,7 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
         match line.parse::<u32>() {
             Ok(value) => {
                 total_fuel += fuel_calculator(value);
-            },
+            }
             Err(error) => {
                 return Err(format!(
                     "Parse error at line {}: {}",

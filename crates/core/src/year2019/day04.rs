@@ -1,9 +1,12 @@
 use std::cmp::Ordering;
 
 pub fn part1(input_string: &str) -> Result<u32, String> {
-    let parts: Vec<&str>= input_string.trim().split('-').collect();
+    let parts: Vec<&str> = input_string.trim().split('-').collect();
     if parts.len() != 2 {
-        return Err(format!("Invalid parts (should be in FROM-TO form): {}", input_string));
+        return Err(format!(
+            "Invalid parts (should be in FROM-TO form): {}",
+            input_string
+        ));
     }
     let from = parts[0].parse::<i32>().or(Err("Invalid range"))?;
     let to = parts[1].parse::<i32>().or(Err("Invalid range"))?;

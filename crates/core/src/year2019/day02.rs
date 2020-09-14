@@ -27,16 +27,22 @@ pub fn part2(input_string: &str) -> Result<Word, String> {
             program.write_memory(1, noun);
             program.write_memory(2, verb);
             if program.run_for_register0() == DESIRED_OUTPUT {
-                return Ok(100 * noun + verb)
+                return Ok(100 * noun + verb);
             }
         }
     }
-    Err(format!("Desired output {} is never produced", DESIRED_OUTPUT))
+    Err(format!(
+        "Desired output {} is never produced",
+        DESIRED_OUTPUT
+    ))
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(Ok(3500), part1_patch("1,9,10,3,2,3,11,0,99,30,40,50", false));
+    assert_eq!(
+        Ok(3500),
+        part1_patch("1,9,10,3,2,3,11,0,99,30,40,50", false)
+    );
     assert_eq!(Ok(2), part1_patch("1,0,0,0,99", false));
     assert_eq!(Ok(2), part1_patch("2,3,0,3,99", false));
     assert_eq!(Ok(2), part1_patch("2,4,4,5,99,0", false));
@@ -44,7 +50,10 @@ pub fn tests_part1() {
 
     assert_eq!(Ok(4570637), part1(include_str!("day02_input.txt")));
 
-    assert_eq!(Err("Unable to parse program word hi: invalid digit found in string".to_string()), part1("hi"));
+    assert_eq!(
+        Err("Unable to parse program word hi: invalid digit found in string".to_string()),
+        part1("hi")
+    );
 }
 
 #[test]

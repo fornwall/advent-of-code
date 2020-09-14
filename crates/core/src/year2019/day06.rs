@@ -58,7 +58,7 @@ pub fn part2(string: &str) -> Result<u32, String> {
             for entry in list.iter() {
                 if visited.insert(entry) {
                     if *entry == target {
-                        return Ok(distance)
+                        return Ok(distance);
                     }
                     let new_distance = distance + 1;
                     to_visit.push_back((new_distance, entry));

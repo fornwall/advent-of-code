@@ -1,5 +1,4 @@
 use std::collections::{HashMap, VecDeque};
-use std::num::ParseIntError;
 
 pub type Word = i64;
 
@@ -38,15 +37,17 @@ impl Program {
 
     pub fn try_parse(input: &str) -> Result<Program, String> {
         let mut memory: Vec<Word> = Vec::new();
-        for word_string in input
-            .trim()
-            .split(',') {
+        for word_string in input.trim().split(',') {
             match word_string.parse::<Word>() {
                 Ok(value) => {
                     memory.push(value);
-                },
+                }
                 Err(error) => {
-                    return Err(format!("Unable to parse program word {}: {}", word_string, error.to_string()));
+                    return Err(format!(
+                        "Unable to parse program word {}: {}",
+                        word_string,
+                        error.to_string()
+                    ));
                 }
             }
         }
