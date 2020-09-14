@@ -1,7 +1,7 @@
 use super::int_code::Program;
 
 fn output_from_input(input_string: &str, input: i64) -> Result<String, String> {
-    let mut program = Program::parse(input_string);
+    let mut program = Program::parse(input_string)?;
     program.input(input);
 
     Ok(program

@@ -45,7 +45,7 @@ impl Direction {
 }
 
 fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), Color>, String> {
-    let mut program = Program::try_parse(input_string)?;
+    let mut program = Program::parse(input_string)?;
     let mut painted: HashMap<(i32, i32), Color> = HashMap::new();
     let mut position = (0, 0);
     let mut current_direction = Direction::Up;

@@ -8,7 +8,7 @@ fn check(program: &Program, x: i32, y: i32) -> bool {
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let program = Program::parse(input_string);
+    let program = Program::parse(input_string)?;
 
     Ok((0..50)
         .flat_map(|x| (0..50).map(move |y| (x, y)))
@@ -17,7 +17,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i32, String> {
-    let program = Program::parse(input_string);
+    let program = Program::parse(input_string)?;
 
     // Find the initial start of the beam (skipping (0,0),
     // as it is not connected to rest of the beam.

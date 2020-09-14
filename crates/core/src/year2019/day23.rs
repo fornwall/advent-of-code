@@ -2,7 +2,8 @@ use super::int_code::Program;
 use std::collections::VecDeque;
 
 pub fn run_simulation(input_string: &str, part1: bool) -> Result<i64, String> {
-    let mut programs = vec![Program::parse(input_string); 50];
+    let program = Program::parse(input_string)?;
+    let mut programs = vec![program; 50];
     let mut input_queues = vec![VecDeque::<(i64, i64)>::new(); 50];
 
     // Assign network addresses:

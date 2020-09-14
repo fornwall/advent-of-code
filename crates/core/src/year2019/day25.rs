@@ -113,7 +113,7 @@ fn parse_output(program: &mut Program) -> Room {
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut program = Program::try_parse(input_string)?;
+    let mut program = Program::parse(input_string)?;
     let initial_room = parse_output(&mut program);
 
     let mut blacklisted_items = HashSet::new();

@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use std::env;
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    Ok(Program::parse(input_string)
+    let mut program = Program::parse(input_string)?;
+    Ok(program
         .run_for_output()
         .iter()
         .skip(2)
@@ -45,7 +46,7 @@ fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
-    let mut program = Program::parse(input_string);
+    let mut program = Program::parse(input_string)?;
 
     // "Memory address 0 represents the number of quarters that
     // have been inserted; set it to 2 to play for free."

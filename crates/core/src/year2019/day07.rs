@@ -3,7 +3,7 @@ use super::permutation::all_permutations;
 use std::cell::RefCell;
 
 pub fn part1(input_string: &str) -> Result<String, String> {
-    let program = Program::try_parse(input_string)?;
+    let program = Program::parse(input_string)?;
     let mut phase_settings = vec![0, 1, 2, 3, 4];
     let mut strongest_signal = 0;
 
@@ -25,7 +25,7 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
-    let program = Program::try_parse(input_string)?;
+    let program = Program::parse(input_string)?;
     let mut phase_settings = vec![5, 6, 7, 8, 9];
     let mut strongest_signal = 0;
 

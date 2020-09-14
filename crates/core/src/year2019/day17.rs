@@ -2,7 +2,7 @@ use super::int_code::Program;
 use std::slice::Iter;
 
 pub fn part1(input_string: &str) -> Result<String, String> {
-    let mut program = Program::parse(input_string);
+    let mut program = Program::parse(input_string)?;
     let map: String = program
         .run_for_output()
         .iter()
@@ -98,7 +98,7 @@ impl Direction {
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
-    let mut program = Program::try_parse(input_string)?;
+    let mut program = Program::parse(input_string)?;
 
     program.write_memory(0, 2);
 

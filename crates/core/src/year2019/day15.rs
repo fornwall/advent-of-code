@@ -16,11 +16,11 @@ fn instruction_for_direction(direction: (i32, i32)) -> i64 {
 
 /// Search the space ship using the given intcode program.
 /// The on_visit is called with ((pos_x, pos_y), is_oxygen, distance).
-fn search_space_ship<F>(input_string: &str, mut on_visit: F)
+fn search_space_ship<F>(input_string: &str, mut on_visit: F) -> Result<(), String>
 where
     F: FnMut((i32, i32), bool, i32),
 {
-    let initial_program = Program::parse(input_string);
+    let initial_program = Program::parse(input_string)?;
     let initial_position = (0, 0);
 
     // Contains (pos_x, pos_y):
@@ -59,6 +59,8 @@ where
             }
         }
     }
+
+    Ok(())
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
@@ -67,7 +69,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         if is_oxygen {
             distance_to_oxygen = distance;
         }
-    });
+    })?;
     Ok(distance_to_oxygen)
 }
 
@@ -83,7 +85,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
         } else {
             locations_without_oxygen.insert(position);
         }
-    });
+    })?;
 
     let mut furthest_distance = -1;
     while let Some((position, distance)) = to_visit.pop_front() {

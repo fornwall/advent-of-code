@@ -2,7 +2,7 @@ use super::int_code::Program;
 use super::int_code::Word;
 
 fn run_with_input(input_string: &str, input: Word) -> Result<Word, String> {
-    let mut program = Program::try_parse(input_string)?;
+    let mut program = Program::parse(input_string)?;
     program.input(input);
     program
         .run_for_output()

@@ -1,7 +1,7 @@
 use super::int_code::Program;
 
 fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<i64, String> {
-    let mut intcode_program = Program::parse(intcode_program_string);
+    let mut intcode_program = Program::parse(intcode_program_string)?;
     intcode_program.run_for_output();
     intcode_program.input_string(ascii_program_string);
 

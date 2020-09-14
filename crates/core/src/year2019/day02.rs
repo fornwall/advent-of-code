@@ -6,7 +6,7 @@ pub fn part1(input_string: &str) -> Result<Word, String> {
 }
 
 pub fn part1_patch(input_string: &str, patch: bool) -> Result<Word, String> {
-    let mut program = Program::try_parse(input_string)?;
+    let mut program = Program::parse(input_string)?;
 
     if patch {
         // To do this, before running the program, replace position 1 with the value 12 and replace position 2 with the value 2.
@@ -18,7 +18,7 @@ pub fn part1_patch(input_string: &str, patch: bool) -> Result<Word, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<Word, String> {
-    let initial_program = Program::try_parse(input_string)?;
+    let initial_program = Program::parse(input_string)?;
     const DESIRED_OUTPUT: Word = 19_690_720;
 
     for noun in 0..=99 {

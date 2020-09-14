@@ -19,23 +19,7 @@ enum Parameter {
 }
 
 impl Program {
-    pub fn parse(input: &str) -> Program {
-        Program {
-            memory: input
-                .split(',')
-                .map(|s| s.parse::<i64>().unwrap())
-                .enumerate()
-                .collect(),
-            instruction_pointer: 0,
-            output_values: Vec::new(),
-            input_values: VecDeque::new(),
-            halted: false,
-            requires_input_to: None,
-            relative_base: 0,
-        }
-    }
-
-    pub fn try_parse(input: &str) -> Result<Program, String> {
+    pub fn parse(input: &str) -> Result<Program, String> {
         let mut memory: Vec<Word> = Vec::new();
         for word_string in input.trim().split(',') {
             match word_string.parse::<Word>() {
