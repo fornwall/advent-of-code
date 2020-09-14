@@ -48,14 +48,14 @@ pub fn determine_station(points: &[(usize, usize)]) -> (usize, (usize, usize)) {
         .unwrap()
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let points = parse_points(input_string);
-    determine_station(&points).0.to_string()
+    Ok(determine_station(&points).0)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i64, String> {
     let (x, y) = part2_nth(input_string, 200);
-    (x * 100 + y).to_string()
+    Ok(x * 100 + y)
 }
 
 pub fn part2_nth(input_string: &str, nth: u32) -> (i64, i64) {
@@ -129,7 +129,7 @@ pub fn tests_part1() {
 ....#
 ...##"
         ),
-        "8"
+        Ok(8)
     );
 
     assert_eq!(
@@ -145,10 +145,10 @@ pub fn tests_part1() {
 ##...#..#.
 .#....####"
         ),
-        "33"
+        Ok(33)
     );
 
-    assert_eq!(part1(include_str!("day10_input.txt")), "319");
+    assert_eq!(part1(include_str!("day10_input.txt")), Ok(319));
 }
 
 #[test]
@@ -174,5 +174,5 @@ fn tests_part2() {
     assert_eq!(part2_nth(input_string, 14), (12, 3));
     assert_eq!(part2_nth(input_string, 15), (16, 4));
 
-    assert_eq!(part2(include_str!("day10_input.txt")), "517");
+    assert_eq!(part2(include_str!("day10_input.txt")), Ok(517));
 }

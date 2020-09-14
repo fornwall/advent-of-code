@@ -1,9 +1,9 @@
 use std::collections::VecDeque;
 
-pub fn part1(input_string: &str) -> String {
+fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, String> {
     let parts: Vec<&str> = input_string.split_whitespace().collect();
     let num_players = parts[0].parse::<usize>().unwrap();
-    let num_marbles = parts[6].parse::<usize>().unwrap() + 1; // 0 based.
+    let num_marbles = (parts[6].parse::<usize>().unwrap() + 1) * last_marble_multiplier; // 0 based.
 
     let mut player_scores = vec![0; num_players];
 
@@ -51,44 +51,45 @@ pub fn part1(input_string: &str) -> String {
         };
     }
 
-    player_scores.iter().max().unwrap().to_string()
+    Ok(*player_scores.iter().max().unwrap())
 }
 
-pub fn part2(input_string: &str) -> String {
-    part1(input_string)
+pub fn part1(input_string: &str) -> Result<usize, String> {
+    solve(input_string, 1)
+}
+
+pub fn part2(input_string: &str) -> Result<usize, String> {
+    solve(input_string, 100)
 }
 
 #[test]
 fn tests_part1() {
-    assert_eq!("32", part1("9 players; last marble is worth 25 points"));
+    assert_eq!(Ok(32), part1("9 players; last marble is worth 25 points"));
     assert_eq!(
-        "8317",
+        Ok(8317),
         part1("10 players; last marble is worth 1618 points")
     );
     assert_eq!(
-        "146373",
+        Ok(146373),
         part1("13 players; last marble is worth 7999 points")
     );
     assert_eq!(
-        "2764",
+        Ok(2764),
         part1("17 players; last marble is worth 1104 points")
     );
     assert_eq!(
-        "54718",
+        Ok(54718),
         part1("21 players; last marble is worth 6111 points")
     );
     assert_eq!(
-        "37305",
+        Ok(37305),
         part1("30 players; last marble is worth 5807 points")
     );
 
-    assert_eq!("423717", part1(include_str!("day09_input.txt")));
+    assert_eq!(Ok(423717), part1(include_str!("day09_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(
-        "3553108197",
-        part2("419 players; last marble is worth 7216400 points")
-    );
+    assert_eq!(Ok(3553108197), part2(include_str!("day09_input.txt")));
 }

@@ -58,7 +58,7 @@ impl Registers {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut registers_before = Registers::of(0, 0, 0, 0);
     let mut instruction: Vec<u16> = Vec::new();
     let mut last_blank = true;
@@ -134,10 +134,10 @@ pub fn part1(input_string: &str) -> String {
         }
     }
 
-    result.to_string()
+    Ok(result)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u16, String> {
     let mut registers_before = Registers::of(0, 0, 0, 0);
     let mut instruction: Vec<u16> = Vec::new();
     let mut last_blank = true;
@@ -258,13 +258,13 @@ pub fn part2(input_string: &str) -> String {
         regs.apply(opcode, instruction[1], instruction[2], instruction[3]);
     }
 
-    regs.values[0].to_string()
+    Ok(regs.values[0])
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "1",
+        Ok(1),
         part1(
             "Before: [3, 2, 1, 1]
 9 2 1 2
@@ -272,10 +272,10 @@ After:  [3, 2, 2, 1]"
         )
     );
 
-    assert_eq!("624", part1(include_str!("day16_input.txt")));
+    assert_eq!(Ok(624), part1(include_str!("day16_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("584", part2(include_str!("day16_input.txt")));
+    assert_eq!(Ok(584), part2(include_str!("day16_input.txt")));
 }

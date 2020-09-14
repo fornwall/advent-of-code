@@ -122,7 +122,7 @@ impl Maze {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let maze = Maze::parse(input_string);
 
     let mut to_visit = VecDeque::new();
@@ -147,16 +147,16 @@ pub fn part1(input_string: &str) -> String {
             if maze.tile_at(new_location.0, new_location.1) == b'.' && visited.insert(new_location)
             {
                 if new_location == maze.end_location {
-                    return new_distance.to_string();
+                    return Ok(new_distance);
                 }
                 to_visit.push_back((new_location, new_distance));
             }
         }
     }
-    "No path found".to_string()
+    Err("No path found".to_string())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     let maze = Maze::parse(input_string);
 
     let mut to_visit = VecDeque::new();
@@ -186,24 +186,24 @@ pub fn part2(input_string: &str) -> String {
                 && visited.insert((new_location, new_level))
             {
                 if new_location == maze.end_location && new_level == 0 {
-                    return new_distance.to_string();
+                    return Ok(new_distance);
                 }
                 to_visit.push_back((new_location, new_distance, new_level));
             }
         }
     }
-    "No path found".to_string()
+    Err("No path found".to_string())
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day20_example.txt")), "23");
-    assert_eq!(part1(include_str!("day20_input.txt")), "580");
-    assert_eq!(part1(include_str!("day20_input_ray.txt")), "552");
+    assert_eq!(part1(include_str!("day20_example.txt")), Ok(23));
+    assert_eq!(part1(include_str!("day20_input.txt")), Ok(580));
+    assert_eq!(part1(include_str!("day20_input_ray.txt")), Ok(552));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day20_input.txt")), "6362");
-    assert_eq!(part2(include_str!("day20_input_ray.txt")), "6492");
+    assert_eq!(part2(include_str!("day20_input.txt")), Ok(6362));
+    assert_eq!(part2(include_str!("day20_input_ray.txt")), Ok(6492));
 }

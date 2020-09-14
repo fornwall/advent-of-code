@@ -36,7 +36,7 @@ impl PartialEq for Step {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<String, String> {
     let mut step_map = HashMap::new();
     let mut remaining_dependencies: HashMap<char, HashSet<char>> = HashMap::new();
 
@@ -87,7 +87,7 @@ pub fn part1(input_string: &str) -> String {
         }
     }
 
-    result
+    Ok(result)
 }
 
 #[derive(Eq)]
@@ -197,8 +197,8 @@ pub fn part2_param(input_string: &str, workers: usize, step_duration_base: i32) 
     latest_work_done_at
 }
 
-pub fn part2(input_string: &str) -> String {
-    part2_param(input_string, 5, 60).to_string()
+pub fn part2(input_string: &str) -> Result<i32, String> {
+    Ok(part2_param(input_string, 5, 60))
 }
 
 #[test]
@@ -214,6 +214,7 @@ Step B must be finished before step E can begin.
 Step D must be finished before step E can begin.
 Step F must be finished before step E can begin."
         )
+        .unwrap()
     );
 
     assert_eq!(
@@ -222,6 +223,7 @@ Step F must be finished before step E can begin."
             "Step B must be finished before step A can begin.
 Step C must be finished before step A can begin."
         )
+        .unwrap()
     );
 
     assert_eq!(
@@ -230,11 +232,12 @@ Step C must be finished before step A can begin."
             "Step C must be finished before step A can begin.
 Step B must be finished before step A can begin."
         )
+        .unwrap()
     );
 
     assert_eq!(
         "OUGLTKDJVBRMIXSACWYPEQNHZF",
-        part1(include_str!("day07_input.txt"))
+        part1(include_str!("day07_input.txt")).unwrap()
     );
 }
 
@@ -255,5 +258,5 @@ Step F must be finished before step E can begin.",
         )
     );
 
-    assert_eq!("929", part2(include_str!("day07_input.txt")));
+    assert_eq!(Ok(929), part2(include_str!("day07_input.txt")));
 }

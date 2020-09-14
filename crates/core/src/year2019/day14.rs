@@ -101,12 +101,12 @@ fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> Chemi
     needed[reactions.ore_id]
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<ChemicalAmount, String> {
     let reactions = Reactions::parse(input_string);
-    required_ore(&reactions, 1).to_string()
+    Ok(required_ore(&reactions, 1))
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i64, String> {
     let reactions = Reactions::parse(input_string);
 
     const AVAILABLE_ORE: i64 = 1_000_000_000_000;
@@ -116,7 +116,7 @@ pub fn part2(input_string: &str) -> String {
     loop {
         let fuel_to_produce = (max_produced_fuel + min_produced_fuel) / 2;
         if fuel_to_produce == min_produced_fuel {
-            return min_produced_fuel.to_string();
+            return Ok(min_produced_fuel);
         }
 
         let ore_amount = required_ore(&reactions, fuel_to_produce);
@@ -143,7 +143,7 @@ pub fn tests_part1() {
 4 C, 1 A => 1 CA
 2 AB, 3 BC, 4 CA => 1 FUEL"
         ),
-        "165"
+        Ok(165)
     );
 
     assert_eq!(
@@ -158,10 +158,10 @@ pub fn tests_part1() {
 165 ORE => 2 GPVTF
 3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
         ),
-        "13312"
+        Ok(13312)
     );
 
-    assert_eq!(part1(include_str!("day14_input.txt")), "1590844");
+    assert_eq!(part1(include_str!("day14_input.txt")), Ok(1590844));
 }
 
 #[test]
@@ -178,8 +178,8 @@ fn tests_part2() {
 165 ORE => 2 GPVTF
 3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
         ),
-        "82892753"
+        Ok(82892753)
     );
 
-    assert_eq!(part2(include_str!("day14_input.txt")), "1184209");
+    assert_eq!(part2(include_str!("day14_input.txt")), Ok(1184209));
 }

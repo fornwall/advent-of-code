@@ -7,7 +7,7 @@ fn run_with_input(input_string: &str, input: Word) -> Result<Word, String> {
     program
         .run_for_output()
         .last()
-        .ok_or("No output produced".to_string())
+        .ok_or_else(|| "No output produced".to_string())
         .map(|word| *word)
 }
 

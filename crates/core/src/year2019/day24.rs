@@ -118,12 +118,12 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<u32, String> {
     let mut grid = Grid::parse(input_string);
-    grid.advance_until_repeat().to_string()
+    Ok(grid.advance_until_repeat())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u32, String> {
     const MINUTES: usize = 200;
     const MAX_LEVELS: usize = MINUTES * 2;
 
@@ -141,19 +141,18 @@ pub fn part2(input_string: &str) -> String {
         std::mem::swap(&mut current_generation, &mut next_generation);
     }
 
-    current_generation
+    Ok(current_generation
         .iter()
         .map(|value| value.count_bugs())
-        .sum::<u32>()
-        .to_string()
+        .sum::<u32>())
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day24_input.txt")), "11042850");
+    assert_eq!(part1(include_str!("day24_input.txt")), Ok(11042850));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day24_input.txt")), "1967");
+    assert_eq!(part2(include_str!("day24_input.txt")), Ok(1967));
 }

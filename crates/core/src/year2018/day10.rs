@@ -8,12 +8,12 @@ struct Point {
     y_speed: i32,
 }
 
-pub fn part1(input_string: &str) -> String {
-    find_letters(input_string).0
+pub fn part1(input_string: &str) -> Result<String, String> {
+    Ok(find_letters(input_string).0)
 }
 
-pub fn part2(input_string: &str) -> String {
-    find_letters(input_string).1.to_string()
+pub fn part2(input_string: &str) -> Result<u32, String> {
+    Ok(find_letters(input_string).1)
 }
 
 pub fn find_letters(input_string: &str) -> (String, u32) {
@@ -126,6 +126,7 @@ position=< 5,  9> velocity=< 1, -2>
 position=<14,  7> velocity=<-2,  0>
 position=<-3,  6> velocity=< 2, -1>"
         )
+        .unwrap()
     );
 
     assert_eq!(
@@ -140,14 +141,14 @@ position=<-3,  6> velocity=< 2, -1>"
 #....#..#...#...#...#...#.......#....#..#...#...#....#..#.....
 #....#..#....#...###....#.......#....#..#....#..#....#..#.....
 ",
-        part1(include_str!("day10_input.txt"))
+        part1(include_str!("day10_input.txt")).unwrap()
     );
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "3",
+        Ok(3),
         part2(
             "position=< 9,  1> velocity=< 0,  2>
 position=< 7,  0> velocity=<-1,  0>
@@ -183,5 +184,5 @@ position=<-3,  6> velocity=< 2, -1>"
         )
     );
 
-    assert_eq!("10888", part2(include_str!("day10_input.txt")));
+    assert_eq!(Ok(10888), part2(include_str!("day10_input.txt")));
 }

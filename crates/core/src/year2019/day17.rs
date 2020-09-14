@@ -1,14 +1,14 @@
 use super::int_code::Program;
 use std::slice::Iter;
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<String, String> {
     let mut program = Program::parse(input_string);
     let map: String = program
         .run_for_output()
         .iter()
         .map(|&b| (b as u8) as char)
         .collect();
-    part1_map(&map)
+    Ok(part1_map(&map))
 }
 
 fn part1_map(map: &str) -> String {
@@ -97,8 +97,8 @@ impl Direction {
     }
 }
 
-pub fn part2(input_string: &str) -> String {
-    let mut program = Program::parse(input_string);
+pub fn part2(input_string: &str) -> Result<String, String> {
+    let mut program = Program::try_parse(input_string)?;
 
     program.write_memory(0, 2);
 
@@ -223,7 +223,7 @@ pub fn part2(input_string: &str) -> String {
                         .replace(function_c, "C");
                     let main_routine = &main_routine[0..main_routine.len() - 1];
 
-                    return vec![main_routine, function_a, function_b, function_c, "n"]
+                    return Ok(vec![main_routine, function_a, function_b, function_c, "n"]
                         .iter_mut()
                         .map(|input| {
                             program.input_string(input);
@@ -235,13 +235,13 @@ pub fn part2(input_string: &str) -> String {
                         .iter()
                         .find(|&&value| value > 255)
                         .unwrap()
-                        .to_string();
+                        .to_string());
                 }
             }
         }
     }
 
-    String::from("")
+    Err("TODO: Describe error".to_string())
 }
 
 #[test]
@@ -259,10 +259,10 @@ pub fn tests_part1() {
         "76"
     );
 
-    assert_eq!(part1(include_str!("day17_input.txt")), "11140");
+    assert_eq!(part1(include_str!("day17_input.txt")).unwrap(), "11140");
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day17_input.txt")), "1113108");
+    assert_eq!(part2(include_str!("day17_input.txt")).unwrap(), "1113108");
 }

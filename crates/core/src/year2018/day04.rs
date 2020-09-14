@@ -36,7 +36,7 @@ fn parse_input(input_string: &str) -> Vec<LogEntry> {
         .collect()
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<u64, String> {
     let entries = parse_input(input_string);
 
     let mut sleepers = HashMap::new();
@@ -82,10 +82,10 @@ pub fn part1(input_string: &str) -> String {
         .unwrap()
         .0 as u64;
 
-    (u64::from(most_sleepy_guard) * most_sleepy_minute).to_string()
+    Ok(u64::from(most_sleepy_guard) * most_sleepy_minute)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u64, String> {
     let entries = parse_input(input_string);
 
     let mut sleepers = HashMap::new();
@@ -118,13 +118,13 @@ pub fn part2(input_string: &str) -> String {
         .max_by_key(|(_, _, sleep_count)| *sleep_count)
         .unwrap();
 
-    (u64::from(guard_id) * most_sleepy_minute as u64).to_string()
+    Ok(u64::from(guard_id) * most_sleepy_minute as u64)
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "240",
+        Ok(240),
         part1(
             "[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
@@ -146,13 +146,13 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!("84834", part1(include_str!("day04_input.txt")));
+    assert_eq!(Ok(84834), part1(include_str!("day04_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "4455",
+        Ok(4455),
         part2(
             "[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
@@ -174,5 +174,5 @@ fn tests_part2() {
         )
     );
 
-    assert_eq!("53427", part2(include_str!("day04_input.txt")));
+    assert_eq!(Ok(53427), part2(include_str!("day04_input.txt")));
 }

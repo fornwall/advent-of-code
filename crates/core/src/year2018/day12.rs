@@ -87,17 +87,15 @@ impl Tunnel {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i64, String> {
     let mut tunnel = Tunnel::parse(input_string, 20);
-
     for _ in 0..20 {
         tunnel.evolve();
     }
-
-    tunnel.score().to_string()
+    Ok(tunnel.score())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i64, String> {
     let num_steps = 200;
     let mut tunnel = Tunnel::parse(input_string, num_steps);
 
@@ -109,17 +107,17 @@ pub fn part2(input_string: &str) -> String {
             let increase_per_generation =
                 tunnel.current_gen.iter().filter(|&&value| value).count() as i64;
             let final_score = tunnel.score() + remaining_generations * increase_per_generation;
-            return final_score.to_string();
+            return Ok(final_score);
         }
     }
 
-    panic!("No translation found");
+    Err("No translation found".to_string())
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "325",
+        Ok(325),
         part1(
             "initial state: #..#.#..##......###...###
 
@@ -139,10 +137,10 @@ fn tests_part1() {
 ####. => #"
         )
     );
-    assert_eq!("2140", part1(include_str!("day12_input.txt")));
+    assert_eq!(Ok(2140), part1(include_str!("day12_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("1900000000384", part2(include_str!("day12_input.txt")));
+    assert_eq!(Ok(1900000000384), part2(include_str!("day12_input.txt")));
 }

@@ -109,17 +109,17 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::parse(input_string);
     grid.print();
     for _ in 0..10 {
         grid.advance_minute();
         grid.print();
     }
-    grid.resource_value().to_string()
+    Ok(grid.resource_value())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::parse(input_string);
     grid.print();
 
@@ -139,20 +139,20 @@ pub fn part2(input_string: &str) -> String {
                 for _ in 0..remaining_hashes {
                     grid.advance_minute();
                 }
-                return grid.resource_value().to_string();
+                return Ok(grid.resource_value());
             }
             Entry::Vacant(entry) => {
                 entry.insert(i);
             }
         }
     }
-    "?".to_string()
+    Err("No solution found".to_string())
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "1147",
+        Ok(1147),
         part1(
             ".#.#...|#.
 .....#|##|
@@ -167,10 +167,10 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!("531417", part1(include_str!("day18_input.txt")));
+    assert_eq!(Ok(531417), part1(include_str!("day18_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("205296", part2(include_str!("day18_input.txt")));
+    assert_eq!(Ok(205296), part2(include_str!("day18_input.txt")));
 }

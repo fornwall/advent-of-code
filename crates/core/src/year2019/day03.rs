@@ -55,7 +55,7 @@ where
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<u32, String> {
     let mut lines = input_string.lines();
     let mut first_wire_points = HashSet::new();
 
@@ -70,10 +70,10 @@ pub fn part1(input_string: &str) -> String {
         }
     });
 
-    closest_distance.to_string()
+    Ok(closest_distance)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u32, String> {
     let mut lines = input_string.lines();
     let mut first_wire_points = HashMap::new();
 
@@ -88,35 +88,35 @@ pub fn part2(input_string: &str) -> String {
         }
     });
 
-    fewest_steps.to_string()
+    Ok(fewest_steps)
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1("R8,U5,L5,D3\nU7,R6,D4,L4"), "6");
+    assert_eq!(part1("R8,U5,L5,D3\nU7,R6,D4,L4"), Ok(6));
     assert_eq!(
         part1("R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83"),
-        "159"
+        Ok(159)
     );
     assert_eq!(
         part1("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7"),
-        "135"
+        Ok(135)
     );
 
-    assert_eq!(part1(include_str!("day03_input.txt")), "375");
+    assert_eq!(part1(include_str!("day03_input.txt")), Ok(375));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2("R8,U5,L5,D3\nU7,R6,D4,L4"), "30");
+    assert_eq!(part2("R8,U5,L5,D3\nU7,R6,D4,L4"), Ok(30));
     assert_eq!(
         part2("R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83"),
-        "610"
+        Ok(610)
     );
     assert_eq!(
         part2("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7"),
-        "410"
+        Ok(410)
     );
 
-    assert_eq!(part2(include_str!("day03_input.txt")), "14746");
+    assert_eq!(part2(include_str!("day03_input.txt")), Ok(14746));
 }

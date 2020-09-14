@@ -43,19 +43,19 @@ impl Nanobot {
         self.distance_to_point(x, y, z) <= self.strength
     }
 }
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let bots = Nanobot::parse(input_string);
     let strongest_bot = bots
         .iter()
         .max_by(|x, y| x.strength.cmp(&y.strength))
         .unwrap();
-    bots.iter()
+    Ok(bots
+        .iter()
         .filter(|&bot| strongest_bot.is_bot_within_range(bot))
-        .count()
-        .to_string()
+        .count())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i64, String> {
     let bots = Nanobot::parse(input_string);
 
     let (mut min_x, mut max_x, mut min_y, mut max_y, mut min_z, mut max_z) =
@@ -105,7 +105,7 @@ pub fn part2(input_string: &str) -> String {
         }
 
         if range == 1 {
-            return best_distance.to_string();
+            return Ok(best_distance);
         }
 
         min_x = best_point.0 - range;
@@ -122,7 +122,7 @@ pub fn part2(input_string: &str) -> String {
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "7",
+        Ok(7),
         part1(
             "pos=<0,0,0>, r=4
 pos=<1,0,0>, r=1
@@ -136,13 +136,13 @@ pos=<1,3,1>, r=1"
         )
     );
 
-    assert_eq!("270", part1(include_str!("day23_input.txt")));
+    assert_eq!(Ok(270), part1(include_str!("day23_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "36",
+        Ok(36),
         part2(
             "pos=<10,12,12>, r=2
 pos=<12,14,12>, r=2
@@ -153,5 +153,5 @@ pos=<10,10,10>, r=5"
         )
     );
 
-    assert_eq!("106323091", part2(include_str!("day23_input.txt")));
+    assert_eq!(Ok(106323091), part2(include_str!("day23_input.txt")));
 }

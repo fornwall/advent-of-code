@@ -5,7 +5,7 @@ const PIXELS_WIDE: u32 = 25;
 const PIXELS_TALL: u32 = 6;
 const LAYER_SIZE: usize = (PIXELS_WIDE * PIXELS_TALL) as usize;
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     assert_eq!(input_string.len() % LAYER_SIZE, 0);
 
     let (_, slice) = input_string
@@ -22,14 +22,14 @@ pub fn part1(input_string: &str) -> String {
     let count_2 = bytecount::count(slice, b'2');
     let result = count_1 * count_2;
 
-    result.to_string()
+    Ok(result)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<String, String> {
     part2_sized(input_string, PIXELS_WIDE, PIXELS_TALL)
 }
 
-pub fn part2_sized(input_string: &str, width: u32, height: u32) -> String {
+pub fn part2_sized(input_string: &str, width: u32, height: u32) -> Result<String, String> {
     let layer_size = (width * height) as usize;
     let mut image = vec![b'2'; layer_size];
 
@@ -47,7 +47,7 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> String {
                 });
         });
 
-    str::from_utf8(&image)
+    Ok(str::from_utf8(&image)
         .unwrap()
         .replace('1', "█")
         .replace('0', " ")
@@ -62,18 +62,18 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> String {
             .into_iter()
             .chain(std::iter::once(c))
         })
-        .collect::<String>()
+        .collect::<String>())
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day08_input.txt")), "2413");
+    assert_eq!(part1(include_str!("day08_input.txt")), Ok(2413));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2_sized("0222112222120000", 2, 2), " █\n█ ");
+    assert_eq!(part2_sized("0222112222120000", 2, 2).unwrap(), " █\n█ ");
 
-    assert_eq!(part2(include_str!("day08_input.txt")),
+    assert_eq!(part2(include_str!("day08_input.txt")).unwrap(),
 "███   ██  ███  ████ ███  \n█  █ █  █ █  █    █ █  █ \n███  █    █  █   █  ███  \n█  █ █    ███   █   █  █ \n█  █ █  █ █    █    █  █ \n███   ██  █    ████ ███  ");
 }

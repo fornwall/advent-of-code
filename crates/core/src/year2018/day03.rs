@@ -64,33 +64,32 @@ fn parse_input<'a>(input_string: &'a str) -> impl Iterator<Item = Claim> + 'a {
     })
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut fabric = Fabric::new();
 
     parse_input(input_string).for_each(|claim| fabric.add_claim(&claim));
 
-    fabric.inches_claimed_multiple().to_string()
+    Ok(fabric.inches_claimed_multiple())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u32, String> {
     let mut fabric = Fabric::new();
 
     let claims: Vec<Claim> = parse_input(input_string).collect();
 
     claims.iter().for_each(|claim| fabric.add_claim(claim));
 
-    claims
+    Ok(claims
         .iter()
         .find(|claim| fabric.is_claimed_once(claim))
         .expect("No result found")
-        .id
-        .to_string()
+        .id)
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "4",
+        Ok(4),
         part1(
             "#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
@@ -98,13 +97,13 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!("104126", part1(include_str!("day03_input.txt")));
+    assert_eq!(Ok(104126), part1(include_str!("day03_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "3",
+        Ok(3),
         part2(
             "#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
@@ -112,5 +111,5 @@ fn tests_part2() {
         )
     );
 
-    assert_eq!("695", part2(include_str!("day03_input.txt")));
+    assert_eq!(Ok(695), part2(include_str!("day03_input.txt")));
 }

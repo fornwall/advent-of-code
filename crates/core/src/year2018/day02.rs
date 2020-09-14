@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i64, String> {
     let picks = input_string.lines().fold((0, 0), |state, line| {
         let mut occurrences = HashMap::new();
 
@@ -15,10 +15,10 @@ pub fn part1(input_string: &str) -> String {
         )
     });
 
-    (picks.0 * picks.1).to_string()
+    Ok(picks.0 * picks.1)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<String, String> {
     let input: Vec<&str> = input_string.lines().collect();
 
     for i in 0..input.len() {
@@ -33,22 +33,22 @@ pub fn part2(input_string: &str) -> String {
                 .count();
 
             if diffs == 1 {
-                return s1
+                return Ok(s1
                     .chars()
                     .zip(s2.chars())
                     .filter(|pair| pair.0 == pair.1)
                     .map(|pair| pair.0)
-                    .collect::<String>();
+                    .collect::<String>());
             }
         }
     }
-    panic!("No solution found");
+    Err("No solution found".to_string())
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "12",
+        12,
         part1(
             "abcdef
 bababc
@@ -59,9 +59,10 @@ abcdee
 ababab
 "
         )
+        .unwrap()
     );
 
-    assert_eq!("6972", part1(include_str!("day02_input.txt")));
+    assert_eq!(6972, part1(include_str!("day02_input.txt")).unwrap());
 }
 
 #[test]
@@ -78,10 +79,11 @@ axcye
 wvxyz
 "
         )
+        .unwrap()
     );
 
     assert_eq!(
         "aixwcbzrmdvpsjfgllthdyoqe",
-        part2(include_str!("day02_input.txt"))
+        part2(include_str!("day02_input.txt")).unwrap()
     );
 }

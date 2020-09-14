@@ -254,11 +254,11 @@ impl Registers {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
-    Program::parse(input_string).execute().to_string()
+pub fn part1(input_string: &str) -> Result<u64, String> {
+    Ok(Program::parse(input_string).execute())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut program = Program::parse(input_string);
 
     program.registers.values[0] = 1;
@@ -281,13 +281,13 @@ pub fn part2(input_string: &str) -> String {
             sum += i;
         }
     }
-    sum.to_string()
+    Ok(sum)
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "7",
+        Ok(7),
         part1(
             "#ip 0
 seti 5 0 1
@@ -300,10 +300,10 @@ seti 9 0 5"
         )
     );
 
-    assert_eq!("978", part1(include_str!("day19_input.txt")));
+    assert_eq!(Ok(978), part1(include_str!("day19_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("10996992", part2(include_str!("day19_input.txt")));
+    assert_eq!(Ok(10996992), part2(include_str!("day19_input.txt")));
 }

@@ -61,17 +61,17 @@ where
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut distance_to_oxygen = -1;
     search_space_ship(input_string, |_, is_oxygen, distance| {
         if is_oxygen {
             distance_to_oxygen = distance;
         }
     });
-    distance_to_oxygen.to_string()
+    Ok(distance_to_oxygen)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     // Contains (pos_x, pos_y).
     let mut locations_without_oxygen = HashSet::new();
     // Contains ((pos_x, pos_y), distance_from_oxygen).
@@ -96,15 +96,15 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    furthest_distance.to_string()
+    Ok(furthest_distance)
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day15_input.txt")), "208");
+    assert_eq!(part1(include_str!("day15_input.txt")), Ok(208));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day15_input.txt")), "306");
+    assert_eq!(part2(include_str!("day15_input.txt")), Ok(306));
 }

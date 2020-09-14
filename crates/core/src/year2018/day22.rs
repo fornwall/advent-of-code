@@ -113,7 +113,7 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::parse(input_string);
     let mut sum = 0;
     for y in 0..=grid.target_y {
@@ -121,10 +121,10 @@ pub fn part1(input_string: &str) -> String {
             sum += grid.risk_level(x, y);
         }
     }
-    sum.to_string()
+    Ok(sum)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut grid = Grid::parse(input_string);
     let mut to_visit = BinaryHeap::new();
     let mut visited = HashSet::new();
@@ -152,7 +152,7 @@ pub fn part2(input_string: &str) -> String {
             && visiting_y == grid.target_y as i32
             && equipment == Equipment::Torch
         {
-            return cost.to_string();
+            return Ok(cost);
         }
 
         let region_type_visiting = grid.region_type(visiting_x as usize, visiting_y as usize);
@@ -195,31 +195,31 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    panic!();
+    Err("No solution found".to_string())
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "114",
+        Ok(114),
         part1(
             "depth: 510
 target: 10,10"
         )
     );
 
-    assert_eq!("11843", part1(include_str!("day22_input.txt")));
+    assert_eq!(Ok(11843), part1(include_str!("day22_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "45",
+        Ok(45),
         part2(
             "depth: 510
 target: 10,10"
         )
     );
 
-    assert_eq!("1078", part2(include_str!("day22_input.txt")));
+    assert_eq!(Ok(1078), part2(include_str!("day22_input.txt")));
 }

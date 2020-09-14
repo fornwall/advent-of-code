@@ -2,15 +2,14 @@ use super::int_code::Program;
 use std::collections::HashMap;
 use std::env;
 
-pub fn part1(input_string: &str) -> String {
-    Program::parse(input_string)
+pub fn part1(input_string: &str) -> Result<usize, String> {
+    Ok(Program::parse(input_string)
         .run_for_output()
         .iter()
         .skip(2)
         .step_by(3)
         .filter(|&&t| t == 2)
-        .count()
-        .to_string()
+        .count())
 }
 
 fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
@@ -45,7 +44,7 @@ fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
     std::thread::sleep(std::time::Duration::from_millis(10));
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i64, String> {
     let mut program = Program::parse(input_string);
 
     // "Memory address 0 represents the number of quarters that
@@ -92,15 +91,15 @@ pub fn part2(input_string: &str) -> String {
         });
     }
 
-    current_score.to_string()
+    Ok(current_score)
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day13_input.txt")), "462");
+    assert_eq!(part1(include_str!("day13_input.txt")), Ok(462));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day13_input.txt")), "23981");
+    assert_eq!(part2(include_str!("day13_input.txt")), Ok(23981));
 }

@@ -18,12 +18,12 @@ fn count_metadata(data: &[i32], start: usize) -> (usize, usize) {
     (current_index + metadata_entries, metadata_sum as usize)
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let data: Vec<i32> = input_string
         .split_whitespace()
         .map(|word| word.parse::<i32>().unwrap())
         .collect();
-    count_metadata(&data, 0).1.to_string()
+    Ok(count_metadata(&data, 0).1)
 }
 
 fn evaluate_node(data: &[i32], start: usize) -> (usize, usize) {
@@ -56,22 +56,22 @@ fn evaluate_node(data: &[i32], start: usize) -> (usize, usize) {
     (current_index + metadata_entries, node_value as usize)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<usize, String> {
     let data: Vec<i32> = input_string
         .split_whitespace()
         .map(|word| word.parse::<i32>().unwrap())
         .collect();
-    evaluate_node(&data, 0).1.to_string()
+    Ok(evaluate_node(&data, 0).1)
 }
 
 #[test]
 fn tests_part1() {
-    assert_eq!("138", part1("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"));
-    assert_eq!("47112", part1(include_str!("day08_input.txt")));
+    assert_eq!(Ok(138), part1("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"));
+    assert_eq!(Ok(47112), part1(include_str!("day08_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("66", part2("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"));
-    assert_eq!("28237", part2(include_str!("day08_input.txt")));
+    assert_eq!(Ok(66), part2("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"));
+    assert_eq!(Ok(28237), part2(include_str!("day08_input.txt")));
 }

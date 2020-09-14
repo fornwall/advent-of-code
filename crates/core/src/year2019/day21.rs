@@ -1,24 +1,24 @@
 use super::int_code::Program;
 
-fn run(intcode_program_string: &str, ascii_program_string: &str) -> String {
+fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<i64, String> {
     let mut intcode_program = Program::parse(intcode_program_string);
     intcode_program.run_for_output();
     intcode_program.input_string(ascii_program_string);
 
     let program_output = intcode_program.run_for_output();
-    if let Some(value) = program_output.iter().find(|&&value| value > 255) {
-        value.to_string()
+    if let Some(&value) = program_output.iter().find(|&&value| value > 255) {
+        Ok(value)
     } else {
         let output_bytes: Vec<u8> = program_output.iter().map(|&value| value as u8).collect();
         let output_string = std::str::from_utf8(&output_bytes).unwrap();
-        panic!(
+        Err(format!(
             "No non-ASCII value found - showing last moments:\n{}",
             output_string
-        );
+        ))
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i64, String> {
     let mut ascii_program = String::new();
     // Jump if there is a hole at A, B or C ...
     ascii_program.push_str("NOT A T\nOR T J\n");
@@ -31,7 +31,7 @@ pub fn part1(input_string: &str) -> String {
     run(input_string, &ascii_program)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i64, String> {
     // ABCDEFGH
     // ???_?..?
     // Do not jump to D if E and H are holes, since we cannot jump again.
@@ -58,10 +58,10 @@ pub fn part2(input_string: &str) -> String {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day21_input.txt")), "19358688");
+    assert_eq!(part1(include_str!("day21_input.txt")), Ok(19358688));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day21_input.txt")), "1141236756");
+    assert_eq!(part2(include_str!("day21_input.txt")), Ok(1141236756));
 }

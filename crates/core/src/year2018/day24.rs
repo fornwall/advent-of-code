@@ -207,16 +207,13 @@ fn execute_battle(groups: Vec<ArmyGroup>) -> Vec<RefCell<ArmyGroup>> {
     groups
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let groups = execute_battle(ArmyGroup::parse(input_string));
-
-    groups
-        .iter()
-        .fold(0, |acc, g| acc + g.borrow().units)
-        .to_string()
+    let result = groups.iter().fold(0, |acc, g| acc + g.borrow().units);
+    Ok(result)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut boost = 1;
     loop {
         let mut groups = ArmyGroup::parse(input_string);
@@ -229,10 +226,8 @@ pub fn part2(input_string: &str) -> String {
         let groups = execute_battle(groups);
 
         if groups.iter().all(|g| g.borrow().immune_system) {
-            return groups
-                .iter()
-                .fold(0, |acc, g| acc + g.borrow().units)
-                .to_string();
+            let result = groups.iter().fold(0, |acc, g| acc + g.borrow().units);
+            return Ok(result);
         }
 
         boost += 1;
@@ -241,7 +236,7 @@ pub fn part2(input_string: &str) -> String {
 
 #[test]
 fn tests_part1() {
-    assert_eq!("5216", part1("Immune System:
+    assert_eq!(Ok(5216), part1("Immune System:
 17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2
 989 units each with 1274 hit points (immune to fire; weak to bludgeoning, slashing) with an attack that does 25 slashing damage at initiative 3
 
@@ -249,10 +244,10 @@ Infection:
 801 units each with 4706 hit points (weak to radiation) with an attack that does 116 bludgeoning damage at initiative 1
 4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4"));
 
-    assert_eq!("26914", part1(include_str!("day24_input.txt")));
+    assert_eq!(Ok(26914), part1(include_str!("day24_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("862", part2(include_str!("day24_input.txt")));
+    assert_eq!(Ok(862), part2(include_str!("day24_input.txt")));
 }

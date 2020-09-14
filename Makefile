@@ -9,8 +9,7 @@ endif
 
 check:
 	cargo fmt --all
-	#cargo clippy --all-targets --all-features -- -D warnings
-	cargo clippy --all-targets --all-features
+	cargo clippy --all-targets --all-features -- -D warnings
 	cargo test
 
 docker-image:

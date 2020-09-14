@@ -7,17 +7,16 @@ fn check(program: &Program, x: i32, y: i32) -> bool {
     program_copy.run_for_output()[0] == 1
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let program = Program::parse(input_string);
 
-    (0..50)
+    Ok((0..50)
         .flat_map(|x| (0..50).map(move |y| (x, y)))
         .filter(|&(x, y)| check(&program, x, y))
-        .count()
-        .to_string()
+        .count())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     let program = Program::parse(input_string);
 
     // Find the initial start of the beam (skipping (0,0),
@@ -35,15 +34,15 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    ((current_x - 99) * 10000 + current_y).to_string()
+    Ok((current_x - 99) * 10000 + current_y)
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day19_input.txt")), "112");
+    assert_eq!(part1(include_str!("day19_input.txt")), Ok(112));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day19_input.txt")), "18261982");
+    assert_eq!(part2(include_str!("day19_input.txt")), Ok(18261982));
 }

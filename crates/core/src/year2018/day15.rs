@@ -291,19 +291,19 @@ impl Board {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut board = Board::parse(input_string, 3);
     board.print();
     loop {
         board.perform_round();
         board.print();
         if let Some(outcome) = board.calculate_outcome() {
-            return outcome.to_string();
+            return Ok(outcome);
         }
     }
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut attack_strength = 4;
     loop {
         let mut board = Board::parse(input_string, attack_strength);
@@ -314,7 +314,7 @@ pub fn part2(input_string: &str) -> String {
             if board.elf_died {
                 break;
             } else if board.goblins_alive == 0 {
-                return board.calculate_outcome().unwrap().to_string();
+                return Ok(board.calculate_outcome().unwrap());
             }
         }
 
@@ -325,7 +325,7 @@ pub fn part2(input_string: &str) -> String {
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "27730",
+        Ok(27730),
         part1(
             "#######
 #.G...#
@@ -338,7 +338,7 @@ fn tests_part1() {
     );
 
     assert_eq!(
-        "36334",
+        Ok(36334),
         part1(
             "#######
 #G..#E#
@@ -351,7 +351,7 @@ fn tests_part1() {
     );
 
     assert_eq!(
-        "39514",
+        Ok(39514),
         part1(
             "#######
 #E..EG#
@@ -364,7 +364,7 @@ fn tests_part1() {
     );
 
     assert_eq!(
-        "27755",
+        Ok(27755),
         part1(
             "#######
 #E.G#.#
@@ -377,7 +377,7 @@ fn tests_part1() {
     );
 
     assert_eq!(
-        "28944",
+        Ok(28944),
         part1(
             "#######
 #.E...#
@@ -390,7 +390,7 @@ fn tests_part1() {
     );
 
     assert_eq!(
-        "18740",
+        Ok(18740),
         part1(
             "#########
 #G......#
@@ -404,13 +404,13 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!("207059", part1(include_str!("day15_input.txt")));
+    assert_eq!(Ok(207059), part1(include_str!("day15_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "4988",
+        Ok(4988),
         part2(
             "#######
 #.G...#
@@ -423,7 +423,7 @@ fn tests_part2() {
     );
 
     assert_eq!(
-        "31284",
+        Ok(31284),
         part2(
             "#######
 #E..EG#
@@ -435,5 +435,5 @@ fn tests_part2() {
         )
     );
 
-    assert_eq!("49120", part2(include_str!("day15_input.txt")));
+    assert_eq!(Ok(49120), part2(include_str!("day15_input.txt")));
 }

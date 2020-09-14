@@ -181,28 +181,28 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::from(input_string);
     grid.print("Initial");
     grid.pour_water();
     grid.print("After pouring");
-    grid.count_water().to_string()
+    Ok(grid.count_water())
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::from(input_string);
     grid.print("Initial");
     grid.pour_water();
     grid.print("After pouring");
     grid.dry_up();
     grid.print("After drying up");
-    grid.count_water().to_string()
+    Ok(grid.count_water())
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "57",
+        Ok(57),
         part1(
             "x=495, y=2..7
 y=7, x=495..501
@@ -215,13 +215,13 @@ y=13, x=498..504"
         )
     );
 
-    assert_eq!("31949", part1(include_str!("day17_input.txt")));
+    assert_eq!(Ok(31949), part1(include_str!("day17_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "29",
+        Ok(29),
         part2(
             "x=495, y=2..7
 y=7, x=495..501
@@ -234,5 +234,5 @@ y=13, x=498..504"
         )
     );
 
-    assert_eq!("26384", part2(include_str!("day17_input.txt")));
+    assert_eq!(Ok(26384), part2(include_str!("day17_input.txt")));
 }

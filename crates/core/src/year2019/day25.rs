@@ -112,8 +112,8 @@ fn parse_output(program: &mut Program) -> Room {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
-    let mut program = Program::parse(input_string);
+pub fn part1(input_string: &str) -> Result<i32, String> {
+    let mut program = Program::try_parse(input_string)?;
     let initial_room = parse_output(&mut program);
 
     let mut blacklisted_items = HashSet::new();
@@ -208,18 +208,18 @@ pub fn part1(input_string: &str) -> String {
             Command::Move(direction_to_pressure_sensitive_floor),
         );
         if let Some(solution) = new_room.solution {
-            return solution.to_string();
+            return Ok(solution);
         }
     }
 
-    String::from("No solution found")
+    Err("No solution found".to_string())
 }
 
-pub fn part2(_input_string: &str) -> String {
-    String::from("")
+pub fn part2(_input_string: &str) -> Result<String, String> {
+    Ok(String::from(""))
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day25_input.txt")), "319815680");
+    assert_eq!(part1(include_str!("day25_input.txt")), Ok(319815680));
 }

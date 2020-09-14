@@ -254,16 +254,16 @@ impl Track {
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<String, String> {
     let mut track = Track::parse(input_string);
     let crash_position = track.find_crash();
-    format!("{},{}", crash_position.x, crash_position.y)
+    Ok(format!("{},{}", crash_position.x, crash_position.y))
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<String, String> {
     let mut track = Track::parse(input_string);
     let remaining_position = track.find_remaining();
-    format!("{},{}", remaining_position.x, remaining_position.y)
+    Ok(format!("{},{}", remaining_position.x, remaining_position.y))
 }
 
 #[test]
@@ -279,6 +279,7 @@ v
 ^
 |"
         )
+        .unwrap()
     );
 
     assert_eq!(
@@ -291,9 +292,10 @@ v
 \-+-/  \-+--/
   \------/"#
         )
+        .unwrap()
     );
 
-    assert_eq!("65,73", part1(include_str!("day13_input.txt")));
+    assert_eq!("65,73", part1(include_str!("day13_input.txt")).unwrap());
 }
 
 #[test]
@@ -310,7 +312,8 @@ fn tests_part2() {
   \<->/
 "#
         )
+        .unwrap()
     );
 
-    assert_eq!("54,66", part2(include_str!("day13_input.txt")));
+    assert_eq!("54,66", part2(include_str!("day13_input.txt")).unwrap());
 }

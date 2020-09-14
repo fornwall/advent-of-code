@@ -1,6 +1,6 @@
+extern crate js_sys;
 extern crate wasm_bindgen;
 use advent_of_code::solve as core_solve;
-use js_sys;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

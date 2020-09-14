@@ -5,10 +5,10 @@ fn destroys_eachother(a: u8, b: u8) -> bool {
     a != b && (a as char).to_ascii_lowercase() == (b as char).to_ascii_lowercase()
 }
 
-pub fn part1(input: &str) -> String {
+pub fn part1(input: &str) -> Result<usize, String> {
     let bytes = input.as_bytes();
     let length = fully_react(bytes);
-    length.to_string()
+    Ok(length)
 }
 
 fn fully_react(bytes: &[u8]) -> usize {
@@ -78,12 +78,12 @@ fn fully_react(bytes: &[u8]) -> usize {
         .count()
 }
 
-pub fn part2(input: &str) -> String {
+pub fn part2(input: &str) -> Result<usize, String> {
     let bytes = input.as_bytes();
 
     let mut considered_unit_types_lower = HashSet::new();
 
-    bytes
+    let result = bytes
         .iter()
         .fold(input.len() + 1, |shortest_length, unit_type| {
             let unit_type_lower = unit_type.to_ascii_lowercase();
@@ -100,23 +100,23 @@ pub fn part2(input: &str) -> String {
             } else {
                 shortest_length
             }
-        })
-        .to_string()
+        });
+    Ok(result)
 }
 
 #[test]
 fn tests_part1() {
-    assert_eq!("0", part1("aA"));
-    assert_eq!("0", part1("abBA"));
-    assert_eq!("4", part1("abAB"));
-    assert_eq!("6", part1("aabAAB"));
+    assert_eq!(Ok(0), part1("aA"));
+    assert_eq!(Ok(0), part1("abBA"));
+    assert_eq!(Ok(4), part1("abAB"));
+    assert_eq!(Ok(6), part1("aabAAB"));
 
-    assert_eq!("11252", part1(include_str!("day05_input.txt")));
+    assert_eq!(Ok(11252), part1(include_str!("day05_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("4", part2("dabAcCaCBAcCcaDA"));
+    assert_eq!(Ok(4), part2("dabAcCaCBAcCcaDA"));
 
-    assert_eq!("6118", part2(include_str!("day05_input.txt")));
+    assert_eq!(Ok(6118), part2(include_str!("day05_input.txt")));
 }

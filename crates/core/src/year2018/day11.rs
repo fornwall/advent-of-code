@@ -15,7 +15,7 @@ fn cell_power(x: usize, y: usize, serial_number: i64) -> i64 {
     cell_power - 5
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<String, String> {
     let serial_number = input_string.parse::<i64>().unwrap();
 
     let mut optimal_power = 0i64;
@@ -40,10 +40,10 @@ pub fn part1(input_string: &str) -> String {
         }
     }
 
-    format!("{},{}", optimal_point.0, optimal_point.1)
+    Ok(format!("{},{}", optimal_point.0, optimal_point.1))
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<String, String> {
     let serial_number = input_string.parse::<i64>().unwrap();
 
     let mut optimal_power = 0i64;
@@ -84,22 +84,22 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    format!(
+    Ok(format!(
         "{},{},{}",
         optimal_point.0, optimal_point.1, optimal_square_width
-    )
+    ))
 }
 
 #[test]
 fn tests_part1() {
-    assert_eq!("33,45", part1("18"));
-    assert_eq!("21,61", part1("42"));
-    assert_eq!("21,68", part1(include_str!("day11_input.txt")));
+    assert_eq!("33,45", part1("18").unwrap());
+    assert_eq!("21,61", part1("42").unwrap());
+    assert_eq!("21,68", part1(include_str!("day11_input.txt")).unwrap());
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("90,269,16", part2("18"));
-    assert_eq!("232,251,12", part2("42"));
-    assert_eq!("90,201,15", part2(include_str!("day11_input.txt")));
+    assert_eq!("90,269,16", part2("18").unwrap());
+    assert_eq!("232,251,12", part2("42").unwrap());
+    assert_eq!("90,201,15", part2(include_str!("day11_input.txt")).unwrap());
 }

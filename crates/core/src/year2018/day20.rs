@@ -108,38 +108,38 @@ where
     }
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut highest_cost = 0;
     visit_rooms(input_string, |cost| {
         highest_cost = max(highest_cost, cost);
     });
-    highest_cost.to_string()
+    Ok(highest_cost)
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut room_count = 0;
     visit_rooms(input_string, |cost| {
         if cost >= 1000 {
             room_count += 1;
         }
     });
-    room_count.to_string()
+    Ok(room_count)
 }
 
 #[test]
 fn tests_part1() {
-    assert_eq!("3", part1("^WNE$"));
-    assert_eq!("10", part1("^ENWWW(NEEE|SSE(EE|N))$"));
-    assert_eq!("18", part1("^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$"));
-    assert_eq!("8", part1("^(SSS|EEESSSWWW)ENNES$"));
-    assert_eq!("4", part1("^(E|SSEENNW)S$"));
-    assert_eq!("2", part1("^(E|SEN)$"));
-    assert_eq!("15", part1("^NNNNN(EEEEE|NNN)NNNNN$"));
+    assert_eq!(Ok(3), part1("^WNE$"));
+    assert_eq!(Ok(10), part1("^ENWWW(NEEE|SSE(EE|N))$"));
+    assert_eq!(Ok(18), part1("^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$"));
+    assert_eq!(Ok(8), part1("^(SSS|EEESSSWWW)ENNES$"));
+    assert_eq!(Ok(4), part1("^(E|SSEENNW)S$"));
+    assert_eq!(Ok(2), part1("^(E|SEN)$"));
+    assert_eq!(Ok(15), part1("^NNNNN(EEEEE|NNN)NNNNN$"));
 
-    assert_eq!("3151", part1(include_str!("day20_input.txt")));
+    assert_eq!(Ok(3151), part1(include_str!("day20_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("8784", part2(include_str!("day20_input.txt")));
+    assert_eq!(Ok(8784), part2(include_str!("day20_input.txt")));
 }

@@ -31,8 +31,8 @@ struct Edge {
     needed_keys: KeyBitset,
 }
 
-pub fn part1(input_string: &str) -> String {
-    steps_to_gather_all_keys(input_string).to_string()
+pub fn part1(input_string: &str) -> Result<usize, String> {
+    Ok(steps_to_gather_all_keys(input_string))
 }
 
 pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
@@ -198,7 +198,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     None
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut map_top_left = String::new();
     let mut map_top_right = String::new();
     let mut map_bottom_left = String::new();
@@ -243,7 +243,7 @@ pub fn part2(input_string: &str) -> String {
         + steps_to_gather_all_keys(&map_top_right)
         + steps_to_gather_all_keys(&map_bottom_left)
         + steps_to_gather_all_keys(&map_bottom_right);
-    result.to_string()
+    Ok(result)
 }
 
 #[test]
@@ -254,7 +254,7 @@ pub fn tests_part1() {
     #b.A.@.a#
     #########"
         ),
-        "8"
+        Ok(8)
     );
 
     assert_eq!(
@@ -265,13 +265,13 @@ pub fn tests_part1() {
 #d.....................#
 ########################"
         ),
-        "86"
+        Ok(86)
     );
 
-    assert_eq!(part1(include_str!("day18_input.txt")), "4248");
+    assert_eq!(part1(include_str!("day18_input.txt")), Ok(4248));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day18_input.txt")), "1878");
+    assert_eq!(part2(include_str!("day18_input.txt")), Ok(1878));
 }

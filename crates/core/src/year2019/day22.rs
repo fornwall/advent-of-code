@@ -1,6 +1,6 @@
 use mod_exp::mod_exp;
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut deck = Vec::new();
     for i in 0..10_007 {
         deck.push(i);
@@ -36,19 +36,16 @@ pub fn part1(input_string: &str) -> String {
                 current_index = (current_index + increment) % deck.len();
             }
         } else {
-            panic!("Invalid line: {}", line);
+            return Err(format!("Invalid line: {}", line));
         }
     }
 
-    deck.iter()
-        .position(|&card| card == 2019)
-        .unwrap()
-        .to_string()
+    Ok(deck.iter().position(|&card| card == 2019).unwrap())
 }
 
 /// Explanation:
 /// https://www.reddit.com/r/adventofcode/comments/ee0rqi/2019_day_22_solutions/fbnkaju?utm_source=share&utm_medium=web2x
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<i128, String> {
     const NUM_CARDS: i128 = 119_315_717_514_047;
     const MOD: i128 = NUM_CARDS;
 
@@ -86,7 +83,7 @@ pub fn part2(input_string: &str) -> String {
         // card in new list, and so on. So, the ith card in our old list goes to the i*nth
         // card in the new list. When is i*n = 1?"
         } else {
-            panic!("Invalid line: {}", line);
+            return Err(format!("Invalid line: {}", line));
         }
 
         increment_mul = increment_mul.rem_euclid(MOD);
@@ -99,15 +96,15 @@ pub fn part2(input_string: &str) -> String {
     let offset = (offset_diff * (1i128 - increment)).rem_euclid(MOD) * inv(1 - increment_mul);
 
     let result = (offset + increment * 2020).rem_euclid(MOD);
-    result.to_string()
+    Ok(result)
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day22_input.txt")), "6526");
+    assert_eq!(part1(include_str!("day22_input.txt")), Ok(6526));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day22_input.txt")), "79855812422607");
+    assert_eq!(part2(include_str!("day22_input.txt")), Ok(79855812422607));
 }

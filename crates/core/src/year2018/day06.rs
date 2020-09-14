@@ -8,7 +8,7 @@ struct Point {
     y: i32,
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut counter = 0;
     let points: Vec<Point> = input_string
         .lines()
@@ -66,12 +66,12 @@ pub fn part1(input_string: &str) -> String {
         }
     }
 
-    id_to_count
+    let result = *id_to_count
         .iter()
         .max_by_key(|(_, &value)| value)
         .unwrap()
-        .1
-        .to_string()
+        .1;
+    Ok(result)
 }
 
 pub fn part2_param(input_string: &str, max_distance_exclusive: i32) -> i32 {
@@ -117,14 +117,14 @@ pub fn part2_param(input_string: &str, max_distance_exclusive: i32) -> i32 {
     sum
 }
 
-pub fn part2(input_string: &str) -> String {
-    part2_param(input_string, 10000).to_string()
+pub fn part2(input_string: &str) -> Result<i32, String> {
+    Ok(part2_param(input_string, 10000))
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "17",
+        Ok(17),
         part1(
             "1, 1
 1, 6
@@ -136,7 +136,7 @@ fn tests_part1() {
     );
 
     assert_eq!(
-        "1876",
+        Ok(1876),
         part1(
             "0, 0
 0, 100
@@ -150,7 +150,7 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!("5333", part1(include_str!("day06_input.txt")));
+    assert_eq!(Ok(5333), part1(include_str!("day06_input.txt")));
 }
 
 #[test]
@@ -168,5 +168,5 @@ fn tests_part2() {
         )
     );
 
-    assert_eq!("35334", part2(include_str!("day06_input.txt")));
+    assert_eq!(Ok(35334), part2(include_str!("day06_input.txt")));
 }

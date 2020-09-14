@@ -141,7 +141,7 @@ impl Registers {
         }
     }
 }
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<u64, String> {
     // The last three instructions are:
     //
     // 28: eqrr 3 0 4
@@ -163,10 +163,10 @@ pub fn part1(input_string: &str) -> String {
     while program.instruction_pointer() != 29 {
         program.execute_one_instruction();
     }
-    program.registers.values[program.instructions[28].a as usize].to_string()
+    Ok(program.registers.values[program.instructions[28].a as usize])
 }
 
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut seen = HashSet::new();
     let mut last_value = 0;
     let mut program = Program::parse(input_string);
@@ -176,7 +176,7 @@ pub fn part2(input_string: &str) -> String {
             if seen.insert(value) {
                 last_value = value;
             } else {
-                return last_value.to_string();
+                return Ok(last_value);
             }
         }
         program.execute_one_instruction();
@@ -185,10 +185,10 @@ pub fn part2(input_string: &str) -> String {
 
 #[test]
 fn tests_part1() {
-    assert_eq!("7216956", part1(include_str!("day21_input.txt")));
+    assert_eq!(Ok(7216956), part1(include_str!("day21_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("14596916", part2(include_str!("day21_input.txt")));
+    assert_eq!(Ok(14596916), part2(include_str!("day21_input.txt")));
 }

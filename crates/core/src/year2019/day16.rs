@@ -1,6 +1,6 @@
 use std::iter::once;
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<String, String> {
     let mut digits: Vec<i32> = input_string.bytes().map(|b| (b - 48) as i32).collect();
     let mut new_digits = vec![0; digits.len()];
     for _ in 0..100 {
@@ -25,11 +25,11 @@ pub fn part1(input_string: &str) -> String {
         std::mem::swap(&mut digits, &mut new_digits);
     }
 
-    digits
+    Ok(digits
         .iter()
         .take(8)
         .map(|b| ((b + 48) as u8) as char)
-        .collect()
+        .collect())
 }
 
 /// Length of input: 650
@@ -61,7 +61,7 @@ pub fn part1(input_string: &str) -> String {
 /// Starting from the end, the last element is always the same.
 /// The next element (second latest) is itself plus last element.
 /// The next element (third latest) is itself plus second latest and last element=itself + previous element!
-pub fn part2(input_string: &str) -> String {
+pub fn part2(input_string: &str) -> Result<String, String> {
     let offset = input_string[0..7].parse::<usize>().unwrap();
     let digits: Vec<i32> = input_string.bytes().map(|b| (b - 48) as i32).collect();
 
@@ -82,20 +82,23 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    end_sequence
+    Ok(end_sequence
         .iter()
         .take(8)
         .map(|&b| ((b + 48) as u8) as char)
-        .collect()
+        .collect())
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1("80871224585914546619083218645595"), "24176176");
-    assert_eq!(part1(include_str!("day16_input.txt")), "37153056");
+    assert_eq!(
+        part1("80871224585914546619083218645595").unwrap(),
+        "24176176"
+    );
+    assert_eq!(part1(include_str!("day16_input.txt")).unwrap(), "37153056");
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day16_input.txt")), "60592199");
+    assert_eq!(part2(include_str!("day16_input.txt")).unwrap(), "60592199");
 }
