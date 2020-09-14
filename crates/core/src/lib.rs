@@ -1,9 +1,43 @@
+use std::fmt::Display;
+
 mod year2018;
 mod year2019;
 
-pub fn get_problem_set(year: u16, day: u8, part: u8) -> Option<fn(&str) -> String> {
-    struct Solutions(fn(&str) -> String, fn(&str) -> String);
+fn to_stringer<T: Display>(
+    function: fn(&str) -> Result<T, String>,
+    input: &str,
+) -> Result<String, String> {
+    match function(input) {
+        Ok(value) => Ok(value.to_string()),
+        Err(error) => Err(error),
+    }
+}
 
+pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String> {
+    match (year, day, part) {
+        (2019, 1, 1) => to_stringer(year2019::day01::part1, input),
+        (2019, 1, 2) => to_stringer(year2019::day01::part2, input),
+        (2019, 2, 1) => to_stringer(year2019::day02::part1, input),
+        (2019, 2, 2) => to_stringer(year2019::day02::part2, input),
+        (2019, 4, 1) => to_stringer(year2019::day04::part1, input),
+        (2019, 4, 2) => to_stringer(year2019::day04::part2, input),
+        (2019, 5, 1) => to_stringer(year2019::day05::part1, input),
+        (2019, 5, 2) => to_stringer(year2019::day05::part2, input),
+        (2019, 6, 1) => to_stringer(year2019::day06::part1, input),
+        (2019, 6, 2) => to_stringer(year2019::day06::part2, input),
+        (2019, 9, 1) => to_stringer(year2019::day09::part1, input),
+        (2019, 9, 2) => to_stringer(year2019::day09::part2, input),
+        (2019, 11, 1) => to_stringer(year2019::day11::part1, input),
+        (2019, 11, 2) => to_stringer(year2019::day11::part2, input),
+        (2019, 12, 1) => to_stringer(year2019::day12::part1, input),
+        (2019, 12, 2) => to_stringer(year2019::day12::part2, input),
+        _ => Err(format!(
+            "Unsupported year={}, day={}, part={}",
+            year, day, part
+        )),
+    }
+
+    /*
     let parts: Solutions = if year == 2018 {
         match day {
             1 => Solutions(year2018::day01::part1, year2018::day01::part2),
@@ -36,7 +70,7 @@ pub fn get_problem_set(year: u16, day: u8, part: u8) -> Option<fn(&str) -> Strin
             }
         }
     } else if year == 2019 {
-        match day {
+        match (day, part) {
             1 => Solutions(year2019::day01::part1, year2019::day01::part2),
             2 => Solutions(year2019::day02::part1, year2019::day02::part2),
             3 => Solutions(year2019::day03::part1, year2019::day03::part2),
@@ -75,11 +109,5 @@ pub fn get_problem_set(year: u16, day: u8, part: u8) -> Option<fn(&str) -> Strin
         2 => Some(parts.1),
         _ => None,
     }
-}
-
-pub fn solve(year: u16, day: u8, part: u8, input: &str) -> String {
-    match get_problem_set(year, day, part) {
-        Some(function) => function(input),
-        None => String::from("Invalid solution - day needs to be 1-25, and part 1-2"),
-    }
+    */
 }

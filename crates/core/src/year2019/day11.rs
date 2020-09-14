@@ -44,8 +44,8 @@ impl Direction {
     }
 }
 
-fn run(input_string: &str, initial_color: Color) -> HashMap<(i32, i32), Color> {
-    let mut program = Program::parse(input_string);
+fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), Color>, String> {
+    let mut program = Program::try_parse(input_string)?;
     let mut painted: HashMap<(i32, i32), Color> = HashMap::new();
     let mut position = (0, 0);
     let mut current_direction = Direction::Up;
@@ -81,15 +81,16 @@ fn run(input_string: &str, initial_color: Color) -> HashMap<(i32, i32), Color> {
         }
     }
 
-    painted
+    Ok(painted)
 }
 
-pub fn part1(input_string: &str) -> String {
-    run(input_string, Color::Black).len().to_string()
+pub fn part1(input_string: &str) -> Result<String, String> {
+    let map = run(input_string, Color::Black)?;
+    Ok(map.len().to_string())
 }
 
-pub fn part2(input_string: &str) -> String {
-    let painted = run(input_string, Color::White);
+pub fn part2(input_string: &str) -> Result<String, String> {
+    let painted = run(input_string, Color::White)?;
     let mut min_x = std::i32::MAX;
     let mut max_x = std::i32::MIN;
     let mut min_y = std::i32::MAX;
@@ -115,18 +116,18 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    result
+    Ok(result)
 }
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day11_input.txt")), "1686");
+    assert_eq!(part1(include_str!("day11_input.txt")).unwrap(), "1686");
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        part2(include_str!("day11_input.txt")),
+        part2(include_str!("day11_input.txt")).unwrap(),
         include_str!("day11_part2_output.txt").trim_end_matches('\n')
     );
 }

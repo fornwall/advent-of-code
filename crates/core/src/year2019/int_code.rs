@@ -1,14 +1,17 @@
 use std::collections::{HashMap, VecDeque};
+use std::num::ParseIntError;
+
+pub type Word = i64;
 
 #[derive(Clone, Debug)]
 pub struct Program {
-    memory: HashMap<usize, i64>,
+    memory: HashMap<usize, Word>,
     instruction_pointer: usize,
-    output_values: Vec<i64>,
-    input_values: VecDeque<i64>,
+    output_values: Vec<Word>,
+    input_values: VecDeque<Word>,
     halted: bool,
     requires_input_to: Option<usize>,
-    relative_base: i64,
+    relative_base: Word,
 }
 
 enum Parameter {
@@ -31,6 +34,31 @@ impl Program {
             requires_input_to: None,
             relative_base: 0,
         }
+    }
+
+    pub fn try_parse(input: &str) -> Result<Program, String> {
+        let mut memory: Vec<Word> = Vec::new();
+        for word_string in input
+            .trim()
+            .split(',') {
+            match word_string.parse::<Word>() {
+                Ok(value) => {
+                    memory.push(value);
+                },
+                Err(error) => {
+                    return Err(format!("Unable to parse program word {}: {}", word_string, error.to_string()));
+                }
+            }
+        }
+        Ok(Program {
+            memory: memory.into_iter().enumerate().collect(),
+            instruction_pointer: 0,
+            output_values: Vec::new(),
+            input_values: VecDeque::new(),
+            halted: false,
+            requires_input_to: None,
+            relative_base: 0,
+        })
     }
 
     pub fn is_halted(&self) -> bool {
@@ -94,7 +122,7 @@ impl Program {
         panic!("Output is not by address");
     }
 
-    fn parameter_value(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> i64 {
+    fn parameter_value(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> Word {
         match self.parameter_mode(opcode_and_parameter_modes, parameter_position) {
             Parameter::Value(value) => value,
             Parameter::Address(location) => self.read_memory(location),

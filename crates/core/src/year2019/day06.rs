@@ -2,13 +2,15 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 
-pub fn part1(string: &str) -> String {
+pub fn part1(string: &str) -> Result<u32, String> {
     let mut map = HashMap::new();
 
     for line in string.lines() {
         let mut parts = line.split(')');
-        let orbited_by = map.entry(parts.next().unwrap()).or_insert_with(Vec::new);
-        orbited_by.push(parts.next().unwrap());
+        let part = parts.next().ok_or(format!("Invalid line: {}", line))?;
+        let orbited_by = map.entry(part).or_insert_with(Vec::new);
+        let part = parts.next().ok_or(format!("Invalid line: {}", line))?;
+        orbited_by.push(part);
     }
 
     fn checksum(map: &HashMap<&str, Vec<&str>>, name: &str, depth: u32) -> u32 {
@@ -20,17 +22,17 @@ pub fn part1(string: &str) -> String {
             })
     }
 
-    checksum(&map, "COM", 0).to_string()
+    Ok(checksum(&map, "COM", 0))
 }
 
-pub fn part2(string: &str) -> String {
+pub fn part2(string: &str) -> Result<u32, String> {
     let mut map = HashMap::new();
     let mut target: &str = "";
 
     for line in string.lines() {
         let mut parts = line.split(')');
-        let orbited_name = parts.next().unwrap();
-        let orbits_name = parts.next().unwrap();
+        let orbited_name = parts.next().ok_or(format!("Invalid line: {}", line))?;
+        let orbits_name = parts.next().ok_or(format!("Invalid line: {}", line))?;
 
         let orbits = map.entry(orbits_name).or_insert_with(Vec::new);
         orbits.push(orbited_name);
@@ -47,7 +49,7 @@ pub fn part2(string: &str) -> String {
     let mut to_visit = VecDeque::new();
 
     visited.insert("YOU");
-    to_visit.push_back((0, "YOU"));
+    to_visit.push_back((0u32, "YOU"));
 
     while !to_visit.is_empty() {
         let (distance, name) = to_visit.pop_front().unwrap();
@@ -56,7 +58,7 @@ pub fn part2(string: &str) -> String {
             for entry in list.iter() {
                 if visited.insert(entry) {
                     if *entry == target {
-                        return distance.to_string();
+                        return Ok(distance)
                     }
                     let new_distance = distance + 1;
                     to_visit.push_back((new_distance, entry));
@@ -65,7 +67,7 @@ pub fn part2(string: &str) -> String {
         }
     }
 
-    "Unable to find path".to_string()
+    Err("Unable to find path".to_string())
 }
 
 #[test]
@@ -84,10 +86,10 @@ E)J
 J)K
 K)L"
         ),
-        "42"
+        Ok(42)
     );
 
-    assert_eq!(part1(include_str!("day06_input.txt")), "273985");
+    assert_eq!(part1(include_str!("day06_input.txt")), Ok(273985));
 }
 
 #[test]
@@ -108,8 +110,8 @@ K)L
 K)YOU
 I)SAN"
         ),
-        "4"
+        Ok(4)
     );
 
-    assert_eq!(part2(include_str!("day06_input.txt")), "460");
+    assert_eq!(part2(include_str!("day06_input.txt")), Ok(460));
 }

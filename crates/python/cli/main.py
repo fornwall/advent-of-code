@@ -14,5 +14,5 @@ def main():
     try:
         problem_output = solve(year, day, part, problem_input)
         print(problem_output)
-    except BaseException:
-        sys.exit("ERROR: Invalid input")
+    except Exception as error:
+        sys.exit("{0}".format(error))

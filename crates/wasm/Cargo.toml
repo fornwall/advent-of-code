@@ -14,6 +14,7 @@ crate-type = ["cdylib", "rlib"]
 advent-of-code = { path = "../core" }
 wasm-bindgen = "*"
 wasm-bindgen-test = "*"
+js-sys = "*"
 
 [package.metadata.wasm-pack.profile.release]
 # https://github.com/rustwasm/wasm-pack/issues/886

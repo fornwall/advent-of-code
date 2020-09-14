@@ -16,10 +16,10 @@ exports.handler = function(event, context, callback) {
   const day = parseInt(parameters.day || '1');
   const part = parseInt(parameters.part || '1')
 
-  if (!(year >= 2018 && year <= 2019)) {
+  if (isNaN(year)) {
     return callback(null, {
       statusCode: 400,
-      body: 'Invalid year - must be integer between 2018 and 2019'
+      body: 'Invalid year - must be integer'
     });
   } else if (!(day >= 1 && day <= 25)) {
     return callback(null, {
@@ -44,7 +44,7 @@ exports.handler = function(event, context, callback) {
   } catch (e) {
     return callback(null, {
       statusCode: 400,
-      body: "Invalid input"
+      body: e.message
     });
   }
 }

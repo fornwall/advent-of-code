@@ -4,7 +4,7 @@ struct Moons {
     velocities: [[i32; 3]; 4],
 }
 
-pub fn gcd(mut a: usize, mut b: usize) -> usize {
+pub fn gcd(mut a: u64, mut b: u64) -> u64 {
     while b != 0 {
         let tmp = a;
         a = b;
@@ -13,16 +13,16 @@ pub fn gcd(mut a: usize, mut b: usize) -> usize {
     a
 }
 
-pub fn lcd(a: usize, b: usize) -> usize {
+pub fn lcd(a: u64, b: u64) -> u64 {
     a * b / gcd(a, b)
 }
 
-pub fn lcd3(a: usize, b: usize, c: usize) -> usize {
+pub fn lcd3(a: u64, b: u64, c: u64) -> u64 {
     lcd(a, lcd(b, c))
 }
 
 impl Moons {
-    fn parse(input: &str) -> Moons {
+    fn parse(input: &str) -> Result<Moons, String> {
         let mut positions = [[0; 3]; 4];
         input.lines().enumerate().for_each(|(i, line)| {
             let parts: Vec<&str> = line
@@ -34,10 +34,10 @@ impl Moons {
             positions[i][2] = parts[7].trim().parse::<i32>().unwrap();
         });
 
-        Moons {
+        Ok(Moons {
             positions,
             velocities: [[0; 3]; 4],
-        }
+        })
     }
 
     fn total_energy(&self) -> u64 {
@@ -78,22 +78,22 @@ fn signum(value: i32) -> i32 {
     }
 }
 
-pub fn part1_nth(input_string: &str, n: usize) -> String {
-    let mut moons = Moons::parse(input_string);
+pub fn part1_nth(input_string: &str, n: usize) -> Result<u64, String> {
+    let mut moons = Moons::parse(input_string)?;
     for _ in 0..n {
         moons.step();
     }
-    moons.total_energy().to_string()
+    Ok(moons.total_energy())
 }
 
-pub fn part1(input_string: &str) -> String {
+pub fn part1(input_string: &str) -> Result<u64, String> {
     part1_nth(input_string, 1000)
 }
 
-pub fn part2(input_string: &str) -> String {
-    let mut moons = Moons::parse(input_string);
+pub fn part2(input_string: &str) -> Result<u64, String> {
+    let mut moons = Moons::parse(input_string)?;
     let initial_moons = moons.clone();
-    let mut cycles: [Option<usize>; 3] = [None; 3];
+    let mut cycles: [Option<u64>; 3] = [None; 3];
 
     let mut step = 0;
     while cycles.iter().any(|x| x.is_none()) {
@@ -117,7 +117,7 @@ pub fn part2(input_string: &str) -> String {
         }
     }
 
-    lcd3(cycles[0].unwrap(), cycles[1].unwrap(), cycles[2].unwrap()).to_string()
+    Ok(lcd3(cycles[0].unwrap(), cycles[1].unwrap(), cycles[2].unwrap()))
 }
 
 #[test]
@@ -130,13 +130,13 @@ pub fn tests_part1() {
 <x=3, y=5, z=-1>",
             10
         ),
-        "179"
+        Ok(179)
     );
 
-    assert_eq!(part1(include_str!("day12_input.txt")), "6220");
+    assert_eq!(part1(include_str!("day12_input.txt")), Ok(6220));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day12_input.txt")), "548525804273976");
+    assert_eq!(part2(include_str!("day12_input.txt")), Ok(548525804273976));
 }

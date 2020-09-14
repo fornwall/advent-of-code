@@ -1,17 +1,14 @@
-use advent_of_code::get_problem_set;
+use advent_of_code::solve as core_solve;
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
 pub fn solve(year: u16, day: u8, part: u8, input: String) -> PyResult<String> {
-    if let Some(solver) = get_problem_set(year, day, part) {
-        Ok(solver(&input))
-    } else {
-        Ok(format!(
-            "Day ({}) must be between 1 and 25 and part ({}) either 1 or 2",
-            day, part
-        ))
+    match core_solve(year, day, part, &input) {
+        Ok(value) => Ok(value),
+        Err(error) => Err(PyValueError::new_err(error)),
     }
 }
 
