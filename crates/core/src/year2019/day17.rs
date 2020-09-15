@@ -259,10 +259,16 @@ pub fn tests_part1() {
         "76"
     );
 
-    assert_eq!(part1(include_str!("day17_input.txt")), Ok("11140".to_string()));
+    assert_eq!(
+        part1(include_str!("day17_input.txt")),
+        Ok("11140".to_string())
+    );
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day17_input.txt")), Ok("1113108".to_string()));
+    assert_eq!(
+        part2(include_str!("day17_input.txt")),
+        Ok("1113108".to_string())
+    );
 }

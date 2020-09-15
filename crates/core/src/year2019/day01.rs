@@ -1,13 +1,19 @@
 fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Result<u32, String> {
-    let mut total_fuel: u32 = 0;
-    for (index, line) in input_string.lines().enumerate() {
-        let line_number = index + 1;
-        let module_mass = line.parse::<u32>().map_err(|error| {
-            format!("Input error at line {}: {}", line_number, error.to_string())
-        })?;
-        total_fuel += fuel_calculator(module_mass);
-    }
-    Ok(total_fuel)
+    let parts = input_string
+        .lines()
+        .enumerate()
+        .map(|(line_index, line)| {
+            let module_mass = line.parse::<u32>().map_err(|error| {
+                format!(
+                    "Input error at line {}: {}",
+                    line_index + 1,
+                    error.to_string()
+                )
+            })?;
+            Ok(fuel_calculator(module_mass))
+        })
+        .collect::<Result<Vec<u32>, String>>()?;
+    Ok(parts.iter().sum())
 }
 
 pub fn part1(input_string: &str) -> Result<u32, String> {

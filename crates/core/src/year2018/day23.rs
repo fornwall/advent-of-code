@@ -9,22 +9,23 @@ struct Nanobot {
 }
 
 impl Nanobot {
-    fn parse(input_string: &str) -> Vec<Self> {
+    fn parse(input_string: &str) -> Result<Vec<Self>, String> {
         input_string
             .lines()
-            .map(|line| {
+            .enumerate()
+            .map(|(line_index, line)| {
+                let line_number = line_index + 1;
                 let parts: Vec<&str> = line
                     .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
                     .collect();
-                //println!("{:?}", parts);
-                Self {
-                    x: parts[2].parse::<i64>().unwrap(),
-                    y: parts[3].parse::<i64>().unwrap(),
-                    z: parts[4].parse::<i64>().unwrap(),
-                    strength: parts[7].parse::<i64>().unwrap(),
-                }
+                let error_message = |_| format!("Invalid input on line {}: {}", line_number, line);
+                let x = parts[2].parse::<i64>().map_err(error_message)?;
+                let y = parts[3].parse::<i64>().map_err(error_message)?;
+                let z = parts[4].parse::<i64>().map_err(error_message)?;
+                let strength = parts[7].parse::<i64>().map_err(error_message)?;
+                Ok(Self { x, y, z, strength })
             })
-            .collect()
+            .collect::<Result<Vec<Self>, String>>()
     }
 
     const fn distance_to_bot(&self, other: &Self) -> i64 {
@@ -44,11 +45,11 @@ impl Nanobot {
     }
 }
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let bots = Nanobot::parse(input_string);
+    let bots = Nanobot::parse(input_string)?;
     let strongest_bot = bots
         .iter()
         .max_by(|x, y| x.strength.cmp(&y.strength))
-        .unwrap();
+        .ok_or("No robot specified")?;
     Ok(bots
         .iter()
         .filter(|&bot| strongest_bot.is_bot_within_range(bot))
@@ -56,7 +57,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
-    let bots = Nanobot::parse(input_string);
+    let bots = Nanobot::parse(input_string)?;
 
     let (mut min_x, mut max_x, mut min_y, mut max_y, mut min_z, mut max_z) =
         bots.iter().fold((0, 0, 0, 0, 0, 0), |acc, bot| {
