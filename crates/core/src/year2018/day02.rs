@@ -48,7 +48,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 #[test]
 fn tests_part1() {
     assert_eq!(
-        12,
+        Ok(12),
         part1(
             "abcdef
 bababc
@@ -59,16 +59,15 @@ abcdee
 ababab
 "
         )
-        .unwrap()
     );
 
-    assert_eq!(6972, part1(include_str!("day02_input.txt")).unwrap());
+    assert_eq!(Ok(6972), part1(include_str!("day02_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "fgij",
+        Ok("fgij".to_string()),
         part2(
             "abcde
 fghij
@@ -79,11 +78,10 @@ axcye
 wvxyz
 "
         )
-        .unwrap()
     );
 
     assert_eq!(
-        "aixwcbzrmdvpsjfgllthdyoqe",
-        part2(include_str!("day02_input.txt")).unwrap()
+        Ok("aixwcbzrmdvpsjfgllthdyoqe".to_string()),
+        part2(include_str!("day02_input.txt"))
     );
 }
