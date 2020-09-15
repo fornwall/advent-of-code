@@ -29,20 +29,22 @@ struct Reactions {
 }
 
 impl Reactions {
-    fn parse(input_string: &str) -> Self {
+    fn parse(input_string: &str) -> Result<Self, String> {
         let mut id_assigner = ChemicalIdAssigner::new();
 
         // Indexed by chemical id that is produced, to amount produced and required.
         let mut reactions: Vec<(ChemicalAmount, Vec<ChemicalAmount>)> = Vec::new();
 
-        input_string.lines().for_each(|line| {
+        for (line_index, line) in input_string.lines().enumerate() {
             // Example: "12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ".
             let parts: Vec<&str> = line.split("=>").collect();
 
             let mut required_chemicals = Vec::new();
             for amount_and_name in parts[0].split(',') {
                 let parts: Vec<&str> = amount_and_name.split_whitespace().collect();
-                let required_amount = parts[0].parse::<ChemicalAmount>().unwrap();
+                let required_amount = parts[0]
+                    .parse::<ChemicalAmount>()
+                    .map_err(|_| format!("Invalid line {}: {}", line_index + 1, line))?;
                 let required_id = id_assigner.id_of(parts[1].trim().to_string());
                 if required_chemicals.len() <= required_id {
                     required_chemicals.resize(required_id + 1, 0);
@@ -51,7 +53,9 @@ impl Reactions {
             }
 
             let to_parts: Vec<&str> = parts[1].split_whitespace().collect();
-            let produced_chemical_amount = to_parts[0].parse::<ChemicalAmount>().unwrap();
+            let produced_chemical_amount = to_parts[0]
+                .parse::<ChemicalAmount>()
+                .map_err(|_| format!("Invalid line {}: {}", line_index + 1, line))?;
             let produced_chemical_name = to_parts[1].trim().to_string();
             let produced_chemical_id = id_assigner.id_of(produced_chemical_name);
 
@@ -59,17 +63,21 @@ impl Reactions {
                 reactions.resize_with(produced_chemical_id + 1, || (0, Vec::new()));
             }
             reactions[produced_chemical_id] = (produced_chemical_amount, required_chemicals);
-        });
+        }
 
-        let fuel_id = *id_assigner.id_map.get("FUEL").unwrap();
-        let ore_id = *id_assigner.id_map.get("ORE").unwrap();
+        let fuel_id = *id_assigner
+            .id_map
+            .get("FUEL")
+            .ok_or("No FUEL encountered")?;
 
-        Self {
+        let ore_id = *id_assigner.id_map.get("ORE").ok_or("No ORE encountered")?;
+
+        Ok(Self {
             id_assigner,
             produced_by: reactions,
             fuel_id,
             ore_id,
-        }
+        })
     }
 }
 
@@ -102,14 +110,14 @@ fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> Chemi
 }
 
 pub fn part1(input_string: &str) -> Result<ChemicalAmount, String> {
-    let reactions = Reactions::parse(input_string);
+    let reactions = Reactions::parse(input_string)?;
     Ok(required_ore(&reactions, 1))
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
     const AVAILABLE_ORE: i64 = 1_000_000_000_000;
 
-    let reactions = Reactions::parse(input_string);
+    let reactions = Reactions::parse(input_string)?;
 
     let mut min_produced_fuel = 1;
     let mut max_produced_fuel = AVAILABLE_ORE;
