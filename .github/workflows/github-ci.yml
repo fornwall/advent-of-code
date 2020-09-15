@@ -63,7 +63,7 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: crates/python/
         env:
-          CIBW_BEFORE_BUILD: "python -m pip install setuptools_rust && choco install rust && rustc --version"
+          CIBW_BEFORE_BUILD: "python -m pip install setuptools_rust"
         run: |
           # Fix ../core being outside of the project built by cibuildwheel:
           perl -p -i -e 's/..\/core/core/' Cargo.toml
