@@ -6,16 +6,23 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         deck.push(i);
     }
 
-    for line in input_string.lines() {
+    for (index, line) in input_string.lines().enumerate() {
+        let line_number = index + 1;
         if line.starts_with("deal into") {
             deck = deck.iter().rev().copied().collect();
         } else if line.starts_with("cut") {
-            let how_many = line
-                .split_whitespace()
-                .nth(1)
-                .unwrap()
-                .parse::<i32>()
-                .unwrap();
+            let how_many = line.split_whitespace().nth(1).ok_or_else(|| {
+                format!(
+                    "Incorrect input at line {}: No argument to cut",
+                    line_number
+                )
+            })?;
+            let how_many = how_many.parse::<i32>().map_err(|parse_error| {
+                format!(
+                    "Incorrect input at line {}: Cannot parse number of cuts - {}",
+                    line_number, parse_error
+                )
+            })?;
             let how_many = if how_many > 0 {
                 how_many
             } else {
@@ -46,15 +53,17 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 /// Explanation:
 /// https://www.reddit.com/r/adventofcode/comments/ee0rqi/2019_day_22_solutions/fbnkaju?utm_source=share&utm_medium=web2x
 pub fn part2(input_string: &str) -> Result<i128, String> {
+    fn inv(n: i128) -> i128 {
+        mod_exp(n, MOD - 2, MOD)
+    }
+
+    const SHUFFLES: i128 = 101_741_582_076_661;
+
     const NUM_CARDS: i128 = 119_315_717_514_047;
     const MOD: i128 = NUM_CARDS;
 
     let mut offset_diff: i128 = 0;
     let mut increment_mul: i128 = 1;
-
-    fn inv(n: i128) -> i128 {
-        mod_exp(n, MOD - 2, MOD)
-    }
 
     for line in input_string.lines() {
         if line.starts_with("deal into") {
@@ -90,10 +99,8 @@ pub fn part2(input_string: &str) -> Result<i128, String> {
         offset_diff = offset_diff.rem_euclid(MOD);
     }
 
-    const SHUFFLES: i128 = 101_741_582_076_661;
-
     let increment = mod_exp(increment_mul, SHUFFLES, MOD);
-    let offset = (offset_diff * (1i128 - increment)).rem_euclid(MOD) * inv(1 - increment_mul);
+    let offset = (offset_diff * (1_i128 - increment)).rem_euclid(MOD) * inv(1 - increment_mul);
 
     let result = (offset + increment * 2020).rem_euclid(MOD);
     Ok(result)
@@ -106,5 +113,8 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day22_input.txt")), Ok(79855812422607));
+    assert_eq!(
+        part2(include_str!("day22_input.txt")),
+        Ok(79_855_812_422_607)
+    );
 }

@@ -16,14 +16,14 @@ struct ArmyGroup {
 }
 
 impl ArmyGroup {
-    fn is_alive(&self) -> bool {
+    const fn is_alive(&self) -> bool {
         self.units > 0
     }
 
-    fn parse(input_string: &str) -> Vec<ArmyGroup> {
+    fn parse(input_string: &str) -> Vec<Self> {
         let mut id_generator = 0;
         let mut immune_system = true;
-        let mut groups: Vec<ArmyGroup> = Vec::new();
+        let mut groups: Vec<Self> = Vec::new();
         for line in input_string.lines().skip(1) {
             if line == "" {
                 // Skip empty line.
@@ -74,7 +74,7 @@ impl ArmyGroup {
                 }
 
                 id_generator += 1;
-                let group = ArmyGroup {
+                let group = Self {
                     id: id_generator,
                     units,
                     hit_points,
@@ -92,11 +92,11 @@ impl ArmyGroup {
         groups
     }
 
-    fn effective_power(&self) -> i32 {
+    const fn effective_power(&self) -> i32 {
         self.units * self.attack_damage
     }
 
-    fn damage_when_attacking(&self, other_group: &ArmyGroup) -> i32 {
+    fn damage_when_attacking(&self, other_group: &Self) -> i32 {
         self.effective_power()
             * if other_group.immunities.contains(&self.attack_type) {
                 0
@@ -107,7 +107,7 @@ impl ArmyGroup {
             }
     }
 
-    fn attack(&self, other_group: &mut ArmyGroup) -> bool {
+    fn attack(&self, other_group: &mut Self) -> bool {
         let damage = self.damage_when_attacking(other_group);
         let killed_units = damage / other_group.hit_points;
         //println!("{} attacks {}, causing damage: {}", self.id, other_group.id, damage);

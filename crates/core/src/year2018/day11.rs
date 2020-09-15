@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-fn cell_power(x: usize, y: usize, serial_number: i64) -> i64 {
+const fn cell_power(x: usize, y: usize, serial_number: i64) -> i64 {
     // Find the fuel cell's rack ID, which is its X coordinate plus 10.
     let rack_id = x + 10;
     // Begin with a power level of the rack ID times the Y coordinate.
@@ -18,7 +18,7 @@ fn cell_power(x: usize, y: usize, serial_number: i64) -> i64 {
 pub fn part1(input_string: &str) -> Result<String, String> {
     let serial_number = input_string.parse::<i64>().unwrap();
 
-    let mut optimal_power = 0i64;
+    let mut optimal_power = 0_i64;
     let mut optimal_point = (0, 0);
 
     for x in 1..=298 {
@@ -46,11 +46,11 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 pub fn part2(input_string: &str) -> Result<String, String> {
     let serial_number = input_string.parse::<i64>().unwrap();
 
-    let mut optimal_power = 0i64;
+    let mut optimal_power = 0_i64;
     let mut optimal_square_width = 0;
     let mut optimal_point = (0, 0);
 
-    for left_column in 0..300usize {
+    for left_column in 0..300_usize {
         let mut row_sums = [0; 300];
         for right_column in left_column..300 {
             let square_width = right_column - left_column + 1;

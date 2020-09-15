@@ -14,17 +14,17 @@ enum Equipment {
     Neither,
 }
 
-fn is_compatible(region_type: RegionType, equipment: Equipment) -> bool {
+const fn is_compatible(region_type: RegionType, equipment: Equipment) -> bool {
     // In rocky regions, you can use the climbing gear or the torch. You cannot use neither (you'll likely slip and fall).
     // In wet regions, you can use the climbing gear or neither tool. You cannot use the torch (if it gets wet, you won't have a light source).
     // In narrow regions, you can use the torch or neither tool. You cannot use the climbing gear (it's too bulky to fit).
     match (region_type, equipment) {
-        (RegionType::Rocky, Equipment::ClimbingGear) => true,
-        (RegionType::Rocky, Equipment::Torch) => true,
-        (RegionType::Wet, Equipment::ClimbingGear) => true,
-        (RegionType::Wet, Equipment::Neither) => true,
-        (RegionType::Narrow, Equipment::Torch) => true,
-        (RegionType::Narrow, Equipment::Neither) => true,
+        (RegionType::Rocky, Equipment::ClimbingGear)
+        | (RegionType::Rocky, Equipment::Torch)
+        | (RegionType::Wet, Equipment::ClimbingGear)
+        | (RegionType::Wet, Equipment::Neither)
+        | (RegionType::Narrow, Equipment::Torch)
+        | (RegionType::Narrow, Equipment::Neither) => true,
         _ => false,
     }
 }
@@ -54,7 +54,7 @@ struct Grid {
 }
 
 impl Grid {
-    fn parse(input_string: &str) -> Grid {
+    fn parse(input_string: &str) -> Self {
         let lines: Vec<&str> = input_string.lines().collect();
         let depth = lines[0][7..].parse::<usize>().unwrap();
 
@@ -62,7 +62,7 @@ impl Grid {
         let target_x = parts[0].parse::<usize>().unwrap();
         let target_y = parts[1].parse::<usize>().unwrap();
 
-        Grid {
+        Self {
             cache: HashMap::new(),
             depth,
             target_x,
@@ -170,7 +170,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
             ));
         }
 
-        for (nx, ny) in [(0, -1i32), (-1i32, 0), (1, 0), (0, 1)].iter() {
+        for (nx, ny) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)].iter() {
             let new_x = (visiting_x as i32 + *nx) as i32;
             let new_y = (visiting_y as i32 + *ny) as i32;
             if new_x < 0 || new_y < 0 {

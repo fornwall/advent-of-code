@@ -58,10 +58,10 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day21_input.txt")), Ok(19358688));
+    assert_eq!(part1(include_str!("day21_input.txt")), Ok(19_358_688));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day21_input.txt")), Ok(1141236756));
+    assert_eq!(part2(include_str!("day21_input.txt")), Ok(1_141_236_756));
 }

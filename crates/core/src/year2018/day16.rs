@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+
 #[derive(Copy, Clone, PartialEq)]
 struct Registers {
     values: [u16; 4],
@@ -25,8 +26,8 @@ enum Opcode {
 }
 
 impl Registers {
-    fn of(r0: u16, r1: u16, r2: u16, r3: u16) -> Registers {
-        Registers {
+    const fn of(r0: u16, r1: u16, r2: u16, r3: u16) -> Self {
+        Self {
             values: [r0, r1, r2, r3],
         }
     }
@@ -145,8 +146,7 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
 
     let mut possible_meanings: Vec<HashSet<Opcode>> = Vec::new();
     for _ in 0..16 {
-        let mut s = HashSet::new();
-        for opcode in [
+        let s: HashSet<Opcode> = [
             Opcode::Addr,
             Opcode::Addi,
             Opcode::Mulr,
@@ -165,9 +165,8 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
             Opcode::Eqrr,
         ]
         .iter()
-        {
-            s.insert(*opcode);
-        }
+        .cloned()
+        .collect();
         possible_meanings.push(s);
     }
 
@@ -236,7 +235,7 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
     while assigned_opcodes.len() != 16 {
         for new in assigned_opcodes.iter() {
             for s in possible_meanings.iter_mut() {
-                if s.len() > 1 && s.remove(&new) && s.len() == 1 {
+                if s.len() > 1 && s.remove(new) && s.len() == 1 {
                     new_assign.push(*s.iter().next().unwrap());
                 }
             }

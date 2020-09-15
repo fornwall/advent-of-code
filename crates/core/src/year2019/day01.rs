@@ -39,7 +39,7 @@ pub fn tests_part1() {
     assert_eq!(654, part1("1969").unwrap());
     assert_eq!(33583, part1("100756").unwrap());
 
-    assert_eq!(3262358, part1(include_str!("day01_input.txt")).unwrap());
+    assert_eq!(3_262_358, part1(include_str!("day01_input.txt")).unwrap());
 
     assert_eq!(
         "Parse error at line 1: cannot parse integer from empty string",
@@ -53,5 +53,5 @@ fn tests_part2() {
     assert_eq!(966, part2("1969").unwrap());
     assert_eq!(50346, part2("100756").unwrap());
 
-    assert_eq!(4890696, part2(include_str!("day01_input.txt")).unwrap());
+    assert_eq!(4_890_696, part2(include_str!("day01_input.txt")).unwrap());
 }

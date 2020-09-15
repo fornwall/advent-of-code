@@ -12,7 +12,7 @@ struct Grid {
 }
 
 impl Grid {
-    fn parse(input_string: &str) -> Grid {
+    fn parse(input_string: &str) -> Self {
         let mut height = 0;
         let mut width = 0;
         let mut cells = Vec::new();
@@ -24,7 +24,7 @@ impl Grid {
 
         let next_gen_cells = vec![0; height * width];
 
-        Grid {
+        Self {
             width,
             height,
             cells,
@@ -34,8 +34,8 @@ impl Grid {
 
     fn count_around(&self, x: usize, y: usize, needle: u8) -> u8 {
         let mut sum = 0;
-        for &dy in &[-1i32, 0, 1] {
-            for &dx in &[-1i32, 0, 1] {
+        for &dy in &[-1_i32, 0, 1] {
+            for &dx in &[-1_i32, 0, 1] {
                 if dx == 0 && dy == 0 {
                     continue;
                 }
@@ -167,10 +167,10 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!(Ok(531417), part1(include_str!("day18_input.txt")));
+    assert_eq!(Ok(531_417), part1(include_str!("day18_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(Ok(205296), part2(include_str!("day18_input.txt")));
+    assert_eq!(Ok(205_296), part2(include_str!("day18_input.txt")));
 }

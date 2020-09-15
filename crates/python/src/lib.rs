@@ -5,8 +5,8 @@ use pyo3::wrap_pyfunction;
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
-pub fn solve(year: u16, day: u8, part: u8, input: String) -> PyResult<String> {
-    match core_solve(year, day, part, &input) {
+pub fn solve(year: u16, day: u8, part: u8, input: &str) -> PyResult<String> {
+    match core_solve(year, day, part, input) {
         Ok(value) => Ok(value),
         Err(error) => Err(PyValueError::new_err(error)),
     }

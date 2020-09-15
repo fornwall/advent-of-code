@@ -22,7 +22,7 @@ struct Vector {
 }
 
 impl Vector {
-    fn add(&mut self, other: Vector) {
+    fn add(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
     }
@@ -53,8 +53,8 @@ struct Cart {
 }
 
 impl Cart {
-    fn new(position: Vector, direction_x: i32, direction_y: i32) -> Cart {
-        Cart {
+    const fn new(position: Vector, direction_x: i32, direction_y: i32) -> Self {
+        Self {
             direction: Vector {
                 x: direction_x,
                 y: direction_y,
@@ -119,7 +119,7 @@ struct Track {
 }
 
 impl Track {
-    fn parse(input_string: &str) -> Track {
+    fn parse(input_string: &str) -> Self {
         let mut carts = Vec::new();
         let mut track = HashMap::new();
         for (y, line) in input_string.lines().enumerate() {
@@ -186,7 +186,7 @@ impl Track {
                 }
             }
         }
-        Track {
+        Self {
             track,
             carts,
             cart_positions: HashSet::new(),

@@ -6,12 +6,12 @@ struct Grid {
 }
 
 impl Grid {
-    fn zeroed() -> Grid {
-        Grid { value: 0 }
+    const fn zeroed() -> Self {
+        Self { value: 0 }
     }
 
-    fn parse(input: &str) -> Grid {
-        Grid {
+    fn parse(input: &str) -> Self {
+        Self {
             value: input
                 .lines()
                 .enumerate()
@@ -27,7 +27,7 @@ impl Grid {
         }
     }
 
-    fn at(self, x: i32, y: i32) -> u32 {
+    const fn at(self, x: i32, y: i32) -> u32 {
         if x < 0 || y < 0 || x >= 5 || y >= 5 {
             0
         } else {
@@ -41,7 +41,7 @@ impl Grid {
     }
 
     fn advance_minute(&mut self) {
-        let mut new_value = 0u32;
+        let mut new_value = 0_u32;
 
         for y in 0..5 {
             for x in 0..5 {
@@ -67,24 +67,26 @@ impl Grid {
         self.value
     }
 
-    fn count_bugs(self) -> u32 {
+    const fn count_bugs(self) -> u32 {
         self.value.count_ones()
     }
 
     fn count_bugs_at_edge(self, coming_from: (i32, i32)) -> u32 {
+        #![allow(clippy::large_digit_groups)]
         (self.value
             & match coming_from {
-                (2, 1) => 0b00000_00000_00000_00000_11111u32,
-                (3, 2) => 0b10000_10000_10000_10000_10000u32,
-                (2, 3) => 0b11111_00000_00000_00000_00000u32,
-                (1, 2) => 0b00001_00001_00001_00001_00001u32,
+                (2, 1) => 0b00000_00000_00000_00000_11111_u32,
+                (3, 2) => 0b10000_10000_10000_10000_10000_u32,
+                (2, 3) => 0b11111_00000_00000_00000_00000_u32,
+                (1, 2) => 0b00001_00001_00001_00001_00001_u32,
                 _ => panic!("Unsupported direction"),
             })
         .count_ones()
     }
 
-    fn advance(&mut self, inner_grid: Grid, outer_grid: Grid) -> Grid {
-        let mut new_value = 0u32;
+    fn advance(&mut self, inner_grid: Self, outer_grid: Self) -> Self {
+        const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
+        let mut new_value = 0_u32;
 
         for y in 0..5 {
             for x in 0..5 {
@@ -94,7 +96,6 @@ impl Grid {
 
                 let mut adjacent_bugs = 0;
 
-                const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
                 for &direction in DIRECTIONS.iter() {
                     let new_x = x + direction.0;
                     let new_y = y + direction.1;
@@ -114,7 +115,7 @@ impl Grid {
             }
         }
 
-        Grid { value: new_value }
+        Self { value: new_value }
     }
 }
 
@@ -149,7 +150,7 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day24_input.txt")), Ok(11042850));
+    assert_eq!(part1(include_str!("day24_input.txt")), Ok(11_042_850));
 }
 
 #[test]

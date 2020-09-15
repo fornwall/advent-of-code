@@ -26,7 +26,7 @@ struct Board {
 }
 
 impl Board {
-    fn parse(input_string: &str, elf_attack_power: i32) -> Board {
+    fn parse(input_string: &str, elf_attack_power: i32) -> Self {
         let width = match input_string.find('\n') {
             Some(len) => len as u32,
             None => {
@@ -65,7 +65,7 @@ impl Board {
             }
         }
 
-        Board {
+        Self {
             width,
             height,
             cells,
@@ -136,7 +136,7 @@ impl Board {
         let mut lowest_hit_points = std::i32::MAX;
         let mut target_position = (0, 0);
 
-        for (dx, dy) in [(0, -1i32), (-1i32, 0), (1, 0), (0, 1)].iter() {
+        for (dx, dy) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)].iter() {
             let (target_x, target_y) = (x as i32 + *dx, y as i32 + *dy);
             if let MapCell::Unit {
                 hit_points, elf, ..
@@ -206,7 +206,7 @@ impl Board {
 
     fn shortest_distance(&mut self, sx: u32, sy: u32, elf_target: bool) -> (u32, u32, u32) {
         let mut to_visit = VecDeque::new();
-        to_visit.push_back((0i32, sx, sy, 0, 0));
+        to_visit.push_back((0_i32, sx, sy, 0, 0));
 
         self.visited.iter_mut().for_each(|element| *element = false);
         self.visited[(sx + self.width * sy) as usize] = true;
@@ -215,7 +215,7 @@ impl Board {
             let (cost, visiting_x, visiting_y) =
                 (visiting.0 + 1, visiting.1 as u32, visiting.2 as u32);
 
-            for (nx, ny) in [(0, -1i32), (-1i32, 0), (1, 0), (0, 1)].iter() {
+            for (nx, ny) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)].iter() {
                 let x = (visiting_x as i32 + *nx) as u32;
                 let y = (visiting_y as i32 + *ny) as u32;
 
@@ -404,7 +404,7 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!(Ok(207059), part1(include_str!("day15_input.txt")));
+    assert_eq!(Ok(207_059), part1(include_str!("day15_input.txt")));
 }
 
 #[test]

@@ -7,9 +7,14 @@ else
   wasm_pack_profile=--release
 endif
 
+CLIPPY_COMMAND = cargo clippy --all-targets --all-features -- -D warnings -W clippy::cargo -W clippy::nursery
+ifeq ($(CLIPPY_PEDANTIC),1)
+  CLIPPY_COMMAND += -W clippy::pedantic
+endif
+
 check:
 	cargo fmt --all
-	cargo clippy --all-targets --all-features -- -D warnings
+	$(CLIPPY_COMMAND)
 	cargo test
 
 docker-image:

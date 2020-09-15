@@ -12,11 +12,11 @@ struct Key {
 type KeyBitset = u32;
 
 impl Key {
-    fn new(value: char) -> Key {
-        Key { value }
+    const fn new(value: char) -> Self {
+        Self { value }
     }
 
-    fn bit_mask(&self) -> KeyBitset {
+    const fn bit_mask(&self) -> KeyBitset {
         1 << (self.value as usize - 'a' as usize)
     }
 }
@@ -74,7 +74,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
 
         // (position, bitset_of_needed_keys, steps):
         let mut to_visit = VecDeque::new();
-        to_visit.push_back((this_key_position, 0u32, 0u32));
+        to_visit.push_back((this_key_position, 0_u32, 0_u32));
 
         let mut visited_positions = HashSet::new();
         visited_positions.insert(this_key_position);
@@ -141,7 +141,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     }
 
     impl Ord for Vertex {
-        fn cmp(&self, other: &Vertex) -> Ordering {
+        fn cmp(&self, other: &Self) -> Ordering {
             other
                 .steps
                 .cmp(&self.steps)
@@ -151,7 +151,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     }
 
     impl PartialOrd for Vertex {
-        fn partial_cmp(&self, other: &Vertex) -> Option<Ordering> {
+        fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
             Some(self.cmp(other))
         }
     }

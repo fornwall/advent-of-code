@@ -75,5 +75,5 @@ fn tests_part2() {
     assert_eq!(Ok(18), part2("92510"));
     assert_eq!(Ok(2018), part2("59414"));
 
-    assert_eq!(Ok(20173656), part2(include_str!("day14_input.txt")));
+    assert_eq!(Ok(20_173_656), part2(include_str!("day14_input.txt")));
 }

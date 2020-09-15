@@ -44,5 +44,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day19_input.txt")), Ok(18261982));
+    assert_eq!(part2(include_str!("day19_input.txt")), Ok(18_261_982));
 }

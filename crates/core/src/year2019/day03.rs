@@ -10,27 +10,27 @@ struct Point {
 }
 
 impl Point {
-    fn new(x: i32, y: i32) -> Point {
-        Point { x, y }
+    const fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
     }
 
-    fn direction(specifier: char) -> Point {
+    fn direction(specifier: char) -> Self {
         match specifier {
-            'U' => Point::new(0, 1),
-            'R' => Point::new(1, 0),
-            'D' => Point::new(0, -1),
-            'L' => Point::new(-1, 0),
+            'U' => Self::new(0, 1),
+            'R' => Self::new(1, 0),
+            'D' => Self::new(0, -1),
+            'L' => Self::new(-1, 0),
             _ => panic!("Invalid direction specifier: {}", specifier),
         }
     }
 
-    fn distance_from_origin(self) -> u32 {
+    const fn distance_from_origin(self) -> u32 {
         self.x.abs() as u32 + self.y.abs() as u32
     }
 }
 
 impl ops::AddAssign<Point> for Point {
-    fn add_assign(&mut self, rhs: Point) {
+    fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
     }

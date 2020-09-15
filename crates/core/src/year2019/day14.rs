@@ -8,8 +8,8 @@ struct ChemicalIdAssigner {
 }
 
 impl ChemicalIdAssigner {
-    fn new() -> ChemicalIdAssigner {
-        ChemicalIdAssigner {
+    fn new() -> Self {
+        Self {
             id_map: HashMap::new(),
         }
     }
@@ -29,7 +29,7 @@ struct Reactions {
 }
 
 impl Reactions {
-    fn parse(input_string: &str) -> Reactions {
+    fn parse(input_string: &str) -> Self {
         let mut id_assigner = ChemicalIdAssigner::new();
 
         // Indexed by chemical id that is produced, to amount produced and required.
@@ -64,7 +64,7 @@ impl Reactions {
         let fuel_id = *id_assigner.id_map.get("FUEL").unwrap();
         let ore_id = *id_assigner.id_map.get("ORE").unwrap();
 
-        Reactions {
+        Self {
             id_assigner,
             produced_by: reactions,
             fuel_id,
@@ -107,9 +107,9 @@ pub fn part1(input_string: &str) -> Result<ChemicalAmount, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
-    let reactions = Reactions::parse(input_string);
-
     const AVAILABLE_ORE: i64 = 1_000_000_000_000;
+
+    let reactions = Reactions::parse(input_string);
 
     let mut min_produced_fuel = 1;
     let mut max_produced_fuel = AVAILABLE_ORE;
@@ -161,7 +161,7 @@ pub fn tests_part1() {
         Ok(13312)
     );
 
-    assert_eq!(part1(include_str!("day14_input.txt")), Ok(1590844));
+    assert_eq!(part1(include_str!("day14_input.txt")), Ok(1_590_844));
 }
 
 #[test]
@@ -178,8 +178,8 @@ fn tests_part2() {
 165 ORE => 2 GPVTF
 3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
         ),
-        Ok(82892753)
+        Ok(82_892_753)
     );
 
-    assert_eq!(part2(include_str!("day14_input.txt")), Ok(1184209));
+    assert_eq!(part2(include_str!("day14_input.txt")), Ok(1_184_209));
 }

@@ -9,8 +9,8 @@ struct Step {
 }
 
 impl Step {
-    fn new(name: char) -> Step {
-        Step {
+    fn new(name: char) -> Self {
+        Self {
             name,
             dependencies: HashSet::new(),
             needed_by: BTreeSet::new(),
@@ -19,19 +19,19 @@ impl Step {
 }
 
 impl Ord for Step {
-    fn cmp(&self, other: &Step) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         other.name.cmp(&self.name)
     }
 }
 
 impl PartialOrd for Step {
-    fn partial_cmp(&self, other: &Step) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl PartialEq for Step {
-    fn eq(&self, other: &Step) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
 }
@@ -78,10 +78,10 @@ pub fn part1(input_string: &str) -> Result<String, String> {
             result.push(step.name);
 
             for needed_by_name in step.needed_by.iter().rev() {
-                let v = remaining_dependencies.get_mut(&needed_by_name).unwrap();
+                let v = remaining_dependencies.get_mut(needed_by_name).unwrap();
                 v.remove(&step.name);
                 if v.is_empty() {
-                    queue.push(&step_map[&needed_by_name]);
+                    queue.push(&step_map[needed_by_name]);
                 };
             }
         }
@@ -97,8 +97,8 @@ struct Work {
 }
 
 impl Work {
-    fn new(name: char, done_at_second: i32) -> Work {
-        Work {
+    const fn new(name: char, done_at_second: i32) -> Self {
+        Self {
             name,
             done_at_second,
         }
@@ -106,19 +106,19 @@ impl Work {
 }
 
 impl Ord for Work {
-    fn cmp(&self, other: &Work) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         other.done_at_second.cmp(&self.done_at_second)
     }
 }
 
 impl PartialOrd for Work {
-    fn partial_cmp(&self, other: &Work) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl PartialEq for Work {
-    fn eq(&self, other: &Work) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
 }
@@ -177,10 +177,10 @@ pub fn part2_param(input_string: &str, workers: usize, step_duration_base: i32) 
         let step = &step_map[&work_done.name];
 
         for needed_by_name in step.needed_by.iter().rev() {
-            let v = remaining_dependencies.get_mut(&needed_by_name).unwrap();
+            let v = remaining_dependencies.get_mut(needed_by_name).unwrap();
             v.remove(&step.name);
             if v.is_empty() {
-                step_queue.push(&step_map[&needed_by_name]);
+                step_queue.push(&step_map[needed_by_name]);
             };
         }
 

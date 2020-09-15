@@ -12,7 +12,7 @@ struct Program {
 }
 
 impl Program {
-    fn instruction_pointer(&self) -> u64 {
+    const fn instruction_pointer(&self) -> u64 {
         self.registers.values[self.instruction_pointer_index as usize]
     }
 
@@ -152,7 +152,7 @@ impl Program {
         }
     }
 
-    fn parse(input_string: &str) -> Program {
+    fn parse(input_string: &str) -> Self {
         let mut lines = input_string.lines();
         let first_line = lines.next().unwrap();
 
@@ -168,7 +168,7 @@ impl Program {
             instructions.push((opcode, a, b, c));
         }
 
-        Program {
+        Self {
             instruction_pointer_index,
             instructions,
             registers: Registers::new(),
@@ -221,8 +221,8 @@ fn opcode_from_str(name: &str) -> Opcode {
 }
 
 impl Registers {
-    fn new() -> Registers {
-        Registers {
+    const fn new() -> Self {
+        Self {
             values: [0, 0, 0, 0, 0, 0],
         }
     }
@@ -305,5 +305,5 @@ seti 9 0 5"
 
 #[test]
 fn tests_part2() {
-    assert_eq!(Ok(10996992), part2(include_str!("day19_input.txt")));
+    assert_eq!(Ok(10_996_992), part2(include_str!("day19_input.txt")));
 }

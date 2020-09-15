@@ -21,7 +21,7 @@ struct Grid {
 }
 
 impl Grid {
-    fn from(input_string: &str) -> Grid {
+    fn from(input_string: &str) -> Self {
         let mut points: Vec<(u16, u16)> = Vec::new();
         let mut x_range = (std::u16::MAX, std::u16::MIN);
         let mut y_range = (std::u16::MAX, std::u16::MIN);
@@ -56,7 +56,7 @@ impl Grid {
         let water_y = 0;
         cells[(water_y * width + water_x as usize) as usize] = b'w';
 
-        Grid {
+        Self {
             cells,
             width,
             height,

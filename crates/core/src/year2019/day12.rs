@@ -4,7 +4,7 @@ struct Moons {
     velocities: [[i32; 3]; 4],
 }
 
-pub fn gcd(mut a: u64, mut b: u64) -> u64 {
+pub const fn gcd(mut a: u64, mut b: u64) -> u64 {
     while b != 0 {
         let tmp = a;
         a = b;
@@ -13,16 +13,16 @@ pub fn gcd(mut a: u64, mut b: u64) -> u64 {
     a
 }
 
-pub fn lcd(a: u64, b: u64) -> u64 {
+pub const fn lcd(a: u64, b: u64) -> u64 {
     a * b / gcd(a, b)
 }
 
-pub fn lcd3(a: u64, b: u64, c: u64) -> u64 {
+pub const fn lcd3(a: u64, b: u64, c: u64) -> u64 {
     lcd(a, lcd(b, c))
 }
 
 impl Moons {
-    fn parse(input: &str) -> Result<Moons, String> {
+    fn parse(input: &str) -> Result<Self, String> {
         let mut positions = [[0; 3]; 4];
         input.lines().enumerate().for_each(|(i, line)| {
             let parts: Vec<&str> = line
@@ -34,7 +34,7 @@ impl Moons {
             positions[i][2] = parts[7].trim().parse::<i32>().unwrap();
         });
 
-        Ok(Moons {
+        Ok(Self {
             positions,
             velocities: [[0; 3]; 4],
         })
@@ -70,7 +70,7 @@ impl Moons {
     }
 }
 
-fn signum(value: i32) -> i32 {
+const fn signum(value: i32) -> i32 {
     match value {
         _ if value < 0 => -1,
         _ if value == 0 => 0,
@@ -142,5 +142,8 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day12_input.txt")), Ok(548525804273976));
+    assert_eq!(
+        part2(include_str!("day12_input.txt")),
+        Ok(548_525_804_273_976)
+    );
 }

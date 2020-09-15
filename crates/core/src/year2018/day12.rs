@@ -9,7 +9,7 @@ struct Tunnel {
 }
 
 impl Tunnel {
-    fn parse(input_string: &str, space_for_generations: usize) -> Tunnel {
+    fn parse(input_string: &str, space_for_generations: usize) -> Self {
         let mut evolutions = HashMap::new();
 
         let mut lines = input_string.lines();
@@ -40,7 +40,7 @@ impl Tunnel {
         }
 
         let capacity = evolutions.len();
-        Tunnel {
+        Self {
             current_gen,
             next_gen,
             offset: max_growth,
@@ -103,7 +103,7 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
         tunnel.evolve();
 
         if tunnel.used_steps.len() == 1 {
-            let remaining_generations = 50_000_000_000i64 - generation as i64;
+            let remaining_generations = 50_000_000_000_i64 - generation as i64;
             let increase_per_generation =
                 tunnel.current_gen.iter().filter(|&&value| value).count() as i64;
             let final_score = tunnel.score() + remaining_generations * increase_per_generation;
@@ -142,5 +142,8 @@ fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(Ok(1900000000384), part2(include_str!("day12_input.txt")));
+    assert_eq!(
+        Ok(1_900_000_000_384),
+        part2(include_str!("day12_input.txt"))
+    );
 }

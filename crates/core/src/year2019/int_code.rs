@@ -19,7 +19,7 @@ enum Parameter {
 }
 
 impl Program {
-    pub fn parse(input: &str) -> Result<Program, String> {
+    pub fn parse(input: &str) -> Result<Self, String> {
         let mut memory: Vec<Word> = Vec::new();
         for word_string in input.trim().split(',') {
             match word_string.parse::<Word>() {
@@ -35,7 +35,7 @@ impl Program {
                 }
             }
         }
-        Ok(Program {
+        Ok(Self {
             memory: memory.into_iter().enumerate().collect(),
             instruction_pointer: 0,
             output_values: Vec::new(),
@@ -46,7 +46,7 @@ impl Program {
         })
     }
 
-    pub fn is_halted(&self) -> bool {
+    pub const fn is_halted(&self) -> bool {
         self.halted
     }
 
@@ -195,7 +195,7 @@ impl Program {
     }
 
     fn read_memory(&self, address: usize) -> i64 {
-        *self.memory.get(&address).unwrap_or(&0i64)
+        *self.memory.get(&address).unwrap_or(&0_i64)
     }
 
     pub fn write_memory(&mut self, address: usize, value: i64) {

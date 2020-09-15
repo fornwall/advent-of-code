@@ -8,10 +8,10 @@ enum Color {
 }
 
 impl Color {
-    fn from(value: i64) -> Color {
+    fn from(value: i64) -> Self {
         match value {
-            0 => Color::Black,
-            1 => Color::White,
+            0 => Self::Black,
+            1 => Self::White,
             _ => panic!("Invalid value: {}", value),
         }
     }
@@ -25,21 +25,21 @@ enum Direction {
 }
 
 impl Direction {
-    fn turn_right(self) -> Direction {
+    const fn turn_right(self) -> Self {
         match self {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
+            Self::Up => Self::Right,
+            Self::Right => Self::Down,
+            Self::Down => Self::Left,
+            Self::Left => Self::Up,
         }
     }
 
-    fn turn_left(self) -> Direction {
+    const fn turn_left(self) -> Self {
         match self {
-            Direction::Up => Direction::Left,
-            Direction::Right => Direction::Up,
-            Direction::Down => Direction::Right,
-            Direction::Left => Direction::Down,
+            Self::Up => Self::Left,
+            Self::Right => Self::Up,
+            Self::Down => Self::Right,
+            Self::Left => Self::Down,
         }
     }
 }

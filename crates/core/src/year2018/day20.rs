@@ -91,7 +91,7 @@ where
 
     let mut visited = HashSet::new();
     let mut to_visit = VecDeque::new();
-    to_visit.push_back((0i32, 0, 0));
+    to_visit.push_back((0_i32, 0, 0));
 
     while let Some(visiting) = to_visit.pop_front() {
         callback(visiting.0);

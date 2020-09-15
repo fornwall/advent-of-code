@@ -20,7 +20,8 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
     marbles.push_back(0);
 
     for marble_number in 1..=num_marbles {
-        if marble_number % 23 != 0 {
+        let normal_case = marble_number % 23 != 0;
+        if normal_case {
             // "Then, each Elf takes a turn placing the lowest-numbered remaining marble into the circle
             // between the marbles that are 1 and 2 marbles clockwise of the current marble. (When the
             // circle is large enough, this means that there is one marble between the marble that was
@@ -70,7 +71,7 @@ fn tests_part1() {
         part1("10 players; last marble is worth 1618 points")
     );
     assert_eq!(
-        Ok(146373),
+        Ok(146_373),
         part1("13 players; last marble is worth 7999 points")
     );
     assert_eq!(
@@ -86,10 +87,10 @@ fn tests_part1() {
         part1("30 players; last marble is worth 5807 points")
     );
 
-    assert_eq!(Ok(423717), part1(include_str!("day09_input.txt")));
+    assert_eq!(Ok(423_717), part1(include_str!("day09_input.txt")));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(Ok(3553108197), part2(include_str!("day09_input.txt")));
+    assert_eq!(Ok(3_553_108_197), part2(include_str!("day09_input.txt")));
 }

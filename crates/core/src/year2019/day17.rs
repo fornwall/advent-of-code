@@ -40,43 +40,43 @@ enum Direction {
 }
 
 impl Direction {
-    fn turn_right(self) -> Direction {
+    const fn turn_right(self) -> Self {
         match self {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
+            Self::Up => Self::Right,
+            Self::Right => Self::Down,
+            Self::Down => Self::Left,
+            Self::Left => Self::Up,
         }
     }
 
-    fn turn_left(self) -> Direction {
+    const fn turn_left(self) -> Self {
         match self {
-            Direction::Up => Direction::Left,
-            Direction::Right => Direction::Up,
-            Direction::Down => Direction::Right,
-            Direction::Left => Direction::Down,
+            Self::Up => Self::Left,
+            Self::Right => Self::Up,
+            Self::Down => Self::Right,
+            Self::Left => Self::Down,
         }
     }
 
-    fn other(self) -> Direction {
+    const fn other(self) -> Self {
         match self {
-            Direction::Up => Direction::Down,
-            Direction::Right => Direction::Left,
-            Direction::Down => Direction::Up,
-            Direction::Left => Direction::Right,
+            Self::Up => Self::Down,
+            Self::Right => Self::Left,
+            Self::Down => Self::Up,
+            Self::Left => Self::Right,
         }
     }
 
-    fn advance(self, position: (i32, i32)) -> (i32, i32) {
+    const fn advance(self, position: (i32, i32)) -> (i32, i32) {
         match self {
-            Direction::Up => (position.0, position.1 - 1),
-            Direction::Right => (position.0 + 1, position.1),
-            Direction::Down => (position.0, position.1 + 1),
-            Direction::Left => (position.0 - 1, position.1),
+            Self::Up => (position.0, position.1 - 1),
+            Self::Right => (position.0 + 1, position.1),
+            Self::Down => (position.0, position.1 + 1),
+            Self::Left => (position.0 - 1, position.1),
         }
     }
 
-    fn instruction_for_turning_to(self, target: Direction) -> char {
+    fn instruction_for_turning_to(self, target: Self) -> char {
         if self.turn_right() == target {
             'R'
         } else if self.turn_left() == target {
@@ -86,7 +86,7 @@ impl Direction {
         }
     }
 
-    pub fn iterator() -> Iter<'static, Direction> {
+    pub fn iterator() -> Iter<'static, Self> {
         static DIRECTIONS: [Direction; 4] = [
             Direction::Up,
             Direction::Right,

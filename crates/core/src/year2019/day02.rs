@@ -18,8 +18,9 @@ pub fn part1_patch(input_string: &str, patch: bool) -> Result<Word, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<Word, String> {
-    let initial_program = Program::parse(input_string)?;
     const DESIRED_OUTPUT: Word = 19_690_720;
+
+    let initial_program = Program::parse(input_string)?;
 
     for noun in 0..=99 {
         for verb in 0..=99 {
@@ -48,7 +49,7 @@ pub fn tests_part1() {
     assert_eq!(Ok(2), part1_patch("2,4,4,5,99,0", false));
     assert_eq!(Ok(30), part1_patch("1,1,1,4,99,5,6,0,99", false));
 
-    assert_eq!(Ok(4570637), part1(include_str!("day02_input.txt")));
+    assert_eq!(Ok(4_570_637), part1(include_str!("day02_input.txt")));
 
     assert_eq!(
         Err("Unable to parse program word hi: invalid digit found in string".to_string()),

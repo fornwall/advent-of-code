@@ -1,7 +1,12 @@
 [package]
 name = "advent-of-code-python"
 version = "2019.12.56"
+keywords = ["advent-of-code", "python", "pyo3"]
+categories = ["algorithms", "rust-patterns"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+repository = "https://github.com/fornwall/advent-of-code"
+description = "Solutions to Advent of Code written in Rust"
+license = "MIT"
 edition = "2018"
 
 [lib]

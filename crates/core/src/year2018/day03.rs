@@ -10,8 +10,8 @@ struct Claim {
 }
 
 impl Fabric {
-    fn new() -> Fabric {
-        Fabric {
+    fn new() -> Self {
+        Self {
             num_claims: vec![0; 1_000_000],
         }
     }
@@ -20,7 +20,7 @@ impl Fabric {
         for y in claim.y..claim.y + claim.height {
             let row_offset = y * 1000;
             for x in claim.x..claim.x + claim.width {
-                self.num_claims[(row_offset + x) as usize] += 1u32;
+                self.num_claims[(row_offset + x) as usize] += 1_u32;
             }
         }
     }
@@ -97,7 +97,7 @@ fn tests_part1() {
         )
     );
 
-    assert_eq!(Ok(104126), part1(include_str!("day03_input.txt")));
+    assert_eq!(Ok(104_126), part1(include_str!("day03_input.txt")));
 }
 
 #[test]

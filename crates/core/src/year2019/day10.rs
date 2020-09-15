@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-pub fn gcd(mut a: i64, mut b: i64) -> i64 {
+pub const fn gcd(mut a: i64, mut b: i64) -> i64 {
     while b != 0 {
         let tmp = a;
         a = b;

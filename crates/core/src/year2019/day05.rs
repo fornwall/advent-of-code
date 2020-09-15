@@ -21,10 +21,10 @@ pub fn part2(input_string: &str) -> Result<Word, String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day05_input.txt")), Ok(15097178));
+    assert_eq!(part1(include_str!("day05_input.txt")), Ok(15_097_178));
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day05_input.txt")), Ok(1558663));
+    assert_eq!(part2(include_str!("day05_input.txt")), Ok(1_558_663));
 }

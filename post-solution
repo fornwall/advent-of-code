@@ -1,19 +1,22 @@
 #!/bin/sh
 set -e -u
 
-if [ "$#" != 3 ]; then
+usage() {
 	echo "usage:\n    ./post-solution <year> <day> <part> # reads input from stdin"
 	echo "example:\n    ./post-solution 2019 23 1 < crates/core/src/year2019/day23_input.txt"
-	exit
+	exit 1
+}
+
+if [ "$#" != 3 ]; then
+	usage
 fi
 
 YEAR=$1
 DAY=$2
 PART=$3
 
-if [ "$YEAR" -ge 2020 ] && [ "$PART" -le 2017 ]; then
-	echo "Invalid year: $YEAR - only 2018-2019 is allowed"
-	exit 1
+if [ -z "$YEAR" ]; then
+	usage
 elif [ "$DAY" -ge 26 ] && [ "$PART" -le 0 ]; then
 	echo "Invalid day: $DAY - only 1-25 is allowed"
 	exit 1

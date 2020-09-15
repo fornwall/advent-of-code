@@ -23,12 +23,12 @@ impl Maze {
         self.array[x + self.cols * y] = tile;
     }
 
-    fn parse(input: &str) -> Maze {
+    fn parse(input: &str) -> Self {
         let rows = input.lines().filter(|&line| !line.is_empty()).count();
         let cols = input.lines().map(|line| line.len()).max().unwrap();
 
         let array = vec![b' '; rows * cols];
-        let mut maze = Maze {
+        let mut maze = Self {
             cols,
             array,
             portals: HashMap::new(),

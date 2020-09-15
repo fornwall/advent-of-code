@@ -3,6 +3,15 @@ use std::collections::HashSet;
 use std::collections::VecDeque;
 
 pub fn part1(string: &str) -> Result<u32, String> {
+    fn checksum(map: &HashMap<&str, Vec<&str>>, name: &str, depth: u32) -> u32 {
+        depth
+            + map.get(name).map_or(0, |list| {
+                list.iter()
+                    .map(|entry| checksum(map, entry, depth + 1))
+                    .sum::<u32>()
+            })
+    }
+
     let mut map = HashMap::new();
 
     for line in string.lines() {
@@ -11,15 +20,6 @@ pub fn part1(string: &str) -> Result<u32, String> {
         let orbited_by = map.entry(part).or_insert_with(Vec::new);
         let part = parts.next().ok_or(format!("Invalid line: {}", line))?;
         orbited_by.push(part);
-    }
-
-    fn checksum(map: &HashMap<&str, Vec<&str>>, name: &str, depth: u32) -> u32 {
-        depth
-            + map.get(name).map_or(0, |list| {
-                list.iter()
-                    .map(|entry| checksum(map, entry, depth + 1))
-                    .sum::<u32>()
-            })
     }
 
     Ok(checksum(&map, "COM", 0))
@@ -49,7 +49,7 @@ pub fn part2(string: &str) -> Result<u32, String> {
     let mut to_visit = VecDeque::new();
 
     visited.insert("YOU");
-    to_visit.push_back((0u32, "YOU"));
+    to_visit.push_back((0_u32, "YOU"));
 
     while !to_visit.is_empty() {
         let (distance, name) = to_visit.pop_front().unwrap();
@@ -89,7 +89,7 @@ K)L"
         Ok(42)
     );
 
-    assert_eq!(part1(include_str!("day06_input.txt")), Ok(273985));
+    assert_eq!(part1(include_str!("day06_input.txt")), Ok(273_985));
 }
 
 #[test]

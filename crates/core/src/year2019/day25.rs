@@ -10,30 +10,30 @@ enum Direction {
 }
 
 impl Direction {
-    fn reverse(self) -> Direction {
+    const fn reverse(self) -> Self {
         match self {
-            Direction::NORTH => Direction::SOUTH,
-            Direction::EAST => Direction::WEST,
-            Direction::SOUTH => Direction::NORTH,
-            Direction::WEST => Direction::EAST,
+            Self::NORTH => Self::SOUTH,
+            Self::EAST => Self::WEST,
+            Self::SOUTH => Self::NORTH,
+            Self::WEST => Self::EAST,
         }
     }
 
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
-            Direction::NORTH => "north",
-            Direction::EAST => "east",
-            Direction::SOUTH => "south",
-            Direction::WEST => "west",
+            Self::NORTH => "north",
+            Self::EAST => "east",
+            Self::SOUTH => "south",
+            Self::WEST => "west",
         }
     }
 
-    fn from_str(string: &str) -> Direction {
+    fn from_str(string: &str) -> Self {
         match string {
-            "north" => Direction::NORTH,
-            "east" => Direction::EAST,
-            "south" => Direction::SOUTH,
-            "west" => Direction::WEST,
+            "north" => Self::NORTH,
+            "east" => Self::EAST,
+            "south" => Self::SOUTH,
+            "west" => Self::WEST,
             _ => {
                 panic!("Invalid direction: {}", string);
             }
@@ -160,7 +160,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
                             .iter()
                             .filter(|&item| !blacklisted_items.contains(item))
                             .inspect(|&item| {
-                                execute_command(&mut program, Command::Take(&item));
+                                execute_command(&mut program, Command::Take(item));
                             })
                             .cloned(),
                     );
@@ -184,7 +184,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 
     // Drop all items:
     for item in carried_items.iter() {
-        execute_command(&mut program, Command::Drop(&item));
+        execute_command(&mut program, Command::Drop(item));
     }
 
     // Try all combinations of items using Gray code,
@@ -196,9 +196,9 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         for (j, item) in carried_items.iter().enumerate() {
             let bit_mask = 1 << j;
             if gray_code & bit_mask != 0 && latest_gray_code & bit_mask == 0 {
-                execute_command(&mut program, Command::Take(&item));
+                execute_command(&mut program, Command::Take(item));
             } else if latest_gray_code & bit_mask != 0 && gray_code & bit_mask == 0 {
-                execute_command(&mut program, Command::Drop(&item));
+                execute_command(&mut program, Command::Drop(item));
             }
         }
         latest_gray_code = gray_code;
@@ -221,5 +221,5 @@ pub fn part2(_input_string: &str) -> Result<String, String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day25_input.txt")), Ok(319815680));
+    assert_eq!(part1(include_str!("day25_input.txt")), Ok(319_815_680));
 }

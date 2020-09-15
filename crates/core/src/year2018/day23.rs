@@ -9,7 +9,7 @@ struct Nanobot {
 }
 
 impl Nanobot {
-    fn parse(input_string: &str) -> Vec<Nanobot> {
+    fn parse(input_string: &str) -> Vec<Self> {
         input_string
             .lines()
             .map(|line| {
@@ -17,7 +17,7 @@ impl Nanobot {
                     .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
                     .collect();
                 //println!("{:?}", parts);
-                Nanobot {
+                Self {
                     x: parts[2].parse::<i64>().unwrap(),
                     y: parts[3].parse::<i64>().unwrap(),
                     z: parts[4].parse::<i64>().unwrap(),
@@ -27,19 +27,19 @@ impl Nanobot {
             .collect()
     }
 
-    fn distance_to_bot(&self, other: &Nanobot) -> i64 {
+    const fn distance_to_bot(&self, other: &Self) -> i64 {
         (self.x - other.x).abs() + (self.y - other.y).abs() + (self.z - other.z).abs()
     }
 
-    fn distance_to_point(&self, x: i64, y: i64, z: i64) -> i64 {
+    const fn distance_to_point(&self, x: i64, y: i64, z: i64) -> i64 {
         (self.x - x).abs() + (self.y - y).abs() + (self.z - z).abs()
     }
 
-    fn is_bot_within_range(&self, other: &Nanobot) -> bool {
+    const fn is_bot_within_range(&self, other: &Self) -> bool {
         self.distance_to_bot(other) <= self.strength
     }
 
-    fn is_point_within_range(&self, x: i64, y: i64, z: i64) -> bool {
+    const fn is_point_within_range(&self, x: i64, y: i64, z: i64) -> bool {
         self.distance_to_point(x, y, z) <= self.strength
     }
 }
@@ -153,5 +153,5 @@ pos=<10,10,10>, r=5"
         )
     );
 
-    assert_eq!(Ok(106323091), part2(include_str!("day23_input.txt")));
+    assert_eq!(Ok(106_323_091), part2(include_str!("day23_input.txt")));
 }
