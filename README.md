@@ -45,7 +45,8 @@ There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/
 ```sh
 $ curl --data-binary 14 "https://aoc.fornwall.net/.netlify/functions/solve?year=2019&day=1&part=1"
 14
-$ curl --data-binary @crates/core/src/day02_input.txt \
+$ curl -s https://raw.githubusercontent.com/fornwall/advent-of-code/master/crates/core/src/year2019/day02_input.txt | \
+  curl --data-binary @- \
      "https://aoc.fornwall.net/.netlify/functions/solve?year=2019&day=2&part=2"
 5485
 ```
