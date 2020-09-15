@@ -121,13 +121,18 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day11_input.txt")).unwrap(), "1686");
+    assert_eq!(
+        part1(include_str!("day11_input.txt")),
+        Ok("1686".to_string())
+    );
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        part2(include_str!("day11_input.txt")).unwrap(),
-        include_str!("day11_part2_output.txt").trim_end_matches('\n')
+        part2(include_str!("day11_input.txt")),
+        Ok(include_str!("day11_part2_output.txt")
+            .trim_end_matches('\n')
+            .to_string())
     );
 }
