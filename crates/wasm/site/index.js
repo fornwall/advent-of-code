@@ -8,7 +8,7 @@ const output_element = document.getElementById('output');
 
 [day_element, part_element, input_element].forEach(element => element.addEventListener('input', function() {
   output_element.textContent = '';
-  output_element.classList.remove('blink');
+  output_element.classList.remove('blink', 'error');
 }, false));
 
 document.getElementById("run_button").addEventListener("click", function() {
@@ -20,9 +20,11 @@ document.getElementById("run_button").addEventListener("click", function() {
    let message;
    try {
       message = wasm.solve(year, day, part, input);
+      output_element.classList.remove('error');
    } catch (e) {
       console.log(e);
       message = e.message;
+      output_element.classList.add('error');
    }
    output_element.textContent = message;
    output_element.scrollIntoView();
