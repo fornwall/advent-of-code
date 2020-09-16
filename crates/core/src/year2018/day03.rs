@@ -1,6 +1,7 @@
 struct Fabric {
     num_claims: Vec<u32>,
 }
+
 struct Claim {
     id: u32,
     x: u32,
@@ -43,31 +44,40 @@ impl Fabric {
     }
 }
 
-fn parse_input<'a>(input_string: &'a str) -> impl Iterator<Item = Claim> + 'a {
-    input_string.lines().map(|line| {
-        let parts: Vec<u32> = line
-            .replace("#", "")
-            .replace("@", "")
-            .replace(",", " ")
-            .replace(":", "")
-            .replace("x", " ")
-            .split_whitespace()
-            .map(|s| s.parse::<u32>().unwrap())
-            .collect();
-        Claim {
-            id: parts[0],
-            x: parts[1],
-            y: parts[2],
-            width: parts[3],
-            height: parts[4],
-        }
-    })
+fn parse_input(input_string: &str) -> Result<Vec<Claim>, String> {
+    input_string
+        .lines()
+        .enumerate()
+        .map(|(line_index, line)| {
+            let error_message = || format!("Invalid input on line {}: {}", line_index + 1, line);
+            let parts: Vec<u32> = line
+                .replace("#", "")
+                .replace("@", "")
+                .replace(",", " ")
+                .replace(":", "")
+                .replace("x", " ")
+                .split_whitespace()
+                .map(|s| s.parse::<u32>().map_err(|_| error_message()))
+                .collect::<Result<_, _>>()?;
+            if parts.len() != 5 {
+                return Err(error_message());
+            }
+            Ok(Claim {
+                id: parts[0],
+                x: parts[1],
+                y: parts[2],
+                width: parts[3],
+                height: parts[4],
+            })
+        })
+        .collect()
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut fabric = Fabric::new();
 
-    parse_input(input_string).for_each(|claim| fabric.add_claim(&claim));
+    let input = parse_input(input_string)?;
+    input.iter().for_each(|claim| fabric.add_claim(claim));
 
     Ok(fabric.inches_claimed_multiple())
 }
@@ -75,15 +85,15 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 pub fn part2(input_string: &str) -> Result<u32, String> {
     let mut fabric = Fabric::new();
 
-    let claims: Vec<Claim> = parse_input(input_string).collect();
+    let claims = parse_input(input_string)?;
 
     claims.iter().for_each(|claim| fabric.add_claim(claim));
 
-    Ok(claims
+    let claim_without_overlap = claims
         .iter()
         .find(|claim| fabric.is_claimed_once(claim))
-        .expect("No result found")
-        .id)
+        .ok_or("No claim without overlap found")?;
+    Ok(claim_without_overlap.id)
 }
 
 #[test]
