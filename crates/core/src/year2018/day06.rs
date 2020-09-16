@@ -8,20 +8,30 @@ struct Point {
     y: i32,
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut counter = 0;
-    let points: Vec<Point> = input_string
+fn parse_input(input_string: &str) -> Result<Vec<Point>, String> {
+    input_string
         .lines()
-        .map(|line| {
-            counter += 1;
+        .enumerate()
+        .map(|(line_index, line)| {
+            let line_number = (line_index + 1) as i32;
             let parts: Vec<&str> = line.split(", ").collect();
-            Point {
-                id: counter,
-                x: parts[0].parse::<i32>().unwrap(),
-                y: parts[1].parse::<i32>().unwrap(),
+            let error_message = || format!("Invalid input one line {}: {}", line_number, line);
+            if parts.len() != 2 {
+                return Err(error_message());
             }
+            let x = parts[0].parse::<i32>().map_err(|_| error_message())?;
+            let y = parts[1].parse::<i32>().map_err(|_| error_message())?;
+            Ok(Point {
+                id: line_number,
+                x,
+                y,
+            })
         })
-        .collect();
+        .collect::<Result<Vec<Point>, String>>()
+}
+
+pub fn part1(input_string: &str) -> Result<i32, String> {
+    let points = parse_input(input_string)?;
 
     let (left, top, right, bottom) = points.iter().fold(
         (std::i32::MAX, std::i32::MAX, std::i32::MIN, std::i32::MIN),
@@ -66,28 +76,15 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         }
     }
 
-    let result = *id_to_count
+    let max = id_to_count
         .iter()
         .max_by_key(|(_, &value)| value)
-        .unwrap()
-        .1;
-    Ok(result)
+        .ok_or("No solution found")?;
+    Ok(*max.1)
 }
 
-pub fn part2_param(input_string: &str, max_distance_exclusive: i32) -> i32 {
-    let mut counter = 0;
-    let points: Vec<Point> = input_string
-        .lines()
-        .map(|line| {
-            counter += 1;
-            let parts: Vec<&str> = line.split(", ").collect();
-            Point {
-                id: counter,
-                x: parts[0].parse::<i32>().unwrap(),
-                y: parts[1].parse::<i32>().unwrap(),
-            }
-        })
-        .collect();
+pub fn part2_param(input_string: &str, max_distance_exclusive: i32) -> Result<i32, String> {
+    let points = parse_input(input_string)?;
 
     let (left, top, right, bottom) = points.iter().fold(
         (std::i32::MAX, std::i32::MAX, std::i32::MIN, std::i32::MIN),
@@ -114,11 +111,11 @@ pub fn part2_param(input_string: &str, max_distance_exclusive: i32) -> i32 {
         }
     }
 
-    sum
+    Ok(sum)
 }
 
 pub fn part2(input_string: &str) -> Result<i32, String> {
-    Ok(part2_param(input_string, 10000))
+    part2_param(input_string, 10000)
 }
 
 #[test]
@@ -156,7 +153,7 @@ fn tests_part1() {
 #[test]
 fn tests_part2() {
     assert_eq!(
-        16,
+        Ok(16),
         part2_param(
             "1, 1
 1, 6
