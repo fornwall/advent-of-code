@@ -6,23 +6,15 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         deck.push(i);
     }
 
-    for (index, line) in input_string.lines().enumerate() {
-        let line_number = index + 1;
+    for (line_index, line) in input_string.lines().enumerate() {
+        let error_message = || format!("Incorrect input at line {}: {}", line_index + 1, line);
+        let error_message_arg = |_| error_message();
+
         if line.starts_with("deal into") {
             deck = deck.iter().rev().copied().collect();
         } else if line.starts_with("cut") {
-            let how_many = line.split_whitespace().nth(1).ok_or_else(|| {
-                format!(
-                    "Incorrect input at line {}: No argument to cut",
-                    line_number
-                )
-            })?;
-            let how_many = how_many.parse::<i32>().map_err(|parse_error| {
-                format!(
-                    "Incorrect input at line {}: Cannot parse number of cuts - {}",
-                    line_number, parse_error
-                )
-            })?;
+            let how_many = line.split_whitespace().nth(1).ok_or_else(error_message)?;
+            let how_many = how_many.parse::<i32>().map_err(error_message_arg)?;
             let how_many = if how_many > 0 {
                 how_many
             } else {
@@ -33,9 +25,8 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
             let increment = line
                 .split_whitespace()
                 .nth(3)
-                .unwrap()
-                .parse::<usize>()
-                .unwrap();
+                .ok_or_else(error_message)
+                .and_then(|value_str| value_str.parse::<usize>().map_err(error_message_arg))?;
             let old_deck = deck.clone();
             let mut current_index = 0;
             for &card_at_front in old_deck.iter() {
@@ -47,7 +38,10 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         }
     }
 
-    Ok(deck.iter().position(|&card| card == 2019).unwrap())
+    let desired_card = 2019;
+    deck.iter()
+        .position(|&card| card == 2019)
+        .ok_or(format!("No card {} found", desired_card))
 }
 
 /// Explanation:
@@ -65,7 +59,10 @@ pub fn part2(input_string: &str) -> Result<i128, String> {
     let mut offset_diff: i128 = 0;
     let mut increment_mul: i128 = 1;
 
-    for line in input_string.lines() {
+    for (line_index, line) in input_string.lines().enumerate() {
+        let error_message = || format!("Incorrect input at line {}: {}", line_index + 1, line);
+        let error_message_arg = |_| error_message();
+
         if line.starts_with("deal into") {
             increment_mul *= -1;
             offset_diff += increment_mul;
@@ -73,17 +70,15 @@ pub fn part2(input_string: &str) -> Result<i128, String> {
             let n = line
                 .split_whitespace()
                 .nth(1)
-                .unwrap()
-                .parse::<i128>()
-                .unwrap();
+                .ok_or_else(error_message)
+                .and_then(|value_str| value_str.parse::<i128>().map_err(error_message_arg))?;
             offset_diff += increment_mul * n;
         } else if line.starts_with("deal with") {
             let n = line
                 .split_whitespace()
                 .nth(3)
-                .unwrap()
-                .parse::<i128>()
-                .unwrap();
+                .ok_or_else(error_message)
+                .and_then(|value_str| value_str.parse::<i128>().map_err(error_message_arg))?;
             increment_mul *= inv(n);
         // The offset (first card) does not change.
         // To get the increment, we need to calculate the second card.

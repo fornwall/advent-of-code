@@ -22,7 +22,7 @@ document.getElementById("run_button").addEventListener("click", function() {
       message = wasm.solve(year, day, part, input);
    } catch (e) {
       console.log(e);
-      message = 'ERROR: Invalid input';
+      message = e.message;
    }
    output_element.textContent = message;
    output_element.scrollIntoView();

@@ -152,9 +152,9 @@ impl Program {
         }
     }
 
-    fn parse(input_string: &str) -> Self {
+    fn parse(input_string: &str) -> Result<Self, String> {
         let mut lines = input_string.lines();
-        let first_line = lines.next().unwrap();
+        let first_line = lines.next().ok_or("No first line")?;
 
         let instruction_pointer_index = (&first_line[4..]).parse::<u8>().unwrap();
 
@@ -168,11 +168,11 @@ impl Program {
             instructions.push((opcode, a, b, c));
         }
 
-        Self {
+        Ok(Self {
             instruction_pointer_index,
             instructions,
             registers: Registers::new(),
-        }
+        })
     }
 }
 
@@ -255,11 +255,12 @@ impl Registers {
 }
 
 pub fn part1(input_string: &str) -> Result<u64, String> {
-    Ok(Program::parse(input_string).execute())
+    let mut program = Program::parse(input_string)?;
+    Ok(program.execute())
 }
 
 pub fn part2(input_string: &str) -> Result<u64, String> {
-    let mut program = Program::parse(input_string);
+    let mut program = Program::parse(input_string)?;
 
     program.registers.values[0] = 1;
 
