@@ -1,6 +1,3 @@
-DOCKER_IMAGE_NAME=fredrikfornwall/advent-of-code
-.PHONY: check docker-image publish-docker publish-html publish-npm publish-all
-
 ifeq ($(DEBUG),1)
   wasm_pack_profile=--dev
 else
@@ -16,12 +13,6 @@ check:
 	cargo fmt --all
 	$(CLIPPY_COMMAND)
 	cargo test
-
-docker-image:
-	docker build --no-cache --tag $(DOCKER_IMAGE_NAME) crates/core
-
-publish-docker: docker-image
-	docker push $(DOCKER_IMAGE_NAME)
 
 install-wasm-target:
 	rustup target add wasm32-unknown-unknown
@@ -52,12 +43,6 @@ test-python:
 		python setup.py develop && \
 		python tests/test_solve.py
 
-publish-all: publish-docker publish-html publish-npm
-	@echo Everything published
-
-home:
-	echo $(HOME)
-
 netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
@@ -70,4 +55,4 @@ netlify:
 		make node-library && \
 		cd crates/wasm/functions && npm install
 
-.PHONY: netlify
+.PHONY: check install-wasm-target create-html node-library serve-html publish-npm test-python netlify
