@@ -16,7 +16,12 @@ The `solve(year, day, part, input)` library function is published on these packa
 - [PyPi](https://pypi.org/project/advent-of-code) for a Python library using [PyO3](https://pyo3.rs/) built with [cibuildwheel](https://cibuildwheel.readthedocs.io/).
 
 ```rust
-fn todo() {}
+// Rust with dependency added: advent-of-code = "2019"
+use advent_of_code::solve;
+
+fn main() {
+    assert_eq!(solve(2019, 1, 1, "14"), Ok("2".to_string()));
+}
 ```
 
 ```python
@@ -32,8 +37,8 @@ assert solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4") == "30"
 const assert = require('assert').strict;
 const solve = require('advent-of-code-wasm').solve;
 
-assert.equal(solve(2019, 1, 1, '14'), '2');
-assert.equal(solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
+assert.equal(solve(2019, 1, 1, "14"), "2");
+assert.equal(solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), "30");
 ```
 
 # Running in the browser
