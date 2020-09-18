@@ -1,5 +1,5 @@
 [build]
-  publish = "crates/wasm/site/dist/"
+  publish = "crates/wasm/target/web"
   # https://advent2019.fornwall.net/.netlify/functions/solve, see ./post-solution
   functions = "crates/wasm/functions/"
   command = "make netlify"

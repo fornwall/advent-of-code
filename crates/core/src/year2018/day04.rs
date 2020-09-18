@@ -11,33 +11,40 @@ struct LogEntry {
     entry: EntryType,
 }
 
-fn parse_input(input_string: &str) -> Vec<LogEntry> {
+fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
     let mut lines: Vec<&str> = input_string.lines().collect();
     lines.sort();
 
     lines
         .iter()
-        .map(|line| {
+        .enumerate()
+        .map(|(line_index, line)| {
+            let error_message = || format!("Incorrect input at line {}: {}", line_index + 1, line);
             let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() < 4 || parts[1].len() != 6 {
+                return Err(error_message());
+            }
 
-            let minute = parts[1][3..5].parse().unwrap();
+            let minute = parts[1][3..5].parse().map_err(|_| error_message())?;
 
             let entry = match *parts.last().unwrap() {
                 "shift" => EntryType::BeginShift {
-                    guard_id: parts[3][1..].parse().expect("Could not parse guard"),
+                    guard_id: parts[3][1..].parse().map_err(|_| error_message())?,
                 },
                 "asleep" => EntryType::FallsAsleep,
                 "up" => EntryType::WakesUp,
-                _ => panic!("Invalid line"),
+                _ => {
+                    return Err(error_message());
+                }
             };
 
-            LogEntry { minute, entry }
+            Ok(LogEntry { minute, entry })
         })
         .collect()
 }
 
 pub fn part1(input_string: &str) -> Result<u64, String> {
-    let entries = parse_input(input_string);
+    let entries = parse_input(input_string)?;
 
     let mut sleepers = HashMap::new();
     let mut current_guard = 0;
@@ -86,7 +93,7 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<u64, String> {
-    let entries = parse_input(input_string);
+    let entries = parse_input(input_string)?;
 
     let mut sleepers = HashMap::new();
     let mut current_guard = 0;

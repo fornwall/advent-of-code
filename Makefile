@@ -17,20 +17,17 @@ check:
 install-wasm-target:
 	rustup target add wasm32-unknown-unknown
 
-create-html:
+site:
 	cd crates/wasm && \
-		wasm-pack build $(wasm_pack_profile) --target browser --out-dir target/browser
-	cd crates/wasm/site && \
-		rm -Rf dist package-lock.json && \
-		npm install && \
-		webpack --config webpack.config.js
-	cd && ln -f -s *.module.wasm module.wasm
+		wasm-pack build $(wasm_pack_profile) --target web --out-dir target/web && \
+		ln -f index.html target/web/index.html && \
+		ln -f index.js target/web/index.js
+
+serve-site: site
+	cd crates/wasm/target/web && devserver
 
 node-library:
 	cd crates/wasm && wasm-pack build --target nodejs --out-dir target/nodejs
-
-serve-html: create-html
-	cd crates/wasm/site/dist && python3 -m http.server
 
 publish-npm:
 	cd crates/wasm && ./publish-npm-module.sh
@@ -50,8 +47,7 @@ netlify:
 		curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
 		sh /tmp/setup-wasm-pack.sh && \
 		rustup target add wasm32-unknown-unknown && \
-		npm install --save-dev webpack webpack-cli && \
-		make create-html && \
+		make site && \
 		make node-library && \
 		cd crates/wasm/functions && npm install
 
