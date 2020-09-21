@@ -4,8 +4,6 @@ on: push
 
 env:
   DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
-  NODE_LTS: '12.x'
-  NODE_CURRENT: '14.x'
 
 jobs:
   check-git-ignore:
@@ -42,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ "${NODE_LTS}", "${NODE_CURRENT}" ]
+        node-version: [ '12.x', '14.x' ]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
@@ -150,7 +148,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
-        node-version: ${NODE_LTS}
+        node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
     - uses: actions/setup-python@v2
     - name: Install bump2version
