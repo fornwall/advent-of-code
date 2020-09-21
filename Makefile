@@ -35,15 +35,18 @@ npm-publish: node-package
 test-python:
 	cd crates/python && ./run-tests.sh
 
+install-wasm-pack:
+	curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
+		sh /tmp/setup-wasm-pack.sh
+
 netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
 		. $(HOME)/.cargo/env && \
-		curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
-		sh /tmp/setup-wasm-pack.sh && \
 		rustup target add wasm32-unknown-unknown && \
+		make install-wasm-pack && \
 		make site && \
 		make node-package && \
 		cd crates/wasm/functions && npm install
 
-.PHONY: check install-wasm-target create-html node-package serve-html npm-publish test-python netlify
+.PHONY: check install-wasm-target create-html node-package serve-html npm-publish test-python netlify install-wasm-pack

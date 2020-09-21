@@ -47,6 +47,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
+    - name: Install wasm-pack
+      run: make install-wasm-pack
     - name: Test with Node ${{ matrix.node-version }}
       run: make node-package
 
@@ -157,7 +159,7 @@ jobs:
       run: bump2version patch
     - name: Publish npm packages
       run: |
-        make netlify
+        make install-wasm-pack
         . ${HOME}/.cargo/env
         make npm-publish
       env:
