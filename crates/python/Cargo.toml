@@ -11,6 +11,7 @@ edition = "2018"
 
 [lib]
 name = "advent_of_code"
+doc = false
 crate-type = ["cdylib"]
 
 [dependencies]

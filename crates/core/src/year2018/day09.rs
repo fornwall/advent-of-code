@@ -2,8 +2,9 @@ use std::collections::VecDeque;
 
 fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, String> {
     let parts: Vec<&str> = input_string.split_whitespace().collect();
-    let num_players = parts[0].parse::<usize>().unwrap();
-    let num_marbles = (parts[6].parse::<usize>().unwrap() + 1) * last_marble_multiplier; // 0 based.
+    let num_players = parts[0].parse::<usize>().map_err(|_| "Invalid input")?;
+    let last_marble_points = parts[6].parse::<usize>().map_err(|_| "Invalid input")?;
+    let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.
 
     let mut player_scores = vec![0; num_players];
 
@@ -28,7 +29,7 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
             // just placed and the current marble.) The marble that was just placed then becomes the
             // current marble."
             for _ in 0..2 {
-                let popped = marbles.pop_front().unwrap();
+                let popped = marbles.pop_front().ok_or("No marble to pop")?;
                 marbles.push_back(popped);
             }
             marbles.push_front(marble_number);
@@ -48,11 +49,15 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
                 let popped = marbles.pop_back().unwrap();
                 marbles.push_front(popped);
             }
-            player_scores[player_number] += marbles.pop_front().unwrap();
+            player_scores[player_number] += marbles.pop_front().ok_or("No marble to pop")?;
         };
     }
 
-    Ok(*player_scores.iter().max().unwrap())
+    player_scores
+        .iter()
+        .max()
+        .ok_or_else(|| "No max value".to_string())
+        .map(|value| *value)
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {

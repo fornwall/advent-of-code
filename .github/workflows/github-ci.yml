@@ -4,6 +4,8 @@ on: push
 
 env:
   DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
+  NODE_LTS: '12.x'
+  NODE_CURRENT: '14.x'
 
 jobs:
   check-git-ignore:
@@ -35,6 +37,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Test with Python ${{ matrix.python-version }}
       run: make test-python
+
+  test-wasm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [${NODE_LTS}, ${NODE_CURRENT}]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
+    - name: Test with Node ${{ matrix.node-version }}
+      run: make node-package
 
   build-python-wheels:
     env:
@@ -89,7 +105,7 @@ jobs:
       run: docker build --tag throwaway crates/core
 
   bump-version:
-    needs: [test-rust, test-python, build-docker-image, build-python-wheels]
+    needs: [test-rust, test-python, test-wasm, build-docker-image, build-python-wheels]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -134,7 +150,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: ${NODE_LTS}
         registry-url: 'https://registry.npmjs.org'
     - uses: actions/setup-python@v2
     - name: Install bump2version
@@ -145,7 +161,7 @@ jobs:
       run: |
         make netlify
         . ${HOME}/.cargo/env
-        make publish-npm
+        make npm-publish
       env:
         # It needs to be named 'NODE_AUTH_TOKEN' as it's referenced
         # by the .npmrc created by setup-node:

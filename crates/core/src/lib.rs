@@ -1,3 +1,4 @@
+#![crate_name = "advent_of_code"]
 use std::fmt::Display;
 
 mod year2018;
@@ -13,6 +14,21 @@ fn to_stringer<T: Display>(
     }
 }
 
+/// Returns the solution for the specified given problem and input.
+///
+/// # Arguments
+///
+/// * `year` - The year of the problem, as in 2018 or 2019.
+/// * `day` - The day of the problem - from 1 to 25.
+/// * `part` - The part of the problem - either 1 or 2.
+/// * `input` - The input to the problem.
+///
+/// # Examples
+/// ```
+/// use advent_of_code::solve;
+/// let solution = solve(2019, 1, 1, "14");
+/// assert_eq!(solution, Ok("2".to_string()));
+/// ```
 pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String> {
     match (year, day, part) {
         (2018, 1, 1) => to_stringer(year2018::day01::part1, input),
@@ -122,6 +138,7 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String
     }
 }
 
+/// A version of [solve](fn.solve.html) that takes strings as arguments and parsers them to the required types.
 pub fn solve_raw(
     year_string: &str,
     day_string: &str,

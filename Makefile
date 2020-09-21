@@ -26,19 +26,14 @@ site:
 serve-site: site
 	cd crates/wasm/target/web && devserver
 
-node-library:
-	cd crates/wasm && wasm-pack build --target nodejs --out-dir target/nodejs
+node-package:
+	cd crates/wasm && ./build-package.sh
 
-publish-npm:
-	cd crates/wasm && ./publish-npm-module.sh
+npm-publish: node-package
+	cd crates/wasm && npm publish
 
 test-python:
-	cd crates/python && \
-		python3 -m venv env && \
-		. env/bin/activate && \
-		pip install -r requirements.txt && \
-		python setup.py develop && \
-		python tests/test_solve.py
+	cd crates/python && ./run-tests.sh
 
 netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
@@ -48,7 +43,7 @@ netlify:
 		sh /tmp/setup-wasm-pack.sh && \
 		rustup target add wasm32-unknown-unknown && \
 		make site && \
-		make node-library && \
+		make node-package && \
 		cd crates/wasm/functions && npm install
 
-.PHONY: check install-wasm-target create-html node-library serve-html publish-npm test-python netlify
+.PHONY: check install-wasm-target create-html node-package serve-html npm-publish test-python netlify

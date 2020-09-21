@@ -1,4 +1,4 @@
-from advent_of_code import solve_raw
+from advent_of_code import solve
 import sys
 
 
@@ -12,7 +12,7 @@ def main():
     problem_input = sys.stdin.read()
 
     try:
-        problem_output = solve_raw(year, day, part, problem_input)
+        problem_output = solve(year, day, part, problem_input)
         print(problem_output)
     except Exception as error:
         sys.exit("{0}".format(error))

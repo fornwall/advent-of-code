@@ -1,12 +1,35 @@
-use advent_of_code::solve as core_solve;
+use advent_of_code::solve_raw;
+use core::fmt::Display;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
+use pyo3::FromPyObject;
+use pyo3::PyAny;
 
-/// Formats the sum of two numbers as string.
+fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &'a PyAny) -> String {
+    if let Ok(value) = object.extract::<String>() {
+        value
+    } else if let Ok(value) = object.extract::<T>() {
+        value.to_string()
+    } else {
+        "".to_string()
+    }
+}
+
+/// Returns the solution for the specified given problem and input.
+///
+/// # Arguments
+///
+/// * `year` - The year of the problem, as in 2018 or 2019.
+/// * `day` - The day of the problem - from 1 to 25.
+/// * `part` - The part of the problem - either 1 or 2.
+/// * `input` - The input to the problem.
 #[pyfunction]
-pub fn solve(year: u16, day: u8, part: u8, input: &str) -> PyResult<String> {
-    match core_solve(year, day, part, input) {
+pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<String> {
+    let year_value = try_to_string::<u16>(year);
+    let day_value = try_to_string::<u8>(day);
+    let part_value = try_to_string::<u8>(part);
+    match solve_raw(&year_value, &day_value, &part_value, input) {
         Ok(value) => Ok(value),
         Err(error) => Err(PyValueError::new_err(error)),
     }

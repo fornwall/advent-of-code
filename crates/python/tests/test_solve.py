@@ -1,6 +1,7 @@
 import unittest
 import advent_of_code
 
+assert advent_of_code.solve("2019", "1", "1", "12") == "2"
 assert advent_of_code.solve(2019, 1, 1, "12") == "2"
 assert advent_of_code.solve(2019, 1, 1, "14") == "2"
 assert advent_of_code.solve(2019, 1, 1, "1969") == "654"
