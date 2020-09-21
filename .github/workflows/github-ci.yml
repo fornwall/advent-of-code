@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [${NODE_LTS}, ${NODE_CURRENT}]
+        node-version: [ "${NODE_LTS}", "${NODE_CURRENT}" ]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
