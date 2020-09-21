@@ -30,7 +30,7 @@ node-package:
 	cd crates/wasm && ./build-package.sh
 
 npm-publish: node-package
-	cd crates/wasm && npm publish
+	cd crates/wasm/target/nodejs && npm publish
 
 test-python:
 	cd crates/python && ./run-tests.sh
