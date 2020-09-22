@@ -32,10 +32,10 @@ struct Edge {
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    Ok(steps_to_gather_all_keys(input_string))
+    steps_to_gather_all_keys(input_string)
 }
 
-pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
+pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
     let mut map: HashMap<(i32, i32), char> = HashMap::new();
     let mut found_keys = HashMap::new();
     let mut all_keys_bitset = 0 as KeyBitset;
@@ -105,7 +105,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
                         continue 'key_direction_loop;
                     }
                     Some(c) => {
-                        panic!("Invalid map entry: {}", c);
+                        return Err(format!("Invalid map entry: {}", c));
                     }
                 }
 
@@ -129,7 +129,8 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> usize {
         }
     }
 
-    shortest_path(&adjacency_list, all_keys_bitset).expect("Not possible to gather all keys")
+    shortest_path(&adjacency_list, all_keys_bitset)
+        .ok_or_else(|| "Not possible to gather all keys".to_string())
 }
 
 fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) -> Option<usize> {
@@ -239,11 +240,11 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
         }
     });
 
-    let result = steps_to_gather_all_keys(&map_top_left)
-        + steps_to_gather_all_keys(&map_top_right)
-        + steps_to_gather_all_keys(&map_bottom_left)
-        + steps_to_gather_all_keys(&map_bottom_right);
-    Ok(result)
+    let s1 = steps_to_gather_all_keys(&map_top_left)?;
+    let s2 = steps_to_gather_all_keys(&map_top_right)?;
+    let s3 = steps_to_gather_all_keys(&map_bottom_left)?;
+    let s4 = steps_to_gather_all_keys(&map_bottom_right)?;
+    Ok(s1 + s2 + s3 + s4)
 }
 
 #[test]

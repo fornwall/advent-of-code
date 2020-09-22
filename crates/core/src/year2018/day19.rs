@@ -140,9 +140,7 @@ impl Program {
                     // (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
                     format!("({} == {}) ? 1 : 0", a, b)
                 }
-                _ => {
-                    panic!("Unhandled opcode at line: {}", line);
-                }
+                _ => format!("Unhandled opcode at line: {}", line),
             };
             print!("{}", pretty);
             if goto {

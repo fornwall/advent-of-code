@@ -193,7 +193,10 @@ pub fn part2(input_string: &str) -> Result<String, String> {
             robot_position = robot_direction.advance(robot_position);
             moves_since_turn += 1;
         } else {
-            panic!("Possible directions={}", possible_directions.len());
+            return Err(format!(
+                "Invalid possible directions: {}",
+                possible_directions.len()
+            ));
         }
     }
 

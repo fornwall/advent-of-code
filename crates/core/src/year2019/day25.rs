@@ -28,15 +28,13 @@ impl Direction {
         }
     }
 
-    fn from_str(string: &str) -> Self {
+    fn from_str(string: &str) -> Option<Self> {
         match string {
-            "north" => Self::NORTH,
-            "east" => Self::EAST,
-            "south" => Self::SOUTH,
-            "west" => Self::WEST,
-            _ => {
-                panic!("Invalid direction: {}", string);
-            }
+            "north" => Some(Self::NORTH),
+            "east" => Some(Self::EAST),
+            "south" => Some(Self::SOUTH),
+            "west" => Some(Self::WEST),
+            _ => None,
         }
     }
 }
@@ -86,11 +84,11 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
             room_id = line;
         } else if line.starts_with("- ") {
             let item = &line[2..];
-            match item {
-                "north" | "east" | "south" | "west" => {
-                    directions.push(Direction::from_str(item));
+            match Direction::from_str(item) {
+                Some(direction) => {
+                    directions.push(direction);
                 }
-                _ => {
+                None => {
                     items.push(item.to_string());
                 }
             }

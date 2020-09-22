@@ -2,7 +2,7 @@ use std::cmp::max;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet, VecDeque};
 
-pub fn visit_rooms<F>(input_string: &str, mut callback: F)
+pub fn visit_rooms<F>(input_string: &str, mut callback: F) -> Result<(), String>
 where
     F: FnMut(i32),
 {
@@ -84,7 +84,7 @@ where
                 positions_at_start_of_branch.pop();
             }
             _ => {
-                panic!("Unexpected char: {}", char);
+                return Err(format!("Invalid map tile: {}", char));
             }
         }
     }
@@ -106,13 +106,14 @@ where
             }
         };
     }
+    Ok(())
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut highest_cost = 0;
     visit_rooms(input_string, |cost| {
         highest_cost = max(highest_cost, cost);
-    });
+    })?;
     Ok(highest_cost)
 }
 
@@ -122,7 +123,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
         if cost >= 1000 {
             room_count += 1;
         }
-    });
+    })?;
     Ok(room_count)
 }
 

@@ -4,14 +4,19 @@ use std::collections::{HashSet, VecDeque};
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 
 /// The intcode instruction for moving the robot in the specified direction.
-fn instruction_for_direction(direction: (i32, i32)) -> i64 {
-    match direction {
+fn instruction_for_direction(direction: (i32, i32)) -> Result<i64, String> {
+    Ok(match direction {
         (0, 1) => 1,
         (0, -1) => 2,
         (-1, 0) => 3,
         (1, 0) => 4,
-        _ => panic!("Invalid direction ({},{})", direction.0, direction.1),
-    }
+        _ => {
+            return Err(format!(
+                "Invalid direction ({},{})",
+                direction.0, direction.1
+            ))
+        }
+    })
 }
 
 /// Search the space ship using the given intcode program.
@@ -41,7 +46,8 @@ where
             let new_distance = distance + 1;
 
             let mut updated_program = program.clone();
-            updated_program.input(instruction_for_direction(direction));
+            let instruction_input = instruction_for_direction(direction)?;
+            updated_program.input(instruction_input);
 
             let output = updated_program.run_for_output()?;
             if output.is_empty() {

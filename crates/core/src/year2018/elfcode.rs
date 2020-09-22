@@ -47,7 +47,7 @@ impl Program {
         let mut instructions = Vec::new();
         for line in lines {
             let parts: Vec<&str> = line.split_whitespace().collect();
-            let opcode = opcode_from_str(parts[0]);
+            let opcode = opcode_from_str(parts[0])?;
             let a = parts[1].parse::<u64>().unwrap();
             let b = parts[2].parse::<u64>().unwrap();
             let c = parts[3].parse::<u64>().unwrap();
@@ -82,8 +82,8 @@ enum Opcode {
     Eqrr, // (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
 }
 
-fn opcode_from_str(name: &str) -> Opcode {
-    match name {
+fn opcode_from_str(name: &str) -> Result<Opcode, String> {
+    Ok(match name {
         "addr" => Opcode::Addr,
         "addi" => Opcode::Addi,
         "mulr" => Opcode::Mulr,
@@ -101,9 +101,9 @@ fn opcode_from_str(name: &str) -> Opcode {
         "eqri" => Opcode::Eqri,
         "eqrr" => Opcode::Eqrr,
         _ => {
-            panic!("No matching opcode: {}", name);
+            return Err(format!("No matching opcode: {}", name));
         }
-    }
+    })
 }
 
 impl Registers {

@@ -16,7 +16,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
             (num_zeros, slice)
         })
         .min_by_key(|(num_zeros, _)| *num_zeros)
-        .expect("Nothing found by min_by_key()");
+        .ok_or("Nothing found by min_by_key()")?;
 
     let count_1 = bytecount::count(slice, b'1');
     let count_2 = bytecount::count(slice, b'2');

@@ -54,7 +54,7 @@ impl Grid {
         sum
     }
 
-    fn advance_minute(&mut self) {
+    fn advance_minute(&mut self) -> Result<(), String> {
         for y in 0..self.height {
             for x in 0..self.width {
                 let cell_value = self.cells[self.width * y + x];
@@ -82,12 +82,13 @@ impl Grid {
                         }
                     }
                     _ => {
-                        panic!("Unhandled cell value: {}", cell_value);
+                        return Err(format!("Unhandled cell value: {}", cell_value));
                     }
                 }
             }
         }
         swap(&mut self.cells, &mut self.next_gen_cells);
+        Ok(())
     }
 
     fn resource_value(&self) -> usize {
@@ -113,7 +114,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::parse(input_string);
     grid.print();
     for _ in 0..10 {
-        grid.advance_minute();
+        grid.advance_minute()?;
         grid.print();
     }
     Ok(grid.resource_value())
@@ -126,7 +127,7 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut seen = HashMap::new();
 
     for i in 1..1_000_000_000 {
-        grid.advance_minute();
+        grid.advance_minute()?;
 
         let mut hasher = DefaultHasher::new();
         grid.cells.hash(&mut hasher);
@@ -137,7 +138,7 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
                 let cycle_length = i - entry.get();
                 let remaining_hashes = (1_000_000_000 - i) % cycle_length;
                 for _ in 0..remaining_hashes {
-                    grid.advance_minute();
+                    grid.advance_minute()?;
                 }
                 return Ok(grid.resource_value());
             }
