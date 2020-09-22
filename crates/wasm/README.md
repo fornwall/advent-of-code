@@ -29,6 +29,6 @@ assert.equal(solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), '30');
 
 ```sh
 $ npm install -g advent-of-code-wasm
-$ echo 14 | advent-of-code-wasm 1 1
+$ echo 14 | advent-of-code-wasm 2019 1 1
 2
 ```

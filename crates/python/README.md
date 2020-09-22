@@ -7,7 +7,7 @@ The solutions are implemented in Rust which is exposed to Python using [PyO3](ht
 Add dependency:
 
 ```sh
-pip install advent-of-code
+pip install --upgrade advent-of-code
 ```
 
 The `advent_of_code` package exports a single `solve` function with the following signature:
@@ -28,7 +28,7 @@ assert "30" == solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4")
 # Usage as a command line tool
 
 ```sh
-$ pip install advent-of-code
-$ echo 14 | advent-of-code-py 1 1
+$ pip install --upgrade advent-of-code
+$ echo 14 | advent-of-code-py 2019 1 1
 2
 ```
