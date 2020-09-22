@@ -29,21 +29,19 @@ const fn is_compatible(region_type: RegionType, equipment: Equipment) -> bool {
     }
 }
 
-fn other_equipment(region_type: RegionType, equipment: Equipment) -> Equipment {
+fn other_equipment(region_type: RegionType, equipment: Equipment) -> Result<Equipment, String> {
     // In rocky regions, you can use the climbing gear or the torch. You cannot use neither (you'll likely slip and fall).
     // In wet regions, you can use the climbing gear or neither tool. You cannot use the torch (if it gets wet, you won't have a light source).
     // In narrow regions, you can use the torch or neither tool. You cannot use the climbing gear (it's too bulky to fit).
-    match (region_type, equipment) {
+    Ok(match (region_type, equipment) {
         (RegionType::Rocky, Equipment::ClimbingGear) => Equipment::Torch,
         (RegionType::Rocky, Equipment::Torch) => Equipment::ClimbingGear,
         (RegionType::Wet, Equipment::ClimbingGear) => Equipment::Neither,
         (RegionType::Wet, Equipment::Neither) => Equipment::ClimbingGear,
         (RegionType::Narrow, Equipment::Torch) => Equipment::Neither,
         (RegionType::Narrow, Equipment::Neither) => Equipment::Torch,
-        _ => {
-            panic!();
-        }
-    }
+        _ => return Err("Invalid region type and equipment pair".to_string()),
+    })
 }
 
 struct Grid {
@@ -157,7 +155,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
 
         let region_type_visiting = grid.region_type(visiting_x as usize, visiting_y as usize);
 
-        let other_equipment = other_equipment(region_type_visiting, equipment);
+        let other_equipment = other_equipment(region_type_visiting, equipment)?;
         if !visited.contains(&(visiting_y, visiting_y, other_equipment)) {
             let new_cost = cost + 7;
             let new_heuristic = heuristic(visiting_x, visiting_y, other_equipment, &grid);

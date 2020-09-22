@@ -3,11 +3,8 @@ use std::slice::Iter;
 
 pub fn part1(input_string: &str) -> Result<String, String> {
     let mut program = Program::parse(input_string)?;
-    let map: String = program
-        .run_for_output()
-        .iter()
-        .map(|&b| (b as u8) as char)
-        .collect();
+    let output = program.run_for_output()?;
+    let map: String = output.iter().map(|&b| (b as u8) as char).collect();
     Ok(part1_map(&map))
 }
 
@@ -102,11 +99,8 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 
     program.write_memory(0, 2);
 
-    let map: String = program
-        .run_for_output()
-        .iter()
-        .map(|&b| (b as u8) as char)
-        .collect();
+    let output = program.run_for_output()?;
+    let map: String = output.iter().map(|&b| (b as u8) as char).collect();
     let map: Vec<&[u8]> = map.lines().map(|line| line.as_bytes()).collect();
     // Strip away last two lines with blank line and "Main:" prompt:
     let map = &map[0..(map.len() - 2)];
@@ -223,19 +217,22 @@ pub fn part2(input_string: &str) -> Result<String, String> {
                         .replace(function_c, "C");
                     let main_routine = &main_routine[0..main_routine.len() - 1];
 
-                    return Ok(vec![main_routine, function_a, function_b, function_c, "n"]
-                        .iter_mut()
-                        .map(|input| {
-                            program.input_string(input);
-                            program.input_string("\n");
-                            program.run_for_output()
-                        })
-                        .last()
-                        .unwrap()
-                        .iter()
-                        .find(|&&value| value > 255)
-                        .unwrap()
-                        .to_string());
+                    let mut perhaps_last_output = None;
+                    for &input in vec![main_routine, function_a, function_b, function_c, "n"].iter()
+                    {
+                        program.input_string(input);
+                        program.input_string("\n");
+                        let this_output = program.run_for_output()?;
+                        perhaps_last_output = Some(this_output);
+                    }
+                    if let Some(last_output) = perhaps_last_output {
+                        return last_output
+                            .iter()
+                            .find(|&&value| value > 255)
+                            .map(|value| value.to_string())
+                            .ok_or_else(|| "No output > 255 produced".to_string());
+                    }
+                    return Err("No output produced".to_string());
                 }
             }
         }

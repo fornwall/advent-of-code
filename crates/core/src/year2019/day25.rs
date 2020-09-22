@@ -54,7 +54,7 @@ struct Room {
     solution: Option<i32>,
 }
 
-fn execute_command(program: &mut Program, command: Command) -> Room {
+fn execute_command(program: &mut Program, command: Command) -> Result<Room, String> {
     match command {
         Command::Move(direction) => {
             program.input_string(&format!("{}\n", direction.as_str()));
@@ -70,8 +70,9 @@ fn execute_command(program: &mut Program, command: Command) -> Room {
     parse_output(program)
 }
 
-fn parse_output(program: &mut Program) -> Room {
-    let output: Vec<u8> = program.run_for_output().iter().map(|&b| b as u8).collect();
+fn parse_output(program: &mut Program) -> Result<Room, String> {
+    let output = program.run_for_output()?;
+    let output: Vec<u8> = output.iter().map(|&b| b as u8).collect();
     let output = std::str::from_utf8(&output).unwrap();
 
     let mut directions = Vec::new();
@@ -104,17 +105,17 @@ fn parse_output(program: &mut Program) -> Room {
         }
     }
 
-    Room {
+    Ok(Room {
         id: room_id.to_string(),
         directions,
         items,
         solution,
-    }
+    })
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
     let mut program = Program::parse(input_string)?;
-    let initial_room = parse_output(&mut program);
+    let initial_room = parse_output(&mut program)?;
 
     let mut blacklisted_items = HashSet::new();
     blacklisted_items.insert("infinite loop".to_string());
@@ -135,11 +136,11 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 
     while let Some((from_room, directions_to_reach_here)) = to_visit.pop_front() {
         for &direction in directions_to_reach_here.iter() {
-            execute_command(&mut program, Command::Move(direction));
+            execute_command(&mut program, Command::Move(direction))?;
         }
 
         for &direction in from_room.directions.iter() {
-            let new_room = execute_command(&mut program, Command::Move(direction));
+            let new_room = execute_command(&mut program, Command::Move(direction))?;
 
             if new_room.id == from_room.id {
                 // Pushed back.
@@ -154,37 +155,35 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 
                 let new_room_id = new_room.id.clone();
                 if visited_rooms.insert(new_room_id) {
-                    carried_items.extend(
-                        new_room
-                            .items
-                            .iter()
-                            .filter(|&item| !blacklisted_items.contains(item))
-                            .inspect(|&item| {
-                                execute_command(&mut program, Command::Take(item));
-                            })
-                            .cloned(),
-                    );
+                    for item in new_room
+                        .items
+                        .iter()
+                        .filter(|&item| !blacklisted_items.contains(item))
+                    {
+                        execute_command(&mut program, Command::Take(item))?;
+                        carried_items.push(item.clone());
+                    }
                     to_visit.push_back((new_room, new_directions));
                 }
 
-                execute_command(&mut program, Command::Move(direction.reverse()));
+                execute_command(&mut program, Command::Move(direction.reverse()))?;
             }
         }
 
         // Go back to starting point.
         for &direction in directions_to_reach_here.iter().rev() {
-            execute_command(&mut program, Command::Move(direction.reverse()));
+            execute_command(&mut program, Command::Move(direction.reverse()))?;
         }
     }
 
     // Go to security checkpoint:
     for &direction in directions_to_security_checkpoint.iter() {
-        execute_command(&mut program, Command::Move(direction));
+        execute_command(&mut program, Command::Move(direction))?;
     }
 
     // Drop all items:
     for item in carried_items.iter() {
-        execute_command(&mut program, Command::Drop(item));
+        execute_command(&mut program, Command::Drop(item))?;
     }
 
     // Try all combinations of items using Gray code,
@@ -196,9 +195,9 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         for (j, item) in carried_items.iter().enumerate() {
             let bit_mask = 1 << j;
             if gray_code & bit_mask != 0 && latest_gray_code & bit_mask == 0 {
-                execute_command(&mut program, Command::Take(item));
+                execute_command(&mut program, Command::Take(item))?;
             } else if latest_gray_code & bit_mask != 0 && gray_code & bit_mask == 0 {
-                execute_command(&mut program, Command::Drop(item));
+                execute_command(&mut program, Command::Drop(item))?;
             }
         }
         latest_gray_code = gray_code;
@@ -206,7 +205,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         let new_room = execute_command(
             &mut program,
             Command::Move(direction_to_pressure_sensitive_floor),
-        );
+        )?;
         if let Some(solution) = new_room.solution {
             return Ok(solution);
         }

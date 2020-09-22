@@ -28,7 +28,8 @@ pub fn run_simulation(input_string: &str, part1: bool) -> Result<i64, String> {
 
         let mut network_idle = true;
         for program in programs.iter_mut() {
-            for chunk in program.run_for_output().chunks(3) {
+            let output = program.run_for_output()?;
+            for chunk in output.chunks(3) {
                 let (destination_address, packet) = (chunk[0], (chunk[1], chunk[2]));
 
                 if destination_address == 255 {

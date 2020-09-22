@@ -4,8 +4,8 @@ fn output_from_input(input_string: &str, input: i64) -> Result<String, String> {
     let mut program = Program::parse(input_string)?;
     program.input(input);
 
-    Ok(program
-        .run_for_output()
+    let output = program.run_for_output()?;
+    Ok(output
         .iter()
         .map(|&value| value.to_string())
         .collect::<Vec<String>>()

@@ -2,10 +2,10 @@ use super::int_code::Program;
 
 fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<i64, String> {
     let mut intcode_program = Program::parse(intcode_program_string)?;
-    intcode_program.run_for_output();
+    intcode_program.run_for_output()?;
     intcode_program.input_string(ascii_program_string);
 
-    let program_output = intcode_program.run_for_output();
+    let program_output = intcode_program.run_for_output()?;
     if let Some(&value) = program_output.iter().find(|&&value| value > 255) {
         Ok(value)
     } else {

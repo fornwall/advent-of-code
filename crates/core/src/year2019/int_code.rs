@@ -50,22 +50,22 @@ impl Program {
         self.halted
     }
 
-    pub fn run_for_register0(&mut self) -> i64 {
+    pub fn run_for_register0(&mut self) -> Result<i64, String> {
         if self.requires_input_to != None {
-            panic!("Cannot run program requiring input");
+            return Err("Cannot run program requiring input".to_string());
         } else if self.halted {
-            panic!("Cannot run halted program");
+            return Err("Cannot run halted program".to_string());
         }
 
         while !self.halted && self.requires_input_to == None {
-            self.evaluate();
+            self.evaluate()?;
         }
-        self.read_memory(0)
+        Ok(self.read_memory(0))
     }
 
-    pub fn run_for_output(&mut self) -> Vec<i64> {
-        self.run_for_register0();
-        std::mem::replace(&mut self.output_values, Vec::new())
+    pub fn run_for_output(&mut self) -> Result<Vec<i64>, String> {
+        self.run_for_register0()?;
+        Ok(std::mem::replace(&mut self.output_values, Vec::new()))
     }
 
     pub fn input(&mut self, input_value: i64) {
@@ -114,7 +114,7 @@ impl Program {
         }
     }
 
-    fn evaluate(&mut self) {
+    fn evaluate(&mut self) -> Result<(), String> {
         let opcode_and_parameter_modes = self.read_memory(self.instruction_pointer);
         let opcode = opcode_and_parameter_modes % 100;
         match opcode {
@@ -189,9 +189,11 @@ impl Program {
                 self.halted = true;
             }
             _ => {
-                panic!("Invalid opcode: {}", opcode);
+                return Err(format!("Invalid opcode: {}", opcode));
             }
         }
+
+        Ok(())
     }
 
     fn read_memory(&self, address: usize) -> i64 {

@@ -4,8 +4,8 @@ use std::env;
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut program = Program::parse(input_string)?;
-    Ok(program
-        .run_for_output()
+    let output = program.run_for_output()?;
+    Ok(output
         .iter()
         .skip(2)
         .step_by(3)
@@ -59,7 +59,8 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
     let debug = env::var("ADVENT_DEBUG").is_ok();
 
     loop {
-        program.run_for_output().chunks(3).for_each(|chunk| {
+        let output = program.run_for_output()?;
+        output.chunks(3).for_each(|chunk| {
             let x = chunk[0];
             let y = chunk[1];
             let third = chunk[2];

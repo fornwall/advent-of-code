@@ -43,7 +43,11 @@ where
             let mut updated_program = program.clone();
             updated_program.input(instruction_for_direction(direction));
 
-            match updated_program.run_for_output()[0] {
+            let output = updated_program.run_for_output()?;
+            if output.is_empty() {
+                return Err("No output produced".to_string());
+            }
+            match output[0] {
                 // 0: The repair droid hit a wall. Its position has not changed.
                 0 => {
                     // Do nothing.

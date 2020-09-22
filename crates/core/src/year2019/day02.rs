@@ -14,7 +14,7 @@ pub fn part1_patch(input_string: &str, patch: bool) -> Result<Word, String> {
         program.write_memory(2, 2);
     }
 
-    Ok(program.run_for_register0())
+    program.run_for_register0()
 }
 
 pub fn part2(input_string: &str) -> Result<Word, String> {
@@ -27,7 +27,8 @@ pub fn part2(input_string: &str) -> Result<Word, String> {
             let mut program = initial_program.clone();
             program.write_memory(1, noun);
             program.write_memory(2, verb);
-            if program.run_for_register0() == DESIRED_OUTPUT {
+            let register0_value = program.run_for_register0()?;
+            if register0_value == DESIRED_OUTPUT {
                 return Ok(100 * noun + verb);
             }
         }

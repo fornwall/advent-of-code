@@ -4,8 +4,8 @@ use super::int_code::Word;
 fn run_with_input(input_string: &str, input: Word) -> Result<Word, String> {
     let mut program = Program::parse(input_string)?;
     program.input(input);
-    program
-        .run_for_output()
+    let output = program.run_for_output()?;
+    output
         .last()
         .ok_or_else(|| "No output produced".to_string())
         .map(|word| *word)

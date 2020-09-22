@@ -26,11 +26,11 @@ struct Board {
 }
 
 impl Board {
-    fn parse(input_string: &str, elf_attack_power: i32) -> Self {
+    fn parse(input_string: &str, elf_attack_power: i32) -> Result<Self, String> {
         let width = match input_string.find('\n') {
             Some(len) => len as u32,
             None => {
-                panic!("No line found");
+                return Err("No line in input".to_string());
             }
         };
 
@@ -59,13 +59,13 @@ impl Board {
                         }
                     }
                     _ => {
-                        panic!("Unrecognized cell: {}", c);
+                        return Err(format!("Unrecognized cell: {}", c));
                     }
                 });
             }
         }
 
-        Self {
+        Ok(Self {
             width,
             height,
             cells,
@@ -76,7 +76,7 @@ impl Board {
             elf_died: false,
             goblins_alive,
             elf_attack_power,
-        }
+        })
     }
 
     fn at(&mut self, x: u32, y: u32) -> &mut MapCell {
@@ -292,7 +292,7 @@ impl Board {
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut board = Board::parse(input_string, 3);
+    let mut board = Board::parse(input_string, 3)?;
     board.print();
     loop {
         board.perform_round();
@@ -306,7 +306,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut attack_strength = 4;
     loop {
-        let mut board = Board::parse(input_string, attack_strength);
+        let mut board = Board::parse(input_string, attack_strength)?;
         board.print();
         loop {
             board.perform_round();

@@ -8,12 +8,14 @@ enum Color {
 }
 
 impl Color {
-    fn from(value: i64) -> Self {
-        match value {
+    fn from(value: i64) -> Result<Self, String> {
+        Ok(match value {
             0 => Self::Black,
             1 => Self::White,
-            _ => panic!("Invalid value: {}", value),
-        }
+            _ => {
+                return Err(format!("Invalid color value: {}", value));
+            }
+        })
     }
 }
 
@@ -56,13 +58,13 @@ fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), C
 
     loop {
         program.input(*painted.get(&position).unwrap_or(&Color::Black) as i64);
-        let output = program.run_for_output();
+        let output = program.run_for_output()?;
 
         if program.is_halted() {
             break;
         }
 
-        let painted_color = Color::from(output[0]);
+        let painted_color = Color::from(output[0])?;
         let turn_direction = output[1];
 
         painted.insert(position, painted_color);
@@ -70,7 +72,9 @@ fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), C
         current_direction = match turn_direction {
             0 => current_direction.turn_left(),
             1 => current_direction.turn_right(),
-            _ => panic!("Invalid direction: {}", turn_direction),
+            _ => {
+                return Err(format!("Invalid direction: {}", turn_direction));
+            }
         };
 
         match current_direction {
