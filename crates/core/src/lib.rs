@@ -138,7 +138,7 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String
     }
 }
 
-/// A version of [solve](fn.solve.html) that takes strings as arguments and parsers them to the required types.
+/// A version of [solve](fn.solve.html) that takes strings as arguments and parses them to the required types.
 pub fn solve_raw(
     year_string: &str,
     day_string: &str,
