@@ -27,7 +27,7 @@ fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
 
             let minute = parts[1][3..5].parse().map_err(|_| error_message())?;
 
-            let entry = match *parts.last().unwrap() {
+            let entry = match *parts.last().ok_or("Internal error: No last value")? {
                 "shift" => EntryType::BeginShift {
                     guard_id: parts[3][1..].parse().map_err(|_| error_message())?,
                 },
@@ -64,7 +64,7 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
     let most_sleepy_guard = *sleepers
         .iter()
         .max_by_key(|(_key, value)| *value)
-        .unwrap()
+        .ok_or("Internal error: No most sleep guard")?
         .0;
 
     let mut sleep_record = vec![0; 61];
@@ -86,7 +86,7 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
         .iter()
         .enumerate()
         .max_by_key(|(_minute, count)| *count)
-        .unwrap()
+        .ok_or("Internal error: No most sleepy minute")?
         .0 as u64;
 
     Ok(u64::from(most_sleepy_guard) * most_sleepy_minute)
@@ -123,7 +123,7 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
             (guard_id, most_sleepy_minute, sleep_count)
         })
         .max_by_key(|(_, _, sleep_count)| *sleep_count)
-        .unwrap();
+        .ok_or("Internal error: No most sleepy found")?;
 
     Ok(u64::from(guard_id) * most_sleepy_minute as u64)
 }

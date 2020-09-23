@@ -57,14 +57,14 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
 
 #[test]
 fn tests_part1() {
-    assert_eq!("5158916779", part1("9").unwrap());
-    assert_eq!("0124515891", part1("5").unwrap());
-    assert_eq!("9251071085", part1("18").unwrap());
-    assert_eq!("5941429882", part1("2018").unwrap());
+    assert_eq!(Ok("5158916779".to_string()), part1("9"));
+    assert_eq!(Ok("0124515891".to_string()), part1("5"));
+    assert_eq!(Ok("9251071085".to_string()), part1("18"));
+    assert_eq!(Ok("5941429882".to_string()), part1("2018"));
 
     assert_eq!(
-        "1150511382",
-        part1(include_str!("day14_input.txt")).unwrap()
+        Ok("1150511382".to_string()),
+        part1(include_str!("day14_input.txt"))
     );
 }
 

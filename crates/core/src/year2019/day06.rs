@@ -51,9 +51,7 @@ pub fn part2(string: &str) -> Result<u32, String> {
     visited.insert("YOU");
     to_visit.push_back((0_u32, "YOU"));
 
-    while !to_visit.is_empty() {
-        let (distance, name) = to_visit.pop_front().unwrap();
-
+    while let Some((distance, name)) = to_visit.pop_front() {
         if let Some(list) = map.get(name) {
             for entry in list.iter() {
                 if visited.insert(entry) {

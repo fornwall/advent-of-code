@@ -52,20 +52,21 @@ struct Grid {
 }
 
 impl Grid {
-    fn parse(input_string: &str) -> Self {
+    fn parse(input_string: &str) -> Result<Self, String> {
+        let error_message = |_| "Invalid grid format";
         let lines: Vec<&str> = input_string.lines().collect();
-        let depth = lines[0][7..].parse::<usize>().unwrap();
+        let depth = lines[0][7..].parse::<usize>().map_err(error_message)?;
 
         let parts: Vec<&str> = lines[1][8..].split(',').collect();
-        let target_x = parts[0].parse::<usize>().unwrap();
-        let target_y = parts[1].parse::<usize>().unwrap();
+        let target_x = parts[0].parse::<usize>().map_err(error_message)?;
+        let target_y = parts[1].parse::<usize>().map_err(error_message)?;
 
-        Self {
+        Ok(Self {
             cache: HashMap::new(),
             depth,
             target_x,
             target_y,
-        }
+        })
     }
 
     fn geological_index(&mut self, x: usize, y: usize) -> usize {
@@ -112,7 +113,7 @@ impl Grid {
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::parse(input_string);
+    let mut grid = Grid::parse(input_string)?;
     let mut sum = 0;
     for y in 0..=grid.target_y {
         for x in 0..=grid.target_x {
@@ -123,7 +124,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i32, String> {
-    let mut grid = Grid::parse(input_string);
+    let mut grid = Grid::parse(input_string)?;
     let mut to_visit = BinaryHeap::new();
     let mut visited = HashSet::new();
 

@@ -23,9 +23,13 @@ impl Maze {
         self.array[x + self.cols * y] = tile;
     }
 
-    fn parse(input: &str) -> Self {
+    fn parse(input: &str) -> Result<Self, String> {
         let rows = input.lines().filter(|&line| !line.is_empty()).count();
-        let cols = input.lines().map(|line| line.len()).max().unwrap();
+        let cols = input
+            .lines()
+            .map(|line| line.len())
+            .max()
+            .ok_or("Internal error: No max line length")?;
 
         let array = vec![b' '; rows * cols];
         let mut maze = Self {
@@ -118,12 +122,12 @@ impl Maze {
             }
         }
 
-        maze
+        Ok(maze)
     }
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
-    let maze = Maze::parse(input_string);
+    let maze = Maze::parse(input_string)?;
 
     let mut to_visit = VecDeque::new();
     let mut visited = HashSet::new();
@@ -157,7 +161,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i32, String> {
-    let maze = Maze::parse(input_string);
+    let maze = Maze::parse(input_string)?;
 
     let mut to_visit = VecDeque::new();
     let mut visited = HashSet::new();

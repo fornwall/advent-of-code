@@ -46,7 +46,7 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
             // score. The marble located immediately clockwise of the marble that was removed becomes
             // the new current marble."
             for _ in 0..7 {
-                let popped = marbles.pop_back().unwrap();
+                let popped = marbles.pop_back().ok_or("No marble to pope")?;
                 marbles.push_front(popped);
             }
             player_scores[player_number] += marbles.pop_front().ok_or("No marble to pop")?;

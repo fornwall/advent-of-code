@@ -9,19 +9,19 @@ struct Tunnel {
 }
 
 impl Tunnel {
-    fn parse(input_string: &str, space_for_generations: usize) -> Self {
+    fn parse(input_string: &str, space_for_generations: usize) -> Result<Self, String> {
         let mut evolutions = HashMap::new();
 
         let mut lines = input_string.lines();
-        let initial_line: &str = &lines.next().unwrap()["initial state: ".len()..];
+        let next_line = lines.next().ok_or("Invalid tunnel format")?;
+        let initial_line: &str = &next_line["initial state: ".len()..];
 
         let max_growth = space_for_generations * 2;
         let state_length = initial_line.len() + 2 * max_growth;
         let mut current_gen = vec![false; state_length];
         let next_gen = vec![false; state_length];
-        let mut bytes = initial_line.bytes();
-        for i in 0..initial_line.len() {
-            current_gen[max_growth + i] = bytes.next().unwrap() == b'#';
+        for (i, byte) in initial_line.bytes().enumerate() {
+            current_gen[max_growth + i] = byte == b'#';
         }
 
         lines.next(); // Skip empty line
@@ -40,13 +40,13 @@ impl Tunnel {
         }
 
         let capacity = evolutions.len();
-        Self {
+        Ok(Self {
             current_gen,
             next_gen,
             offset: max_growth,
             evolutions,
             used_steps: HashSet::with_capacity(capacity),
-        }
+        })
     }
 
     fn evolve(&mut self) {
@@ -88,7 +88,7 @@ impl Tunnel {
 }
 
 pub fn part1(input_string: &str) -> Result<i64, String> {
-    let mut tunnel = Tunnel::parse(input_string, 20);
+    let mut tunnel = Tunnel::parse(input_string, 20)?;
     for _ in 0..20 {
         tunnel.evolve();
     }
@@ -97,7 +97,7 @@ pub fn part1(input_string: &str) -> Result<i64, String> {
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
     let num_steps = 200;
-    let mut tunnel = Tunnel::parse(input_string, num_steps);
+    let mut tunnel = Tunnel::parse(input_string, num_steps)?;
 
     for generation in 1..=num_steps {
         tunnel.evolve();

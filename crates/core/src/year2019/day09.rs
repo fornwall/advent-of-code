@@ -23,25 +23,28 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 #[test]
 pub fn tests_part1() {
     assert_eq!(
-        part1("104,1125899906842624,99").unwrap(),
-        "1125899906842624"
+        part1("104,1125899906842624,99"),
+        Ok("1125899906842624".to_string())
     );
     assert_eq!(
-        part1("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99").unwrap(),
-        "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
+        part1("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"),
+        Ok("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99".to_string())
     );
     assert_eq!(
-        part1("1102,34915192,34915192,7,4,7,99,0").unwrap(),
-        "1219070632396864"
+        part1("1102,34915192,34915192,7,4,7,99,0"),
+        Ok("1219070632396864".to_string())
     );
 
     assert_eq!(
-        part1(include_str!("day09_input.txt")).unwrap(),
-        "3601950151"
+        part1(include_str!("day09_input.txt")),
+        Ok("3601950151".to_string())
     );
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day09_input.txt")).unwrap(), "64236");
+    assert_eq!(
+        part2(include_str!("day09_input.txt")),
+        Ok("64236".to_string())
+    );
 }

@@ -1,3 +1,5 @@
+use std::env;
+
 #[derive(Copy, Clone, PartialEq)]
 pub struct Registers {
     pub values: [u64; 6],
@@ -38,6 +40,13 @@ impl Program {
         true
     }
 
+    pub fn execute(&mut self) -> u64 {
+        while self.execute_one_instruction() {
+            // Go on.
+        }
+        self.registers.values[0]
+    }
+
     pub fn parse(input_string: &str) -> Result<Self, String> {
         let mut lines = input_string.lines();
         let first_line = lines.next().unwrap();
@@ -59,6 +68,121 @@ impl Program {
             instructions,
             registers: Registers::new(),
         })
+    }
+
+    pub fn optimize(&mut self) {
+        for (line, instruction) in self.instructions.iter_mut().enumerate() {
+            match instruction.opcode {
+                Opcode::Addi => {
+                    if instruction.a as u8 == self.instruction_pointer_index {
+                        instruction.opcode = Opcode::Seti;
+                        instruction.a = line as u64 + instruction.b;
+                        instruction.b = 0; // ignored
+                    }
+                }
+                Opcode::Mulr => {
+                    if instruction.a as u8 == self.instruction_pointer_index
+                        && instruction.b as u8 == self.instruction_pointer_index
+                    {
+                        instruction.opcode = Opcode::Seti;
+                        instruction.a = line as u64 * line as u64;
+                        instruction.b = 0; // ignored
+                    }
+                }
+                Opcode::Muli => {
+                    if instruction.a as u8 == self.instruction_pointer_index {
+                        instruction.opcode = Opcode::Seti;
+                        instruction.a = line as u64 * instruction.b;
+                        instruction.b = 0; // ignored
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    pub fn pretty_print(&self, title: &str) {
+        if env::var("ADVENT_DEBUG").is_err() {
+            return;
+        }
+
+        println!("# {}", title);
+
+        for (line, &instruction) in self.instructions.iter().enumerate() {
+            print!("{:02}: ", line);
+
+            // If target register is the instruction pointer:
+            let goto = instruction.c as u8 == self.instruction_pointer_index;
+            if goto {
+                print!("goto ");
+            } else {
+                print!("r{} = ", instruction.c)
+            }
+
+            let a_is_value = match instruction.opcode {
+                Opcode::Seti | Opcode::Gtir | Opcode::Eqir => true,
+                _ => false,
+            };
+            let b_is_value = match instruction.opcode {
+                Opcode::Addi
+                | Opcode::Muli
+                | Opcode::Bani
+                | Opcode::Bori
+                | Opcode::Gtri
+                | Opcode::Eqri => true,
+                _ => false,
+            };
+
+            let a = if a_is_value {
+                format!("{}", instruction.a)
+            } else if instruction.a as u8 == self.instruction_pointer_index {
+                line.to_string()
+            } else {
+                format!("r{}", instruction.a)
+            };
+
+            let b = if b_is_value {
+                format!("{}", instruction.b)
+            } else if instruction.b as u8 == self.instruction_pointer_index {
+                //b_is_value = true
+                // instruction.b = line
+                line.to_string()
+            } else {
+                format!("r{}", instruction.b)
+            };
+
+            let pretty = match instruction.opcode {
+                Opcode::Addr | Opcode::Addi => {
+                    if a_is_value && b_is_value {
+                        format!("{}", instruction.a + instruction.b)
+                    } else {
+                        format!("{} + {}", a, b)
+                    }
+                }
+                Opcode::Mulr | Opcode::Muli => {
+                    if a_is_value && b_is_value {
+                        format!("{}", instruction.a * instruction.b)
+                    } else {
+                        format!("{} * {}", a, b)
+                    }
+                }
+                Opcode::Setr | Opcode::Seti => a.to_string(),
+                Opcode::Gtrr => {
+                    // (greater-than register/register) sets register C to 1 if register A is greater than register B. Otherwise, register C is set to 0.
+                    format!("({} > {}) ? 1 : 0", a, b)
+                }
+                Opcode::Eqrr => {
+                    // (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
+                    format!("({} == {}) ? 1 : 0", a, b)
+                }
+                _ => format!("Unhandled opcode at line: {}", line),
+            };
+            print!("{}", pretty);
+            if goto {
+                print!(" + 1");
+            }
+            println!();
+        }
     }
 }
 

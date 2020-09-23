@@ -42,8 +42,17 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 
     for line in input_string.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
-        let step_name = parts[7].chars().next().unwrap();
-        let depends_on = parts[1].chars().next().unwrap();
+        if parts.len() != 10 {
+            return Err(format!("Invalid line: {}", line));
+        }
+        let step_name = parts[7]
+            .chars()
+            .next()
+            .ok_or(format!("Invalid line: {}", line))?;
+        let depends_on = parts[1]
+            .chars()
+            .next()
+            .ok_or(format!("Invalid line: {}", line))?;
 
         let step = step_map
             .entry(step_name)
@@ -123,14 +132,27 @@ impl PartialEq for Work {
     }
 }
 
-pub fn part2_param(input_string: &str, workers: usize, step_duration_base: i32) -> i32 {
+pub fn part2_param(
+    input_string: &str,
+    workers: usize,
+    step_duration_base: i32,
+) -> Result<i32, String> {
     let mut step_map = HashMap::new();
     let mut remaining_dependencies: HashMap<char, HashSet<char>> = HashMap::new();
 
     for line in input_string.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
-        let step_name = parts[7].chars().next().unwrap();
-        let depends_on = parts[1].chars().next().unwrap();
+        if parts.len() != 10 {
+            return Err(format!("Invalid line: {}", line));
+        }
+        let step_name = parts[7]
+            .chars()
+            .next()
+            .ok_or(format!("Invalid line: {}", line))?;
+        let depends_on = parts[1]
+            .chars()
+            .next()
+            .ok_or(format!("Invalid line: {}", line))?;
 
         let step = step_map
             .entry(step_name)
@@ -194,17 +216,17 @@ pub fn part2_param(input_string: &str, workers: usize, step_duration_base: i32) 
         }
     }
 
-    latest_work_done_at
+    Ok(latest_work_done_at)
 }
 
 pub fn part2(input_string: &str) -> Result<i32, String> {
-    Ok(part2_param(input_string, 5, 60))
+    part2_param(input_string, 5, 60)
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "CABDFE",
+        Ok("CABDFE".to_string()),
         part1(
             "Step C must be finished before step A can begin.
 Step C must be finished before step F can begin.
@@ -214,37 +236,34 @@ Step B must be finished before step E can begin.
 Step D must be finished before step E can begin.
 Step F must be finished before step E can begin."
         )
-        .unwrap()
     );
 
     assert_eq!(
-        "BCA",
+        Ok("BCA".to_string()),
         part1(
             "Step B must be finished before step A can begin.
 Step C must be finished before step A can begin."
         )
-        .unwrap()
     );
 
     assert_eq!(
-        "BCA",
+        Ok("BCA".to_string()),
         part1(
             "Step C must be finished before step A can begin.
 Step B must be finished before step A can begin."
         )
-        .unwrap()
     );
 
     assert_eq!(
-        "OUGLTKDJVBRMIXSACWYPEQNHZF",
-        part1(include_str!("day07_input.txt")).unwrap()
+        Ok("OUGLTKDJVBRMIXSACWYPEQNHZF".to_string()),
+        part1(include_str!("day07_input.txt"))
     );
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        15,
+        Ok(15),
         part2_param(
             "Step C must be finished before step A can begin.
 Step C must be finished before step F can begin.
