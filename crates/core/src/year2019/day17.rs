@@ -73,13 +73,13 @@ impl Direction {
         }
     }
 
-    fn instruction_for_turning_to(self, target: Self) -> char {
+    fn instruction_for_turning_to(self, target: Self) -> Result<char, String> {
         if self.turn_right() == target {
-            'R'
+            Ok('R')
         } else if self.turn_left() == target {
-            'L'
+            Ok('L')
         } else {
-            panic!("From {:?} to {:?}", self, target);
+            Err(format!("Cannot turn from {:?} to {:?}", self, target))
         }
     }
 
@@ -158,7 +158,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
         if possible_directions.len() == 1 {
             if starting {
                 starting = false;
-                movements.push(robot_direction.instruction_for_turning_to(possible_directions[0]));
+                movements.push(robot_direction.instruction_for_turning_to(possible_directions[0])?);
                 robot_direction = possible_directions[0];
                 moves_since_turn = 0;
             } else {
@@ -186,7 +186,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
                     moves_since_turn = 0;
                 }
                 movements.push(',');
-                movements.push(robot_direction.instruction_for_turning_to(new_direction));
+                movements.push(robot_direction.instruction_for_turning_to(new_direction)?);
                 robot_direction = new_direction;
             }
         } else if possible_directions.len() == 4 {

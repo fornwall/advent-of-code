@@ -99,15 +99,15 @@ impl Grid {
         self.erosion_level(x, y) % 3
     }
 
-    fn region_type(&mut self, x: usize, y: usize) -> RegionType {
-        match self.risk_level(x, y) {
+    fn region_type(&mut self, x: usize, y: usize) -> Result<RegionType, String> {
+        Ok(match self.risk_level(x, y) {
             0 => RegionType::Rocky,
             1 => RegionType::Wet,
             2 => RegionType::Narrow,
-            _ => {
-                panic!();
+            other => {
+                return Err(format!("Invalid risk level: {}", other));
             }
-        }
+        })
     }
 }
 
@@ -153,7 +153,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
             return Ok(cost);
         }
 
-        let region_type_visiting = grid.region_type(visiting_x as usize, visiting_y as usize);
+        let region_type_visiting = grid.region_type(visiting_x as usize, visiting_y as usize)?;
 
         let other_equipment = other_equipment(region_type_visiting, equipment)?;
         if !visited.contains(&(visiting_y, visiting_y, other_equipment)) {
@@ -175,7 +175,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
                 continue;
             }
 
-            let region_type_new = grid.region_type(new_x as usize, new_y as usize);
+            let region_type_new = grid.region_type(new_x as usize, new_y as usize)?;
             if is_compatible(region_type_new, equipment) {
                 if visited.contains(&(new_x, new_y, equipment)) {
                     continue;

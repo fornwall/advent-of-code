@@ -98,13 +98,17 @@ impl Program {
         }
     }
 
-    fn output_location(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> usize {
+    fn output_location(
+        &self,
+        opcode_and_parameter_modes: i64,
+        parameter_position: u32,
+    ) -> Result<usize, String> {
         if let Parameter::Address(location) =
             self.parameter_mode(opcode_and_parameter_modes, parameter_position)
         {
-            return location;
+            return Ok(location);
         }
-        panic!("Output is not by address");
+        Err("Invalid parameter mode for where to write".to_string())
     }
 
     fn parameter_value(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> Word {
@@ -121,7 +125,7 @@ impl Program {
             1 | 2 => {
                 let parameter1 = self.parameter_value(opcode_and_parameter_modes, 1);
                 let parameter2 = self.parameter_value(opcode_and_parameter_modes, 2);
-                let output_location = self.output_location(opcode_and_parameter_modes, 3);
+                let output_location = self.output_location(opcode_and_parameter_modes, 3)?;
                 self.write_memory(
                     output_location as usize,
                     if opcode == 1 {
@@ -134,7 +138,7 @@ impl Program {
             }
             3 => {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
-                let output_location = self.output_location(opcode_and_parameter_modes, 1);
+                let output_location = self.output_location(opcode_and_parameter_modes, 1)?;
                 if let Some(input_value) = self.input_values.pop_front() {
                     self.write_memory(output_location as usize, input_value);
                 } else {
@@ -177,7 +181,7 @@ impl Program {
                     0
                 };
 
-                let output_location = self.output_location(opcode_and_parameter_modes, 3);
+                let output_location = self.output_location(opcode_and_parameter_modes, 3)?;
                 self.write_memory(output_location as usize, output_value);
                 self.instruction_pointer += 4;
             }

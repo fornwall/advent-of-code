@@ -72,8 +72,11 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2_sized("0222112222120000", 2, 2).unwrap(), " █\n█ ");
+    assert_eq!(
+        part2_sized("0222112222120000", 2, 2),
+        Ok(" █\n█ ".to_string())
+    );
 
-    assert_eq!(part2(include_str!("day08_input.txt")).unwrap(),
-"███   ██  ███  ████ ███  \n█  █ █  █ █  █    █ █  █ \n███  █    █  █   █  ███  \n█  █ █    ███   █   █  █ \n█  █ █  █ █    █    █  █ \n███   ██  █    ████ ███  ");
+    assert_eq!(part2(include_str!("day08_input.txt")),
+Ok("███   ██  ███  ████ ███  \n█  █ █  █ █  █    █ █  █ \n███  █    █  █   █  ███  \n█  █ █    ███   █   █  █ \n█  █ █  █ █    █    █  █ \n███   ██  █    ████ ███  ".to_string()));
 }

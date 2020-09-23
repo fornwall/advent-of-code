@@ -1,4 +1,33 @@
 use std::collections::HashSet;
+use std::slice::Iter;
+
+#[derive(Copy, Clone)]
+enum Direction {
+    Up,
+    Right,
+    Down,
+    Left,
+}
+
+impl Direction {
+    const fn delta(&self) -> (i32, i32) {
+        match self {
+            Self::Up => (0, 1),
+            Self::Right => (1, 0),
+            Self::Down => (0, -1),
+            Self::Left => (-1, 0),
+        }
+    }
+    fn iterator() -> Iter<'static, Self> {
+        static DIRECTIONS: [Direction; 4] = [
+            Direction::Up,
+            Direction::Right,
+            Direction::Down,
+            Direction::Left,
+        ];
+        DIRECTIONS.iter()
+    }
+}
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone)]
 struct Grid {
@@ -71,21 +100,19 @@ impl Grid {
         self.value.count_ones()
     }
 
-    fn count_bugs_at_edge(self, coming_from: (i32, i32)) -> u32 {
+    const fn count_bugs_at_edge(self, coming_from: Direction) -> u32 {
         #![allow(clippy::large_digit_groups)]
         (self.value
             & match coming_from {
-                (2, 1) => 0b00000_00000_00000_00000_11111_u32,
-                (3, 2) => 0b10000_10000_10000_10000_10000_u32,
-                (2, 3) => 0b11111_00000_00000_00000_00000_u32,
-                (1, 2) => 0b00001_00001_00001_00001_00001_u32,
-                _ => panic!("Unsupported direction"),
+                Direction::Up => 0b00000_00000_00000_00000_11111_u32,
+                Direction::Left => 0b10000_10000_10000_10000_10000_u32,
+                Direction::Down => 0b11111_00000_00000_00000_00000_u32,
+                Direction::Right => 0b00001_00001_00001_00001_00001_u32,
             })
         .count_ones()
     }
 
     fn advance(&mut self, inner_grid: Self, outer_grid: Self) -> Self {
-        const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
         let mut new_value = 0_u32;
 
         for y in 0..5 {
@@ -96,13 +123,14 @@ impl Grid {
 
                 let mut adjacent_bugs = 0;
 
-                for &direction in DIRECTIONS.iter() {
-                    let new_x = x + direction.0;
-                    let new_y = y + direction.1;
+                for &direction in Direction::iterator() {
+                    let delta = direction.delta();
+                    let new_x = x + delta.0;
+                    let new_y = y + delta.1;
                     adjacent_bugs += if !((0..5).contains(&new_x) && (0..5).contains(&new_y)) {
-                        outer_grid.at(2 + direction.0, 2 + direction.1)
+                        outer_grid.at(2 + delta.0, 2 + delta.1)
                     } else if (new_x, new_y) == (2, 2) {
-                        inner_grid.count_bugs_at_edge((x, y))
+                        inner_grid.count_bugs_at_edge(direction)
                     } else {
                         self.at(new_x, new_y)
                     };

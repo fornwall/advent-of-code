@@ -65,7 +65,9 @@ where
                     on_visit(new_position, val == 2, new_distance);
                     to_visit.push_back((new_position, new_distance, updated_program.clone()));
                 }
-                other => panic!("Invalid output: {}", other),
+                other => {
+                    return Err(format!("Invalid output: {}", other));
+                }
             }
         }
     }

@@ -4,12 +4,12 @@ else
   wasm_pack_profile=--release
 endif
 
-CLIPPY_COMMAND = cargo clippy --all-targets --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used
+CLIPPY_COMMAND = cargo clippy --all-targets --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used -D clippy::panic
 ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_COMMAND += -W clippy::pedantic
 endif
-ifeq ($(CLIPPY_PANIC),1)
-  CLIPPY_COMMAND += -D clippy::unwrap_used -D clippy::panic
+ifeq ($(CLIPPY_UNWRAP),1)
+  CLIPPY_COMMAND += -D clippy::unwrap_used
 endif
 
 check:

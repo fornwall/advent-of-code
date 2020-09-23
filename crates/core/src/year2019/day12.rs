@@ -24,15 +24,16 @@ pub const fn lcd3(a: u64, b: u64, c: u64) -> u64 {
 impl Moons {
     fn parse(input: &str) -> Result<Self, String> {
         let mut positions = [[0; 3]; 4];
-        input.lines().enumerate().for_each(|(i, line)| {
+        for (i, line) in input.lines().enumerate() {
+            let error_message = |_| format!("Invalid input line {}: {}", i + 1, line);
             let parts: Vec<&str> = line
                 .split(|c| c == '=' || c == ' ' || c == '>' || c == ',')
                 .collect();
 
-            positions[i][0] = parts[1].trim().parse::<i32>().unwrap();
-            positions[i][1] = parts[4].trim().parse::<i32>().unwrap();
-            positions[i][2] = parts[7].trim().parse::<i32>().unwrap();
-        });
+            positions[i][0] = parts[1].trim().parse::<i32>().map_err(error_message)?;
+            positions[i][1] = parts[4].trim().parse::<i32>().map_err(error_message)?;
+            positions[i][2] = parts[7].trim().parse::<i32>().map_err(error_message)?;
+        }
 
         Ok(Self {
             positions,
@@ -118,9 +119,9 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
     }
 
     Ok(lcd3(
-        cycles[0].unwrap(),
-        cycles[1].unwrap(),
-        cycles[2].unwrap(),
+        cycles[0].ok_or("Cycles not found")?,
+        cycles[1].ok_or("Cycles not found")?,
+        cycles[2].ok_or("Cycles not found")?,
     ))
 }
 

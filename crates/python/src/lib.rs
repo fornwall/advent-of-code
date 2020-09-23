@@ -1,3 +1,4 @@
+#![allow(clippy::panic)]
 use advent_of_code::solve_raw;
 use core::fmt::Display;
 use pyo3::exceptions::PyValueError;
