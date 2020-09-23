@@ -23,8 +23,9 @@ install-wasm-target:
 site:
 	cd crates/wasm && \
 		wasm-pack build $(wasm_pack_profile) --target web --out-dir target/web && \
-		ln -f index.html target/web/index.html && \
-		ln -f index.js target/web/index.js
+		ln -f site/index.html target/web/index.html && \
+		ln -f site/index.js target/web/index.js && \
+		ln -f site/forkme.svg target/web/forkme.svg
 
 serve-site: site
 	cd crates/wasm/target/web && devserver
