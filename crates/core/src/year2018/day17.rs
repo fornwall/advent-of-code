@@ -60,7 +60,7 @@ impl Grid {
         // Place water on top (may exist above as well coming from the spring, but ignore as that's
         // above the minimum y value).
         let water_y = 0;
-        cells[(water_y * width + water_x as usize) as usize] = b'w';
+        cells[(water_y * width + water_x as usize) as usize] = b'|';
 
         Self {
             cells,
@@ -90,22 +90,21 @@ impl Grid {
         self.cells[y as usize * self.width + x as usize]
     }
 
-    fn set_water_at(&mut self, x: u16, y: u16) {
-        self.cells[y as usize * self.width + x as usize] = b'w';
+    fn set_water_at(&mut self, x: u16, y: u16, solid: bool) {
+        self.cells[y as usize * self.width + x as usize] = if solid { b'w' } else { b'|' };
     }
 
     fn dry_at(&mut self, x: u16, y: u16) {
         self.cells[y as usize * self.width + x as usize] = b'.';
     }
 
-    fn fill_in_direction(&mut self, x_start: u16, y: u16, x_direction: i32) -> bool {
+    fn wall_in_direction(&self, x_start: u16, y: u16, x_direction: i32) -> bool {
         let mut x = (i32::from(x_start) + x_direction) as u16;
         loop {
             let cell = self.at(x, y);
-            if !(cell == b'.' || cell == b'w') {
+            if !(cell == b'.' || cell == b'w' || cell == b'|') {
                 break;
             }
-            self.set_water_at(x, y);
             let below = self.at(x, y + 1);
             if !(below == b'#' || below == b'w') {
                 return false;
@@ -115,15 +114,37 @@ impl Grid {
         self.at(x, y) == b'#'
     }
 
+    fn fill_in_direction(&mut self, x_start: u16, y: u16, x_direction: i32, solid: bool) {
+        let mut x = (i32::from(x_start) + x_direction) as u16;
+        loop {
+            let cell = self.at(x, y);
+            if !(cell == b'.' || cell == b'w' || cell == b'|') {
+                break;
+            }
+            self.set_water_at(x, y, solid);
+            let below = self.at(x, y + 1);
+            if !(below == b'#' || below == b'w') {
+                return;
+            }
+            x = (i32::from(x) + x_direction) as u16;
+        }
+    }
+
     fn spread_water_at(&mut self, x: u16, y: u16) -> u16 {
-        self.set_water_at(x, y);
+        self.set_water_at(x, y, false);
 
         if (y as usize) < self.height - 1 {
             let below = self.at(x, y + 1);
             if below == b'#' || below == b'w' {
-                let left_wall = self.fill_in_direction(x, y, -1);
-                let right_wall = self.fill_in_direction(x, y, 1);
-                if left_wall && right_wall && y > 0 {
+                let left_wall = self.wall_in_direction(x, y, -1);
+                let right_wall = self.wall_in_direction(x, y, 1);
+                let surrounded_by_walls = left_wall && right_wall;
+                self.fill_in_direction(x, y, -1, surrounded_by_walls);
+                self.fill_in_direction(x, y, 1, surrounded_by_walls);
+                if surrounded_by_walls {
+                    self.set_water_at(x, y, true);
+                }
+                if surrounded_by_walls && y > 0 {
                     return self.spread_water_at(x, y - 1);
                 }
             }
@@ -135,12 +156,16 @@ impl Grid {
         let mut line = 1;
         while line < self.height {
             let mut top_y = line;
+            let mut to_fill = Vec::new();
             for x in 0..self.width {
-                if self.at(x as u16, line as u16 - 1) == b'w'
+                if self.at(x as u16, line as u16 - 1) == b'|'
                     && self.at(x as u16, line as u16) == b'.'
                 {
-                    top_y = min(top_y, self.spread_water_at(x as u16, line as u16) as usize);
+                    to_fill.push(x);
                 }
+            }
+            for x in to_fill {
+                top_y = min(top_y, self.spread_water_at(x as u16, line as u16) as usize);
             }
             line = top_y + 1;
         }
@@ -185,6 +210,12 @@ impl Grid {
     }
 
     fn count_water(&self) -> usize {
+        self.cells
+            .iter()
+            .fold(0, |n, c| n + (*c == b'w' || *c == b'|') as usize)
+    }
+
+    fn count_drained_water(&self) -> usize {
         self.cells.iter().fold(0, |n, c| n + (*c == b'w') as usize)
     }
 }
@@ -204,7 +235,7 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
     grid.print("After pouring");
     grid.dry_up();
     grid.print("After drying up");
-    Ok(grid.count_water())
+    Ok(grid.count_drained_water())
 }
 
 #[test]
