@@ -88,32 +88,19 @@ impl Board {
     }
 
     fn calculate_outcome(&self) -> Option<i32> {
-        if self.round > 200 {
-            return Some(1337);
+        if self.elves_alive != 0 && self.goblins_alive != 0 {
+            return None;
         }
-        let mut elf_alive = false;
-        let mut goblin_alive = false;
-        let mut hit_point_sum = 0;
 
-        for cell in self.cells.iter() {
-            if let MapCell::Unit {
-                hit_points, elf, ..
-            } = *cell
-            {
-                hit_point_sum += hit_points;
-                if elf {
-                    elf_alive = true;
-                } else {
-                    goblin_alive = true;
-                }
+        let hit_point_sum = self.cells.iter().fold(0, |acc, cell| {
+            acc + if let MapCell::Unit { hit_points, .. } = *cell {
+                hit_points
+            } else {
+                0
             }
-        }
-        if goblin_alive && elf_alive {
-            None
-        } else {
-            let round_for_score = self.round - if self.full_round { 0 } else { 1 };
-            Some(hit_point_sum * round_for_score)
-        }
+        });
+        let round_for_score = self.round - if self.full_round { 0 } else { 1 };
+        Some(hit_point_sum * round_for_score)
     }
 
     fn perform_round(&mut self) {
@@ -192,9 +179,7 @@ impl Board {
         }
 
         // Move.
-        let (closest_distance, nx, ny) = self.shortest_distance(x, y, elf_target);
-
-        if closest_distance != std::u32::MAX {
+        if let Some((nx, ny)) = self.shortest_distance(x, y, elf_target) {
             let cell_value = *self.at(x, y);
             self.put(nx, ny, cell_value);
             self.put(x, y, MapCell::Open);
@@ -204,16 +189,23 @@ impl Board {
         }
     }
 
-    fn shortest_distance(&mut self, sx: u32, sy: u32, elf_target: bool) -> (u32, u32, u32) {
+    fn shortest_distance(&mut self, sx: u32, sy: u32, elf_target: bool) -> Option<(u32, u32)> {
         let mut to_visit = VecDeque::new();
         to_visit.push_back((0_i32, sx, sy, 0, 0));
 
         self.visited.iter_mut().for_each(|element| *element = false);
         self.visited[(sx + self.width * sy) as usize] = true;
 
+        let mut found: Vec<(i32, u32, u32, u32, u32)> = Vec::new();
+        let mut found_cost = -1;
+
         while let Some(visiting) = to_visit.pop_front() {
             let (cost, visiting_x, visiting_y) =
                 (visiting.0 + 1, visiting.1 as u32, visiting.2 as u32);
+
+            if found_cost != -1 && found_cost != cost {
+                break;
+            }
 
             for (nx, ny) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)].iter() {
                 let x = (visiting_x as i32 + *nx) as u32;
@@ -221,7 +213,8 @@ impl Board {
 
                 match self.at(x, y) {
                     MapCell::Unit { elf, .. } if *elf == elf_target => {
-                        return (cost as u32, visiting.3, visiting.4);
+                        found.push((cost, visiting_x, visiting_y, visiting.3, visiting.4));
+                        found_cost = cost;
                     }
                     MapCell::Open => {
                         if !self.visited[(x + y * self.height) as usize] {
@@ -246,7 +239,17 @@ impl Board {
             }
         }
 
-        (std::u32::MAX, 0, 0)
+        if found.is_empty() {
+            None
+        } else {
+            found.sort_by(|a, b| {
+                a.0.cmp(&b.0)
+                    .then(a.2.cmp(&b.2))
+                    .then(a.1.cmp(&b.1))
+                    .then(a.4.cmp(&b.4).then(a.3.cmp(&b.3)))
+            });
+            Some((found[0].3, found[0].4))
+        }
     }
 
     fn print(&mut self) {
@@ -300,6 +303,9 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         if let Some(outcome) = board.calculate_outcome() {
             return Ok(outcome);
         }
+        if board.round > 500 {
+            return Err("No solution found".to_string());
+        }
     }
 }
 
@@ -309,12 +315,15 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
         let mut board = Board::parse(input_string, attack_strength)?;
         board.print();
         loop {
+            if board.round > 500 {
+                return Err("No solution found".to_string());
+            }
             board.perform_round();
             board.print();
             if board.elf_died {
                 break;
-            } else if board.goblins_alive == 0 {
-                return Ok(board.calculate_outcome().unwrap());
+            } else if let Some(outcome) = board.calculate_outcome() {
+                return Ok(outcome);
             }
         }
 

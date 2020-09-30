@@ -49,8 +49,10 @@ struct Room {
     id: String,
     directions: Vec<Direction>,
     items: Vec<String>,
-    solution: Option<i32>,
+    solution: Option<SolutionType>,
 }
+
+type SolutionType = i64;
 
 fn execute_command(program: &mut Program, command: Command) -> Result<Room, String> {
     match command {
@@ -71,7 +73,7 @@ fn execute_command(program: &mut Program, command: Command) -> Result<Room, Stri
 fn parse_output(program: &mut Program) -> Result<Room, String> {
     let output = program.run_for_output()?;
     let output: Vec<u8> = output.iter().map(|&b| b as u8).collect();
-    let output = std::str::from_utf8(&output).unwrap();
+    let output = std::str::from_utf8(&output).map_err(|_| "Invalid input: Not utf-8")?;
 
     let mut directions = Vec::new();
     let mut items = Vec::new();
@@ -93,12 +95,13 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
                 }
             }
         } else if line.starts_with("\"Oh, hello! You should be able to get in by typing") {
+            let error_message = "Unable to parse typing instruction";
             solution = Some(
                 line.split_whitespace()
                     .nth(11)
-                    .unwrap()
-                    .parse::<i32>()
-                    .unwrap(),
+                    .ok_or(error_message)?
+                    .parse::<SolutionType>()
+                    .map_err(|_| error_message)?,
             );
         }
     }
@@ -111,7 +114,7 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
     })
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
+pub fn part1(input_string: &str) -> Result<SolutionType, String> {
     let mut program = Program::parse(input_string)?;
     let initial_room = parse_output(&mut program)?;
 
@@ -219,4 +222,5 @@ pub fn part2(_input_string: &str) -> Result<String, String> {
 #[test]
 pub fn tests_part1() {
     assert_eq!(part1(include_str!("day25_input.txt")), Ok(319_815_680));
+    assert_eq!(part1(include_str!("day25_input_2.txt")), Ok(2_424_308_736));
 }

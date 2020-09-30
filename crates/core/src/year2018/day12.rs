@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 struct Tunnel {
     current_gen: std::vec::Vec<bool>,
@@ -96,22 +96,30 @@ pub fn part1(input_string: &str) -> Result<i64, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
-    let num_steps = 200;
-    let mut tunnel = Tunnel::parse(input_string, num_steps)?;
+    let max_steps = 200;
+    let mut tunnel = Tunnel::parse(input_string, max_steps)?;
 
-    for generation in 1..=num_steps {
+    let mut score_diffs = VecDeque::with_capacity(5);
+    let mut previous_score = -1;
+    for generation in 1..=max_steps {
         tunnel.evolve();
 
-        if tunnel.used_steps.len() == 1 {
-            let remaining_generations = 50_000_000_000_i64 - generation as i64;
-            let increase_per_generation =
-                tunnel.current_gen.iter().filter(|&&value| value).count() as i64;
-            let final_score = tunnel.score() + remaining_generations * increase_per_generation;
-            return Ok(final_score);
+        let score_diff = tunnel.score() - previous_score;
+        previous_score = tunnel.score();
+        score_diffs.push_back(score_diff);
+
+        if score_diffs.len() > 5 {
+            score_diffs.pop_front();
+            if score_diffs.iter().filter(|&&e| e == score_diffs[0]).count() == 5 {
+                let remaining_generations = 50_000_000_000_i64 - generation as i64;
+                let increase_per_generation = score_diff;
+                let final_score = tunnel.score() + remaining_generations * increase_per_generation;
+                return Ok(final_score);
+            }
         }
     }
 
-    Err("No translation found".to_string())
+    Err("No cycle found".to_string())
 }
 
 #[test]

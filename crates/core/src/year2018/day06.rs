@@ -1,6 +1,7 @@
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 struct Point {
     id: i32,
@@ -46,6 +47,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
     );
 
     let mut id_to_count = HashMap::new();
+    let mut point_ids_with_infinite_area = HashSet::new();
 
     for y in top..=bottom {
         for x in left..=right {
@@ -69,8 +71,9 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 
             if x == left || x == right || y == top || y == bottom {
                 // These points have infinite area, so do not count them:
+                point_ids_with_infinite_area.insert(closest_point_id);
                 id_to_count.remove(&closest_point_id);
-            } else {
+            } else if !point_ids_with_infinite_area.contains(&closest_point_id) {
                 *id_to_count.entry(closest_point_id).or_insert(0) += 1;
             }
         }

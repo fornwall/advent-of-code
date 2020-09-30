@@ -42,17 +42,23 @@ impl Grid {
             }
         }
 
-        let width = ((x_range.1 - x_range.0) + 3) as usize;
+        // Water pouring down at sides:
+        x_range = (x_range.0 - 1, x_range.1 + 1);
+
+        // +1 since ranges are inclusive:
+        let width = ((x_range.1 - x_range.0) + 1) as usize;
         let height = ((y_range.1 - y_range.0) + 1) as usize;
 
         let mut cells = vec![b'.'; width as usize * height as usize];
         for point in points {
-            let x = point.0 - x_range.0 + 1;
+            let x = point.0 - x_range.0;
             let y = point.1 - y_range.0;
             cells[y as usize * width + x as usize] = b'#';
         }
 
-        let water_x = 500 - x_range.0 + 1;
+        let water_x = 500 - x_range.0;
+        // Place water on top (may exist above as well coming from the spring, but ignore as that's
+        // above the minimum y value).
         let water_y = 0;
         cells[(water_y * width + water_x as usize) as usize] = b'w';
 
@@ -73,6 +79,8 @@ impl Grid {
                 "{}",
                 String::from_utf8(self.cells[y * self.width..(y + 1) * self.width].to_vec())
                     .unwrap()
+                    .replace('.', " ")
+                    .replace('#', "█")
             );
         }
         println!();

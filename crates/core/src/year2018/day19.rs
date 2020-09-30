@@ -14,8 +14,14 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
     program.optimize();
     program.pretty_print("Optimized");
 
-    // Assuming som of all factors program starts at instruction 1:
-    while program.registers.values[1] == 0 {
+    if program.instructions.len() < 3 {
+        return Err("Too few instructions".to_string());
+    }
+    let register = program.instructions[2].c as usize;
+    if register > 5 {
+        return Err("Register outside bounds".to_string());
+    }
+    while program.registers.values[register] == 0 {
         program.execute_one_instruction();
     }
 

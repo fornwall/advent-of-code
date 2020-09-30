@@ -9,31 +9,33 @@ struct Point {
 }
 
 pub fn part1(input_string: &str) -> Result<String, String> {
-    Ok(find_letters(input_string).0)
+    Ok(find_letters(input_string)?.0)
 }
 
 pub fn part2(input_string: &str) -> Result<u32, String> {
-    Ok(find_letters(input_string).1)
+    Ok(find_letters(input_string)?.1)
 }
 
-pub fn find_letters(input_string: &str) -> (String, u32) {
+pub fn find_letters(input_string: &str) -> Result<(String, u32), String> {
     let mut points: Vec<Point> = input_string
         .lines()
-        .map(|line| {
+        .enumerate()
+        .map(|(line_index, line)| {
             let parts: Vec<&str> = line.split(|c| c == '<' || c == '>' || c == ',').collect();
+            let error = |_| format!("Invalid input at line {}: {}", line_index + 1, line);
 
-            let x = parts[1].trim().parse::<i32>().unwrap();
-            let y = parts[2].trim().parse::<i32>().unwrap();
-            let x_speed = parts[4].trim().parse::<i32>().unwrap();
-            let y_speed = parts[5].trim().parse::<i32>().unwrap();
-            Point {
+            let x = parts[1].trim().parse::<i32>().map_err(error)?;
+            let y = parts[2].trim().parse::<i32>().map_err(error)?;
+            let x_speed = parts[4].trim().parse::<i32>().map_err(error)?;
+            let y_speed = parts[5].trim().parse::<i32>().map_err(error)?;
+            Ok(Point {
                 x,
                 y,
                 x_speed,
                 y_speed,
-            }
+            })
         })
-        .collect();
+        .collect::<Result<_, String>>()?;
 
     let mut previous_height = std::i32::MAX;
     let mut seconds = 0;
@@ -58,7 +60,7 @@ pub fn find_letters(input_string: &str) -> (String, u32) {
     let mut occupied = HashSet::new();
     let mut borders = (std::i32::MAX, std::i32::MIN, std::i32::MIN, std::i32::MAX);
     for point in &mut points {
-        // Step back efter last expanding step.
+        // Step back after last expanding step.
         point.x -= point.x_speed;
         point.y -= point.y_speed;
 
@@ -78,111 +80,62 @@ pub fn find_letters(input_string: &str) -> (String, u32) {
         result += "\n";
     }
 
-    (result, seconds)
+    let identified_chars = identify_chars(&result)?;
+    Ok((identified_chars, seconds))
+}
+
+fn identify_char(input: &str) -> Result<char, String> {
+    Ok(match input {
+        "..##..\n.#..#.\n#....#\n#....#\n#....#\n######\n#....#\n#....#\n#....#\n#....#\n" => 'A',
+        "#####.\n#....#\n#....#\n#....#\n#####.\n#....#\n#....#\n#....#\n#....#\n#####.\n" => 'B',
+        "######\n#.....\n#.....\n#.....\n#####.\n#.....\n#.....\n#.....\n#.....\n#.....\n" => 'F',
+        ".####.\n#....#\n#.....\n#.....\n#.....\n#..###\n#....#\n#....#\n#...##\n.###.#\n" => 'G',
+        "#....#\n#....#\n#....#\n#....#\n######\n#....#\n#....#\n#....#\n#....#\n#....#\n" => 'H',
+        "...###\n....#.\n....#.\n....#.\n....#.\n....#.\n....#.\n#...#.\n#...#.\n.###..\n" => 'J',
+        "#....#\n#...#.\n#..#..\n#.#...\n##....\n##....\n#.#...\n#..#..\n#...#.\n#....#\n" => 'K',
+        "#....#\n##...#\n##...#\n#.#..#\n#.#..#\n#..#.#\n#..#.#\n#...##\n#...##\n#....#\n" => 'N',
+        "#####.\n#....#\n#....#\n#....#\n#####.\n#.....\n#.....\n#.....\n#.....\n#.....\n" => 'P',
+        "#####.\n#....#\n#....#\n#....#\n#####.\n#..#..\n#...#.\n#...#.\n#....#\n#....#\n" => 'R',
+        "#....#\n#....#\n.#..#.\n.#..#.\n..##..\n..##..\n.#..#.\n.#..#.\n#....#\n#....#\n" => 'X',
+        "######\n.....#\n.....#\n....#.\n...#..\n..#...\n.#....\n#.....\n#.....\n######\n" => 'Z',
+        _ => {
+            println!("###Unrecognized string:\n{}###", input);
+            let mut shower = String::new();
+            shower.push('"');
+            shower.push_str(&input.replace("\n", "\\n"));
+            shower.push_str("\" => '?',");
+            println!("Shower:\n{}", shower);
+            return Err(format!("Unrecognized char: {}", input));
+        }
+    })
+}
+
+fn identify_chars(input: &str) -> Result<String, String> {
+    let lines: Vec<&str> = input.lines().collect();
+    let mut i = 0;
+    let mut result = String::new();
+    while i + 5 < lines[0].len() {
+        let mut this_char_input = String::new();
+        for line in lines.iter() {
+            this_char_input.push_str(&line[i..i + 6]);
+            this_char_input.push('\n');
+        }
+        result.push(identify_char(&this_char_input)?);
+        i += 8;
+    }
+
+    Ok(result)
 }
 
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "#...#..###
-#...#...#.
-#...#...#.
-#####...#.
-#...#...#.
-#...#...#.
-#...#...#.
-#...#..###
-",
-        part1(
-            "position=< 9,  1> velocity=< 0,  2>
-position=< 7,  0> velocity=<-1,  0>
-position=< 3, -2> velocity=<-1,  1>
-position=< 6, 10> velocity=<-2, -1>
-position=< 2, -4> velocity=< 2,  2>
-position=<-6, 10> velocity=< 2, -2>
-position=< 1,  8> velocity=< 1, -1>
-position=< 1,  7> velocity=< 1,  0>
-position=<-3, 11> velocity=< 1, -2>
-position=< 7,  6> velocity=<-1, -1>
-position=<-2,  3> velocity=< 1,  0>
-position=<-4,  3> velocity=< 2,  0>
-position=<10, -3> velocity=<-1,  1>
-position=< 5, 11> velocity=< 1, -2>
-position=< 4,  7> velocity=< 0, -1>
-position=< 8, -2> velocity=< 0,  1>
-position=<15,  0> velocity=<-2,  0>
-position=< 1,  6> velocity=< 1,  0>
-position=< 8,  9> velocity=< 0, -1>
-position=< 3,  3> velocity=<-1,  1>
-position=< 0,  5> velocity=< 0, -1>
-position=<-2,  2> velocity=< 2,  0>
-position=< 5, -2> velocity=< 1,  2>
-position=< 1,  4> velocity=< 2,  1>
-position=<-2,  7> velocity=< 2, -2>
-position=< 3,  6> velocity=<-1, -1>
-position=< 5,  0> velocity=< 1,  0>
-position=<-6,  0> velocity=< 2,  0>
-position=< 5,  9> velocity=< 1, -2>
-position=<14,  7> velocity=<-2,  0>
-position=<-3,  6> velocity=< 2, -1>"
-        )
-        .unwrap()
-    );
-
-    assert_eq!(
-        "#....#..#....#.....###..######....##....#....#....##....######
-#....#..#...#.......#...#........#..#...#...#....#..#...#.....
-#....#..#..#........#...#.......#....#..#..#....#....#..#.....
-#....#..#.#.........#...#.......#....#..#.#.....#....#..#.....
-######..##..........#...#####...#....#..##......#....#..#####.
-#....#..##..........#...#.......######..##......######..#.....
-#....#..#.#.........#...#.......#....#..#.#.....#....#..#.....
-#....#..#..#....#...#...#.......#....#..#..#....#....#..#.....
-#....#..#...#...#...#...#.......#....#..#...#...#....#..#.....
-#....#..#....#...###....#.......#....#..#....#..#....#..#.....
-",
-        part1(include_str!("day10_input.txt")).unwrap()
+        part1(include_str!("day10_input.txt")),
+        Ok("HKJFAKAF".to_string()),
     );
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(
-        Ok(3),
-        part2(
-            "position=< 9,  1> velocity=< 0,  2>
-position=< 7,  0> velocity=<-1,  0>
-position=< 3, -2> velocity=<-1,  1>
-position=< 6, 10> velocity=<-2, -1>
-position=< 2, -4> velocity=< 2,  2>
-position=<-6, 10> velocity=< 2, -2>
-position=< 1,  8> velocity=< 1, -1>
-position=< 1,  7> velocity=< 1,  0>
-position=<-3, 11> velocity=< 1, -2>
-position=< 7,  6> velocity=<-1, -1>
-position=<-2,  3> velocity=< 1,  0>
-position=<-4,  3> velocity=< 2,  0>
-position=<10, -3> velocity=<-1,  1>
-position=< 5, 11> velocity=< 1, -2>
-position=< 4,  7> velocity=< 0, -1>
-position=< 8, -2> velocity=< 0,  1>
-position=<15,  0> velocity=<-2,  0>
-position=< 1,  6> velocity=< 1,  0>
-position=< 8,  9> velocity=< 0, -1>
-position=< 3,  3> velocity=<-1,  1>
-position=< 0,  5> velocity=< 0, -1>
-position=<-2,  2> velocity=< 2,  0>
-position=< 5, -2> velocity=< 1,  2>
-position=< 1,  4> velocity=< 2,  1>
-position=<-2,  7> velocity=< 2, -2>
-position=< 3,  6> velocity=<-1, -1>
-position=< 5,  0> velocity=< 1,  0>
-position=<-6,  0> velocity=< 2,  0>
-position=< 5,  9> velocity=< 1, -2>
-position=<14,  7> velocity=<-2,  0>
-position=<-3,  6> velocity=< 2, -1>"
-        )
-    );
-
     assert_eq!(Ok(10888), part2(include_str!("day10_input.txt")));
 }
