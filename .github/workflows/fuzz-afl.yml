@@ -9,7 +9,7 @@ jobs:
     - name: Check out source code
       uses: actions/checkout@v2
     - name: Install current LLVM
-      run: bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Fuzz with AFL
       run: make fuzz-afl
       continue-on-error: true
