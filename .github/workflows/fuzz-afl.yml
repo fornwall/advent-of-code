@@ -1,0 +1,13 @@
+name: Fuzz with AFL
+
+on: push
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+    - name: Fuzz with AFL
+      run: make fuzz-afl
+      continue-on-error: true

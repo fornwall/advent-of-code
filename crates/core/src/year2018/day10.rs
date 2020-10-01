@@ -21,13 +21,18 @@ pub fn find_letters(input_string: &str) -> Result<(String, u32), String> {
         .lines()
         .enumerate()
         .map(|(line_index, line)| {
-            let parts: Vec<&str> = line.split(|c| c == '<' || c == '>' || c == ',').collect();
-            let error = |_| format!("Invalid input at line {}: {}", line_index + 1, line);
+            let error = || format!("Invalid input at line {}: {}", line_index + 1, line);
 
-            let x = parts[1].trim().parse::<i32>().map_err(error)?;
-            let y = parts[2].trim().parse::<i32>().map_err(error)?;
-            let x_speed = parts[4].trim().parse::<i32>().map_err(error)?;
-            let y_speed = parts[5].trim().parse::<i32>().map_err(error)?;
+            let parts: Vec<&str> = line.split(|c| c == '<' || c == '>' || c == ',').collect();
+            if parts.len() < 6 {
+                return Err(error());
+            }
+
+            let error_mapper = |_| error();
+            let x = parts[1].trim().parse::<i32>().map_err(error_mapper)?;
+            let y = parts[2].trim().parse::<i32>().map_err(error_mapper)?;
+            let x_speed = parts[4].trim().parse::<i32>().map_err(error_mapper)?;
+            let y_speed = parts[5].trim().parse::<i32>().map_err(error_mapper)?;
             Ok(Point {
                 x,
                 y,

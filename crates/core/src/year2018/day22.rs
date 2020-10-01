@@ -55,6 +55,13 @@ impl Grid {
     fn parse(input_string: &str) -> Result<Self, String> {
         let error_message = |_| "Invalid grid format";
         let lines: Vec<&str> = input_string.lines().collect();
+        if lines.len() != 2 {
+            return Err("Invalid input - expecting 2 lines".to_string());
+        } else if lines[0].len() < 8 {
+            return Err("Invalid input - first line is too short".to_string());
+        } else if lines[1].len() < 9 {
+            return Err("Invalid input - second line is too short".to_string());
+        }
         let depth = lines[0][7..].parse::<usize>().map_err(error_message)?;
 
         let parts: Vec<&str> = lines[1][8..].split(',').collect();

@@ -172,7 +172,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
             return Some(current.steps);
         }
 
-        for edge in adjacency_list.get(&current.at_key).unwrap() {
+        for edge in adjacency_list.get(&current.at_key)? {
             let all_needed_keys_gathered =
                 edge.needed_keys & current.gathered_keys == edge.needed_keys;
             if !all_needed_keys_gathered {

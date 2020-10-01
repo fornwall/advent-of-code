@@ -59,90 +59,132 @@ impl Registers {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut registers_before = Registers::of(0, 0, 0, 0);
-    let mut instruction: Vec<u16> = Vec::new();
-    let mut last_blank = true;
-    let mut result = 0;
+struct Sample {
+    registers_before: Registers,
+    instruction: [u16; 4],
+    registers_after: Registers,
+}
 
-    for line in input_string.lines() {
-        if line.is_empty() {
-            if last_blank {
-                break;
-            } else {
-                last_blank = true;
+struct Input {
+    pub samples: Vec<Sample>,
+    pub program: Vec<Vec<u16>>,
+}
+
+impl Input {
+    fn parse(input_string: &str) -> Result<Self, String> {
+        let mut samples = Vec::new();
+        let mut registers_before = Registers::of(0, 0, 0, 0);
+        let mut instruction: Vec<u16> = Vec::new();
+        let mut last_blank = true;
+        let mut in_program = false;
+
+        let mut program: Vec<Vec<u16>> = Vec::new();
+
+        for (line_index, line) in input_string.lines().enumerate() {
+            let error_mapper = |_| format!("Invalid input at line {}", line_index + 1);
+            if line.is_empty() {
+                if last_blank {
+                    in_program = true;
+                } else {
+                    last_blank = true;
+                }
                 continue;
             }
+            if in_program {
+                let instruction = line
+                    .split_whitespace()
+                    .map(|n| n.trim().parse::<u16>().map_err(error_mapper))
+                    .collect::<Result<_, _>>()?;
+                program.push(instruction);
+            }
+
+            last_blank = false;
+
+            let before = line.starts_with("Before:");
+            let after = line.starts_with("After:");
+            if before || after {
+                let parts: Vec<u16> = line[9..]
+                    .split(|c| c == '[' || c == ']' || c == ',')
+                    .filter(|s| !s.is_empty())
+                    .map(|n| n.trim().parse::<u16>().unwrap())
+                    .collect();
+
+                if before {
+                    registers_before = Registers::of(parts[0], parts[1], parts[2], parts[3]);
+                } else {
+                    let registers_after = Registers::of(parts[0], parts[1], parts[2], parts[3]);
+                    samples.push(Sample {
+                        registers_before,
+                        instruction: [
+                            instruction[0],
+                            instruction[1],
+                            instruction[2],
+                            instruction[3],
+                        ],
+                        registers_after,
+                    });
+                }
+            } else {
+                instruction = line
+                    .split_whitespace()
+                    .map(|n| n.trim().parse::<u16>().map_err(error_mapper))
+                    .collect::<Result<_, _>>()?;
+            }
         }
 
-        last_blank = false;
+        if samples.is_empty() {
+            return Err("Invalid input - no samples".to_string());
+        }
+        Ok(Self { samples, program })
+    }
+}
 
-        let before = line.starts_with("Before:");
-        let after = line.starts_with("After:");
-        if before || after {
-            let parts: Vec<u16> = line[9..]
-                .split(|c| c == '[' || c == ']' || c == ',')
-                .filter(|s| !s.is_empty())
-                .map(|n| n.trim().parse::<u16>().unwrap())
-                .collect();
+pub fn part1(input_string: &str) -> Result<i32, String> {
+    let input = Input::parse(input_string)?;
+    let mut result = 0;
 
-            if before {
-                registers_before = Registers::of(parts[0], parts[1], parts[2], parts[3]);
-            } else {
-                let registers_after = Registers::of(parts[0], parts[1], parts[2], parts[3]);
-                let mut sum = 0;
-
-                for opcode in [
-                    Opcode::Addr,
-                    Opcode::Addi,
-                    Opcode::Mulr,
-                    Opcode::Muli,
-                    Opcode::Banr,
-                    Opcode::Bani,
-                    Opcode::Borr,
-                    Opcode::Bori,
-                    Opcode::Setr,
-                    Opcode::Seti,
-                    Opcode::Gtir,
-                    Opcode::Gtri,
-                    Opcode::Gtrr,
-                    Opcode::Eqir,
-                    Opcode::Eqri,
-                    Opcode::Eqrr,
-                ]
-                .iter()
-                {
-                    let mut registers_applied = registers_before;
-                    registers_applied.apply(
-                        *opcode,
-                        instruction[1],
-                        instruction[2],
-                        instruction[3],
-                    );
-                    if registers_applied == registers_after {
-                        sum += 1;
-                    }
-                }
-                if sum >= 3 {
-                    result += 1;
-                }
+    for sample in input.samples {
+        let mut sum = 0;
+        for opcode in [
+            Opcode::Addr,
+            Opcode::Addi,
+            Opcode::Mulr,
+            Opcode::Muli,
+            Opcode::Banr,
+            Opcode::Bani,
+            Opcode::Borr,
+            Opcode::Bori,
+            Opcode::Setr,
+            Opcode::Seti,
+            Opcode::Gtir,
+            Opcode::Gtri,
+            Opcode::Gtrr,
+            Opcode::Eqir,
+            Opcode::Eqri,
+            Opcode::Eqrr,
+        ]
+        .iter()
+        {
+            let mut registers_applied = sample.registers_before;
+            registers_applied.apply(
+                *opcode,
+                sample.instruction[1],
+                sample.instruction[2],
+                sample.instruction[3],
+            );
+            if registers_applied == sample.registers_after {
+                sum += 1;
             }
-        } else {
-            instruction = line
-                .split_whitespace()
-                .map(|n| n.trim().parse::<u16>().unwrap())
-                .collect();
+        }
+        if sum >= 3 {
+            result += 1;
         }
     }
-
     Ok(result)
 }
 
 pub fn part2(input_string: &str) -> Result<u16, String> {
-    let mut registers_before = Registers::of(0, 0, 0, 0);
-    let mut instruction: Vec<u16> = Vec::new();
-    let mut last_blank = true;
-    let mut in_program = false;
+    let input = Input::parse(input_string)?;
 
     let mut possible_meanings: Vec<HashSet<Opcode>> = Vec::new();
     for _ in 0..16 {
@@ -170,58 +212,19 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
         possible_meanings.push(s);
     }
 
-    let mut program: Vec<Vec<u16>> = Vec::new();
-    for line in input_string.lines() {
-        if line.is_empty() {
-            if last_blank {
-                in_program = true;
-            } else {
-                last_blank = true;
-            }
-            continue;
-        }
-        if in_program {
-            let instruction = line
-                .split_whitespace()
-                .map(|n| n.trim().parse::<u16>().unwrap())
-                .collect();
-            program.push(instruction);
-        }
+    for sample in input.samples {
+        let s: &mut HashSet<Opcode> = &mut possible_meanings[sample.instruction[0] as usize];
 
-        last_blank = false;
-
-        let before = line.starts_with("Before:");
-        let after = line.starts_with("After:");
-        if before || after {
-            let parts: Vec<u16> = line[9..]
-                .split(|c| c == '[' || c == ']' || c == ',')
-                .filter(|s| !s.is_empty())
-                .map(|n| n.trim().parse::<u16>().unwrap())
-                .collect();
-
-            if before {
-                registers_before = Registers::of(parts[0], parts[1], parts[2], parts[3]);
-            } else {
-                let registers_after = Registers::of(parts[0], parts[1], parts[2], parts[3]);
-                let s: &mut HashSet<Opcode> = &mut possible_meanings[instruction[0] as usize];
-
-                s.retain(|opcode| {
-                    let mut registers_applied = registers_before;
-                    registers_applied.apply(
-                        *opcode,
-                        instruction[1],
-                        instruction[2],
-                        instruction[3],
-                    );
-                    registers_applied == registers_after
-                });
-            }
-        } else {
-            instruction = line
-                .split_whitespace()
-                .map(|n| n.trim().parse::<u16>().unwrap())
-                .collect();
-        }
+        s.retain(|opcode| {
+            let mut registers_applied = sample.registers_before;
+            registers_applied.apply(
+                *opcode,
+                sample.instruction[1],
+                sample.instruction[2],
+                sample.instruction[3],
+            );
+            registers_applied == sample.registers_after
+        });
     }
 
     let mut assigned_opcodes = HashSet::new();
@@ -252,7 +255,7 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
         .collect();
 
     let mut regs = Registers::of(0, 0, 0, 0);
-    for instruction in program {
+    for instruction in input.program {
         let opcode = meanings[instruction[0] as usize];
         regs.apply(opcode, instruction[1], instruction[2], instruction[3]);
     }

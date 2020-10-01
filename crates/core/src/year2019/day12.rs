@@ -30,6 +30,10 @@ impl Moons {
                 .split(|c| c == '=' || c == ' ' || c == '>' || c == ',')
                 .collect();
 
+            if parts.len() != 9 {
+                return Err(format!("Invalid input line {}: {}", i + 1, line));
+            }
+
             positions[i][0] = parts[1].trim().parse::<i32>().map_err(error_message)?;
             positions[i][1] = parts[4].trim().parse::<i32>().map_err(error_message)?;
             positions[i][2] = parts[7].trim().parse::<i32>().map_err(error_message)?;

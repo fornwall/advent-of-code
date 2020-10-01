@@ -14,7 +14,9 @@ impl Tunnel {
 
         let mut lines = input_string.lines();
         let next_line = lines.next().ok_or("Invalid tunnel format")?;
-        let initial_line: &str = &next_line["initial state: ".len()..];
+        let prefix_length = "initial state: ".len();
+
+        let initial_line: &str = next_line.get(prefix_length..).ok_or("Invalid input")?;
 
         let max_growth = space_for_generations * 2;
         let state_length = initial_line.len() + 2 * max_growth;
@@ -27,7 +29,13 @@ impl Tunnel {
         lines.next(); // Skip empty line
         for line in lines {
             let parts: Vec<&str> = line.split(" => ").collect();
+            if parts.len() != 2 {
+                return Err("Invalid input".to_string());
+            }
             let from_bytes: Vec<u8> = parts[0].bytes().collect();
+            if from_bytes.len() != 5 {
+                return Err("Invalid input".to_string());
+            }
             let result = parts[1] == "#";
             let from = (
                 from_bytes[0] == b'#',

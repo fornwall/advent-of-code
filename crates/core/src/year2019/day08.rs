@@ -7,7 +7,12 @@ const PIXELS_TALL: u32 = 6;
 const LAYER_SIZE: usize = (PIXELS_WIDE * PIXELS_TALL) as usize;
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    assert_eq!(input_string.len() % LAYER_SIZE, 0);
+    if input_string.len() % LAYER_SIZE != 0 {
+        return Err(format!(
+            "Invalid input - expected to be multiple of layer size {}",
+            LAYER_SIZE
+        ));
+    }
 
     let (_, slice) = input_string
         .as_bytes()

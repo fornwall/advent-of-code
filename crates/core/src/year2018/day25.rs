@@ -4,15 +4,18 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         .enumerate()
         .map(|(i, line)| {
             let parts: Vec<&str> = line.split(',').collect();
-            (
+            if parts.len() != 4 {
+                return Err("Invalid input".to_string());
+            }
+            Ok((
                 parts[0].parse::<i32>().unwrap(),
                 parts[1].parse::<i32>().unwrap(),
                 parts[2].parse::<i32>().unwrap(),
                 parts[3].parse::<i32>().unwrap(),
                 i,
-            )
+            ))
         })
-        .collect();
+        .collect::<Result<_, _>>()?;
 
     for i in 0..points.len() {
         for j in i + 1..points.len() {

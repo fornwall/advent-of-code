@@ -1,16 +1,19 @@
 use std::cmp::{max, min};
 use std::env;
 
-fn parse_point_interval(s: &str) -> (u16, u16) {
+fn parse_point_interval(s: &str) -> Result<(u16, u16), String> {
     if s.contains("..") {
         let parts: Vec<&str> = s.split("..").collect();
-        (
-            parts[0].parse::<u16>().unwrap(),
-            parts[1].parse::<u16>().unwrap(),
-        )
+        if parts.len() != 2 {
+            return Err("Invalid input".to_string());
+        }
+        Ok((
+            parts[0].parse::<u16>().map_err(|_| "Invalid input")?,
+            parts[1].parse::<u16>().map_err(|_| "Invalid input")?,
+        ))
     } else {
-        let point = s.parse::<u16>().unwrap();
-        (point, point)
+        let point = s.parse::<u16>().map_err(|_| "Invalid input")?;
+        Ok((point, point))
     }
 }
 
@@ -21,16 +24,19 @@ struct Grid {
 }
 
 impl Grid {
-    fn from(input_string: &str) -> Self {
+    fn from(input_string: &str) -> Result<Self, String> {
         let mut points: Vec<(u16, u16)> = Vec::new();
         let mut x_range = (std::u16::MAX, std::u16::MIN);
         let mut y_range = (std::u16::MAX, std::u16::MIN);
 
         for line in input_string.lines() {
             let mut parts: Vec<&str> = line.split(", ").collect();
+            if parts.len() != 2 {
+                return Err("Invalid input".to_string());
+            }
             parts.sort();
-            let (x_start, x_end) = parse_point_interval(&parts[0][2..]);
-            let (y_start, y_end) = parse_point_interval(&parts[1][2..]);
+            let (x_start, x_end) = parse_point_interval(&parts[0][2..])?;
+            let (y_start, y_end) = parse_point_interval(&parts[1][2..])?;
 
             x_range = (min(x_range.0, x_start), max(x_range.1, x_end));
             y_range = (min(y_range.0, y_start), max(y_range.1, y_end));
@@ -62,11 +68,11 @@ impl Grid {
         let water_y = 0;
         cells[(water_y * width + water_x as usize) as usize] = b'|';
 
-        Self {
+        Ok(Self {
             cells,
             width,
             height,
-        }
+        })
     }
 
     fn print(&self, name: &str) {
@@ -221,7 +227,7 @@ impl Grid {
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::from(input_string);
+    let mut grid = Grid::from(input_string)?;
     grid.print("Initial");
     grid.pour_water();
     grid.print("After pouring");
@@ -229,7 +235,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::from(input_string);
+    let mut grid = Grid::from(input_string)?;
     grid.print("Initial");
     grid.pour_water();
     grid.print("After pouring");

@@ -43,6 +43,10 @@ install-wasm-pack:
 	curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
 		sh /tmp/setup-wasm-pack.sh
 
+fuzz-afl:
+	cargo install afl
+	cd crates/fuzzing-afl/ && ./fuzz.sh
+
 netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \

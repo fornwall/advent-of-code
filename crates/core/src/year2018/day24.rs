@@ -20,7 +20,7 @@ impl ArmyGroup {
         self.units > 0
     }
 
-    fn parse(input_string: &str) -> Vec<Self> {
+    fn parse(input_string: &str) -> Result<Vec<Self>, String> {
         let mut id_generator = 0;
         let mut immune_system = true;
         let mut groups: Vec<Self> = Vec::new();
@@ -45,6 +45,9 @@ impl ArmyGroup {
                 if main_parts.len() == 1 {
                     // No parenthesis.
                     let words: Vec<&str> = line.split_whitespace().collect();
+                    if words.len() != 18 {
+                        return Err("Invalid input".to_string());
+                    }
                     units = words[0].parse::<i32>().unwrap();
                     hit_points = words[4].parse::<i32>().unwrap();
                     attack_damage = words[12].parse::<i32>().unwrap();
@@ -89,7 +92,7 @@ impl ArmyGroup {
                 groups.push(group);
             }
         }
-        groups
+        Ok(groups)
     }
 
     const fn effective_power(&self) -> i32 {
@@ -208,7 +211,7 @@ fn execute_battle(groups: Vec<ArmyGroup>) -> Vec<RefCell<ArmyGroup>> {
 }
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
-    let groups = execute_battle(ArmyGroup::parse(input_string));
+    let groups = execute_battle(ArmyGroup::parse(input_string)?);
     let result = groups.iter().fold(0, |acc, g| acc + g.borrow().units);
     Ok(result)
 }
@@ -216,7 +219,7 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
 pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut boost = 1;
     loop {
-        let mut groups = ArmyGroup::parse(input_string);
+        let mut groups = ArmyGroup::parse(input_string)?;
         for g in groups.iter_mut() {
             if g.immune_system {
                 g.attack_damage += boost;

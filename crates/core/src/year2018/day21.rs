@@ -20,8 +20,8 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
     // set register 0 to the value it's first compared with here to exit as soon as possible.
 
     let mut program = Program::parse(input_string)?;
-    while program.instruction_pointer() != 29 {
-        program.execute_one_instruction();
+    while program.instruction_pointer()? != 29 {
+        program.execute_one_instruction()?;
     }
     Ok(program.registers.values[program.instructions[28].a as usize])
 }
@@ -31,7 +31,7 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut last_value = 0;
     let mut program = Program::parse(input_string)?;
     loop {
-        if program.instruction_pointer() == 29 {
+        if program.instruction_pointer()? == 29 {
             let value = program.registers.values[program.instructions[28].a as usize];
             if seen.insert(value) {
                 last_value = value;
@@ -39,7 +39,7 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
                 return Ok(last_value);
             }
         }
-        program.execute_one_instruction();
+        program.execute_one_instruction()?;
     }
 }
 

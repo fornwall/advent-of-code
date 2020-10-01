@@ -1,5 +1,7 @@
 pub fn part1(input_string: &str) -> Result<String, String> {
-    let input_number = input_string.parse::<usize>().unwrap();
+    let input_number = input_string
+        .parse::<usize>()
+        .map_err(|error| format!("Invalid input: {}", error.to_string()))?;
     let desired_length = input_number + 10;
 
     let mut scores = vec![3_u8, 7_u8];
@@ -15,9 +17,9 @@ pub fn part1(input_string: &str) -> Result<String, String> {
             scores.push(current_recipes_score % 10);
         }
 
-        elf_positions.iter_mut().for_each(|position| {
+        for position in elf_positions.iter_mut() {
             *position = (*position + 1 + scores[*position as usize] as usize) % scores.len();
-        });
+        }
     }
 
     Ok(scores
@@ -28,7 +30,14 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<usize, String> {
-    let input_bytes: Vec<u8> = input_string.as_bytes().iter().map(|b| b - 48).collect();
+    let input_bytes: Vec<u8> = input_string
+        .chars()
+        .map(|b| {
+            b.to_digit(10)
+                .map(|b| b as u8)
+                .ok_or_else(|| "Invalid input".to_string())
+        })
+        .collect::<Result<Vec<_>, String>>()?;
 
     let mut scores = vec![3_u8, 7_u8];
     let mut elf_positions = vec![0, 1];
@@ -49,9 +58,9 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
             }
         }
 
-        elf_positions.iter_mut().for_each(|position| {
+        for position in elf_positions.iter_mut() {
             *position = (*position + 1 + scores[*position as usize] as usize) % scores.len();
-        });
+        }
     }
 }
 

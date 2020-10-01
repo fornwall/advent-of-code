@@ -2,7 +2,7 @@ use super::elfcode::Program;
 
 pub fn part1(input_string: &str) -> Result<u64, String> {
     let mut program = Program::parse(input_string)?;
-    Ok(program.execute())
+    program.execute()
 }
 
 pub fn part2(input_string: &str) -> Result<u64, String> {
@@ -22,7 +22,7 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
         return Err("Register outside bounds".to_string());
     }
     while program.registers.values[register] == 0 {
-        program.execute_one_instruction();
+        program.execute_one_instruction()?;
     }
 
     let mut sum = 0;

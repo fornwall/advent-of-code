@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/core",
+    "crates/fuzzing-afl",
     "crates/python",
     "crates/wasm"
 ]

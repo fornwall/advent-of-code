@@ -1,7 +1,18 @@
 use std::iter::once;
 
+fn parse_digits(input_string: &str) -> Result<Vec<i32>, String> {
+    input_string
+        .chars()
+        .map(|b| {
+            b.to_digit(10)
+                .map(|b| b as i32)
+                .ok_or_else(|| "Invalid input".to_string())
+        })
+        .collect::<Result<Vec<_>, String>>()
+}
+
 pub fn part1(input_string: &str) -> Result<String, String> {
-    let mut digits: Vec<i32> = input_string.bytes().map(|b| (b - 48) as i32).collect();
+    let mut digits = parse_digits(input_string)?;
     let mut new_digits = vec![0; digits.len()];
     for _ in 0..100 {
         for (index, digit) in new_digits.iter_mut().enumerate() {
@@ -62,8 +73,12 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 /// The next element (second latest) is itself plus last element.
 /// The next element (third latest) is itself plus second latest and last element=itself + previous element!
 pub fn part2(input_string: &str) -> Result<String, String> {
-    let offset = input_string[0..7].parse::<usize>().unwrap();
-    let digits: Vec<i32> = input_string.bytes().map(|b| (b - 48) as i32).collect();
+    let offset = input_string
+        .get(0..7)
+        .map(|slice| slice.parse::<usize>())
+        .ok_or_else(|| "Invalid input".to_string())?
+        .map_err(|_| "Invalid input".to_string())?;
+    let digits = parse_digits(input_string)?;
 
     let times_to_repeat = 10000;
     let end_sequence_length = input_string.len() * times_to_repeat - offset as usize;

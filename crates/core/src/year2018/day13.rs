@@ -119,7 +119,7 @@ struct Track {
 }
 
 impl Track {
-    fn parse(input_string: &str) -> Self {
+    fn parse(input_string: &str) -> Result<Self, String> {
         let mut carts = Vec::new();
         let mut track = HashMap::new();
         for (y, line) in input_string.lines().enumerate() {
@@ -180,17 +180,20 @@ impl Track {
                             );
                         }
                     }
-                    _ => {
+                    '-' | ' ' => {
                         // Ignore
+                    }
+                    _ => {
+                        return Err(format!("Invalid char: {}", c));
                     }
                 }
             }
         }
-        Self {
+        Ok(Self {
             track,
             carts,
             cart_positions: HashSet::new(),
-        }
+        })
     }
 
     fn find_crash(&mut self) -> Vector {
@@ -255,13 +258,13 @@ impl Track {
 }
 
 pub fn part1(input_string: &str) -> Result<String, String> {
-    let mut track = Track::parse(input_string);
+    let mut track = Track::parse(input_string)?;
     let crash_position = track.find_crash();
     Ok(format!("{},{}", crash_position.x, crash_position.y))
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
-    let mut track = Track::parse(input_string);
+    let mut track = Track::parse(input_string)?;
     let remaining_position = track.find_remaining();
     Ok(format!("{},{}", remaining_position.x, remaining_position.y))
 }

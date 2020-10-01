@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
+fn parse_input(input_string: &str) -> Result<(i32, i32), String> {
     let parts: Vec<&str> = input_string.trim().split('-').collect();
     if parts.len() != 2 {
         return Err(format!(
@@ -10,6 +10,11 @@ pub fn part1(input_string: &str) -> Result<u32, String> {
     }
     let from = parts[0].parse::<i32>().or(Err("Invalid range"))?;
     let to = parts[1].parse::<i32>().or(Err("Invalid range"))?;
+    Ok((from, to))
+}
+
+pub fn part1(input_string: &str) -> Result<u32, String> {
+    let (from, to) = parse_input(input_string)?;
 
     let mut meeting_criteria_count: u32 = 0;
     'outer: for i in from..=to {
@@ -41,9 +46,7 @@ pub fn part1(input_string: &str) -> Result<u32, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<u32, String> {
-    let mut parts = input_string.trim().split('-');
-    let from = parts.next().unwrap().parse::<i32>().unwrap();
-    let to = parts.next().unwrap().parse::<i32>().unwrap();
+    let (from, to) = parse_input(input_string)?;
 
     let mut meeting_criteria_count: u32 = 0;
     'outer: for i in from..=to {

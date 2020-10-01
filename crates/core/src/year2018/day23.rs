@@ -18,11 +18,15 @@ impl Nanobot {
                 let parts: Vec<&str> = line
                     .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
                     .collect();
-                let error_message = |_| format!("Invalid input on line {}: {}", line_number, line);
-                let x = parts[2].parse::<i64>().map_err(error_message)?;
-                let y = parts[3].parse::<i64>().map_err(error_message)?;
-                let z = parts[4].parse::<i64>().map_err(error_message)?;
-                let strength = parts[7].parse::<i64>().map_err(error_message)?;
+                let error_message = || format!("Invalid input on line {}: {}", line_number, line);
+                if parts.len() != 8 {
+                    return Err(error_message());
+                }
+                let error_mapper = |_| error_message();
+                let x = parts[2].parse::<i64>().map_err(error_mapper)?;
+                let y = parts[3].parse::<i64>().map_err(error_mapper)?;
+                let z = parts[4].parse::<i64>().map_err(error_mapper)?;
+                let strength = parts[7].parse::<i64>().map_err(error_mapper)?;
                 Ok(Self { x, y, z, strength })
             })
             .collect::<Result<Vec<Self>, String>>()

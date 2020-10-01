@@ -15,8 +15,14 @@ const fn cell_power(x: usize, y: usize, serial_number: i64) -> i64 {
     cell_power - 5
 }
 
+fn parse_input(input_string: &str) -> Result<i64, String> {
+    input_string
+        .parse::<i64>()
+        .map_err(|error| format!("Invalid input: {}", error.to_string()))
+}
+
 pub fn part1(input_string: &str) -> Result<String, String> {
-    let serial_number = input_string.parse::<i64>().unwrap();
+    let serial_number = parse_input(input_string)?;
 
     let mut optimal_power = 0_i64;
     let mut optimal_point = (0, 0);
@@ -44,7 +50,7 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
-    let serial_number = input_string.parse::<i64>().unwrap();
+    let serial_number = parse_input(input_string)?;
 
     let mut optimal_power = 0_i64;
     let mut optimal_square_width = 0;

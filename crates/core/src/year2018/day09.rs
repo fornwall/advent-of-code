@@ -2,6 +2,9 @@ use std::collections::VecDeque;
 
 fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, String> {
     let parts: Vec<&str> = input_string.split_whitespace().collect();
+    if parts.len() != 8 {
+        return Err("Invalid input".to_string());
+    }
     let num_players = parts[0].parse::<usize>().map_err(|_| "Invalid input")?;
     let last_marble_points = parts[6].parse::<usize>().map_err(|_| "Invalid input")?;
     let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.

@@ -39,12 +39,16 @@ impl Reactions {
             // Example: "12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ".
             let parts: Vec<&str> = line.split("=>").collect();
 
+            let error = || format!("Invalid input line {}: {}", line_index + 1, line);
+
             let mut required_chemicals = Vec::new();
             for amount_and_name in parts[0].split(',') {
                 let parts: Vec<&str> = amount_and_name.split_whitespace().collect();
-                let required_amount = parts[0]
-                    .parse::<ChemicalAmount>()
-                    .map_err(|_| format!("Invalid line {}: {}", line_index + 1, line))?;
+                if parts.len() != 2 {
+                    return Err(error());
+                }
+
+                let required_amount = parts[0].parse::<ChemicalAmount>().map_err(|_| error())?;
                 let required_id = id_assigner.id_of(parts[1].trim().to_string());
                 if required_chemicals.len() <= required_id {
                     required_chemicals.resize(required_id + 1, 0);

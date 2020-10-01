@@ -20,14 +20,18 @@ pub struct Program {
 }
 
 impl Program {
-    pub const fn instruction_pointer(&self) -> u64 {
-        self.registers.values[self.instruction_pointer_index as usize]
+    pub fn instruction_pointer(&self) -> Result<u64, String> {
+        self.registers
+            .values
+            .get(self.instruction_pointer_index as usize)
+            .copied()
+            .ok_or_else(|| "Invalid instruction pointer".to_string())
     }
 
-    pub fn execute_one_instruction(&mut self) -> bool {
-        let ip = self.instruction_pointer();
+    pub fn execute_one_instruction(&mut self) -> Result<bool, String> {
+        let ip = self.instruction_pointer()?;
         if ip as usize >= self.instructions.len() {
-            return false;
+            return Ok(false);
         }
         let instruction = self.instructions[ip as usize];
         self.registers.apply(
@@ -37,29 +41,33 @@ impl Program {
             instruction.c,
         );
         self.registers.values[self.instruction_pointer_index as usize] += 1;
-        true
+        Ok(true)
     }
 
-    pub fn execute(&mut self) -> u64 {
-        while self.execute_one_instruction() {
+    pub fn execute(&mut self) -> Result<u64, String> {
+        while self.execute_one_instruction()? {
             // Go on.
         }
-        self.registers.values[0]
+        Ok(self.registers.values[0])
     }
 
     pub fn parse(input_string: &str) -> Result<Self, String> {
         let mut lines = input_string.lines();
-        let first_line = lines.next().unwrap();
+        let first_line = lines.next().ok_or("Empty input")?;
 
-        let instruction_pointer_index = (&first_line[4..]).parse::<u8>().unwrap();
+        if first_line.len() < 5 {
+            return Err("Invalid input".to_string());
+        }
+        let error = |_| "Invalid input";
+        let instruction_pointer_index = (&first_line[4..]).parse::<u8>().map_err(error)?;
 
         let mut instructions = Vec::new();
         for line in lines {
             let parts: Vec<&str> = line.split_whitespace().collect();
             let opcode = opcode_from_str(parts[0])?;
-            let a = parts[1].parse::<u64>().unwrap();
-            let b = parts[2].parse::<u64>().unwrap();
-            let c = parts[3].parse::<u64>().unwrap();
+            let a = parts[1].parse::<u64>().map_err(error)?;
+            let b = parts[2].parse::<u64>().map_err(error)?;
+            let c = parts[3].parse::<u64>().map_err(error)?;
             instructions.push(Instruction { opcode, a, b, c });
         }
 
@@ -187,7 +195,7 @@ impl Program {
 }
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
-enum Opcode {
+pub enum Opcode {
     Addr, // (add register) stores into register C the result of adding register A and register B
     Addi, // (add immediate) stores into register C the result of adding register A and value B.
     Mulr, // (multiply register) stores into register C the result of multiplying register A and register B.

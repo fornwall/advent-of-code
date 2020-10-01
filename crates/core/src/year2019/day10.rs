@@ -25,7 +25,7 @@ pub fn parse_points(input_string: &str) -> Vec<(usize, usize)> {
 }
 
 /// Return (max_seen, (x, y)) of station.
-pub fn determine_station(points: &[(usize, usize)]) -> (usize, (usize, usize)) {
+pub fn determine_station(points: &[(usize, usize)]) -> Result<(usize, (usize, usize)), String> {
     points
         .iter()
         .map(|&this_point| {
@@ -45,22 +45,22 @@ pub fn determine_station(points: &[(usize, usize)]) -> (usize, (usize, usize)) {
             (seen_count, this_point)
         })
         .max_by_key(|&(seen_count, _)| seen_count)
-        .unwrap()
+        .ok_or_else(|| "No points in input".to_string())
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
     let points = parse_points(input_string);
-    Ok(determine_station(&points).0)
+    Ok(determine_station(&points)?.0)
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
-    let (x, y) = part2_nth(input_string, 200);
+    let (x, y) = part2_nth(input_string, 200)?;
     Ok(x * 100 + y)
 }
 
-pub fn part2_nth(input_string: &str, nth: u32) -> (i64, i64) {
+pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
     let points = parse_points(input_string);
-    let (_, base_location) = determine_station(&points);
+    let (_, base_location) = determine_station(&points)?;
 
     let mut seen = HashMap::new();
     for &(x, y) in points.iter().filter(|&&p| p != base_location) {
@@ -107,7 +107,7 @@ pub fn part2_nth(input_string: &str, nth: u32) -> (i64, i64) {
             if destroyed_count == nth {
                 let result_x = destroyed.0 + base_location.0 as i64;
                 let result_y = destroyed.1 + base_location.1 as i64;
-                return (result_x, result_y);
+                return Ok((result_x, result_y));
             }
 
             if points.is_empty() {
@@ -153,26 +153,5 @@ pub fn tests_part1() {
 
 #[test]
 fn tests_part2() {
-    let input_string = ".#....#####...#..
-##...##.#####..##
-##...#...#.#####.
-..#.....#...###..
-..#.#.....#....##";
-    assert_eq!(part2_nth(input_string, 1), (8, 1));
-    assert_eq!(part2_nth(input_string, 2), (9, 0));
-    assert_eq!(part2_nth(input_string, 3), (9, 1));
-    assert_eq!(part2_nth(input_string, 4), (10, 0));
-    assert_eq!(part2_nth(input_string, 5), (9, 2));
-    assert_eq!(part2_nth(input_string, 6), (11, 1));
-    assert_eq!(part2_nth(input_string, 7), (12, 1));
-    assert_eq!(part2_nth(input_string, 8), (11, 2));
-    assert_eq!(part2_nth(input_string, 9), (15, 1));
-    assert_eq!(part2_nth(input_string, 10), (12, 2));
-    assert_eq!(part2_nth(input_string, 11), (13, 2));
-    assert_eq!(part2_nth(input_string, 12), (14, 2));
-    assert_eq!(part2_nth(input_string, 13), (15, 2));
-    assert_eq!(part2_nth(input_string, 14), (12, 3));
-    assert_eq!(part2_nth(input_string, 15), (16, 4));
-
     assert_eq!(part2(include_str!("day10_input.txt")), Ok(517));
 }

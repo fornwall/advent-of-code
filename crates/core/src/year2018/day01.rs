@@ -25,11 +25,13 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
     let input = parse_input(input_string)?;
 
     let mut i = 0;
-    let mut frequency = 0;
+    let mut frequency: i32 = 0;
     let mut seen_frequencies = HashSet::new();
 
     while seen_frequencies.insert(frequency) {
-        frequency += input[i];
+        frequency = frequency
+            .checked_add(input[i])
+            .ok_or("Too high frequency")?;
         i = (i + 1) % input.len();
     }
 

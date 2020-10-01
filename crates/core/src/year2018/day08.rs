@@ -1,32 +1,47 @@
 // Returns (size, metadata sum)
-fn count_metadata(data: &[i32], start: usize) -> (usize, usize) {
+fn count_metadata(data: &[i32], start: usize) -> Result<(usize, usize), String> {
+    if data.len() < start + 2 {
+        return Err("Invalid input".to_string());
+    }
     let num_child_nodes = data[start];
     let metadata_entries = data[start + 1] as usize;
 
-    let mut metadata_sum = 0;
+    let mut metadata_sum: usize = 0;
     let mut current_index = start + 2;
     for _ in 0..num_child_nodes {
-        let child = count_metadata(data, current_index);
+        let child = count_metadata(data, current_index)?;
         current_index = child.0;
         metadata_sum += child.1;
     }
 
     for i in data.iter().skip(current_index).take(metadata_entries) {
-        metadata_sum += *i as usize;
+        metadata_sum = metadata_sum
+            .checked_add(*i as usize)
+            .ok_or("Overflow in computation")?;
     }
 
-    (current_index + metadata_entries, metadata_sum as usize)
+    Ok((current_index + metadata_entries, metadata_sum as usize))
+}
+
+fn parse_input(input_string: &str) -> Result<Vec<i32>, String> {
+    input_string
+        .split_whitespace()
+        .map(|word| {
+            word.parse::<i32>()
+                .map_err(|error| format!("Invalid input: {}", error.to_string()))
+        })
+        .collect()
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let data: Vec<i32> = input_string
-        .split_whitespace()
-        .map(|word| word.parse::<i32>().unwrap())
-        .collect();
-    Ok(count_metadata(&data, 0).1)
+    let data = parse_input(input_string)?;
+    Ok(count_metadata(&data, 0)?.1)
 }
 
-fn evaluate_node(data: &[i32], start: usize) -> (usize, usize) {
+fn evaluate_node(data: &[i32], start: usize) -> Result<(usize, usize), String> {
+    if data.len() < start + 2 {
+        return Err("Invalid input".to_string());
+    }
     let num_child_nodes = data[start];
     let metadata_entries = data[start + 1] as usize;
 
@@ -34,7 +49,7 @@ fn evaluate_node(data: &[i32], start: usize) -> (usize, usize) {
     let mut current_index = start + 2;
 
     for _ in 0..num_child_nodes {
-        let child = evaluate_node(data, current_index);
+        let child = evaluate_node(data, current_index)?;
         current_index = child.0;
         children_values.push(child.1);
     }
@@ -53,15 +68,15 @@ fn evaluate_node(data: &[i32], start: usize) -> (usize, usize) {
                 }
             });
 
-    (current_index + metadata_entries, node_value as usize)
+    let new_index = current_index
+        .checked_add(metadata_entries)
+        .ok_or("Overflow in computation")?;
+    Ok((new_index, node_value as usize))
 }
 
 pub fn part2(input_string: &str) -> Result<usize, String> {
-    let data: Vec<i32> = input_string
-        .split_whitespace()
-        .map(|word| word.parse::<i32>().unwrap())
-        .collect();
-    Ok(evaluate_node(&data, 0).1)
+    let data = parse_input(input_string)?;
+    Ok(evaluate_node(&data, 0)?.1)
 }
 
 #[test]
