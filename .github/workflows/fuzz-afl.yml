@@ -23,5 +23,5 @@ jobs:
     - name: Modify kernel/core_pattern for AFL
       run: sudo echo core >/proc/sys/kernel/core_pattern
     - name: Fuzz with AFL
-      run: timeout 600s LLVM_CONFIG=llvm-config-11 make fuzz-afl
+      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 timeout 600s make fuzz-afl
       continue-on-error: true
