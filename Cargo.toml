@@ -1,10 +1,5 @@
 [workspace]
-members = [
-    "crates/core",
-    "crates/fuzzing-afl",
-    "crates/python",
-    "crates/wasm"
-]
+members = [ "crates/*" ]
 
 [profile.release]
 opt-level = 'z'
