@@ -1,26 +1,5 @@
 #!/bin/bash
-set -u
-
-# Check that provided input does not give direct crash:
-cd ../core
-cargo build
-for input in src/year*/day*input.txt; do
-	for year in 2018 2019; do
-		for day in {1..25}; do
-			for part in 1 2; do
-				echo "$year $day $part < $input"
-				cargo run -q $year $day $part < $input
-				EXIT_CODE=$?
-				if [ $EXIT_CODE != 0 ] && [ $EXIT_CODE != 1 ]; then
-					echo "Crash found"
-					exit 1
-				fi
-			done
-		done
-	done
-done
-
-set -e
+set -e -u
 
 # Build instrumented binary:
 cargo afl build
@@ -31,11 +10,17 @@ OUTPUT=target/fuzzing-output
 rm -Rf $INPUT $OUTPUT
 mkdir -p $INPUT $OUTPUT
 # TODO: Do not overwrite between years
-for year in core/src/year*; do
-	echo $year
-	#cp  ../core/src/year*/day*_input.txt $INPUT/
+COUNT=0
+for YEAR_PATH in ../core/src/year*; do
+	YEAR=${YEAR_PATH: -4}
+	for INPUT_FILE in ../core/src/year${YEAR}/day*_input.txt; do
+		COUNT=$(( COUNT + 1 ))
+		if [ $COUNT -lt 5 ]; then
+			SEED_FILENAME=year${YEAR}_`basename $INPUT_FILE`
+			cp $INPUT_FILE $INPUT/$SEED_FILENAME
+		fi
+	done
 done
-exit 1
 
 cargo afl fuzz \
 	-i $INPUT \

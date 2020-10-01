@@ -39,8 +39,11 @@ impl Grid {
         Self { value: 0 }
     }
 
-    fn parse(input: &str) -> Self {
-        Self {
+    fn parse(input: &str) -> Result<Self, String> {
+        if input.chars().filter(|&c| c == '#' || c == '.').count() != 25 {
+            return Err("Invalid input - expected 5x5 grid of '#' and '.'".to_string());
+        }
+        Ok(Self {
             value: input
                 .lines()
                 .enumerate()
@@ -53,7 +56,7 @@ impl Grid {
                         })
                 })
                 .fold(0, |value, (x, y)| value | 1 << ((y * 5) + x)),
-        }
+        })
     }
 
     const fn at(self, x: i32, y: i32) -> u32 {
@@ -148,7 +151,7 @@ impl Grid {
 }
 
 pub fn part1(input_string: &str) -> Result<u32, String> {
-    let mut grid = Grid::parse(input_string);
+    let mut grid = Grid::parse(input_string)?;
     Ok(grid.advance_until_repeat())
 }
 
@@ -159,7 +162,7 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
     let mut current_generation = vec![Grid::zeroed(); MAX_LEVELS];
     let mut next_generation = vec![Grid::zeroed(); MAX_LEVELS];
 
-    current_generation[MAX_LEVELS / 2] = Grid::parse(input_string);
+    current_generation[MAX_LEVELS / 2] = Grid::parse(input_string)?;
 
     for _minute in 0..MINUTES {
         for i in 1..(current_generation.len() - 1) {

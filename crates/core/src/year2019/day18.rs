@@ -66,6 +66,10 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
         });
     });
 
+    if !found_keys.contains_key(&Key::new('@')) {
+        return Err("No entrance ('@') found".to_string());
+    }
+
     // Mapping to (other_key, needed_keys_to_reach, steps):
     let mut adjacency_list: HashMap<Key, Vec<Edge>> = HashMap::new();
 
@@ -239,6 +243,10 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
             map_bottom_right.push('\n');
         }
     });
+
+    if !(map_top_left.starts_with('#')) {
+        return Err("Invalid input (not surrounded by '#')".to_string());
+    }
 
     let s1 = steps_to_gather_all_keys(&map_top_left)?;
     let s2 = steps_to_gather_all_keys(&map_top_right)?;

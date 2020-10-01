@@ -3,6 +3,16 @@ name: Fuzz with AFL
 on: push
 
 jobs:
+
+  check-seed:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+    - name: Check seed
+      run: ./check-seed.sh
+      continue-on-error: true
+
   fuzz:
     runs-on: ubuntu-latest
     steps:

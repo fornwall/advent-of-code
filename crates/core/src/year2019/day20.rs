@@ -31,6 +31,10 @@ impl Maze {
             .max()
             .ok_or("Internal error: No max line length")?;
 
+        if rows < 5 || cols < 5 {
+            return Err("Too small input - expected at least 5x5".to_string());
+        }
+
         let array = vec![b' '; rows * cols];
         let mut maze = Self {
             cols,
@@ -120,6 +124,10 @@ impl Maze {
             for x in 0..=cols {
                 on_tile(x as i32, y as i32, true);
             }
+        }
+
+        if maze.start_location == maze.end_location {
+            return Err("Start location not distinct from end location".to_string());
         }
 
         Ok(maze)

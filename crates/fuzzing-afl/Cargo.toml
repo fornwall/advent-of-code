@@ -11,5 +11,5 @@ edition = "2018"
 
 [dependencies]
 advent-of-code = { path = "../core" }
-afl = "0"
+afl = "*"
 
