@@ -11,5 +11,5 @@ jobs:
     - name: Install current LLVM
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Fuzz with AFL
-      run: make fuzz-afl
+      run: LLVM_CONFIG=llvm-config-11 make fuzz-afl
       continue-on-error: true
