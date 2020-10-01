@@ -20,6 +20,8 @@ jobs:
       uses: actions/checkout@v2
     - name: Install current LLVM
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+    - name: Modify kernel/core_pattern for AFL
+      run: sudo echo core >/proc/sys/kernel/core_pattern
     - name: Fuzz with AFL
-      run: LLVM_CONFIG=llvm-config-11 make fuzz-afl
+      run: timeout 600s LLVM_CONFIG=llvm-config-11 make fuzz-afl
       continue-on-error: true

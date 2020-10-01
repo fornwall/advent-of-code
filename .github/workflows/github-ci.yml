@@ -73,7 +73,7 @@ jobs:
         run: pip install bump2version
       - name: Install cibuildwheel
         run: |
-          python -m pip install cibuildwheel==1.6.1 setuptools_rust==0.11.3
+          python -m pip install cibuildwheel setuptools_rust
       - name: Bump version
         run: bump2version patch
       - name: Build wheels on Linux and macOS
