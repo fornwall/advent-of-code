@@ -19,8 +19,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: Show rust version
       run: rustc --version
+    - name: Install current LLVM
+      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Test and check
-      run: make check
+      run: LLVM_CONFIG=llvm-config-11 make check
 
   test-python:
     runs-on: ubuntu-latest
