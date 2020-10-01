@@ -10,7 +10,7 @@ jobs:
     - name: Check out source code
       uses: actions/checkout@v2
     - name: Check seed
-      run: ./check-seed.sh
+      run: cd crates/fuzzing-afl && ./check-seed.sh
       continue-on-error: true
 
   fuzz:
