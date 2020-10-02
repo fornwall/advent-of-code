@@ -10,7 +10,7 @@ jobs:
     - name: Check out source code
       uses: actions/checkout@v2
     - name: Check seed
-      run: cd crates/fuzzing-afl && ./check-seed.sh
+      run: cd crates/fuzzing-afl && timeout 900s ./check-seed.sh
       continue-on-error: true
 
   fuzz:
@@ -21,5 +21,5 @@ jobs:
     - name: Install current LLVM
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Fuzz with AFL
-      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 timeout 600s make fuzz-afl
+      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 timeout 900s make fuzz-afl
       continue-on-error: true

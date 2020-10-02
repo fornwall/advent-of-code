@@ -23,6 +23,7 @@ for YEAR_PATH in ../core/src/year*; do
 done
 
 cargo afl fuzz \
+	-t 50000 \
 	-i $INPUT \
 	-o $OUTPUT \
 	../../target/debug/advent-of-code-afl-fuzzing
