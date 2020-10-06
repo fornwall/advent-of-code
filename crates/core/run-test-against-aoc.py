@@ -13,16 +13,18 @@ from aocd.models import Puzzle, User
 
 sessions_file = f"{Path.home()}/.advent-of-code.json"
 with open(sessions_file) as f:
-    SESSIONS = [entry["cookie"] for entry in json.load(f)]
+    SESSIONS = json.load(f)
 
 for session in SESSIONS:
-    user = User(session)
+    session_cookie = session["cookie"]
+    session_description = session["description"]
+    user = User(session_cookie)
     for year in [2018, 2019]:
         for day in range(1, 26):
             puzzle = Puzzle(year=year, day=day, user=user)
             input_data = puzzle.input_data
             for part in range(1, 3):
-                print(f"# Year {year}, Day {day}, part {part}, session {session}")
+                print(f"# Year {year}, Day {day}, part {part} - {session_description}")
                 forked_process = subprocess.run(
                     f"cargo run --release -q {year} {day} {part}",
                     capture_output=True,
