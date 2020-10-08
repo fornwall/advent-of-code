@@ -20,8 +20,15 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
     // set register 0 to the value it's first compared with here to exit as soon as possible.
 
     let mut program = Program::parse(input_string)?;
+    const MAX_INSTRUCTIONS: i32 = 1_000_000;
+    let mut loop_count = 0;
     while program.instruction_pointer()? != 29 {
         program.execute_one_instruction()?;
+
+        loop_count += 1;
+        if loop_count > MAX_INSTRUCTIONS {
+            return Err(format!("Aborted after {} instructions", loop_count));
+        }
     }
     Ok(program.registers.values[program.instructions[28].a as usize])
 }
@@ -30,6 +37,8 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut seen = HashSet::new();
     let mut last_value = 0;
     let mut program = Program::parse(input_string)?;
+    const MAX_INSTRUCTIONS: u64 = 10_000_000_000;
+    let mut loop_count = 0;
     loop {
         if program.instruction_pointer()? == 29 {
             let value = program.registers.values[program.instructions[28].a as usize];
@@ -40,6 +49,11 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
             }
         }
         program.execute_one_instruction()?;
+
+        loop_count += 1;
+        if loop_count > MAX_INSTRUCTIONS {
+            return Err(format!("Aborted after {} instructions", loop_count));
+        }
     }
 }
 

@@ -16,9 +16,9 @@ pub fn part1(string: &str) -> Result<u32, String> {
 
     for line in string.lines() {
         let mut parts = line.split(')');
-        let part = parts.next().ok_or(format!("Invalid line: {}", line))?;
+        let part = parts.next().ok_or("Invalid input")?;
         let orbited_by = map.entry(part).or_insert_with(Vec::new);
-        let part = parts.next().ok_or(format!("Invalid line: {}", line))?;
+        let part = parts.next().ok_or("Invalid input")?;
         orbited_by.push(part);
     }
 
@@ -31,8 +31,8 @@ pub fn part2(string: &str) -> Result<u32, String> {
 
     for line in string.lines() {
         let mut parts = line.split(')');
-        let orbited_name = parts.next().ok_or(format!("Invalid line: {}", line))?;
-        let orbits_name = parts.next().ok_or(format!("Invalid line: {}", line))?;
+        let orbited_name = parts.next().ok_or("Invalid input")?;
+        let orbits_name = parts.next().ok_or("Invalid input")?;
 
         let orbits = map.entry(orbits_name).or_insert_with(Vec::new);
         orbits.push(orbited_name);

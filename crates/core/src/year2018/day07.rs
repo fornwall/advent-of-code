@@ -36,23 +36,29 @@ impl PartialEq for Step {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<String, String> {
+struct Input {
+    step_map: HashMap<char, Step>,
+    remaining_dependencies: HashMap<char, HashSet<char>>,
+}
+
+fn parse_input(input_string: &str) -> Result<Input, String> {
     let mut step_map = HashMap::new();
     let mut remaining_dependencies: HashMap<char, HashSet<char>> = HashMap::new();
 
-    for line in input_string.lines() {
+    for (line_index, line) in input_string.lines().enumerate() {
+        let line_number = line_index + 1;
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() != 10 {
-            return Err(format!("Invalid line: {}", line));
+            return Err(format!("Invalid line: {}", line_number));
         }
         let step_name = parts[7]
             .chars()
             .next()
-            .ok_or(format!("Invalid line: {}", line))?;
+            .ok_or(format!("Invalid line: {}", line_number))?;
         let depends_on = parts[1]
             .chars()
             .next()
-            .ok_or(format!("Invalid line: {}", line))?;
+            .ok_or(format!("Invalid line: {}", line_number))?;
 
         let step = step_map
             .entry(step_name)
@@ -69,6 +75,18 @@ pub fn part1(input_string: &str) -> Result<String, String> {
             .needed_by
             .insert(step_name);
     }
+
+    Ok(Input {
+        step_map,
+        remaining_dependencies,
+    })
+}
+
+pub fn part1(input_string: &str) -> Result<String, String> {
+    let Input {
+        step_map,
+        mut remaining_dependencies,
+    } = parse_input(input_string)?;
 
     // Topological sorting:
     let mut queue: BinaryHeap<&Step> = BinaryHeap::new();
@@ -137,38 +155,10 @@ pub fn part2_param(
     workers: usize,
     step_duration_base: i32,
 ) -> Result<i32, String> {
-    let mut step_map = HashMap::new();
-    let mut remaining_dependencies: HashMap<char, HashSet<char>> = HashMap::new();
-
-    for line in input_string.lines() {
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() != 10 {
-            return Err(format!("Invalid line: {}", line));
-        }
-        let step_name = parts[7]
-            .chars()
-            .next()
-            .ok_or(format!("Invalid line: {}", line))?;
-        let depends_on = parts[1]
-            .chars()
-            .next()
-            .ok_or(format!("Invalid line: {}", line))?;
-
-        let step = step_map
-            .entry(step_name)
-            .or_insert_with(|| Step::new(step_name));
-        step.dependencies.insert(depends_on);
-        remaining_dependencies
-            .entry(step_name)
-            .or_insert_with(HashSet::new)
-            .insert(depends_on);
-
-        step_map
-            .entry(depends_on)
-            .or_insert_with(|| Step::new(depends_on))
-            .needed_by
-            .insert(step_name);
-    }
+    let Input {
+        step_map,
+        mut remaining_dependencies,
+    } = parse_input(input_string)?;
 
     let mut work_queue: BinaryHeap<Work> = BinaryHeap::new();
     let mut step_queue: BinaryHeap<&Step> = BinaryHeap::new();

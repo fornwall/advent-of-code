@@ -7,7 +7,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
     }
 
     for (line_index, line) in input_string.lines().enumerate() {
-        let error_message = || format!("Incorrect input at line {}: {}", line_index + 1, line);
+        let error_message = || format!("Invalid line: {}", line_index + 1);
         let error_message_arg = |_| error_message();
 
         if line.starts_with("deal into") {
@@ -34,7 +34,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
                 current_index = (current_index + increment) % deck.len();
             }
         } else {
-            return Err(format!("Invalid line: {}", line));
+            return Err(format!("Invalid line: {}", line_index + 1));
         }
     }
 
@@ -60,7 +60,7 @@ pub fn part2(input_string: &str) -> Result<i128, String> {
     let mut increment_mul: i128 = 1;
 
     for (line_index, line) in input_string.lines().enumerate() {
-        let error_message = || format!("Incorrect input at line {}: {}", line_index + 1, line);
+        let error_message = || format!("Invalid line: {}", line_index + 1);
         let error_message_arg = |_| error_message();
 
         if line.starts_with("deal into") {
@@ -87,7 +87,7 @@ pub fn part2(input_string: &str) -> Result<i128, String> {
         // card in new list, and so on. So, the ith card in our old list goes to the i*nth
         // card in the new list. When is i*n = 1?"
         } else {
-            return Err(format!("Invalid line: {}", line));
+            return Err(format!("Invalid line: {}", line_index + 1));
         }
 
         increment_mul = increment_mul.rem_euclid(MOD);

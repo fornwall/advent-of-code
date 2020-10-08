@@ -39,7 +39,7 @@ impl Reactions {
             // Example: "12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ".
             let parts: Vec<&str> = line.split("=>").collect();
 
-            let error = || format!("Invalid input line {}: {}", line_index + 1, line);
+            let error = || format!("Invalid input line {}", line_index + 1);
 
             let mut required_chemicals = Vec::new();
             for amount_and_name in parts[0].split(',') {

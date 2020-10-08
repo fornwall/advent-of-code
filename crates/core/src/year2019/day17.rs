@@ -6,11 +6,14 @@ pub fn part1(input_string: &str) -> Result<String, String> {
     let mut program = Program::parse(input_string)?;
     let output = program.run_for_output()?;
     let map: String = output.iter().map(|&b| (b as u8) as char).collect();
-    Ok(part1_map(&map))
+    part1_map(&map)
 }
 
-fn part1_map(map: &str) -> String {
+fn part1_map(map: &str) -> Result<String, String> {
     let map: Vec<&[u8]> = map.lines().map(|line| line.as_bytes()).collect();
+    if map.len() < 3 {
+        return Err("Too small input (less than three lines)".to_string());
+    }
 
     let mut alignment_parameters_sum = 0;
     for y in 1..(map.len() - 1) {
@@ -26,7 +29,7 @@ fn part1_map(map: &str) -> String {
         }
     }
 
-    alignment_parameters_sum.to_string()
+    Ok(alignment_parameters_sum.to_string())
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -348,7 +351,7 @@ pub fn tests_part1() {
 ..#...#...#..
 ..#####...^..",
         ),
-        "76"
+        Ok("76".to_string())
     );
 
     assert_eq!(

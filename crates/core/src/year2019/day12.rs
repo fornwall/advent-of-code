@@ -25,13 +25,13 @@ impl Moons {
     fn parse(input: &str) -> Result<Self, String> {
         let mut positions = [[0; 3]; 4];
         for (i, line) in input.lines().enumerate() {
-            let error_message = |_| format!("Invalid input line {}: {}", i + 1, line);
+            let error_message = |_| format!("Invalid line: {}", i + 1);
             let parts: Vec<&str> = line
                 .split(|c| c == '=' || c == ' ' || c == '>' || c == ',')
                 .collect();
 
             if parts.len() != 9 {
-                return Err(format!("Invalid input line {}: {}", i + 1, line));
+                return Err(format!("Invalid line: {}", i + 1));
             }
 
             positions[i][0] = parts[1].trim().parse::<i32>().map_err(error_message)?;

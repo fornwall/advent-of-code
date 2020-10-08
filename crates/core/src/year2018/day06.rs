@@ -16,7 +16,7 @@ fn parse_input(input_string: &str) -> Result<Vec<Point>, String> {
         .map(|(line_index, line)| {
             let line_number = (line_index + 1) as i32;
             let parts: Vec<&str> = line.split(", ").collect();
-            let error_message = || format!("Invalid input one line {}: {}", line_number, line);
+            let error_message = || format!("Invalid input one line {}", line_number);
             if parts.len() != 2 {
                 return Err(error_message());
             }

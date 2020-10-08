@@ -19,7 +19,7 @@ fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
         .iter()
         .enumerate()
         .map(|(line_index, line)| {
-            let error_message = || format!("Incorrect input at line {}: {}", line_index + 1, line);
+            let error_message = || format!("Incorrect input at line {}", line_index + 1);
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() < 4 || parts[1].len() != 6 {
                 return Err(error_message());
