@@ -13,7 +13,7 @@ struct LogEntry {
 
 fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
     let mut lines: Vec<&str> = input_string.lines().collect();
-    lines.sort();
+    lines.sort_unstable();
 
     lines
         .iter()

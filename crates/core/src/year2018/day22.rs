@@ -18,15 +18,15 @@ const fn is_compatible(region_type: RegionType, equipment: Equipment) -> bool {
     // In rocky regions, you can use the climbing gear or the torch. You cannot use neither (you'll likely slip and fall).
     // In wet regions, you can use the climbing gear or neither tool. You cannot use the torch (if it gets wet, you won't have a light source).
     // In narrow regions, you can use the torch or neither tool. You cannot use the climbing gear (it's too bulky to fit).
-    match (region_type, equipment) {
+    matches!(
+        (region_type, equipment),
         (RegionType::Rocky, Equipment::ClimbingGear)
-        | (RegionType::Rocky, Equipment::Torch)
-        | (RegionType::Wet, Equipment::ClimbingGear)
-        | (RegionType::Wet, Equipment::Neither)
-        | (RegionType::Narrow, Equipment::Torch)
-        | (RegionType::Narrow, Equipment::Neither) => true,
-        _ => false,
-    }
+            | (RegionType::Rocky, Equipment::Torch)
+            | (RegionType::Wet, Equipment::ClimbingGear)
+            | (RegionType::Wet, Equipment::Neither)
+            | (RegionType::Narrow, Equipment::Torch)
+            | (RegionType::Narrow, Equipment::Neither)
+    )
 }
 
 fn other_equipment(region_type: RegionType, equipment: Equipment) -> Result<Equipment, String> {

@@ -4,17 +4,18 @@ else
   wasm_pack_profile=--release
 endif
 
-CLIPPY_COMMAND = cargo clippy --all-targets --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used -D clippy::panic
+CLIPPY_PARAMS = --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used
 ifeq ($(CLIPPY_PEDANTIC),1)
-  CLIPPY_COMMAND += -W clippy::pedantic
+  CLIPPY_PARAMS += -W clippy::pedantic
 endif
 ifeq ($(CLIPPY_UNWRAP),1)
-  CLIPPY_COMMAND += -D clippy::unwrap_used
+  CLIPPY_PARAMS += -D clippy::unwrap_used
 endif
 
 check:
 	cargo fmt --all
-	$(CLIPPY_COMMAND)
+	cargo clippy --all-targets $(CLIPPY_PARAMS)
+	cargo clippy $(CLIPPY_PARAMS) -D clippy::panic
 	cargo test
 
 install-wasm-target:

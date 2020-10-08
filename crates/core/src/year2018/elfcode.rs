@@ -131,19 +131,19 @@ impl Program {
                 print!("r{} = ", instruction.c)
             }
 
-            let a_is_value = match instruction.opcode {
-                Opcode::Seti | Opcode::Gtir | Opcode::Eqir => true,
-                _ => false,
-            };
-            let b_is_value = match instruction.opcode {
+            let a_is_value = matches!(
+                instruction.opcode,
+                Opcode::Seti | Opcode::Gtir | Opcode::Eqir
+            );
+            let b_is_value = matches!(
+                instruction.opcode,
                 Opcode::Addi
-                | Opcode::Muli
-                | Opcode::Bani
-                | Opcode::Bori
-                | Opcode::Gtri
-                | Opcode::Eqri => true,
-                _ => false,
-            };
+                    | Opcode::Muli
+                    | Opcode::Bani
+                    | Opcode::Bori
+                    | Opcode::Gtri
+                    | Opcode::Eqri
+            );
 
             let a = if a_is_value {
                 format!("{}", instruction.a)

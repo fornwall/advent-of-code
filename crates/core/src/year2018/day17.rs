@@ -34,7 +34,7 @@ impl Grid {
             if parts.len() != 2 {
                 return Err("Invalid input".to_string());
             }
-            parts.sort();
+            parts.sort_unstable();
             let (x_start, x_end) = parse_point_interval(&parts[0][2..])?;
             let (y_start, y_end) = parse_point_interval(&parts[1][2..])?;
 

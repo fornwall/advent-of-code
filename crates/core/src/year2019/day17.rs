@@ -161,7 +161,9 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 
         if possible_directions.len() == 1 {
             if starting {
-                assert_eq!(moves_since_turn, 0);
+                if moves_since_turn != 0 {
+                    return Err("Starting with moves already performed".to_string());
+                }
                 starting = false;
                 movements.push(
                     robot_direction

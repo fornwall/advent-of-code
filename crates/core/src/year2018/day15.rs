@@ -40,7 +40,9 @@ impl Board {
         let mut height = 0;
         for line in input_string.lines() {
             height += 1;
-            assert_eq!(width, line.len() as u32);
+            if width as usize != line.len() {
+                return Err("Not all lines are of equal length".to_string());
+            }
             for c in line.chars() {
                 cells.push(match c {
                     '#' => MapCell::Wall,

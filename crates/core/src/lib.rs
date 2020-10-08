@@ -1,3 +1,6 @@
+/*!
+This crates provides solutions for Advent of Code problems.
+*/
 #![crate_name = "advent_of_code"]
 use std::fmt::Display;
 
