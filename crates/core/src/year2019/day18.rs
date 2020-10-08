@@ -210,7 +210,11 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut map_bottom_right = String::new();
 
     let num_rows = input_string.lines().count();
-    let num_columns = input_string.lines().next().unwrap().len();
+    let num_columns = input_string
+        .lines()
+        .next()
+        .ok_or("Invalid input - empty first line")?
+        .len();
     let center_y = num_rows / 2;
     let center_x = num_columns / 2;
 

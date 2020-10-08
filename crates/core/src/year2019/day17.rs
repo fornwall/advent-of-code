@@ -231,8 +231,6 @@ pub fn part2(input_string: &str) -> Result<String, String> {
             .find(|&&value| value > 255)
             .map(|value| value.to_string())
             .ok_or_else(|| "No output > 255 produced".to_string());
-    } else {
-        println!("No found functions");
     }
 
     Err("No output produced".to_string())
@@ -301,22 +299,22 @@ where
         seq: &'a [T],
         num_subsequences: usize,
         mut subsequences: Vec<&'a [T]>,
-    ) -> Vec<&'a [T]>
+    ) -> Option<Vec<&'a [T]>>
     where
         T: PartialEq,
     {
         if seq.is_empty() || subsequences.len() == num_subsequences {
-            subsequences
+            Some(subsequences)
         } else if let Some(prefix) = subsequences.iter().find(|subseq| seq.starts_with(subseq)) {
             fill_subsequences(&seq[prefix.len()..], num_subsequences, subsequences)
         } else {
-            let next = find_longest_repeated_subsequence(seq).unwrap();
+            let next = find_longest_repeated_subsequence(seq)?;
             subsequences.push(next);
             fill_subsequences(&seq[next.len()..], num_subsequences, subsequences)
         }
     }
 
-    let mut subsequences: Vec<&[T]> = fill_subsequences(seq, num_subsequences, Vec::new());
+    let mut subsequences: Vec<&[T]> = fill_subsequences(seq, num_subsequences, Vec::new())?;
 
     while !subsequences[0].is_empty() {
         if let Some(covering) = find_subseq_covering(seq, &subsequences) {
@@ -324,11 +322,11 @@ where
         } else {
             while !subsequences.is_empty() {
                 let i = subsequences.len() - 1;
-                subsequences[i] = subsequences[i].split_last().unwrap().1;
+                subsequences[i] = subsequences[i].split_last()?.1;
                 if subsequences[subsequences.len() - 1].is_empty() {
                     subsequences.pop();
                 } else {
-                    subsequences = fill_subsequences(seq, num_subsequences, subsequences);
+                    subsequences = fill_subsequences(seq, num_subsequences, subsequences)?;
                     break;
                 }
             }

@@ -85,7 +85,9 @@ pub fn part2(input_string: &str) -> Result<String, String> {
                     optimal_power = square_power;
                 }
 
-                square_power -= deque.pop_back().unwrap();
+                square_power -= deque
+                    .pop_back()
+                    .ok_or("Internal error - cannot pop from back")?
             }
         }
     }
@@ -98,14 +100,20 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 
 #[test]
 fn tests_part1() {
-    assert_eq!("33,45", part1("18").unwrap());
-    assert_eq!("21,61", part1("42").unwrap());
-    assert_eq!("21,68", part1(include_str!("day11_input.txt")).unwrap());
+    assert_eq!(Ok("33,45".to_string()), part1("18"));
+    assert_eq!(Ok("21,61".to_string()), part1("42"));
+    assert_eq!(
+        Ok("21,68".to_string()),
+        part1(include_str!("day11_input.txt"))
+    );
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!("90,269,16", part2("18").unwrap());
-    assert_eq!("232,251,12", part2("42").unwrap());
-    assert_eq!("90,201,15", part2(include_str!("day11_input.txt")).unwrap());
+    assert_eq!(Ok("90,269,16".to_string()), part2("18"));
+    assert_eq!(Ok("232,251,12".to_string()), part2("42"));
+    assert_eq!(
+        Ok("90,201,15".to_string()),
+        part2(include_str!("day11_input.txt"))
+    );
 }

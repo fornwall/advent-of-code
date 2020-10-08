@@ -46,8 +46,17 @@ where
     let mut current_step: u32 = 0;
 
     for word in string.split(',') {
-        let direction = Point::direction(word.chars().next().unwrap())?;
-        let steps = word[1..].parse::<i32>().unwrap();
+        let first_char = word
+            .chars()
+            .next()
+            .ok_or("Invalid input - too small word")?;
+        let direction = Point::direction(first_char)?;
+        let steps = word[1..].parse::<i32>().map_err(|error| {
+            format!(
+                "Invalid input - could not parse steps: {}",
+                error.to_string()
+            )
+        })?;
 
         for _ in 0..steps {
             current_step += 1;
@@ -58,16 +67,27 @@ where
     Ok(())
 }
 
+fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
+    let lines: Vec<&str> = input_string.lines().collect();
+    if lines.len() != 2 {
+        return Err(format!(
+            "Invalid number of input lines - expected 2, was {}",
+            lines.len(),
+        ));
+    }
+    Ok((lines[0], lines[1]))
+}
+
 pub fn part1(input_string: &str) -> Result<u32, String> {
-    let mut lines = input_string.lines();
+    let (first_line, second_line) = input_lines(input_string)?;
     let mut first_wire_points = HashSet::new();
 
-    parse_wire_points(lines.next().unwrap(), |point, _| {
+    parse_wire_points(first_line, |point, _| {
         first_wire_points.insert(point);
     })?;
 
     let mut closest_distance = std::u32::MAX;
-    parse_wire_points(lines.next().unwrap(), |point, _| {
+    parse_wire_points(second_line, |point, _| {
         if first_wire_points.contains(&point) {
             closest_distance = cmp::min(closest_distance, point.distance_from_origin());
         }
@@ -77,15 +97,15 @@ pub fn part1(input_string: &str) -> Result<u32, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<u32, String> {
-    let mut lines = input_string.lines();
+    let (first_line, second_line) = input_lines(input_string)?;
     let mut first_wire_points = HashMap::new();
 
-    parse_wire_points(lines.next().unwrap(), |point, step| {
+    parse_wire_points(first_line, |point, step| {
         first_wire_points.entry(point).or_insert(step);
     })?;
 
     let mut fewest_steps = std::u32::MAX;
-    parse_wire_points(lines.next().unwrap(), |point, step| {
+    parse_wire_points(second_line, |point, step| {
         if let Some(&value) = first_wire_points.get(&point) {
             fewest_steps = cmp::min(fewest_steps, step + value);
         }

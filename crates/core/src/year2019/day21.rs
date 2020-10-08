@@ -10,7 +10,8 @@ fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<i64, 
         Ok(value)
     } else {
         let output_bytes: Vec<u8> = program_output.iter().map(|&value| value as u8).collect();
-        let output_string = std::str::from_utf8(&output_bytes).unwrap();
+        let output_string =
+            std::str::from_utf8(&output_bytes).map_err(|_| "Output is not utf-8")?;
         Err(format!(
             "No non-ASCII value found - showing last moments:\n{}",
             output_string

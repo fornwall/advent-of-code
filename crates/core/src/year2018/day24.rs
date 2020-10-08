@@ -24,6 +24,9 @@ impl ArmyGroup {
         let mut id_generator = 0;
         let mut immune_system = true;
         let mut groups: Vec<Self> = Vec::new();
+
+        let error = |_| "Invalid input";
+
         for line in input_string.lines().skip(1) {
             if line == "" {
                 // Skip empty line.
@@ -48,23 +51,26 @@ impl ArmyGroup {
                     if words.len() != 18 {
                         return Err("Invalid input".to_string());
                     }
-                    units = words[0].parse::<i32>().unwrap();
-                    hit_points = words[4].parse::<i32>().unwrap();
-                    attack_damage = words[12].parse::<i32>().unwrap();
+                    units = words[0].parse::<i32>().map_err(error)?;
+                    hit_points = words[4].parse::<i32>().map_err(error)?;
+                    attack_damage = words[12].parse::<i32>().map_err(error)?;
                     attack_type = words[13].to_string();
-                    initiative = words[17].parse::<i32>().unwrap();
+                    initiative = words[17].parse::<i32>().map_err(error)?;
                 } else {
                     if main_parts.len() != 3 {
                         return Err("Invalid input".to_string());
                     }
                     let before_parentheses: Vec<&str> = main_parts[0].split_whitespace().collect();
                     let after_parentheses: Vec<&str> = main_parts[2].split_whitespace().collect();
+                    if before_parentheses.len() != 7 || after_parentheses.len() != 11 {
+                        return Err("Invalid input".to_string());
+                    }
 
-                    units = before_parentheses[0].parse::<i32>().unwrap();
-                    hit_points = before_parentheses[4].parse::<i32>().unwrap();
-                    attack_damage = after_parentheses[5].parse::<i32>().unwrap();
+                    units = before_parentheses[0].parse::<i32>().map_err(error)?;
+                    hit_points = before_parentheses[4].parse::<i32>().map_err(error)?;
+                    attack_damage = after_parentheses[5].parse::<i32>().map_err(error)?;
                     attack_type = after_parentheses[6].to_string();
-                    initiative = after_parentheses[10].parse::<i32>().unwrap();
+                    initiative = after_parentheses[10].parse::<i32>().map_err(error)?;
 
                     for part in main_parts[1].split("; ") {
                         if part.starts_with("weak to") {

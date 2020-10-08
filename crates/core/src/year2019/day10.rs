@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
 pub const fn gcd(mut a: i64, mut b: i64) -> i64 {
@@ -99,7 +100,7 @@ pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
         let (x, y) = p2[0];
         let a2 = -(x as f64).atan2(y as f64);
 
-        a1.partial_cmp(&a2).unwrap()
+        a1.partial_cmp(&a2).unwrap_or(Ordering::Equal)
     });
 
     let mut destroyed_count = 0;
@@ -108,7 +109,7 @@ pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
         while i != points_grouped_by_direction.len() {
             let points = &mut points_grouped_by_direction[i];
 
-            let destroyed = points.pop().unwrap();
+            let destroyed = points.pop().ok_or("No points to pop")?;
             destroyed_count += 1;
             if destroyed_count == nth {
                 let result_x = destroyed.0 + base_location.0 as i64;

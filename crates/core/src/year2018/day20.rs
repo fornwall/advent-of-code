@@ -64,17 +64,21 @@ where
             '|' => {
                 new_possibilities
                     .last_mut()
-                    .unwrap()
+                    .ok_or("No possibility to push to for |")?
                     .push(current_positions);
-                current_positions = positions_at_start_of_branch.last_mut().unwrap().clone();
+                current_positions = positions_at_start_of_branch
+                    .last_mut()
+                    .ok_or("No position at start of branch for |")?
+                    .clone();
             }
             ')' => {
                 new_possibilities
                     .last_mut()
-                    .unwrap()
+                    .ok_or("No possibility to push to for )")?
                     .push(current_positions);
                 current_positions = HashSet::new();
-                let nn: Vec<HashSet<(i32, i32)>> = new_possibilities.pop().unwrap();
+                let nn: Vec<HashSet<(i32, i32)>> =
+                    new_possibilities.pop().ok_or("No new possibility for )")?;
                 for n in nn {
                     for e in n {
                         current_positions.insert(e);

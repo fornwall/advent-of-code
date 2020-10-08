@@ -112,20 +112,23 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
         }
     }
 
-    let (&guard_id, most_sleepy_minute, _) = sleepers
-        .iter()
-        .map(|(guard_id, sleep_record)| {
-            let (most_sleepy_minute, sleep_count) = sleep_record
-                .iter()
-                .enumerate()
-                .max_by_key(|(_minute, count)| *count)
-                .unwrap();
-            (guard_id, most_sleepy_minute, sleep_count)
-        })
-        .max_by_key(|(_, _, sleep_count)| *sleep_count)
-        .ok_or("Internal error: No most sleepy found")?;
+    let mut highest_sleep_count = -1;
+    let mut sleepiest_guard_id = 0;
+    let mut most_sleepy_minute = 0;
+    for (&guard_id, sleep_record) in sleepers.iter() {
+        let (sleepy_minute, &sleep_count) = sleep_record
+            .iter()
+            .enumerate()
+            .max_by_key(|(_minute, count)| *count)
+            .ok_or("No sleep record for guard")?;
+        if sleep_count > highest_sleep_count {
+            highest_sleep_count = sleep_count;
+            sleepiest_guard_id = guard_id;
+            most_sleepy_minute = sleepy_minute;
+        }
+    }
 
-    Ok(u64::from(guard_id) * most_sleepy_minute as u64)
+    Ok(u64::from(sleepiest_guard_id) * most_sleepy_minute as u64)
 }
 
 #[test]

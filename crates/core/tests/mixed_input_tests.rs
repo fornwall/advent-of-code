@@ -34,7 +34,7 @@ fn mixed_input() -> Result<(), String> {
     println!("{:?}", entries);
     for entry in entries {
         let entry_clone = entry.clone();
-        let p = entry_clone.to_str().unwrap();
+        let p = entry_clone.to_str().ok_or("Invalid utf-8 in entry")?;
         println!("{:?}", entry);
         let input_string = read_to_string(entry).map_err(|_| "Cannot read file")?;
         for year in 2018..2019 {

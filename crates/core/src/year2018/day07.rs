@@ -105,7 +105,9 @@ pub fn part1(input_string: &str) -> Result<String, String> {
             result.push(step.name);
 
             for needed_by_name in step.needed_by.iter().rev() {
-                let v = remaining_dependencies.get_mut(needed_by_name).unwrap();
+                let v = remaining_dependencies
+                    .get_mut(needed_by_name)
+                    .ok_or("Dependency not found")?;
                 v.remove(&step.name);
                 if v.is_empty() {
                     queue.push(&step_map[needed_by_name]);
@@ -170,7 +172,7 @@ pub fn part2_param(
         });
 
     while work_queue.len() < workers && !step_queue.is_empty() {
-        let step = step_queue.pop().unwrap();
+        let step = step_queue.pop().ok_or("No step to pop")?;
         let done_at_time = step_duration_base + (1 + step.name as i32 - 'A' as i32);
         work_queue.push(Work::new(step.name, done_at_time));
     }
@@ -189,7 +191,9 @@ pub fn part2_param(
         let step = &step_map[&work_done.name];
 
         for needed_by_name in step.needed_by.iter().rev() {
-            let v = remaining_dependencies.get_mut(needed_by_name).unwrap();
+            let v = remaining_dependencies
+                .get_mut(needed_by_name)
+                .ok_or("Dependency not found")?;
             v.remove(&step.name);
             if v.is_empty() {
                 step_queue.push(&step_map[needed_by_name]);
@@ -197,7 +201,7 @@ pub fn part2_param(
         }
 
         while work_queue.len() < workers && !step_queue.is_empty() {
-            let next_step = step_queue.pop().unwrap();
+            let next_step = step_queue.pop().ok_or("No step to pop")?;
             let next_step_done_at = work_done.done_at_second
                 + step_duration_base
                 + (1 + next_step.name as i32 - 'A' as i32);

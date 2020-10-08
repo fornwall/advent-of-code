@@ -272,7 +272,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 #[test]
 fn tests_part1() {
     assert_eq!(
-        "0,3",
+        Ok("0,3".to_string()),
         part1(
             "|
 v
@@ -282,11 +282,10 @@ v
 ^
 |"
         )
-        .unwrap()
     );
 
     assert_eq!(
-        "7,3",
+        Ok("7,3".to_string()),
         part1(
             r#"/->-\
 |   |  /----\
@@ -295,16 +294,18 @@ v
 \-+-/  \-+--/
   \------/"#
         )
-        .unwrap()
     );
 
-    assert_eq!("65,73", part1(include_str!("day13_input.txt")).unwrap());
+    assert_eq!(
+        Ok("65,73".to_string()),
+        part1(include_str!("day13_input.txt"))
+    );
 }
 
 #[test]
 fn tests_part2() {
     assert_eq!(
-        "6,4",
+        Ok("6,4".to_string()),
         part2(
             r#"/>-<\
 |   |
@@ -315,8 +316,10 @@ fn tests_part2() {
   \<->/
 "#
         )
-        .unwrap()
     );
 
-    assert_eq!("54,66", part2(include_str!("day13_input.txt")).unwrap());
+    assert_eq!(
+        Ok("54,66".to_string()),
+        part2(include_str!("day13_input.txt"))
+    );
 }

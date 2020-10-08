@@ -84,7 +84,7 @@ impl Grid {
             println!(
                 "{}",
                 String::from_utf8(self.cells[y * self.width..(y + 1) * self.width].to_vec())
-                    .unwrap()
+                    .unwrap_or_else(|_| "Invalid utf-8".to_string())
                     .replace('.', " ")
                     .replace('#', "█")
             );

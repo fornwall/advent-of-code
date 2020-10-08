@@ -106,8 +106,8 @@ impl Input {
                 let parts: Vec<u16> = line[9..]
                     .split(|c| c == '[' || c == ']' || c == ',')
                     .filter(|s| !s.is_empty())
-                    .map(|n| n.trim().parse::<u16>().unwrap())
-                    .collect();
+                    .map(|n| n.trim().parse::<u16>().map_err(|_| "Invalid input"))
+                    .collect::<Result<_, _>>()?;
 
                 if before {
                     registers_before = Registers::of(parts[0], parts[1], parts[2], parts[3]);
@@ -230,7 +230,7 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
     let mut assigned_opcodes = HashSet::new();
     for s in possible_meanings.iter_mut() {
         if s.len() == 1 {
-            assigned_opcodes.insert(*s.iter().next().unwrap());
+            assigned_opcodes.insert(*s.iter().next().ok_or("Internal error - no elements in s")?);
         }
     }
 
@@ -239,7 +239,11 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
         for new in assigned_opcodes.iter() {
             for s in possible_meanings.iter_mut() {
                 if s.len() > 1 && s.remove(new) && s.len() == 1 {
-                    new_assign.push(*s.iter().next().unwrap());
+                    new_assign.push(
+                        *s.iter()
+                            .next()
+                            .ok_or("Internal error - no elements in s for new_assign")?,
+                    );
                 }
             }
         }
@@ -251,8 +255,13 @@ pub fn part2(input_string: &str) -> Result<u16, String> {
 
     let meanings: Vec<Opcode> = possible_meanings
         .iter()
-        .map(|s| *s.iter().next().unwrap())
-        .collect();
+        .map(|s| {
+            s.iter()
+                .next()
+                .copied()
+                .ok_or("Internal error - no elements in s for meanings")
+        })
+        .collect::<Result<_, _>>()?;
 
     let mut regs = Registers::of(0, 0, 0, 0);
     for instruction in input.program {

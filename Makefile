@@ -4,12 +4,9 @@ else
   wasm_pack_profile=--release
 endif
 
-CLIPPY_PARAMS = --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used
+CLIPPY_PARAMS = --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used -D clippy::unwrap_used
 ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
-endif
-ifeq ($(CLIPPY_UNWRAP),1)
-  CLIPPY_PARAMS += -D clippy::unwrap_used
 endif
 
 check:
