@@ -49,7 +49,7 @@ fn parse_input(input_string: &str) -> Result<Vec<Claim>, String> {
         .lines()
         .enumerate()
         .map(|(line_index, line)| {
-            let error_message = || format!("Invalid input on line {}: {}", line_index + 1, line);
+            let error_message = || format!("Invalid input on line {}", line_index + 1);
             let parts: Vec<u32> = line
                 .replace("#", "")
                 .replace("@", "")

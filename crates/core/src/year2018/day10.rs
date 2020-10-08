@@ -21,10 +21,10 @@ pub fn find_letters(input_string: &str) -> Result<(String, u32), String> {
         .lines()
         .enumerate()
         .map(|(line_index, line)| {
-            let error = || format!("Invalid input at line {}: {}", line_index + 1, line);
+            let error = || format!("Invalid input at line {}", line_index + 1);
 
             let parts: Vec<&str> = line.split(|c| c == '<' || c == '>' || c == ',').collect();
-            if parts.len() < 6 {
+            if parts.len() < 6 || !line.starts_with("position=") {
                 return Err(error());
             }
 

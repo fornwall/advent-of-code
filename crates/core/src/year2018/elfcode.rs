@@ -44,9 +44,13 @@ impl Program {
         Ok(true)
     }
 
-    pub fn execute(&mut self) -> Result<u64, String> {
+    pub fn execute_until_halt(&mut self, max_instructions: u32) -> Result<u64, String> {
+        let mut loop_count = 0;
         while self.execute_one_instruction()? {
-            // Go on.
+            loop_count += 1;
+            if loop_count > max_instructions {
+                return Err(format!("Aborting after {} instructions", max_instructions));
+            }
         }
         Ok(self.registers.values[0])
     }

@@ -36,12 +36,9 @@ for session in SESSIONS:
                 result = forked_process.stdout.strip()
                 try:
                     existing_answer = puzzle.answer_a if part == 1 else puzzle.answer_b
-                    if existing_answer == result:
-                        print("Existing solution ok!")
-                    else:
+                    if existing_answer != result:
                         sys.exit(f"Incorrect! Expected={puzzle.answer_a}, got {result}")
                 except Exception:
-                    print("Submitting new solution")
                     if part == 1:
                         puzzle.answer_a = result
                     else:

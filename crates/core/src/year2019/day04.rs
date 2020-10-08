@@ -3,10 +3,7 @@ use std::cmp::Ordering;
 fn parse_input(input_string: &str) -> Result<(i32, i32), String> {
     let parts: Vec<&str> = input_string.trim().split('-').collect();
     if parts.len() != 2 {
-        return Err(format!(
-            "Invalid parts (should be in FROM-TO form): {}",
-            input_string
-        ));
+        return Err("Invalid parts - should be in FROM-TO form".to_string());
     }
     let from = parts[0].parse::<i32>().or(Err("Invalid range"))?;
     let to = parts[1].parse::<i32>().or(Err("Invalid range"))?;

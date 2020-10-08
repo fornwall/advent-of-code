@@ -28,8 +28,7 @@ impl Program {
                 }
                 Err(error) => {
                     return Err(format!(
-                        "Unable to parse program word {}: {}",
-                        word_string,
+                        "Unable to parse program word: {}",
                         error.to_string()
                     ));
                 }

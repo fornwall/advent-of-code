@@ -9,8 +9,14 @@ pub const fn gcd(mut a: i64, mut b: i64) -> i64 {
     a
 }
 
-pub fn parse_points(input_string: &str) -> Vec<(usize, usize)> {
-    input_string
+pub fn parse_points(input_string: &str) -> Result<Vec<(usize, usize)>, String> {
+    for c in input_string.chars() {
+        if !(c == '#' || c == '.' || c == '\n') {
+            return Err(format!("Invalid character: {}", c));
+        }
+    }
+
+    Ok(input_string
         .lines()
         .enumerate()
         .flat_map(|(row, line)| {
@@ -21,7 +27,7 @@ pub fn parse_points(input_string: &str) -> Vec<(usize, usize)> {
                     _ => None,
                 })
         })
-        .collect()
+        .collect())
 }
 
 /// Return (max_seen, (x, y)) of station.
@@ -49,7 +55,7 @@ pub fn determine_station(points: &[(usize, usize)]) -> Result<(usize, (usize, us
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let points = parse_points(input_string);
+    let points = parse_points(input_string)?;
     Ok(determine_station(&points)?.0)
 }
 
@@ -59,7 +65,7 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
 }
 
 pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
-    let points = parse_points(input_string);
+    let points = parse_points(input_string)?;
     let (_, base_location) = determine_station(&points)?;
 
     let mut seen = HashMap::new();

@@ -18,7 +18,7 @@ impl Nanobot {
                 let parts: Vec<&str> = line
                     .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
                     .collect();
-                let error_message = || format!("Invalid input on line {}: {}", line_number, line);
+                let error_message = || format!("Invalid input on line {}", line_number);
                 if parts.len() != 8 {
                     return Err(error_message());
                 }

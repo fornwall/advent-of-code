@@ -3,15 +3,20 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         .lines()
         .enumerate()
         .map(|(i, line)| {
+            let line_number = i + 1;
             let parts: Vec<&str> = line.split(',').collect();
             if parts.len() != 4 {
-                return Err("Invalid input".to_string());
+                return Err(format!(
+                    "Invalid input at line {} - not 4 comma-separated values",
+                    line_number
+                ));
             }
+            let error = |e| format!("Invalid input at line {}: {}", line_number, e);
             Ok((
-                parts[0].parse::<i32>().unwrap(),
-                parts[1].parse::<i32>().unwrap(),
-                parts[2].parse::<i32>().unwrap(),
-                parts[3].parse::<i32>().unwrap(),
+                parts[0].parse::<i32>().map_err(error)?,
+                parts[1].parse::<i32>().map_err(error)?,
+                parts[2].parse::<i32>().map_err(error)?,
+                parts[3].parse::<i32>().map_err(error)?,
                 i,
             ))
         })

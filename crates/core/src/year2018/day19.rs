@@ -2,7 +2,7 @@ use super::elfcode::Program;
 
 pub fn part1(input_string: &str) -> Result<u64, String> {
     let mut program = Program::parse(input_string)?;
-    program.execute()
+    program.execute_until_halt(10_000_000)
 }
 
 pub fn part2(input_string: &str) -> Result<u64, String> {

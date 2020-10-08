@@ -54,6 +54,9 @@ impl ArmyGroup {
                     attack_type = words[13].to_string();
                     initiative = words[17].parse::<i32>().unwrap();
                 } else {
+                    if main_parts.len() != 3 {
+                        return Err("Invalid input".to_string());
+                    }
                     let before_parentheses: Vec<&str> = main_parts[0].split_whitespace().collect();
                     let after_parentheses: Vec<&str> = main_parts[2].split_whitespace().collect();
 

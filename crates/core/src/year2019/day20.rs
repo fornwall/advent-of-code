@@ -24,7 +24,7 @@ impl Maze {
     }
 
     fn parse(input: &str) -> Result<Self, String> {
-        let rows = input.lines().filter(|&line| !line.is_empty()).count();
+        let rows = input.lines().count();
         let cols = input
             .lines()
             .map(|line| line.len())
