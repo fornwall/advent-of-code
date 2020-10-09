@@ -7,6 +7,8 @@ fn check(program: &Program, x: i32, y: i32) -> Result<bool, String> {
     let output = program_copy.run_for_output()?;
     if output.is_empty() {
         return Err("No output produced".to_string());
+    } else if output.len() != 1 || !matches!(output[0], 0 | 1) {
+        return Err("Invalid output from program (expected only 0 or 1)".to_string());
     }
     Ok(output[0] == 1)
 }

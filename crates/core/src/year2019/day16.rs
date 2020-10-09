@@ -1,14 +1,18 @@
 use std::iter::once;
 
 fn parse_digits(input_string: &str) -> Result<Vec<i32>, String> {
-    input_string
+    let result = input_string
         .chars()
         .map(|b| {
             b.to_digit(10)
                 .map(|b| b as i32)
                 .ok_or_else(|| "Invalid input".to_string())
         })
-        .collect::<Result<Vec<_>, String>>()
+        .collect::<Result<Vec<_>, String>>()?;
+    if result.len() > 1000 {
+        return Err("Too big input".to_string());
+    }
+    Ok(result)
 }
 
 pub fn part1(input_string: &str) -> Result<String, String> {

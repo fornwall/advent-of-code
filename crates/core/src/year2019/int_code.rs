@@ -49,21 +49,32 @@ impl Program {
         self.halted
     }
 
-    pub fn run_for_register0(&mut self) -> Result<i64, String> {
+    pub fn run_until_halt_or_input(&mut self, max_instructions: u32) -> Result<(), String> {
         if self.requires_input_to != None {
             return Err("Cannot run program requiring input".to_string());
         } else if self.halted {
             return Err("Cannot run halted program".to_string());
         }
 
+        let mut current_instruction = 0;
         while !self.halted && self.requires_input_to == None {
             self.evaluate()?;
+
+            current_instruction += 1;
+            if current_instruction == max_instructions {
+                return Err(format!("Aborted after {} instructions", max_instructions));
+            }
         }
-        Ok(self.read_memory(0))
+        Ok(())
     }
 
     pub fn run_for_output(&mut self) -> Result<Vec<i64>, String> {
-        self.run_for_register0()?;
+        self.run_until_halt_or_input(1_000_000_000)?;
+        Ok(std::mem::replace(&mut self.output_values, Vec::new()))
+    }
+
+    pub fn run_for_output_limited(&mut self, max_instructions: u32) -> Result<Vec<i64>, String> {
+        self.run_until_halt_or_input(max_instructions)?;
         Ok(std::mem::replace(&mut self.output_values, Vec::new()))
     }
 
@@ -199,7 +210,7 @@ impl Program {
         Ok(())
     }
 
-    fn read_memory(&self, address: usize) -> i64 {
+    pub fn read_memory(&self, address: usize) -> i64 {
         *self.memory.get(&address).unwrap_or(&0_i64)
     }
 

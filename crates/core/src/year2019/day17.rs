@@ -10,9 +10,11 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 }
 
 fn part1_map(map: &str) -> Result<String, String> {
-    let map: Vec<&[u8]> = map.lines().map(|line| line.as_bytes()).collect();
+    let map: Vec<&[u8]> = map.trim().lines().map(|line| line.as_bytes()).collect();
     if map.len() < 3 {
         return Err("Too small input (less than three lines)".to_string());
+    } else if map.iter().filter(|row| row.len() != map[0].len()).count() > 0 {
+        return Err("Invalid map - not all rows are of equal length".to_string());
     }
 
     let mut alignment_parameters_sum = 0;
@@ -107,7 +109,14 @@ pub fn part2(input_string: &str) -> Result<String, String> {
     let map: String = output.iter().map(|&b| (b as u8) as char).collect();
     let map: Vec<&[u8]> = map.lines().map(|line| line.as_bytes()).collect();
     // Strip away last two lines with blank line and "Main:" prompt:
+    if map.len() < 5 {
+        return Err("Too small input (less than five lines)".to_string());
+    }
     let map = &map[0..(map.len() - 2)];
+
+    if map.iter().filter(|row| row.len() != map[0].len()).count() > 0 {
+        return Err("Invalid map - not all rows are of equal length".to_string());
+    }
 
     let mut robot_direction = Direction::Up;
     let mut robot_position: (i32, i32) = (0, 0);

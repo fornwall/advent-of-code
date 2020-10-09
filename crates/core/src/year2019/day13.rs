@@ -60,7 +60,7 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
 
     loop {
         let output = program.run_for_output()?;
-        output.chunks(3).for_each(|chunk| {
+        output.chunks_exact(3).for_each(|chunk| {
             let x = chunk[0];
             let y = chunk[1];
             let third = chunk[2];

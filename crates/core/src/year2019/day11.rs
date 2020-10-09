@@ -65,6 +65,10 @@ fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), C
             break;
         }
 
+        if output.len() != 2 {
+            return Err("Invalid output length".to_string());
+        }
+
         let painted_color = Color::from(output[0])?;
         let turn_direction = output[1];
 

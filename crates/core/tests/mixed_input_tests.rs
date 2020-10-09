@@ -31,13 +31,12 @@ fn mixed_input() -> Result<(), String> {
         }
     })
     .map_err(|_| "Unable to visit directories".to_string())?;
-    println!("{:?}", entries);
     for entry in entries {
         let entry_clone = entry.clone();
         let p = entry_clone.to_str().ok_or("Invalid utf-8 in entry")?;
         println!("{:?}", entry);
         let input_string = read_to_string(entry).map_err(|_| "Cannot read file")?;
-        for year in 2018..2019 {
+        for year in 2018..=2019 {
             for day in 1..=25 {
                 for part in 1..=2 {
                     println!("cargo run -q {} {} {} < {}", year, day, part, p);

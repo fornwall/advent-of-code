@@ -9,6 +9,8 @@ fn parse(input_string: &str) -> Result<Program, String> {
     Ok(program)
 }
 
+const MAX_INSTRUCTIONS: u64 = 1_000_000;
+
 pub fn part1(input_string: &str) -> Result<u64, String> {
     // The last three instructions are (as seen with program.pretty_print()):
     //
@@ -23,7 +25,6 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
 
     let mut program = parse(input_string)?;
     program.pretty_print("Initial program");
-    const MAX_INSTRUCTIONS: i32 = 1_000_000;
     let mut loop_count = 0;
     while program.instruction_pointer()? != 29 {
         program.execute_one_instruction()?;
@@ -40,10 +41,15 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut seen = HashSet::new();
     let mut last_value = 0;
     let mut program = parse(input_string)?;
-    const MAX_INSTRUCTIONS: u64 = 10_000_000_000;
     let mut loop_count = 0;
     loop {
-        if program.instruction_pointer()? == 29 {
+        let ip = program.instruction_pointer()?;
+        if ip == 14 {
+            if program.registers.values[program.instructions[13].c as usize] == 0 {
+                program.registers.values[program.instructions[6].c as usize] /= 256;
+                program.registers.values[program.instruction_pointer_index as usize] = 8;
+            }
+        } else if ip == 29 {
             let value = program.registers.values[program.instructions[28].a as usize];
             if seen.insert(value) {
                 last_value = value;

@@ -14,7 +14,8 @@ pub fn part1_patch(input_string: &str, patch: bool) -> Result<Word, String> {
         program.write_memory(2, 2);
     }
 
-    program.run_for_register0()
+    program.run_until_halt_or_input(10_000)?;
+    Ok(program.read_memory(0))
 }
 
 pub fn part2(input_string: &str) -> Result<Word, String> {
@@ -27,8 +28,8 @@ pub fn part2(input_string: &str) -> Result<Word, String> {
             let mut program = initial_program.clone();
             program.write_memory(1, noun);
             program.write_memory(2, verb);
-            let register0_value = program.run_for_register0()?;
-            if register0_value == DESIRED_OUTPUT {
+            program.run_until_halt_or_input(10_000)?;
+            if program.read_memory(0) == DESIRED_OUTPUT {
                 return Ok(100 * noun + verb);
             }
         }

@@ -17,6 +17,14 @@ pub fn parse_points(input_string: &str) -> Result<Vec<(usize, usize)>, String> {
         }
     }
 
+    let num_asteroides = input_string.chars().filter(|&c| c == '#').count();
+    if num_asteroides < 201 {
+        return Err(format!(
+            "Too few asteroids - expected at least 201, got {}",
+            num_asteroides
+        ));
+    }
+
     Ok(input_string
         .lines()
         .enumerate()
@@ -128,33 +136,6 @@ pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
 
 #[test]
 pub fn tests_part1() {
-    assert_eq!(
-        part1(
-            ".#..#
-.....
-#####
-....#
-...##"
-        ),
-        Ok(8)
-    );
-
-    assert_eq!(
-        part1(
-            "......#.#.
-#..#.#....
-..#######.
-.#.#.###..
-.#..#.....
-..#....#.#
-#..#....#.
-.##.#..###
-##...#..#.
-.#....####"
-        ),
-        Ok(33)
-    );
-
     assert_eq!(part1(include_str!("day10_input.txt")), Ok(319));
 }
 

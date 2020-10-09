@@ -14,7 +14,7 @@ pub struct Instruction {
 }
 
 pub struct Program {
-    instruction_pointer_index: u8,
+    pub instruction_pointer_index: u8,
     pub instructions: Vec<Instruction>,
     pub registers: Registers,
 }
