@@ -33,9 +33,9 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
     // as it is not connected to rest of the beam.
     let mut current_x = 0;
     let mut current_y = 0;
-    for (x, y) in (1..50).flat_map(|x| (0..50).map(move |y| (x, y))) {
+    for (y, x) in (1..50).flat_map(|x| (0..50).map(move |y| (x, y))) {
         let checked = check(&program, x, y)?;
-        if checked {
+        if checked && current_x == 0 {
             current_x = x;
             current_y = y;
         }
@@ -44,8 +44,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
     // Track the top right of the beam as long as square does not fit.
     while !check(&program, current_x - 99, current_y + 99)? {
         current_y += 1;
-        let checked = check(&program, current_x + 1, current_y)?;
-        if checked {
+        while check(&program, current_x + 1, current_y)? {
             current_x += 1;
         }
     }
