@@ -15,15 +15,30 @@ sessions_file = f"{Path.home()}/.advent-of-code.json"
 with open(sessions_file) as f:
     SESSIONS = json.load(f)
 
+if 'AOC_YEAR' in os.environ:
+    years = [int(os.environ['AOC_YEAR'])]
+else:
+    years = [2018, 2019]
+
+if 'AOC_DAY' in os.environ:
+    days = [int(os.environ['AOC_DAY'])]
+else:
+    days = range(1, 26)
+
+if 'AOC_PART' in os.environ:
+    parts = [int(os.environ['AOC_PART'])]
+else:
+    parts = range(1, 3)
+
 for session in SESSIONS:
     session_cookie = session["cookie"]
     session_description = session["description"]
     user = User(session_cookie)
-    for year in [2018, 2019]:
-        for day in range(1, 26):
+    for year in years:
+        for day in days:
             puzzle = Puzzle(year=year, day=day, user=user)
             input_data = puzzle.input_data
-            for part in range(1, 3):
+            for part in parts:
                 print(f"# Year {year}, Day {day}, part {part} - {session_description}")
                 forked_process = subprocess.run(
                     f"cargo run --release -q {year} {day} {part}",

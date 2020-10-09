@@ -1,17 +1,19 @@
 use super::elfcode::Program;
 use std::collections::HashSet;
 
+fn parse(input_string: &str) -> Result<Program, String> {
+    let program = Program::parse(input_string)?;
+    if program.instructions.len() != 31 {
+        return Err("Expected 31 instructions in program".to_string());
+    }
+    Ok(program)
+}
+
 pub fn part1(input_string: &str) -> Result<u64, String> {
-    // The last three instructions are:
+    // The last three instructions are (as seen with program.pretty_print()):
     //
-    // 28: eqrr 3 0 4
-    // 29: addr 4 1 1
-    // 30: seti 5 9 1
-    //
-    // or (since the instruction pointer is incremented before executing the next instruction):
-    //
-    // 28: r4 = (r0 == r3)
-    // 29: goto 30 + r4
+    // 28: r4 = (r3 == r0) ? 1 : 0
+    // 29: goto r4 + 30
     // 30: goto 6
     //
     // which exits on instruction 29 only if r4 is non-zero, which means r0 must equal r3.
@@ -19,7 +21,8 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
     // Since this is the only place in the program where register 0 is referenced, we can
     // set register 0 to the value it's first compared with here to exit as soon as possible.
 
-    let mut program = Program::parse(input_string)?;
+    let mut program = parse(input_string)?;
+    program.pretty_print("Initial program");
     const MAX_INSTRUCTIONS: i32 = 1_000_000;
     let mut loop_count = 0;
     while program.instruction_pointer()? != 29 {
@@ -36,7 +39,7 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
 pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut seen = HashSet::new();
     let mut last_value = 0;
-    let mut program = Program::parse(input_string)?;
+    let mut program = parse(input_string)?;
     const MAX_INSTRUCTIONS: u64 = 10_000_000_000;
     let mut loop_count = 0;
     loop {

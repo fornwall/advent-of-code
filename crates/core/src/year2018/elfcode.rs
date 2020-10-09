@@ -131,6 +131,23 @@ impl Program {
                 print!("r{} = ", instruction.c)
             }
 
+            // "When the instruction pointer is bound to a register, its value is written to that register
+            // just before each instruction is executed, and the value of that register is written back to
+            // the instruction pointer immediately after each instruction finishes execution. Afterward,
+            // move to the next instruction by adding one to the instruction pointer, even if the value
+            // in the instruction pointer was just updated by an instruction. (Because of this, instructions
+            // must effectively set the instruction pointer to the instruction before the one they want
+            // executed next.)" - Day 19 instructions
+            // So inline value if possible.
+            let mut append_to_value = if goto { 1 } else { 0 };
+            let mut appender = || {
+                let result = append_to_value;
+                append_to_value = 0;
+                result
+            };
+
+            let b_is_ignored = matches!(instruction.opcode, Opcode::Setr | Opcode::Seti);
+
             let a_is_value = matches!(
                 instruction.opcode,
                 Opcode::Seti | Opcode::Gtir | Opcode::Eqir
@@ -146,19 +163,20 @@ impl Program {
             );
 
             let a = if a_is_value {
-                format!("{}", instruction.a)
+                format!(
+                    "{}",
+                    instruction.a + if b_is_ignored { appender() } else { 0 }
+                )
             } else if instruction.a as u8 == self.instruction_pointer_index {
-                line.to_string()
+                format!("{}", line)
             } else {
                 format!("r{}", instruction.a)
             };
 
             let b = if b_is_value {
-                format!("{}", instruction.b)
+                format!("{}", instruction.b + appender() as u64)
             } else if instruction.b as u8 == self.instruction_pointer_index {
-                //b_is_value = true
-                // instruction.b = line
-                line.to_string()
+                format!("{}", (line + appender() as usize))
             } else {
                 format!("r{}", instruction.b)
             };
@@ -179,18 +197,17 @@ impl Program {
                     }
                 }
                 Opcode::Setr | Opcode::Seti => a.to_string(),
-                Opcode::Gtrr => {
-                    // (greater-than register/register) sets register C to 1 if register A is greater than register B. Otherwise, register C is set to 0.
-                    format!("({} > {}) ? 1 : 0", a, b)
-                }
-                Opcode::Eqrr => {
-                    // (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
-                    format!("({} == {}) ? 1 : 0", a, b)
-                }
-                _ => format!("Unhandled opcode at line: {}", line),
+                Opcode::Gtir | Opcode::Gtri | Opcode::Gtrr => format!("({} > {}) ? 1 : 0", a, b),
+                Opcode::Eqrr | Opcode::Eqri => format!("({} == {}) ? 1 : 0", a, b),
+                Opcode::Bani => format!("{} & {}", a, b),
+                Opcode::Bori => format!("{} | {}", a, b),
+                _ => format!(
+                    "Unhandled opcode at line {}: {:?}",
+                    line, instruction.opcode
+                ),
             };
             print!("{}", pretty);
-            if goto {
+            if append_to_value != 0 {
                 print!(" + 1");
             }
             println!();
