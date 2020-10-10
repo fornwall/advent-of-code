@@ -24,7 +24,7 @@ jobs:
     - name: Fuzz with AFL
       run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 make fuzz-afl
     - name: List crashes found by fuzzing
-      run: ls -lha ./crates/fuzzing-afl/target/fuzzing-output/crashes/
+      run: ls -lha ./crates/fuzzing-afl/target/crashes-to-upload/
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v2
       with:
