@@ -22,8 +22,17 @@ for YEAR_PATH in ../core/src/year*; do
 	done
 done
 
-cargo afl fuzz \
+set +e
+timeout 1200s cargo afl fuzz \
 	-t 50000 \
 	-i $INPUT \
 	-o $OUTPUT \
 	../../target/debug/advent-of-code-afl-fuzzing
+
+mkdir -p target/crashes-to-upload
+rm -Rf target/fuzzing-output/crashes/README.txt
+COUNT=0
+for file in target/fuzzing-output/crashes/*; do
+   (( COUNT +=1 ))
+   mv $file target/crashes-to-upload/crash_$COUNT.txt
+done

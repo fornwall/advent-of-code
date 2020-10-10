@@ -104,10 +104,12 @@ pub fn part1(input_string: &str) -> Result<i64, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
-    let max_steps = 200;
+    let max_steps = 1000;
     let mut tunnel = Tunnel::parse(input_string, max_steps)?;
 
-    let mut score_diffs = VecDeque::with_capacity(5);
+    const DESIRED_STALE_SCORE_DIFF: usize = 100;
+
+    let mut score_diffs = VecDeque::with_capacity(DESIRED_STALE_SCORE_DIFF);
     let mut previous_score = -1;
     for generation in 1..=max_steps {
         tunnel.evolve();
@@ -116,12 +118,13 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
         previous_score = tunnel.score();
         score_diffs.push_back(score_diff);
 
-        if score_diffs.len() > 5 {
+        if score_diffs.len() > DESIRED_STALE_SCORE_DIFF {
             score_diffs.pop_front();
-            if score_diffs.iter().filter(|&&e| e == score_diffs[0]).count() == 5 {
+            if score_diffs.iter().filter(|&&e| e == score_diffs[0]).count()
+                == DESIRED_STALE_SCORE_DIFF
+            {
                 let remaining_generations = 50_000_000_000_i64 - generation as i64;
-                let increase_per_generation = score_diff;
-                let final_score = tunnel.score() + remaining_generations * increase_per_generation;
+                let final_score = tunnel.score() + remaining_generations * score_diff;
                 return Ok(final_score);
             }
         }

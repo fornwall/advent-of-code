@@ -71,10 +71,14 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> Result<String
             && image[(start_of_current_char_x + 3) as usize] != b'1'
             && image[(start_of_current_char_x + 4) as usize] == b'1';
 
-        if empty_column || y_detected || x == width {
+        if empty_column || y_detected || x == width - 1 {
             let mut this_char_string = String::new();
             for y in 0..height {
-                let end_index = if x == width { x + 1 } else { x };
+                let end_index = x + if x == width - 1 && !empty_column {
+                    1
+                } else {
+                    0
+                };
                 for char_x in start_of_current_char_x..end_index {
                     this_char_string.push(if image[(char_x + width * y) as usize] == b'1' {
                         '█'
@@ -87,7 +91,6 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> Result<String
                 }
             }
             start_of_current_char_x = x + if y_detected { 0 } else { 1 };
-            //println!("###\n{}\n####", this_char_string);
             result.push(
                 recognize(&this_char_string)
                     .ok_or(format!("Unrecognized character: {}", this_char_string))?,
