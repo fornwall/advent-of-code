@@ -11,10 +11,12 @@ struct Claim {
 }
 
 impl Fabric {
-    fn new() -> Self {
-        Self {
+    fn from_claims(claims: &[Claim]) -> Self {
+        let mut result = Self {
             num_claims: vec![0; 1_000_000],
-        }
+        };
+        claims.iter().for_each(|claim| result.add_claim(claim));
+        result
     }
 
     fn add_claim(&mut self, claim: &Claim) {
@@ -74,20 +76,15 @@ fn parse_input(input_string: &str) -> Result<Vec<Claim>, String> {
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut fabric = Fabric::new();
-
-    let input = parse_input(input_string)?;
-    input.iter().for_each(|claim| fabric.add_claim(claim));
+    let claims = parse_input(input_string)?;
+    let fabric = Fabric::from_claims(&claims);
 
     Ok(fabric.inches_claimed_multiple())
 }
 
 pub fn part2(input_string: &str) -> Result<u32, String> {
-    let mut fabric = Fabric::new();
-
     let claims = parse_input(input_string)?;
-
-    claims.iter().for_each(|claim| fabric.add_claim(claim));
+    let fabric = Fabric::from_claims(&claims);
 
     let claim_without_overlap = claims
         .iter()

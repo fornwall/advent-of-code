@@ -11,7 +11,7 @@ rm -Rf $INPUT $OUTPUT
 mkdir -p $INPUT $OUTPUT
 # TODO: Do not overwrite between years
 COUNT=0
-for YEAR_PATH in ../core/src/year*; do
+for YEAR_PATH in ../core/src/year{2018,2019}; do
 	YEAR=${YEAR_PATH: -4}
 	for INPUT_FILE in ../core/src/year${YEAR}/day*_input.txt; do
 		COUNT=$(( COUNT + 1 ))
