@@ -11,9 +11,7 @@ fn main() -> Result<(), String> {
     };
 
     let args: Vec<String> = env::args().collect();
-    if args.len() != 4 {
-        usage();
-    } else {
+    if args.len() == 4 {
         let year = &args[1];
         let day = &args[2];
         let part = &args[3];
@@ -24,6 +22,8 @@ fn main() -> Result<(), String> {
 
         let solution = solve_raw(year, day, part, input.as_ref())?;
         println!("{}", solution);
+    } else {
+        usage();
     }
     Ok(())
 }

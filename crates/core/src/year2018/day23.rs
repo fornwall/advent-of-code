@@ -340,22 +340,22 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
                 let b = b.borrow();
 
                 // Sort by leaf with max possible overlaps
-                if a.max_possible != b.max_possible {
-                    // Put leaves with larger max_possible values at the end
-                    a.max_possible.cmp(&b.max_possible)
-                } else {
+                if a.max_possible == b.max_possible {
                     let av = a.bounds.volume();
                     let bv = b.bounds.volume();
 
-                    if av != bv {
-                        // Put larger volumes at the end
-                        av.cmp(&bv)
-                    } else {
+                    if av == bv {
                         // Put volumes closer to the origin at the end
                         let dist_a = a.bounds.distance_from(origin);
                         let dist_b = b.bounds.distance_from(origin);
                         dist_b.cmp(&dist_a)
+                    } else {
+                        // Put larger volumes at the end
+                        av.cmp(&bv)
                     }
+                } else {
+                    // Put leaves with larger max_possible values at the end
+                    a.max_possible.cmp(&b.max_possible)
                 }
             });
         }

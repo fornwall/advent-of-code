@@ -10,7 +10,7 @@ enum Direction {
 }
 
 impl Direction {
-    const fn delta(&self) -> (i32, i32) {
+    const fn delta(self) -> (i32, i32) {
         match self {
             Self::Up => (0, 1),
             Self::Right => (1, 0),

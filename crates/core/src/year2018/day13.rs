@@ -69,25 +69,13 @@ impl Cart {
 
     fn on_enter(&mut self, piece: &TrackPiece) {
         match *piece {
-            TrackPiece::TopRight => {
+            TrackPiece::TopRight | TrackPiece::BottomLeft => {
                 self.direction = Vector {
                     x: self.direction.y,
                     y: self.direction.x,
                 };
             }
-            TrackPiece::TopLeft => {
-                self.direction = Vector {
-                    x: -self.direction.y,
-                    y: -self.direction.x,
-                };
-            }
-            TrackPiece::BottomLeft => {
-                self.direction = Vector {
-                    x: self.direction.y,
-                    y: self.direction.x,
-                };
-            }
-            TrackPiece::BottomRight => {
+            TrackPiece::TopLeft | TrackPiece::BottomRight => {
                 self.direction = Vector {
                     x: -self.direction.y,
                     y: -self.direction.x,

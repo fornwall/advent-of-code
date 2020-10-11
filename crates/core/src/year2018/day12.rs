@@ -104,10 +104,10 @@ pub fn part1(input_string: &str) -> Result<i64, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<i64, String> {
+    const DESIRED_STALE_SCORE_DIFF: usize = 100;
+
     let max_steps = 1000;
     let mut tunnel = Tunnel::parse(input_string, max_steps)?;
-
-    const DESIRED_STALE_SCORE_DIFF: usize = 100;
 
     let mut score_diffs = VecDeque::with_capacity(DESIRED_STALE_SCORE_DIFF);
     let mut previous_score = -1;

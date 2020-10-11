@@ -16,7 +16,7 @@ impl Key {
         Self { value }
     }
 
-    const fn bit_mask(&self) -> KeyBitset {
+    const fn bit_mask(self) -> KeyBitset {
         1 << (self.value as usize - 'a' as usize)
     }
 }

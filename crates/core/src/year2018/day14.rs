@@ -2,6 +2,8 @@ fn run_until<F>(condition: F) -> Result<Vec<u8>, String>
 where
     F: Fn(&Vec<u8>) -> bool,
 {
+    const MAX_ITERATIONS: i32 = 100_000_000;
+
     let mut scores = vec![3_u8, 7_u8];
     let mut elf_positions = vec![0, 1];
 
@@ -27,7 +29,6 @@ where
         }
 
         loop_count += 1;
-        const MAX_ITERATIONS: i32 = 100_000_000;
         if loop_count > MAX_ITERATIONS {
             return Err(format!("Aborted after {} iterations", MAX_ITERATIONS));
         }

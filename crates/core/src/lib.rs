@@ -4,6 +4,7 @@ This crates provides solutions for Advent of Code problems.
 #![crate_name = "advent_of_code"]
 use std::fmt::Display;
 
+mod year2017;
 mod year2018;
 mod year2019;
 
@@ -34,6 +35,10 @@ fn to_stringer<T: Display>(
 /// ```
 pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String> {
     match (year, day, part) {
+        (2017, 1, 1) => to_stringer(year2017::day01::part1, input),
+        (2017, 1, 2) => to_stringer(year2017::day01::part2, input),
+        (2017, 2, 1) => to_stringer(year2017::day02::part1, input),
+        (2017, 2, 2) => to_stringer(year2017::day02::part2, input),
         (2018, 1, 1) => to_stringer(year2018::day01::part1, input),
         (2018, 1, 2) => to_stringer(year2018::day01::part2, input),
         (2018, 2, 1) => to_stringer(year2018::day02::part1, input),

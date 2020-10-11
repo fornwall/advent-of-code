@@ -34,12 +34,15 @@ fn other_equipment(region_type: RegionType, equipment: Equipment) -> Result<Equi
     // In wet regions, you can use the climbing gear or neither tool. You cannot use the torch (if it gets wet, you won't have a light source).
     // In narrow regions, you can use the torch or neither tool. You cannot use the climbing gear (it's too bulky to fit).
     Ok(match (region_type, equipment) {
-        (RegionType::Rocky, Equipment::ClimbingGear) => Equipment::Torch,
-        (RegionType::Rocky, Equipment::Torch) => Equipment::ClimbingGear,
-        (RegionType::Wet, Equipment::ClimbingGear) => Equipment::Neither,
-        (RegionType::Wet, Equipment::Neither) => Equipment::ClimbingGear,
-        (RegionType::Narrow, Equipment::Torch) => Equipment::Neither,
-        (RegionType::Narrow, Equipment::Neither) => Equipment::Torch,
+        (RegionType::Rocky, Equipment::ClimbingGear) | (RegionType::Narrow, Equipment::Neither) => {
+            Equipment::Torch
+        }
+        (RegionType::Rocky, Equipment::Torch) | (RegionType::Wet, Equipment::Neither) => {
+            Equipment::ClimbingGear
+        }
+        (RegionType::Wet, Equipment::ClimbingGear) | (RegionType::Narrow, Equipment::Torch) => {
+            Equipment::Neither
+        }
         _ => return Err("Invalid region type and equipment pair".to_string()),
     })
 }
