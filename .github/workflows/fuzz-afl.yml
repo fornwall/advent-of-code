@@ -29,3 +29,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         path: ./crates/fuzzing-afl/target/crashes-to-upload/
+        name: fuzzing-crashes-afl

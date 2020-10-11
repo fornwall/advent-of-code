@@ -36,10 +36,13 @@ impl Reactions {
         let mut reactions: Vec<(ChemicalAmount, Vec<ChemicalAmount>)> = Vec::new();
 
         for (line_index, line) in input_string.lines().enumerate() {
+            let error = || format!("Invalid input line {}", line_index + 1);
+
             // Example: "12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ".
             let parts: Vec<&str> = line.split("=>").collect();
-
-            let error = || format!("Invalid input line {}", line_index + 1);
+            if parts.len() != 2 {
+                return Err(error());
+            }
 
             let mut required_chemicals = Vec::new();
             for amount_and_name in parts[0].split(',') {
@@ -57,6 +60,9 @@ impl Reactions {
             }
 
             let to_parts: Vec<&str> = parts[1].split_whitespace().collect();
+            if to_parts.len() != 2 {
+                return Err(error());
+            }
             let produced_chemical_amount = to_parts[0]
                 .parse::<ChemicalAmount>()
                 .map_err(|_| format!("Invalid line {}: {}", line_index + 1, line))?;

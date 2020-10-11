@@ -23,7 +23,7 @@ for YEAR_PATH in ../core/src/year{2018,2019}; do
 done
 
 set +e
-timeout 1200s cargo afl fuzz \
+timeout 1800s cargo afl fuzz \
 	-t 50000 \
 	-i $INPUT \
 	-o $OUTPUT \
