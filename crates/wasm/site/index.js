@@ -9,12 +9,13 @@ async function run() {
 	const input_element = document.getElementById('input');
 	const output_element = document.getElementById('output');
 
-	[day_element, part_element, input_element].forEach(element => element.addEventListener('input', function() {
+	[day_element, part_element, input_element].forEach(element => element.addEventListener('input', () => {
 	  output_element.textContent = '';
 	  output_element.classList.remove('blink', 'error');
 	}, false));
 
-	document.getElementById("run_button").addEventListener("click", function() {
+	document.querySelector("form").addEventListener("submit", (event) => {
+	   event.preventDefault();
 	   const year = year_element.options[year_element.selectedIndex].value;
 	   const day = day_element.options[day_element.selectedIndex].value;
 	   const part = part_element.options[part_element.selectedIndex].value;
@@ -33,6 +34,22 @@ async function run() {
 	   output_element.scrollIntoView();
 	   output_element.classList.add('blink');
 	});
+
+	if (window.showOpenFilePicker) {
+		const readFileButton = document.getElementById("read_file");
+		readFileButton.classList.remove("hidden");
+		readFileButton.addEventListener("click", async () => {
+			try {
+				let fileHandle;
+				[fileHandle] = await window.showOpenFilePicker();
+				const file = await fileHandle.getFile();
+				const contents = await file.text();
+				document.getElementById('input').value = contents;
+			} catch (e) {
+				// Ignore user aborting request.
+			}
+		});
+	}
 }
 
 run();

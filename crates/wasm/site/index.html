@@ -1,27 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>Advent of Code 2019</title>
-    <link rel="stylesheet" href="https://unpkg.com/picnic">
+    <meta name="description" content="Advent of Code solutions in Rust compiled to WebAssembly"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://unpkg.com/picnic"/>
+    <link rel="preload" href="index.js" as="script"/>
     <style>
         body { margin: 20px; }
         .blink { animation: blinker 0.5s linear 3; }
         .error { color: red; }
         @keyframes blinker { 50% { opacity: 0; } }
+        .buttons { text-align: right; }
+        .hidden { display: none; }
     </style>
   </head>
   <body>
 <a href="https://github.com/fornwall/advent-of-code"><img src="forkme.svg"
 style="position:absolute;top:0;right:0;" alt="Fork me on GitHub"></a>
-   <div class="content">
+   <form class="content">
     <h1>Advent of Code</h1>
-    <p>This page runs solutions for <a href="https://adventofcode.com/">Advent of Code</a> using WebAssembly.</p>
+    <p>This page runs solutions for <a href="https://adventofcode.com/">Advent of Code</a> using WebAssembly compiled from Rust.</p>
 
     <h2><label for="year">Year</label></h2>
     <select id="year">
       <option value="2019">2019</option>
       <option value="2018">2018</option>
+      <option value="2017">2017</option>
     </select>
 
     <h2><label for="day">Day</label></h2>
@@ -61,12 +67,15 @@ style="position:absolute;top:0;right:0;" alt="Fork me on GitHub"></a>
 
     <h2><label for="input">Input</label></h2>
     <textarea id="input" rows="5"></textarea>
-    <button id="run_button">Run</button>
+    <div class="buttons">
+      <button id="read_file" class="hidden">Read file</button>
+      <input type="submit" value="Run"/>
+    </div>
 
     <h2>Output</h2>
     <pre id="output" />
 
     <script type="module" src="index.js"></script>
-   </div>
+   </form>
   </body>
 </html>
