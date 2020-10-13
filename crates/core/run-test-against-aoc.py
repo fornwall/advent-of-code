@@ -40,21 +40,29 @@ for session in SESSIONS:
             input_data = puzzle.input_data
             for part in parts:
                 print(f"# Year {year}, Day {day}, part {part} - {session_description}")
-                forked_process = subprocess.run(
-                    f"cargo run --release -q {year} {day} {part}",
-                    capture_output=True,
-                    shell=True,
-                    check=True,
-                    input=input_data,
-                    encoding="utf-8",
-                )
-                result = forked_process.stdout.strip()
+                fork_command = f"cargo run --release -q {year} {day} {part}"
+                if "AOC_CLOUDFLARE" in os.environ:
+                    fork_command = f"../../post-input-cloudflare {year} {day} {part}"
+                elif "AOC_NETLIFY" in os.environ:
+                    fork_command = f"../../post-input-netlify {year} {day} {part}"
                 try:
-                    existing_answer = puzzle.answer_a if part == 1 else puzzle.answer_b
-                    if existing_answer != result:
-                        sys.exit(f"Incorrect! Expected={puzzle.answer_a}, got {result}")
-                except Exception:
-                    if part == 1:
-                        puzzle.answer_a = result
-                    else:
-                        puzzle.answer_b = result
+                    forked_process = subprocess.run(
+                        fork_command,
+                        capture_output=True,
+                        shell=True,
+                        check=True,
+                        input=input_data,
+                        encoding="utf-8",
+                    )
+                    result = forked_process.stdout.strip()
+                    try:
+                        existing_answer = puzzle.answer_a if part == 1 else puzzle.answer_b
+                        if existing_answer != result:
+                            sys.exit(f"Incorrect! Expected={puzzle.answer_a}, got {result}")
+                    except Exception:
+                        if part == 1:
+                            puzzle.answer_a = result
+                        else:
+                            puzzle.answer_b = result
+                except subprocess.CalledProcessError:
+                    print("Failed running")

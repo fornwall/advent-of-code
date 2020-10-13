@@ -1,101 +1,101 @@
-use std::collections::VecDeque;
+type GridValue = i32;
 
-const fn cell_power(x: usize, y: usize, serial_number: i64) -> i64 {
+/// A summed-area table is a data structure for quickly generating sum of values in a rectangular grid.
+/// See https://en.wikipedia.org/wiki/Summed-area_table
+/// Note that x and y coordinates are 1-based in method parameters.
+struct SummedAreaTable {
+    storage: [GridValue; (Self::SIZE * Self::SIZE) as usize],
+}
+
+impl SummedAreaTable {
+    const SIZE: u32 = 300;
+
+    fn new(serial_number: GridValue) -> Self {
+        let mut result = Self {
+            storage: [0; (Self::SIZE * Self::SIZE) as usize],
+        };
+        for y in 1..=Self::SIZE {
+            let mut row_value: GridValue = 0;
+            for x in 1..=Self::SIZE {
+                row_value += cell_power(x, y, serial_number);
+                let storage_index = x - 1 + (y - 1) * Self::SIZE;
+                result.storage[storage_index as usize] = row_value + result.at(x, y - 1);
+            }
+        }
+        result
+    }
+
+    fn at(&self, x: u32, y: u32) -> GridValue {
+        if x < 1 || y < 1 {
+            return 0;
+        }
+        self.storage
+            .get((x - 1 + (y - 1) * Self::SIZE) as usize)
+            .copied()
+            .unwrap_or(0)
+    }
+
+    fn square_power(&self, x: u32, y: u32, size: u32) -> GridValue {
+        self.at(x - 1, y - 1) + self.at(x + size - 1, y + size - 1)
+            - self.at(x + size - 1, y - 1)
+            - self.at(x - 1, y + size - 1)
+    }
+}
+
+const fn cell_power(x: u32, y: u32, serial_number: GridValue) -> GridValue {
     // Find the fuel cell's rack ID, which is its X coordinate plus 10.
     let rack_id = x + 10;
     // Begin with a power level of the rack ID times the Y coordinate.
-    let mut cell_power: i64 = (rack_id * y) as i64;
+    let mut cell_power: GridValue = (rack_id * y) as GridValue;
     // Increase the power level by the value of the grid serial number (your puzzle input).
     cell_power += serial_number;
     // Set the power level to itself multiplied by the rack ID.
-    cell_power *= rack_id as i64;
+    cell_power *= rack_id as GridValue;
     // Keep only the hundreds digit of the power level (so 12345 becomes 3; numbers with no hundreds digit become 0).
     cell_power = (cell_power / 100) % 10;
     // Subtract 5 from the power level.
     cell_power - 5
 }
 
-fn parse_input(input_string: &str) -> Result<i64, String> {
-    input_string
-        .parse::<i64>()
-        .map_err(|error| format!("Invalid input: {}", error.to_string()))
-}
+fn solution(input_string: &str, part1: bool) -> Result<String, String> {
+    let serial_number = input_string
+        .parse::<GridValue>()
+        .map_err(|error| format!("Invalid input: {}", error.to_string()))?;
+    let table = SummedAreaTable::new(serial_number);
 
-pub fn part1(input_string: &str) -> Result<String, String> {
-    let serial_number = parse_input(input_string)?;
-
-    let mut optimal_power = 0_i64;
-    let mut optimal_point = (0, 0);
-
-    for x in 1..=298 {
-        for y in 1..=298 {
-            let mut square_power = 0;
-
-            for i in 0..=2 {
-                for j in 0..=2 {
-                    let x_coordinate = x + i;
-                    let y_coordinate = y + j;
-                    square_power += cell_power(x_coordinate, y_coordinate, serial_number);
-                }
-            }
-
-            if square_power > optimal_power {
-                optimal_power = square_power;
-                optimal_point = (x, y);
-            }
-        }
-    }
-
-    Ok(format!("{},{}", optimal_point.0, optimal_point.1))
-}
-
-pub fn part2(input_string: &str) -> Result<String, String> {
-    let serial_number = parse_input(input_string)?;
-
-    let mut optimal_power = 0_i64;
+    let mut optimal_power: GridValue = 0;
     let mut optimal_square_width = 0;
     let mut optimal_point = (0, 0);
 
-    for left_column in 0..300_usize {
-        let mut row_sums = [0; 300];
-        for right_column in left_column..300 {
-            let square_width = right_column - left_column + 1;
-
-            for (row, value) in row_sums.iter_mut().enumerate() {
-                // From zero based to 1 based:
-                *value += cell_power(right_column + 1, row + 1, serial_number);
-            }
-
-            let mut deque = VecDeque::with_capacity(square_width as usize);
-            let mut square_power = 0;
-
-            for &row_sum in row_sums.iter().take(square_width - 1) {
-                deque.push_front(row_sum);
-                square_power += row_sum;
-            }
-
-            for (end_row, &row_value) in row_sums.iter().enumerate().skip(square_width - 1) {
-                // for end_row in square_width - 1..300 {
-                deque.push_front(row_value);
-                square_power += row_value;
-
+    for square_width in if part1 { 3..=3 } else { 1..=300 } {
+        for x in 1..=(SummedAreaTable::SIZE - square_width) {
+            for y in 1..=(SummedAreaTable::SIZE - square_width) {
+                let square_power = table.square_power(x, y, square_width);
                 if square_power > optimal_power {
-                    optimal_point = (left_column + 1, end_row + 1 - (square_width - 1));
                     optimal_square_width = square_width;
                     optimal_power = square_power;
+                    optimal_point = (x, y);
                 }
-
-                square_power -= deque
-                    .pop_back()
-                    .ok_or("Internal error - cannot pop from back")?
             }
         }
     }
 
-    Ok(format!(
-        "{},{},{}",
-        optimal_point.0, optimal_point.1, optimal_square_width
-    ))
+    Ok(if part1 {
+        format!("{},{}", optimal_point.0, optimal_point.1)
+    } else {
+        format!(
+            "{},{},{}",
+            optimal_point.0, optimal_point.1, optimal_square_width
+        )
+    })
+}
+
+pub fn part1(input_string: &str) -> Result<String, String> {
+    solution(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> Result<String, String> {
+    solution(input_string, false)
 }
 
 #[test]

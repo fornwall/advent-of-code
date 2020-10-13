@@ -37,11 +37,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
-    part2_sized(input_string, PIXELS_WIDE, PIXELS_TALL)
-}
-
-pub fn part2_sized(input_string: &str, width: u32, height: u32) -> Result<String, String> {
-    let layer_size = (width * height) as usize;
+    let layer_size = (PIXELS_WIDE * PIXELS_TALL) as usize;
     let mut image = vec![b'2'; layer_size];
 
     input_string
@@ -60,10 +56,10 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> Result<String
 
     let mut result = String::new();
     let mut start_of_current_char_x = 0;
-    for x in 0..width {
+    for x in 0..PIXELS_WIDE {
         let mut empty_column = true;
-        for y in 0..height {
-            if image[(x + width * y) as usize] == b'1' {
+        for y in 0..PIXELS_TALL {
+            if image[(x + PIXELS_WIDE * y) as usize] == b'1' {
                 empty_column = false;
             }
         }
@@ -76,22 +72,22 @@ pub fn part2_sized(input_string: &str, width: u32, height: u32) -> Result<String
             && image[(start_of_current_char_x + 3) as usize] != b'1'
             && image[(start_of_current_char_x + 4) as usize] == b'1';
 
-        if empty_column || y_detected || x == width - 1 {
+        if empty_column || y_detected || x == PIXELS_WIDE - 1 {
             let mut this_char_string = String::new();
-            for y in 0..height {
-                let end_index = x + if x == width - 1 && !empty_column {
+            for y in 0..PIXELS_TALL {
+                let end_index = x + if x == PIXELS_WIDE - 1 && !empty_column {
                     1
                 } else {
                     0
                 };
                 for char_x in start_of_current_char_x..end_index {
-                    this_char_string.push(if image[(char_x + width * y) as usize] == b'1' {
+                    this_char_string.push(if image[(char_x + PIXELS_WIDE * y) as usize] == b'1' {
                         '█'
                     } else {
                         ' '
                     });
                 }
-                if y != height - 1 {
+                if y != PIXELS_TALL - 1 {
                     this_char_string.push('\n');
                 }
             }

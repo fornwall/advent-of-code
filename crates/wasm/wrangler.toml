@@ -1,0 +1,6 @@
+name = "my-app"
+type = "rust"
+account_id = "c494646a87f38a82ce35ea24edaada52"
+workers_dev = true
+route = ""
+zone_id = ""

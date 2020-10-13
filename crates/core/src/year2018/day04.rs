@@ -43,56 +43,7 @@ fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
         .collect()
 }
 
-pub fn part1(input_string: &str) -> Result<u64, String> {
-    let entries = parse_input(input_string)?;
-
-    let mut sleepers = HashMap::new();
-    let mut current_guard = 0;
-    let mut start_minute = 0;
-
-    for log_entry in entries.iter() {
-        match log_entry.entry {
-            EntryType::BeginShift { guard_id } => current_guard = guard_id,
-            EntryType::FallsAsleep => start_minute = log_entry.minute,
-            EntryType::WakesUp => {
-                let duration = log_entry.minute - start_minute;
-                *sleepers.entry(current_guard).or_insert(0) += duration;
-            }
-        }
-    }
-
-    let most_sleepy_guard = *sleepers
-        .iter()
-        .max_by_key(|(_key, value)| *value)
-        .ok_or("Internal error: No most sleep guard")?
-        .0;
-
-    let mut sleep_record = vec![0; 61];
-    for log_entry in entries.iter() {
-        match log_entry.entry {
-            EntryType::BeginShift { guard_id } => current_guard = guard_id,
-            EntryType::FallsAsleep => start_minute = log_entry.minute,
-            EntryType::WakesUp => {
-                if current_guard == most_sleepy_guard {
-                    for minute in start_minute..log_entry.minute {
-                        sleep_record[minute as usize] += 1;
-                    }
-                }
-            }
-        }
-    }
-
-    let most_sleepy_minute = sleep_record
-        .iter()
-        .enumerate()
-        .max_by_key(|(_minute, count)| *count)
-        .ok_or("Internal error: No most sleepy minute")?
-        .0 as u64;
-
-    Ok(u64::from(most_sleepy_guard) * most_sleepy_minute)
-}
-
-pub fn part2(input_string: &str) -> Result<u64, String> {
+fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let entries = parse_input(input_string)?;
 
     let mut sleepers = HashMap::new();
@@ -112,25 +63,46 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
         }
     }
 
-    let mut highest_sleep_count = -1;
-    let mut sleepiest_guard_id = 0;
-    let mut most_sleepy_minute = 0;
-    for (&guard_id, sleep_record) in sleepers.iter() {
-        let (sleepy_minute, &sleep_count) = sleep_record
+    if part1 {
+        let (&most_sleepy_guard, sleep_record) = sleepers
+            .iter()
+            .max_by_key(|(_key, value)| value.iter().sum::<i32>())
+            .ok_or("Internal error: No most sleep guard")?;
+        let most_sleepy_minute = sleep_record
             .iter()
             .enumerate()
             .max_by_key(|(_minute, count)| *count)
-            .ok_or("No sleep record for guard")?;
-        if sleep_count > highest_sleep_count {
-            highest_sleep_count = sleep_count;
-            sleepiest_guard_id = guard_id;
-            most_sleepy_minute = sleepy_minute;
-        }
-    }
+            .ok_or("Internal error: No most sleepy minute")?
+            .0 as u32;
 
-    Ok(u64::from(sleepiest_guard_id) * most_sleepy_minute as u64)
+        Ok(most_sleepy_guard * most_sleepy_minute)
+    } else {
+        let mut highest_sleep_count = -1;
+        let mut sleepiest_guard_id = 0;
+        let mut most_sleepy_minute = 0;
+        for (&guard_id, sleep_record) in sleepers.iter() {
+            let (sleepy_minute, &sleep_count) = sleep_record
+                .iter()
+                .enumerate()
+                .max_by_key(|(_minute, count)| *count)
+                .ok_or("No sleep record for guard")?;
+            if sleep_count > highest_sleep_count {
+                highest_sleep_count = sleep_count;
+                sleepiest_guard_id = guard_id;
+                most_sleepy_minute = sleepy_minute;
+            }
+        }
+        Ok(sleepiest_guard_id * most_sleepy_minute as u32)
+    }
 }
 
+pub fn part1(input_string: &str) -> Result<u32, String> {
+    solution(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> Result<u32, String> {
+    solution(input_string, false)
+}
 #[test]
 fn tests_part1() {
     assert_eq!(

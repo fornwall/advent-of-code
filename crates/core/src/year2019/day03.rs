@@ -1,6 +1,5 @@
 use std::cmp;
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::ops;
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone)]
@@ -78,25 +77,7 @@ fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
     Ok((lines[0], lines[1]))
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    let (first_line, second_line) = input_lines(input_string)?;
-    let mut first_wire_points = HashSet::new();
-
-    parse_wire_points(first_line, |point, _| {
-        first_wire_points.insert(point);
-    })?;
-
-    let mut closest_distance = std::u32::MAX;
-    parse_wire_points(second_line, |point, _| {
-        if first_wire_points.contains(&point) {
-            closest_distance = cmp::min(closest_distance, point.distance_from_origin());
-        }
-    })?;
-
-    Ok(closest_distance)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
+fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let (first_line, second_line) = input_lines(input_string)?;
     let mut first_wire_points = HashMap::new();
 
@@ -104,14 +85,29 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
         first_wire_points.entry(point).or_insert(step);
     })?;
 
-    let mut fewest_steps = std::u32::MAX;
+    let mut best = std::u32::MAX;
     parse_wire_points(second_line, |point, step| {
         if let Some(&value) = first_wire_points.get(&point) {
-            fewest_steps = cmp::min(fewest_steps, step + value);
+            best = cmp::min(
+                best,
+                if part1 {
+                    point.distance_from_origin()
+                } else {
+                    step + value
+                },
+            );
         }
     })?;
 
-    Ok(fewest_steps)
+    Ok(best)
+}
+
+pub fn part1(input_string: &str) -> Result<u32, String> {
+    solution(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> Result<u32, String> {
+    solution(input_string, false)
 }
 
 #[test]

@@ -4,6 +4,7 @@ on: push
 
 env:
   DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
+  SERVER_DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-server
 
 jobs:
   check-git-ignore:
@@ -127,7 +128,7 @@ jobs:
     - name: Push changes to git
       run: git push
 
-  release-docker-image:
+  release-core-docker-image:
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
@@ -147,6 +148,30 @@ jobs:
         docker build --tag ${IMAGE} crates/core
         docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
         docker push ${DOCKER_IMAGE_NAME}
+
+  release-server-docker-image:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - name: Install bump2version
+      run: pip install bump2version
+    - name: Login to docker hub
+      run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
+      env:
+        DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+    - name: Build and push docker image
+      run: |
+        NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
+        IMAGE=${SERVER_DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
+        cd crates/server
+        cp -Rf ../core core
+        perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
+        docker build --tag ${IMAGE} .
+        docker tag ${IMAGE} ${SERVER_DOCKER_IMAGE_NAME}:latest
+        docker push ${SERVER_DOCKER_IMAGE_NAME}
 
   release-npm-packages:
     needs: bump-version

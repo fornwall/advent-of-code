@@ -10,7 +10,7 @@ fn parse_input(input_string: &str) -> Result<(i32, i32), String> {
     Ok((from, to))
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
+fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let (from, to) = parse_input(input_string)?;
 
     let mut meeting_criteria_count: u32 = 0;
@@ -19,37 +19,6 @@ pub fn part1(input_string: &str) -> Result<u32, String> {
         let mut last_digit = 10;
         let mut two_digits_adjacent = false;
 
-        while divider <= 100_000 {
-            let digit = (i / divider) % 10;
-            match digit.cmp(&last_digit) {
-                Ordering::Greater => {
-                    continue 'outer;
-                }
-                Ordering::Equal => {
-                    two_digits_adjacent = true;
-                }
-                _ => {}
-            }
-
-            last_digit = digit;
-            divider *= 10;
-        }
-        if two_digits_adjacent {
-            meeting_criteria_count += 1;
-        }
-    }
-
-    Ok(meeting_criteria_count)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    let (from, to) = parse_input(input_string)?;
-
-    let mut meeting_criteria_count: u32 = 0;
-    'outer: for i in from..=to {
-        let mut divider = 1;
-        let mut last_digit = 10;
-        let mut two_digits_adjacent = false;
         let mut digits_adjacent_streak = 1;
 
         while divider <= 100_000 {
@@ -59,7 +28,11 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
                     continue 'outer;
                 }
                 Ordering::Equal => {
-                    digits_adjacent_streak += 1;
+                    if part1 {
+                        two_digits_adjacent = true;
+                    } else {
+                        digits_adjacent_streak += 1;
+                    }
                 }
                 Ordering::Less => {
                     if digits_adjacent_streak == 2 {
@@ -83,6 +56,14 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
     }
 
     Ok(meeting_criteria_count)
+}
+
+pub fn part1(input_string: &str) -> Result<u32, String> {
+    solution(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> Result<u32, String> {
+    solution(input_string, false)
 }
 
 #[test]

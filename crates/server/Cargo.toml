@@ -1,0 +1,16 @@
+[package]
+name = "advent-of-code-server"
+version = "2019.12.98"
+keywords = ["advent-of-code", "rust", "warp"]
+categories = ["algorithms", "rust-patterns"]
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+repository = "https://github.com/fornwall/advent-of-code"
+description = "Solutions to Advent of Code written in Rust"
+license = "MIT"
+readme = "../../README.md"
+edition = "2018"
+
+[dependencies]
+advent-of-code = { path = "../core" }
+tokio = { version = "0.2", features = ["full"] }
+warp = "0.2"

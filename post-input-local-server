@@ -2,8 +2,8 @@
 set -e -u
 
 usage() {
-	echo "usage:\n    ./post-solution <year> <day> <part> # reads input from stdin"
-	echo "example:\n    ./post-solution 2019 23 1 < crates/core/src/year2019/day23_input.txt"
+	echo "usage:\n    ./post-input-local-server <year> <day> <part> # reads input from stdin"
+	echo "example:\n    ./post-input-local-server 2019 23 1 < crates/core/src/year2019/day23_input.txt"
 	exit 1
 }
 
@@ -25,6 +25,7 @@ elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
 	exit 1
 fi
 
-curl -w '\n'\
+curl -D- --fail \
+	-w '\n'\
 	--data-binary @- \
-	"https://aoc.fornwall.net/.netlify/functions/solve?year=$YEAR&day=$DAY&part=$PART"
+	"http://localhost:8080/$YEAR/$DAY/$PART"

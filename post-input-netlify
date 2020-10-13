@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e -u
+
+usage() {
+	echo "usage:\n    ./post-input-netlify <year> <day> <part> # reads input from stdin"
+	echo "example:\n    ./post-input-netlify 2019 23 1 < crates/core/src/year2019/day23_input.txt"
+	exit 1
+}
+
+if [ "$#" != 3 ]; then
+	usage
+fi
+
+YEAR=$1
+DAY=$2
+PART=$3
+
+if [ -z "$YEAR" ]; then
+	usage
+elif [ "$DAY" -ge 26 ] && [ "$PART" -le 0 ]; then
+	echo "Invalid day: $DAY - only 1-25 is allowed"
+	exit 1
+elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
+	echo "Invalid part: $PART - only 1 or 2 is allowed"
+	exit 1
+fi
+
+curl -w '\n'\
+	--data-binary @- \
+	"https://aoc.fornwall.net/.netlify/functions/solve?year=$YEAR&day=$DAY&part=$PART"

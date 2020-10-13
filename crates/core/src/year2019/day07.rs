@@ -2,38 +2,17 @@ use super::int_code::Program;
 use super::permutation::all_permutations;
 use std::cell::RefCell;
 
-pub fn part1(input_string: &str) -> Result<String, String> {
+fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     let program = Program::parse(input_string)?;
-    let mut phase_settings = vec![0, 1, 2, 3, 4];
+    let mut phase_settings = if part1 {
+        vec![0, 1, 2, 3, 4]
+    } else {
+        vec![5, 6, 7, 8, 9]
+    };
     let mut strongest_signal = 0;
 
     all_permutations(&mut phase_settings, &mut |permutation: &Vec<i64>| {
-        let mut signal = 0;
-        for &phase in permutation.iter() {
-            let mut amplifier_program = program.clone();
-
-            amplifier_program.input(phase);
-            amplifier_program.input(signal);
-
-            let output = amplifier_program.run_for_output_limited(10_000)?;
-            let last_output = output.last().ok_or("No output produced")?;
-            signal = *last_output;
-        }
-
-        strongest_signal = std::cmp::max(strongest_signal, signal);
-        Ok(())
-    })?;
-
-    Ok(strongest_signal.to_string())
-}
-
-pub fn part2(input_string: &str) -> Result<String, String> {
-    let program = Program::parse(input_string)?;
-    let mut phase_settings = vec![5, 6, 7, 8, 9];
-    let mut strongest_signal = 0;
-
-    all_permutations(&mut phase_settings, &mut |permutation: &Vec<i64>| {
-        let mut amplifier_programs = Vec::new();
+        let mut amplifier_programs = Vec::with_capacity(5);
         for &phase in permutation.iter() {
             let mut new_program = program.clone();
             new_program.input(phase);
@@ -52,7 +31,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
                     if let Some(&value) = output.last() {
                         last_signal_output = value;
                     }
-                    if current_program.is_halted() {
+                    if part1 || current_program.is_halted() {
                         break 'outer;
                     }
                 }
@@ -69,6 +48,14 @@ pub fn part2(input_string: &str) -> Result<String, String> {
     })?;
 
     Ok(strongest_signal.to_string())
+}
+
+pub fn part1(input_string: &str) -> Result<String, String> {
+    solution(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> Result<String, String> {
+    solution(input_string, false)
 }
 
 #[test]

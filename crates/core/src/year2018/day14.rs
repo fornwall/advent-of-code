@@ -5,28 +5,32 @@ where
     const MAX_ITERATIONS: i32 = 100_000_000;
 
     let mut scores = vec![3_u8, 7_u8];
-    let mut elf_positions = vec![0, 1];
+    let push_score = |scores: &mut Vec<u8>, score: u8| {
+        scores.push(score);
+        condition(scores)
+    };
+
+    let mut elf_positions = (0_u32, 1_u32);
 
     let mut loop_count = 0;
     loop {
-        let current_recipes_score = scores[elf_positions[0]] + scores[elf_positions[1]];
+        let current_recipes_score =
+            scores[elf_positions.0 as usize] + scores[elf_positions.1 as usize];
 
-        let scores_to_push = if current_recipes_score < 10 {
-            vec![current_recipes_score]
+        let done = if current_recipes_score < 10 {
+            push_score(&mut scores, current_recipes_score)
         } else {
-            vec![current_recipes_score / 10, current_recipes_score % 10]
+            push_score(&mut scores, current_recipes_score / 10)
+                || push_score(&mut scores, current_recipes_score % 10)
         };
-
-        for score in scores_to_push {
-            scores.push(score);
-            if condition(&scores) {
-                return Ok(scores);
-            }
+        if done {
+            return Ok(scores);
         }
 
-        for position in elf_positions.iter_mut() {
-            *position = (*position + 1 + scores[*position as usize] as usize) % scores.len();
-        }
+        elf_positions.0 =
+            (elf_positions.0 + 1 + scores[elf_positions.0 as usize] as u32) % scores.len() as u32;
+        elf_positions.1 =
+            (elf_positions.1 + 1 + scores[elf_positions.1 as usize] as u32) % scores.len() as u32;
 
         loop_count += 1;
         if loop_count > MAX_ITERATIONS {
