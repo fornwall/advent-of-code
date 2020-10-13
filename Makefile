@@ -23,6 +23,7 @@ site:
 		wasm-pack build $(wasm_pack_profile) --target web --out-dir target/web && \
 		ln -f site/index.html target/web/index.html && \
 		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > target/web/picnic-6.5.3.min.css && \
+		curl https://adventofcode.com/favicon.ico > target/web/favicon.ico && \
 		ln -f site/index.js target/web/index.js && \
 		ln -f site/forkme.svg target/web/forkme.svg
 

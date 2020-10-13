@@ -3,11 +3,13 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>Advent of Code</title>
+	<title>Advent of Code solutions</title>
 	<meta name="description" content="Advent of Code solutions in Rust compiled to WebAssembly"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link rel="preload" href="/index.js" as="script" crossorigin="anonymous"/>
+	<link rel="preload" href="/advent_of_code_wasm.js" as="script" crossorigin="anonymous"/>
+	<link rel="preload" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous"/>
 	<link rel="stylesheet" href="/picnic-6.5.3.min.css"/>
-	<link rel="preload" href="index.js" as="script"/>
 	<style>
 		body { padding: 20px; }
 		.blink { animation: blinker 0.5s linear 3; }
@@ -24,7 +26,7 @@
 
 	<form class="content">
 
-	<h1>Advent of Code</h1>
+	<h1>Advent of Code solutions</h1>
 	<p>This page runs solutions for <a href="https://adventofcode.com/">Advent of Code</a> problems using WebAssembly compiled from Rust.</p>
 
 	<h2><label for="year">Year</label> - <label for="day">Day</label> - <label for="part">Part</label></h2>
