@@ -14,7 +14,3 @@ edition = "2018"
 
 [lib]
 name = "advent_of_code"
-
-[dependencies]
-bytecount = "0.*"
-mod_exp = "1.*"

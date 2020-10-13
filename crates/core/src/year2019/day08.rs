@@ -1,6 +1,5 @@
 use super::character_recognition::recognize;
 use std::str;
-extern crate bytecount;
 
 const PIXELS_WIDE: u32 = 25;
 const PIXELS_TALL: u32 = 6;
@@ -18,14 +17,20 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         .as_bytes()
         .chunks(LAYER_SIZE)
         .map(|slice| {
-            let num_zeros = bytecount::count(slice, b'0');
+            let num_zeros = slice
+                .iter()
+                .fold(0, |acc, &b| acc + if b == b'0' { 1 } else { 0 });
             (num_zeros, slice)
         })
         .min_by_key(|(num_zeros, _)| *num_zeros)
         .ok_or("Nothing found by min_by_key()")?;
 
-    let count_1 = bytecount::count(slice, b'1');
-    let count_2 = bytecount::count(slice, b'2');
+    let (count_1, count_2) = slice.iter().fold((0, 0), |acc, &b| {
+        (
+            acc.0 + if b == b'1' { 1 } else { 0 },
+            acc.1 + if b == b'2' { 1 } else { 0 },
+        )
+    });
     let result = count_1 * count_2;
 
     Ok(result)
