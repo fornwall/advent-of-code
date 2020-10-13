@@ -10,6 +10,12 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
                     error.to_string()
                 )
             })?;
+            if module_mass < 6 {
+                return Err(format!(
+                    "Too small module mass (less than 6) at line {}",
+                    line_index + 1
+                ));
+            }
             Ok(fuel_calculator(module_mass))
         })
         .collect::<Result<Vec<u32>, String>>()?;
