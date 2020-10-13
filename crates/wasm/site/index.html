@@ -1,81 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Advent of Code 2019</title>
-    <meta name="description" content="Advent of Code solutions in Rust compiled to WebAssembly"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="https://unpkg.com/picnic"/>
-    <link rel="preload" href="index.js" as="script"/>
-    <style>
-        body { margin: 20px; }
-        .blink { animation: blinker 0.5s linear 3; }
-        .error { color: red; }
-        @keyframes blinker { 50% { opacity: 0; } }
-        .buttons { text-align: right; }
-        .hidden { display: none; }
-    </style>
-  </head>
-  <body>
-<a href="https://github.com/fornwall/advent-of-code"><img src="forkme.svg"
-style="position:absolute;top:0;right:0;" alt="Fork me on GitHub"></a>
-   <form class="content">
-    <h1>Advent of Code</h1>
-    <p>This page runs solutions for <a href="https://adventofcode.com/">Advent of Code</a> using WebAssembly compiled from Rust.</p>
 
-    <h2><label for="year">Year</label></h2>
-    <select id="year">
-      <option value="2019">2019</option>
-      <option value="2018">2018</option>
-      <option value="2017">2017</option>
-    </select>
+<head>
+	<meta charset="utf-8">
+	<title>Advent of Code 2019</title>
+	<meta name="description" content="Advent of Code solutions in Rust compiled to WebAssembly"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link rel="stylesheet" href="https://unpkg.com/picnic"/>
+	<link rel="preload" href="index.js" as="script"/>
+	<style>
+		body { margin: 20px; }
+		.blink { animation: blinker 0.5s linear 3; }
+		.error { color: red; }
+		@keyframes blinker { 50% { opacity: 0; } }
+		.buttons { text-align: right; }
+		.hidden { display: none; }
+		#output { padding: .3em .6em; background: #f5f5f5; border-radius: .2em; }
+	</style>
+</head>
 
-    <h2><label for="day">Day</label></h2>
-    <select id="day">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="11">11</option>
-      <option value="12">12</option>
-      <option value="13">13</option>
-      <option value="14">14</option>
-      <option value="15">15</option>
-      <option value="16">16</option>
-      <option value="17">17</option>
-      <option value="18">18</option>
-      <option value="19">19</option>
-      <option value="20">20</option>
-      <option value="21">21</option>
-      <option value="22">22</option>
-      <option value="23">23</option>
-      <option value="24">24</option>
-      <option value="25">25</option>
-    </select>
+<body>
+	<a href="https://github.com/fornwall/advent-of-code"><img src="forkme.svg" style="position:absolute;top:0;right:0;" alt="Fork me on GitHub"></a>
 
-    <h2><label for="part">Part</label></h2>
-    <select id="part">
-      <option value="1">1</option>
-      <option value="2">2</option>
-    </select>
+	<form class="content">
 
-    <h2><label for="input">Input</label></h2>
-    <textarea id="input" rows="5"></textarea>
-    <div class="buttons">
-      <button id="read_file" class="hidden">Read file</button>
-      <input type="submit" value="Run"/>
-    </div>
+	<h1>Advent of Code</h1>
+	<p>This page runs solutions for <a href="https://adventofcode.com/">Advent of Code</a> using WebAssembly compiled from Rust.</p>
 
-    <h2>Output</h2>
-    <pre id="output" />
+	<h2><label for="year">Year</label> - <label for="day">Day</label> - <label for="part">Part</label></h2>
+	<fieldset class="flex three">
+		<label>
+			<select id="year">
+				<option value="2019">2019</option>
+				<option value="2018">2018</option>
+				<option value="2017">2017</option>
+			</select>
+		</label>
+		<label>
+			<select id="day">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="11">11</option>
+				<option value="12">12</option>
+				<option value="13">13</option>
+				<option value="14">14</option>
+				<option value="15">15</option>
+				<option value="16">16</option>
+				<option value="17">17</option>
+				<option value="18">18</option>
+				<option value="19">19</option>
+				<option value="20">20</option>
+				<option value="21">21</option>
+				<option value="22">22</option>
+				<option value="23">23</option>
+				<option value="24">24</option>
+				<option value="25">25</option>
+			</select>
+		</label>
+		<label>
+			<select id="part">
+			  <option value="1">1</option>
+			  <option value="2">2</option>
+			</select>
+		</label>
+	</fieldset>
 
-    <script type="module" src="index.js"></script>
-   </form>
-  </body>
+	<h2><label for="input">Input</label></h2>
+	<textarea id="input" rows="5"></textarea>
+	<div class="buttons">
+		<button id="read_file" class="hidden">Read file</button>
+		<input type="submit" value="Run"/>
+	</div>
+
+	<h2>Output</h2>
+	<div id="output">&nbsp;</div>
+
+	<script type="module" src="index.js"></script>
+	</form>
+</body>
+
 </html>

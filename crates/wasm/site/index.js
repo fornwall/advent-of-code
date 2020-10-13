@@ -10,7 +10,7 @@ async function run() {
 	const output_element = document.getElementById('output');
 
 	[day_element, part_element, input_element].forEach(element => element.addEventListener('input', () => {
-	  output_element.textContent = '';
+	  output_element.innerHTML = '&nbsp;';
 	  output_element.classList.remove('blink', 'error');
 	}, false));
 
