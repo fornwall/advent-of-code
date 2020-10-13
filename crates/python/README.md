@@ -1,5 +1,5 @@
 # advent-of-code
-Solutions to [Advent of Code 2019](https://adventofcode.com/2019).
+Solutions to [Advent of Code](https://adventofcode.com/).
 
 The solutions are implemented in Rust which is exposed to Python using [PyO3](https://pyo3.rs/).
 

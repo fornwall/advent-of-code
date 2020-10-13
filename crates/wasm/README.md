@@ -1,5 +1,5 @@
 # advent-of-code-wasm
-Solutions to [Advent of Code 2019](https://adventofcode.com/2019).
+Solutions to [Advent of Code](https://adventofcode.com/).
 
 The solutions are implemented in Rust which is compiled to WebAssembly.
 

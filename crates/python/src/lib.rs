@@ -40,7 +40,7 @@ pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<S
 // below into a python docstring, and "python setup.py test" will run
 // the tests in the docstring:
 
-/// A package for solving Advent of Code 2019
+/// A package with solutions for Advent of Code problems
 ///
 /// This package provides python bindings for the rust crate
 /// [cpp_demangle](http://github.com/gimli-rs/cpp_demangle) by building
