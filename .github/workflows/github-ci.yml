@@ -173,13 +173,13 @@ jobs:
         docker build --tag ${IMAGE} .
         docker tag ${IMAGE} ${SERVER_DOCKER_IMAGE_NAME}:latest
         docker push ${SERVER_DOCKER_IMAGE_NAME}
-     - name: Deploy to Fly
-       uses: superfly/flyctl-actions@master
-       env:
-         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-         FLY_PROJECT_PATH: crates/server
-       with:
-         args: "deploy"
+    - name: Deploy to Fly
+      uses: superfly/flyctl-actions@master
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        FLY_PROJECT_PATH: crates/server
+      with:
+        args: "deploy"
 
 
   release-npm-packages:
