@@ -45,6 +45,8 @@ for session in SESSIONS:
                     fork_command = f"../../post-input-cloudflare {year} {day} {part}"
                 elif "AOC_NETLIFY" in os.environ:
                     fork_command = f"../../post-input-netlify {year} {day} {part}"
+                elif "AOC_FLY" in os.environ:
+                    fork_command = f"../../post-input-fly {year} {day} {part}"
                 try:
                     forked_process = subprocess.run(
                         fork_command,

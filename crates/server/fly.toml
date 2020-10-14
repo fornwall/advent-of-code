@@ -3,7 +3,7 @@
 app = "aoc"
 
 [build]
-  image = "fredrikfornwall/advent-of-code-server"
+  image = "fredrikfornwall/advent-of-code-server:2019.12.99"
 
 
 [[services]]

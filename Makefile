@@ -30,6 +30,9 @@ site:
 serve-site: site
 	cd crates/wasm/target/web && devserver
 
+serve-api:
+	cd crates/server && cargo run
+
 node-package:
 	cd crates/wasm && ./build-package.sh
 

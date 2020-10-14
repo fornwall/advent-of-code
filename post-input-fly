@@ -25,7 +25,7 @@ elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
 	exit 1
 fi
 
-curl -D- \
+curl --fail \
 	-w '\n'\
 	--data-binary @- \
-	"http://localhost:8080/$YEAR/$DAY/$PART"
+	"https://aoc.fly.dev/$YEAR/$DAY/$PART"
