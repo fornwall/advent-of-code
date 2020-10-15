@@ -25,6 +25,7 @@ site:
 		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > target/web/picnic-6.5.3.min.css && \
 		curl https://adventofcode.com/favicon.ico > target/web/favicon.ico && \
 		ln -f site/index.js target/web/index.js && \
+		ln -f site/_redirect target/web/_redirect && \
 		ln -f site/forkme.svg target/web/forkme.svg
 
 serve-site: site
