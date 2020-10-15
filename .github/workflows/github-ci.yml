@@ -184,6 +184,7 @@ jobs:
   deploy-cloudflare-worker:
     needs: bump-version
     runs-on: ubuntu-latest
+    steps:
     - uses: hecrj/setup-rust-action@v1
     - name: Deploy to Cloudflare
       env:
