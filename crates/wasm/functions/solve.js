@@ -12,13 +12,13 @@ exports.handler = function(event, context, callback) {
   }
 
   const pathParts = event.path.substring(1).split('/');
-  if (pathParts.length != 3) {
+  if (pathParts.length != 4) {
     return callback(null, {
       statusCode: 200,
-      body: "Invalid path - expected /{YEAR}/{DAY}/{PART}, was: " + path
+      body: "Invalid path - expected /api/{YEAR}/{DAY}/{PART}, was: " + path
     });
   }
-  const [year, day, part] = pathParts;
+  const [_api, year, day, part] = pathParts;
 
   try {
     const input = event.body;

@@ -180,11 +180,14 @@ jobs:
         FLY_PROJECT_PATH: crates/server
       with:
         args: "deploy"
+    - uses: hecrj/setup-rust-action@v1
     - name: Deploy to Cloudflare
-      uses: cloudflare/wrangler-action@1.3.0
-      with:
-        apiToken: ${{ secrets.CLOuDFLARE_API_TOKEN }}
-        workingDirectory: crates/wasm/
+      env:
+        CF_API_TOKEN: ${{ secrets.CLOuDFLARE_API_TOKEN }}
+      run: |
+        make install-wasm-pack
+        npm install -g @cloudflare/wrangler
+        wrangler publish
 
   release-npm-packages:
     needs: bump-version
