@@ -173,6 +173,7 @@ jobs:
         docker build --tag ${IMAGE} .
         docker tag ${IMAGE} ${SERVER_DOCKER_IMAGE_NAME}:latest
         docker push ${SERVER_DOCKER_IMAGE_NAME}
+        rm -Rf core
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
       env:
