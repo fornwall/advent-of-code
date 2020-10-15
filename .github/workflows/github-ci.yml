@@ -187,6 +187,7 @@ jobs:
       run: |
         make install-wasm-pack
         sudo npm install -g @cloudflare/wrangler
+        cd crates/wasm
         wrangler publish
 
   release-npm-packages:

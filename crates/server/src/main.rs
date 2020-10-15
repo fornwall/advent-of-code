@@ -36,20 +36,25 @@ async fn handle_post(
     part: String,
     body: warp::hyper::body::Bytes,
 ) -> Result<impl warp::Reply, Infallible> {
+    let response = warp::http::response::Response::builder()
+        .header("content-type", "text/plain; charset=utf-8 ")
+        .header("cache-control", "no-cache");
     Ok(if let Ok(input) = std::str::from_utf8(body.as_ref()) {
         match solve_raw(&year, &day, &part, input) {
-            Ok(solution) => warp::http::response::Response::builder()
-                .header("content-type", "text/plain")
+            Ok(solution) => response
                 .status(warp::http::StatusCode::OK)
+                .header("content-length", solution.len())
                 .body(solution),
-            Err(error) => warp::http::response::Response::builder()
-                .header("content-type", "text/plain")
+            Err(error) => response
+                .header("content-length", error.len())
                 .status(warp::http::StatusCode::BAD_REQUEST)
                 .body(error),
         }
     } else {
-        warp::http::response::Response::builder()
+        let message = "Invalid utf-8".to_string();
+        response
             .status(warp::http::StatusCode::BAD_REQUEST)
+            .header("content-length", message.len())
             .body("Invalid utf-8".to_string())
     })
 }
