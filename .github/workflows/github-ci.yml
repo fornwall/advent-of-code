@@ -149,7 +149,7 @@ jobs:
         docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
         docker push ${DOCKER_IMAGE_NAME}
 
-  release-server:
+  release-and-deploy-server:
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
@@ -173,7 +173,6 @@ jobs:
         docker build --tag ${IMAGE} .
         docker tag ${IMAGE} ${SERVER_DOCKER_IMAGE_NAME}:latest
         docker push ${SERVER_DOCKER_IMAGE_NAME}
-        rm -Rf core
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
       env:
@@ -181,6 +180,10 @@ jobs:
         FLY_PROJECT_PATH: crates/server
       with:
         args: "deploy"
+
+  deploy-cloudflare-worker:
+    needs: bump-version
+    runs-on: ubuntu-latest
     - uses: hecrj/setup-rust-action@v1
     - name: Deploy to Cloudflare
       env:
