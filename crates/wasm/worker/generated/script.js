@@ -245,24 +245,29 @@ wasm_bindgen = Object.assign(init, __exports);
   event.respondWith(handleRequest(event.request))
 })
 
-/**
- * Fetch and log a request
- * @param {Request} request
- */
+
+function badInput(errorMessage) {
+    console.error(errorMessage);
+    return new Response(errorMessage, {status: 400});
+}
+
+
 async function handleRequest(request) {
-    const { searchParams } = new URL(request.url);
-    let year = searchParams.get("year");
-    let day = searchParams.get("day");
-    let part = searchParams.get("part");
-    let input = await request.text();
+    var path = new URL(request.url).pathname;
+    var pathParts = path.substring(1).split('/');
+    if (pathParts.length != 3) {
+        return badInput("Invalid path - expected /{YEAR}/{DAY}/{PART}, was: " + path);
+    }
+    const [year, day, part] = pathParts;
+    const input = await request.text();
 
     const { solve } = wasm_bindgen;
     await wasm_bindgen(wasm);
+
     try {
         const solution = solve(year, day, part, input);
         return new Response(solution, {status: 200});
     } catch (e) {
-        console.error(e.message);
-        return new Response(e.message, {status: 400});
+        return badInput(e.message);
     }
 }

@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.3",
+  "tags": [{
+    "name": "solve"
+  }],
+  "info": {
+    "version": "1.0.0",
+    "title": "Advent of Code API",
+    "description": "Solutions for Advent of Code.",
+    "contact": {
+      "name": "GitHub repository to report issues or learn more",
+      "url": "https://github.com/fornwall/advent-of-code"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://aoc.fly.dev"
+    },
+    {
+      "url": "https://aoc.fornwall.workers.dev"
+    },
+    {
+      "url": "https://aoc.fornwall.net"
+    },
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/{year}/{day}/{part}": {
+      "post": {
+        "operationId": "solve",
+        "tags": [
+          "solve"
+        ],
+        "description": "Solve a specific Advent of Code problem for the specified input.",
+        "requestBody": {
+          "description": "The problem input",
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "description": "The year of the problem",
+            "schema": {
+              "type": "integer",
+              "minimum": 2017,
+              "maximum": 2019,
+              "enum": [
+                2019,
+                2018,
+                2017
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "day",
+            "required": true,
+            "description": "The day of the problem",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25,
+              "enum": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "part",
+            "required": true,
+            "description": "The day of the problem",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2,
+              "enum": [
+                1,
+                2
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Problem solved successfully with solution in the returned body.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "The problem solution for the specified input."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input was bad",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Description of the problem in the input",
+                  "example": "Input error at line 1: invalid digit found in string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

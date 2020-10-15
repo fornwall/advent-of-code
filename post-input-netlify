@@ -27,4 +27,4 @@ fi
 
 curl -w '\n'\
 	--data-binary @- \
-	"https://aoc.fornwall.net/.netlify/functions/solve?year=$YEAR&day=$DAY&part=$PART"
+	"https://aoc.fornwall.net/$YEAR/$DAY/$PART"

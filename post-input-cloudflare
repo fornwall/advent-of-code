@@ -28,4 +28,4 @@ fi
 curl --fail \
 	-w '\n'\
 	--data-binary @- \
-	"https://my-app.fornwall.workers.dev?year=$YEAR&day=$DAY&part=$PART"
+	"https://aoc.fornwall.workers.dev/$YEAR/$DAY/$PART"
