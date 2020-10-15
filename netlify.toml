@@ -3,3 +3,10 @@
   # https://advent2019.fornwall.net/.netlify/functions/solve, see ./post-input-netlify
   functions = "crates/wasm/functions/"
   command = "make netlify"
+
+[[redirects]]
+  from = "/*/*/*"
+  to = "/.netlify/functions/solve"
+  status = 200
+  force = true
+
