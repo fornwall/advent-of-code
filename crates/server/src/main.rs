@@ -10,7 +10,7 @@ async fn main() {
         .allow_any_origin()
         .allow_methods(vec!["GET", "POST"]);
 
-    let post_input_route = warp::path!("solve " / String / String / String)
+    let post_input_route = warp::path!("solve" / String / String / String)
         .and(warp::body::bytes())
         .and_then(handle_post);
 
