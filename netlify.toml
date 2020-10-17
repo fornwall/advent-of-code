@@ -5,7 +5,7 @@
   command = "make netlify"
 
 [[redirects]]
-  from = "/api/*"
+  from = "/solve/*"
   to = "/.netlify/functions/solve"
   status = 200
   force = true

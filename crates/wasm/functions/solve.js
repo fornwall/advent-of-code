@@ -20,7 +20,7 @@ exports.handler = function(event, context, callback) {
     return callback(null, {
       statusCode: 400,
       headers,
-      body: "Invalid path - expected /api/{YEAR}/{DAY}/{PART}, was: " + path
+      body: "Invalid path - expected /solve/{YEAR}/{DAY}/{PART}, was: " + path
     });
   }
   const [_api, year, day, part] = pathParts;

@@ -20,14 +20,14 @@
       "url": "https://aoc.fornwall.workers.dev"
     },
     {
-      "url": "https://aoc.fornwall.net/api"
+      "url": "https://aoc.fornwall.net"
     },
     {
       "url": "http://localhost:8080"
     }
   ],
   "paths": {
-    "/{year}/{day}/{part}": {
+    "/solve/{year}/{day}/{part}": {
       "post": {
         "operationId": "solve",
         "tags": [

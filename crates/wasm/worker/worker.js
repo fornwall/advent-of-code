@@ -12,10 +12,10 @@ function badInput(errorMessage) {
 async function handleRequest(request) {
   var path = new URL(request.url).pathname;
   var pathParts = path.substring(1).split('/');
-  if (pathParts.length != 3) {
-    return badInput("Invalid path - expected /{YEAR}/{DAY}/{PART}, was: " + path);
+  if (pathParts.length != 4) {
+    return badInput("Invalid path - expected /solve/{YEAR}/{DAY}/{PART}, was: " + path);
   }
-  const [year, day, part] = pathParts;
+  const [_method, year, day, part] = pathParts;
   const input = await request.text();
 
   const { solve } = wasm_bindgen;
