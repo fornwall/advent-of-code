@@ -23,7 +23,6 @@ site:
 		curl https://adventofcode.com/favicon.ico > target/web/favicon.ico && \
 		ln -f site/index.js target/web/index.js && \
 		ln -f site/openapi.json target/web/openapi.json && \
-		ln -f site/forkme.svg target/web/forkme.svg
 
 wasm-size: site
 	ls -la crates/wasm/target/web/advent_of_code_wasm_bg.wasm
