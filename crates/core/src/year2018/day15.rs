@@ -27,12 +27,9 @@ struct Board {
 
 impl Board {
     fn parse(input_string: &str, elf_attack_power: i32) -> Result<Self, String> {
-        let width = match input_string.find('\n') {
-            Some(len) => len as u32,
-            None => {
-                return Err("No line in input".to_string());
-            }
-        };
+        let width = input_string
+            .find('\n')
+            .ok_or_else(|| "No line in input".to_string())? as u32;
 
         let mut elves_alive = 0;
         let mut goblins_alive = 0;
