@@ -1,20 +1,20 @@
 /// Generate all permutations of a sequence using Heap's algorithm.
-pub fn all_permutations<F, T>(sequence: &mut Vec<T>, on_permutation: &mut F) -> Result<(), String>
+pub fn all_permutations<F, T>(sequence: &mut [T], on_permutation: &mut F) -> Result<(), String>
 where
-    F: FnMut(&Vec<T>) -> Result<(), String>,
+    F: FnMut(&[T]) -> Result<(), String>,
 {
     let size = sequence.len();
     all_permutations_internal(sequence, size, size, on_permutation)
 }
 
 fn all_permutations_internal<F, T>(
-    sequence: &mut Vec<T>,
+    sequence: &mut [T],
     size: usize,
     n: usize,
     on_permutation: &mut F,
 ) -> Result<(), String>
 where
-    F: FnMut(&Vec<T>) -> Result<(), String>,
+    F: FnMut(&[T]) -> Result<(), String>,
 {
     if size == 1 {
         return on_permutation(sequence);

@@ -5,13 +5,13 @@ use std::cell::RefCell;
 fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     let program = Program::parse(input_string)?;
     let mut phase_settings = if part1 {
-        vec![0, 1, 2, 3, 4]
+        [0, 1, 2, 3, 4]
     } else {
-        vec![5, 6, 7, 8, 9]
+        [5, 6, 7, 8, 9]
     };
     let mut strongest_signal = 0;
 
-    all_permutations(&mut phase_settings, &mut |permutation: &Vec<i64>| {
+    all_permutations(&mut phase_settings, &mut |permutation: &[i64]| {
         let mut amplifier_programs = Vec::with_capacity(5);
         for &phase in permutation.iter() {
             let mut new_program = program.clone();
