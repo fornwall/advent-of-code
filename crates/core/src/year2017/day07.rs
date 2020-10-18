@@ -1,4 +1,3 @@
-use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 
 type ProgramId = usize;
@@ -103,31 +102,21 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 fn fixup_weight(program_id: ProgramId, tree: &ProgramTree) -> Option<u32> {
     let program = &tree.nodes[program_id];
     if program.children.len() > 1 {
-        let grouped = program
+        if let (Some(lone_weight), desired_weight) = program
             .children
             .iter()
             .fold(HashMap::new(), |mut acc, &child_id| {
-                match acc.entry(tree.total_weight(child_id)) {
-                    Entry::Occupied(mut entry) => {
-                        entry.insert(entry.get() + 1);
-                    }
-                    Entry::Vacant(entry) => {
-                        entry.insert(1);
-                    }
-                }
+                *acc.entry(tree.total_weight(child_id)).or_insert(0) += 1;
                 acc
-            });
-
-        if let (Some(lone_weight), desired_weight) =
-            grouped
-                .iter()
-                .fold((None, 0), |acc, (&weight, &occurrences)| {
-                    if occurrences == 1 {
-                        (Some(weight), acc.1)
-                    } else {
-                        (acc.0, weight)
-                    }
-                })
+            })
+            .iter()
+            .fold((None, 0), |acc, (&weight, &occurrences)| {
+                if occurrences == 1 {
+                    (Some(weight), acc.1)
+                } else {
+                    (acc.0, weight)
+                }
+            })
         {
             if let Some(&child_id) = program
                 .children
@@ -138,13 +127,10 @@ fn fixup_weight(program_id: ProgramId, tree: &ProgramTree) -> Option<u32> {
                 return if child.children.is_empty() {
                     Some(desired_weight)
                 } else {
-                    match fixup_weight(child_id, tree) {
-                        Some(value) => Some(value),
-                        None => {
-                            let total_weight = tree.total_weight(child_id);
-                            Some(desired_weight - (total_weight - child.weight))
-                        }
-                    }
+                    fixup_weight(child_id, tree).or_else(|| {
+                        let total_weight = tree.total_weight(child_id);
+                        Some(desired_weight - (total_weight - child.weight))
+                    })
                 };
             }
         }
