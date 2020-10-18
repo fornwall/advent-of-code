@@ -1,17 +1,42 @@
 import init, { solve } from './advent_of_code_wasm.js';
 
-async function run() {
-	await init();
+const year_element = document.getElementById('year');
+const day_element = document.getElementById('day');
+const part_element = document.getElementById('part');
+const input_element = document.getElementById('input');
+const output_element = document.getElementById('output');
 
-	const year_element = document.getElementById('year');
-	const day_element = document.getElementById('day');
-	const part_element = document.getElementById('part');
-	const input_element = document.getElementById('input');
-	const output_element = document.getElementById('output');
+function showMessage(message, isError) {
+    if (isError) {
+        output_element.classList.add('error');
+        input_element.setCustomValidity(message);
+        document.querySelector("form").reportValidity();
+    } else {
+        clearError(false);
+    }
+    output_element.textContent = message;
+    output_element.scrollIntoView();
+    output_element.classList.add('blink');
+}
+
+function clearError(removeBlink) {
+    input_element.setCustomValidity('');
+    output_element.innerHTML = '&nbsp;';
+    output_element.classList.remove('error');
+    if (removeBlink) output_element.classList.remove('blink');
+}
+
+async function run() {
+    try {
+	    await init();
+	} catch (e) {
+	    console.warn(e);
+	    document.getElementById('run').disabled = true;
+	    return;
+	}
 
 	[day_element, part_element, input_element].forEach(element => element.addEventListener('input', () => {
-	  output_element.innerHTML = '&nbsp;';
-	  output_element.classList.remove('blink', 'error');
+	  clearError(true);
 	}, false));
 
 	document.querySelector("form").addEventListener("submit", (event) => {
@@ -21,18 +46,13 @@ async function run() {
 	   const part = part_element.options[part_element.selectedIndex].value;
 	   const input = input_element.value;
 
-	   let message;
 	   try {
-		  message = solve(year, day, part, input);
-		  output_element.classList.remove('error');
+	      const message = solve(year, day, part, input);
+	      showMessage(message);
 	   } catch (e) {
 		  console.log(e);
-		  message = e.message;
-		  output_element.classList.add('error');
+	      showMessage(e.message, true);
 	   }
-	   output_element.textContent = message;
-	   output_element.scrollIntoView();
-	   output_element.classList.add('blink');
 	});
 
 	if (window.showOpenFilePicker) {
