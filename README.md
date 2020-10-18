@@ -46,14 +46,14 @@ assert.equal(solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4"), "30");
 The solutions can be run client-side in a browser using WebAssembly at https://aoc.fornwall.net.
 
 # Post to HTTP endpoint
-There is a HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
+There is an HTTP endpoint running on [Netlify Functions](https://www.netlify.com/products/functions/) (using Node.js and WebAssembly) that can be used as follows:
 
 ```sh
-$ curl --data-binary 14 "https://aoc.fornwall.net/.netlify/functions/solve?year=2019&day=1&part=1"
+$ curl -d 14 "https://aoc.fornwall.net/solve/2019/1/1"
 14
-$ curl -s https://raw.githubusercontent.com/fornwall/advent-of-code/master/crates/core/src/year2019/day02_input.txt | \
+$ curl -s https://raw.githubusercontent.com/fornwall/advent-of-code/master/crates/core/src/year2019/day02_input.txt | \
   curl --data-binary @- \
-     "https://aoc.fornwall.net/.netlify/functions/solve?year=2019&day=2&part=2"
+     "https://aoc.fornwall.net/solve/2019/2/2"
 5485
 ```
 
