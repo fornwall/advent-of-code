@@ -1,3 +1,4 @@
+#[cfg(feature = "debug-output")]
 use std::env;
 
 #[derive(Copy, Clone, PartialEq)]
@@ -113,6 +114,7 @@ impl Program {
         }
     }
 
+    #[cfg(feature = "debug-output")]
     pub fn pretty_print(&self, title: &str) {
         if env::var("ADVENT_DEBUG").is_err() {
             return;

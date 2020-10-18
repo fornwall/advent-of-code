@@ -1,3 +1,10 @@
+fn make_ascii_titlecase(s: &mut str) -> &str {
+    if let Some(r) = s.get_mut(0..1) {
+        r.make_ascii_uppercase();
+    }
+    s
+}
+
 fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Result<u32, String> {
     let parts = input_string
         .lines()
@@ -5,14 +12,14 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
         .map(|(line_index, line)| {
             let module_mass = line.parse::<u32>().map_err(|error| {
                 format!(
-                    "Input error at line {}: {}",
+                    "Line {}: {}",
                     line_index + 1,
-                    error.to_string()
+                    make_ascii_titlecase(&mut error.to_string())
                 )
             })?;
             if module_mass < 6 {
                 return Err(format!(
-                    "Too small module mass (less than 6) at line {}",
+                    "Line {}: Too small module mass (less than 6)",
                     line_index + 1
                 ));
             }
@@ -47,7 +54,7 @@ pub fn tests_part1() {
     assert_eq!(Ok(3_262_358), part1(include_str!("day01_input.txt")));
 
     assert_eq!(
-        Some("Input error at line 1: cannot parse integer from empty string".to_string()),
+        Some("Line 1: Cannot parse integer from empty string".to_string()),
         part1("\n").err()
     );
 }

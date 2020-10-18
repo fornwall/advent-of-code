@@ -24,6 +24,7 @@ pub fn part1(input_string: &str) -> Result<u64, String> {
     // set register 0 to the value it's first compared with here to exit as soon as possible.
 
     let mut program = parse(input_string)?;
+    #[cfg(feature = "debug-output")]
     program.pretty_print("Initial program");
     let mut loop_count = 0;
     while program.instruction_pointer()? != 29 {

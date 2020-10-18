@@ -1,4 +1,5 @@
 use std::cmp::{max, min};
+#[cfg(feature = "debug-output")]
 use std::env;
 
 fn parse_point_interval(s: &str) -> Result<(u16, u16), String> {
@@ -75,6 +76,7 @@ impl Grid {
         })
     }
 
+    #[cfg(feature = "debug-output")]
     fn print(&self, name: &str) {
         if env::var("ADVENT_DEBUG").is_err() {
             return;
@@ -228,18 +230,23 @@ impl Grid {
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::from(input_string)?;
+    #[cfg(feature = "debug-output")]
     grid.print("Initial");
     grid.pour_water();
+    #[cfg(feature = "debug-output")]
     grid.print("After pouring");
     Ok(grid.count_water())
 }
 
 pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut grid = Grid::from(input_string)?;
+    #[cfg(feature = "debug-output")]
     grid.print("Initial");
     grid.pour_water();
+    #[cfg(feature = "debug-output")]
     grid.print("After pouring");
     grid.dry_up();
+    #[cfg(feature = "debug-output")]
     grid.print("After drying up");
     Ok(grid.count_drained_water())
 }

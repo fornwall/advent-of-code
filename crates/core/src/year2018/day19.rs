@@ -10,8 +10,10 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
 
     program.registers.values[0] = 1;
 
+    #[cfg(feature = "debug-output")]
     program.pretty_print("Initial");
     program.optimize();
+    #[cfg(feature = "debug-output")]
     program.pretty_print("Optimized");
 
     if program.instructions.len() < 3 {
