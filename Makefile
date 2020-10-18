@@ -25,6 +25,9 @@ site:
 		ln -f site/openapi.json target/web/openapi.json && \
 		ln -f site/forkme.svg target/web/forkme.svg
 
+wasm-size: site
+	ls -la crates/wasm/target/web/advent_of_code_wasm_bg.wasm
+
 serve-site: site
 	cd crates/wasm/target/web && devserver
 
@@ -58,4 +61,4 @@ netlify:
 		make node-package && \
 		cd crates/wasm/functions && npm install
 
-.PHONY: check site serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
+.PHONY: check site wasm-size serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
