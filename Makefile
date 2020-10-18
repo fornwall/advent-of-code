@@ -17,12 +17,10 @@ check:
 
 site:
 	cd crates/wasm && \
-		wasm-pack build $(wasm_pack_profile) --target web --out-dir target/web && \
-		ln -f site/index.html target/web/index.html && \
+		wasm-pack build $(wasm_pack_profile) --target no-modules --out-dir target/web && \
 		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > target/web/picnic-6.5.3.min.css && \
 		curl https://adventofcode.com/favicon.ico > target/web/favicon.ico && \
-		ln -f site/index.js target/web/index.js && \
-		ln -f site/openapi.json target/web/openapi.json
+		for i in site/*; do ln -f $$i target/web/`basename $$i`; done
 
 wasm-size: site
 	ls -la crates/wasm/target/web/advent_of_code_wasm_bg.wasm

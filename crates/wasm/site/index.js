@@ -1,12 +1,20 @@
-import init, { solve } from './advent_of_code_wasm.js';
+const worker = new Worker("./worker.js", { name: "solver" });
 
 const year_element = document.getElementById('year');
 const day_element = document.getElementById('day');
 const part_element = document.getElementById('part');
 const input_element = document.getElementById('input');
 const output_element = document.getElementById('output');
+const executionTime_element = document.getElementById('executionTime');
+
+worker.onmessage = (e) => {
+    const { isError, output } = e.data;
+    showMessage(output, isError);
+}
 
 function showMessage(message, isError) {
+    const executionTime = performance.now() - window.solveStart;
+    executionTime_element.textContent = ' (in ' + Math.round(executionTime) + ' ms)';
     if (isError) {
         output_element.classList.add('error');
         input_element.setCustomValidity(message);
@@ -27,14 +35,6 @@ function clearError(removeBlink) {
 }
 
 async function run() {
-    try {
-	    await init();
-	} catch (e) {
-	    console.warn(e);
-	    document.getElementById('run').disabled = true;
-	    return;
-	}
-
 	[day_element, part_element, input_element].forEach(element => element.addEventListener('input', () => {
 	  clearError(true);
 	}, false));
@@ -47,8 +47,8 @@ async function run() {
 	   const input = input_element.value;
 
 	   try {
-	      const message = solve(year, day, part, input);
-	      showMessage(message);
+	      window.solveStart = performance.now();
+	      worker.postMessage({year, day, part, input});
 	   } catch (e) {
 		  console.log(e);
 	      showMessage(e.message, true);
