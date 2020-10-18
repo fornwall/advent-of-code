@@ -129,7 +129,7 @@
             }
           },
           "400": {
-            "description": "Input was bad",
+            "description": "Input was bad with error message returned as response body text.",
             "content": {
               "text/plain": {
                 "schema": {
