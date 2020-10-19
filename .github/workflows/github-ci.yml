@@ -16,15 +16,30 @@ jobs:
 
   test-rust:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, nightly]
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: ${{ matrix.rust }}
     - name: Show rust version
       run: rustc --version
     - name: Install current LLVM
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Test and check
       run: LLVM_CONFIG=llvm-config-11 make check
+
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly
+    - name: Run benchmark
+      run: cd crates/core && cargo +nightly bench
 
   test-python:
     runs-on: ubuntu-latest
