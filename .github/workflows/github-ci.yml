@@ -44,8 +44,15 @@ jobs:
     - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: nightly
+    - name: Install cargo benchcmp
+      run: cargo install cargo-benchcmp
     - name: Run benchmark
-      run: cd crates/core && cargo +nightly bench
+      run: |
+        cd crates/core
+        cargo +nightly bench > new-benchmark
+        git co HEAD~1
+        cargo +nightly bench > old-benchmark
+        cargo benchcmp old-benchmark new-benchmark
 
   test-python:
     runs-on: ubuntu-latest
