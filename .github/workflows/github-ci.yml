@@ -50,7 +50,7 @@ jobs:
       run: |
         cd crates/core
         cargo +nightly bench > new-benchmark
-        git co HEAD~1
+        git checkout HEAD~1
         cargo +nightly bench > old-benchmark
         cargo benchcmp old-benchmark new-benchmark
 
