@@ -4,16 +4,24 @@ else
   wasm_pack_profile=--release
 endif
 
-CLIPPY_PARAMS = --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used -D clippy::unwrap_used -D clippy::items_after_statements -D clippy::if_not_else -D clippy::trivially_copy_pass_by_ref -D clippy::match_same_arms
+CLIPPY_PARAMS =  --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used -D clippy::unwrap_used -D clippy::items_after_statements -D clippy::if_not_else -D clippy::trivially_copy_pass_by_ref -D clippy::match_same_arms
+CLIPPY_CARGO = cargo
+ifeq ($(CLIPPY_NIGHTLY),1)
+  CLIPPY_CARGO += +nightly
+  CLIPPY_PARAMS := --benches $(CLIPPY_PARAMS)
+endif
 ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
 endif
 
 check:
 	cargo fmt --all
-	cargo clippy --all-targets $(CLIPPY_PARAMS)
-	cargo clippy $(CLIPPY_PARAMS) -D clippy::panic
-	cargo test
+	$(CLIPPY_CARGO) clippy --tests $(CLIPPY_PARAMS)
+	$(CLIPPY_CARGO) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
+	$(CLIPPY_CARGO) test
+
+bench:
+	cargo +nightly bench
 
 site:
 	cd crates/wasm && \
@@ -26,7 +34,7 @@ wasm-size: site
 	ls -la crates/wasm/target/web/advent_of_code_wasm_bg.wasm
 
 serve-site: site
-	cd crates/wasm/target/web && devserver
+	cd crates/wasm/target/web && devserver --address 192.168.2.30:8080
 
 serve-api:
 	cd crates/server && cargo run
@@ -58,4 +66,4 @@ netlify:
 		make node-package && \
 		cd crates/wasm/functions && npm install
 
-.PHONY: check site wasm-size serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
+.PHONY: bench check site wasm-size serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify

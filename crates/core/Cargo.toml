@@ -17,3 +17,6 @@ name = "advent_of_code"
 
 [features]
 debug-output = []
+
+[dev-dependencies]
+paste = "1.0"
