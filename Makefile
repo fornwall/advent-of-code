@@ -15,7 +15,7 @@ ifeq ($(CLIPPY_PEDANTIC),1)
 endif
 
 check:
-	cargo fmt --all
+	$(CLIPPY_CARGO) fmt --all
 	$(CLIPPY_CARGO) clippy --tests $(CLIPPY_PARAMS)
 	$(CLIPPY_CARGO) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
 	$(CLIPPY_CARGO) test
