@@ -84,8 +84,7 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
         if line.starts_with("== ") {
             // This takes the second if bounced from "Pressure-Sensitive Floor".
             room_id = line;
-        } else if line.starts_with("- ") {
-            let item = &line[2..];
+        } else if let Some(item) = line.strip_prefix("- ") {
             match Direction::from_str(item) {
                 Some(direction) => {
                     directions.push(direction);
