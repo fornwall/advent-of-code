@@ -30,10 +30,10 @@ jobs:
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Test and check (stable)
       run: LLVM_CONFIG=llvm-config-11 make check
-      if: ${{ matrix.rust }} == 'stable'
+      if: matrix.rust == 'stable'
     - name: Test and check (nightly)
       run: rustup component add rustfmt --toolchain nightly && LLVM_CONFIG=llvm-config-11 make CLIPPY_NIGHTLY=1 check
-      if: ${{ matrix.rust }} == 'nightly'
+      if: matrix.rust == 'nightly'
 
   benchmark:
     runs-on: ubuntu-latest
