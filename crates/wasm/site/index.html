@@ -19,7 +19,7 @@
     .buttons { text-align: right; }
     .hidden { display: none; }
     #output { padding: .3em .6em; background: #f5f5f5; border-radius: .2em; }
-    .other-buttons { float: left; }
+    p { margin-top: 0; }
     button { min-width: 8em; }
 	</style>
 </head>
@@ -77,12 +77,11 @@
 	</fieldset>
 
 	<h2><label for="input">Input</label></h2>
+  <p id="input-instructions"></p>
 	<textarea id="input" rows="3" required="required"></textarea>
 	<div class="buttons">
-    <span class="other-buttons">
 		<button id="paste" type="button" class="hidden success">Paste</button>
 		<button id="read_file" type="button" class="hidden success">Read file</button>
-    </span>
 		<button id="run-api" type="button">Run API</button>
 		<button id="run-wasm" type="button">Run Wasm</button>
 	</div>
@@ -93,7 +92,7 @@
 	<script type="module" src="index.js"></script>
 	</form>
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/fontawesome.min.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css"/>
 </body>
 
 </html>

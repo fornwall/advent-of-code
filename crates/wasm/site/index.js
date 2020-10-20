@@ -1,5 +1,6 @@
 const worker = new Worker("./worker.js", { name: "solver" });
 
+const input_instructions_element = document.getElementById('input-instructions');
 const run_wasm_element = document.getElementById('run-wasm');
 const run_api_element = document.getElementById('run-api');
 const year_element = document.getElementById('year');
@@ -32,7 +33,7 @@ function showMessage(message, isError, wasm) {
   executionTime_element.textContent = ' (from ' + (wasm?'Wasm':'API') + ' in ' + Math.round(executionTime) + ' ms)';
   if (isError) {
     output_element.classList.add('error');
-    input_element.setCustomValidity(message);
+    //input_element.setCustomValidity(message);
     document.querySelector("form").reportValidity();
   } else {
     clearError(false);
@@ -40,10 +41,11 @@ function showMessage(message, isError, wasm) {
   output_element.textContent = message;
   output_element.scrollIntoView();
   output_element.classList.add('blink');
+  output_element.focus();
 }
 
 function clearError() {
-  input_element.setCustomValidity('');
+  //input_element.setCustomValidity('');
   output_element.innerHTML = '&nbsp;';
   output_element.classList.remove('error');
 }
@@ -63,15 +65,23 @@ function execute(event, wasm) {
   worker.postMessage({year, day, part, input, wasm});
 }
 
+function updateInputLink() {
+  const link = `adventofcode.com/${year_element.value}/day/${day_element.value}/input`;
+  input_instructions_element.innerHTML = `Your input is at <a href="https://${link}">${link}</a>.`;
+}
+
+window.addEventListener('pageshow', () => updateInputLink());
+
 async function run() {
   run_api_element.addEventListener("click", (event) => execute(event, false));
   run_wasm_element.addEventListener("click", (event) => execute(event, true));
 
-  [day_element, part_element, input_element].forEach(element => element.addEventListener('input', (event) => {
-    element.setCustomValidity('');
+  [year_element, day_element, part_element, input_element].forEach(element => element.addEventListener('input', (event) => {
+    //element.setCustomValidity('');
+    updateInputLink();
   }, false));
 
-  if ('clipboard' in navigator) {
+  if (navigator.clipboard) {
     const pasteButton = document.getElementById('paste');
     pasteButton.classList.remove('hidden');
     document.getElementById('paste').addEventListener('click', async () => {
@@ -94,7 +104,7 @@ async function run() {
         const contents = await file.text();
         document.getElementById('input').value = contents;
       } catch (e) {
-        // Ignore user aborting request.
+        console.log(e);
       }
     });
   }

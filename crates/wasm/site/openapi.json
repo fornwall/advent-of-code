@@ -7,7 +7,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Advent of Code API",
-    "description": "An API to solve [Advent of Code](https://adventofcode.com/) problems.",
+    "description": "An API to solve [Advent of Code](https://adventofcode.com/) problems. See also [the Wasm solver](/).",
     "contact": {
       "name": "GitHub repository",
       "url": "https://github.com/fornwall/advent-of-code"
@@ -16,15 +16,15 @@
   "servers": [
     {
       "url": "https://aoc.fly.dev",
-      "description": "Deployment to fly.io"
+      "description": "Fly deployment"
     },
     {
       "url": "https://aoc.fornwall.workers.dev",
-      "description": "Deplyment to Cloudflare Workers (may time out)"
+      "description": "Cloudflare Worker"
     },
     {
       "url": "https://aoc.fornwall.net",
-      "description": "Deplyment to Netlify Functions"
+      "description": "Netlify Function"
     },
     {
       "url": "http://localhost:8080",
