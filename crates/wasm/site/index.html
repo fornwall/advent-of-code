@@ -12,14 +12,15 @@
 	<link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous"/>
 	<link rel="stylesheet" href="/picnic-6.5.3.min.css"/>
 	<style>
-		body { padding: 20px; }
-		.blink { animation: blinker 0.5s linear 3; }
-		.error { color: red; }
-		@keyframes blinker { 50% { color: rgba(0,0,0,0); } }
-		.buttons { text-align: right; }
-		.hidden { display: none; }
-		#output { padding: .3em .6em; background: #f5f5f5; border-radius: .2em; }
-		button { min-width: 8em; }
+    body { padding: 20px; }
+    .blink { animation: blinker 0.5s linear 3; }
+    .error { color: red; }
+    @keyframes blinker { 50% { color: rgba(0,0,0,0); } }
+    .buttons { text-align: right; }
+    .hidden { display: none; }
+    #output { padding: .3em .6em; background: #f5f5f5; border-radius: .2em; }
+    .other-buttons { float: left; }
+    button { min-width: 8em; }
 	</style>
 </head>
 
@@ -78,7 +79,10 @@
 	<h2><label for="input">Input</label></h2>
 	<textarea id="input" rows="3" required="required"></textarea>
 	<div class="buttons">
-		<button id="read_file" class="hidden">Read file</button>
+    <span class="other-buttons">
+		<button id="paste" type="button" class="hidden success">Paste</button>
+		<button id="read_file" type="button" class="hidden success">Read file</button>
+    </span>
 		<button id="run-api" type="button">Run API</button>
 		<button id="run-wasm" type="button">Run Wasm</button>
 	</div>

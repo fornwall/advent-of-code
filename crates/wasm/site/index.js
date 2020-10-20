@@ -71,6 +71,18 @@ async function run() {
     element.setCustomValidity('');
   }, false));
 
+  if ('clipboard' in navigator) {
+    const pasteButton = document.getElementById('paste');
+    pasteButton.classList.remove('hidden');
+    document.getElementById('paste').addEventListener('click', async () => {
+      try {
+        input_element.value = await navigator.clipboard.readText();
+      } catch (e) {
+        console.log(e);
+      }
+    }, false);
+  }
+
   if (window.showOpenFilePicker) {
     const readFileButton = document.getElementById("read_file");
     readFileButton.classList.remove("hidden");
