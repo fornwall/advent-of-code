@@ -21,7 +21,7 @@ async function run() {
       }
       try {
         const output = wasm_bindgen.solve(year, day, part, input);
-        postMessage({output, isError: false});
+        postMessage({output, isError: false, wasm});
       } catch (e) {
         console.log(e);
         postMessage({output: e.message, isError: true, wasm});

@@ -18,14 +18,14 @@ worker.onmessage = (e) => {
     }
     return;
   }
-  const { isError, output } = e.data;
+  const { isError, output, wasm } = e.data;
   run_wasm_element.innerHTML = 'Run Wasm';
   run_wasm_element.disabled = false;
   run_wasm_element.classList.remove('in-progress');
   run_api_element.innerHTML = 'Run API';
   run_api_element.disabled = false;
   run_wasm_element.classList.remove('in-progress');
-  showMessage(output, isError, e.data.wasm);
+  showMessage(output, isError, wasm);
 }
 
 function showMessage(message, isError, wasm) {
