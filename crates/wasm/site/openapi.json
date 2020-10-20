@@ -1,56 +1,51 @@
 {
   "openapi": "3.0.3",
   "tags": [{
-    "name": "solve"
+    "name": "advent-of-code",
+    "description": "Solve Advent of Code problems"
   }],
   "info": {
     "version": "1.0.0",
     "title": "Advent of Code API",
-    "description": "Solutions for Advent of Code.",
+    "description": "An API to solve [Advent of Code](https://adventofcode.com/) problems.",
     "contact": {
-      "name": "GitHub repository to report issues or learn more",
+      "name": "GitHub repository",
       "url": "https://github.com/fornwall/advent-of-code"
     }
   },
   "servers": [
     {
-      "url": "https://aoc.fly.dev"
+      "url": "https://aoc.fly.dev",
+      "description": "Deployment to fly.io"
     },
     {
-      "url": "https://aoc.fornwall.workers.dev"
+      "url": "https://aoc.fornwall.workers.dev",
+      "description": "Deplyment to Cloudflare Workers (may time out)"
     },
     {
-      "url": "https://aoc.fornwall.net"
+      "url": "https://aoc.fornwall.net",
+      "description": "Deplyment to Netlify Functions"
     },
     {
-      "url": "http://localhost:8080"
+      "url": "http://localhost:8080",
+      "description": "Local development server"
     }
   ],
   "paths": {
     "/solve/{year}/{day}/{part}": {
       "post": {
+        "summary": "A summary",
         "operationId": "solve",
         "tags": [
-          "solve"
+          "advent-of-code"
         ],
-        "description": "Solve a specific Advent of Code problem for the specified input.",
-        "requestBody": {
-          "description": "The problem input",
-          "required": true,
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
-        },
+        "description": "Solve a specific Advent of Code problem for the input given in the posted request body.",
         "parameters": [
           {
             "in": "path",
             "name": "year",
             "required": true,
-            "description": "The year of the problem",
+            "description": "Year of the problem to solve",
             "schema": {
               "type": "integer",
               "minimum": 2017,
@@ -66,7 +61,7 @@
             "in": "path",
             "name": "day",
             "required": true,
-            "description": "The day of the problem",
+            "description": "Day of the problem to solve",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -104,7 +99,7 @@
             "in": "path",
             "name": "part",
             "required": true,
-            "description": "The day of the problem",
+            "description": "Part of the problem to solve",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -116,26 +111,39 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "Problem input to solve the problem with. Can be found at https://adventofcode.com/${YEAR}/day/${DAY}/input",
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "12"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Problem solved successfully with solution in the returned body.",
+            "description": "Problem solved successfully - the solution is returned as the response body text.",
             "content": {
               "text/plain": {
                 "schema": {
                   "type": "string",
-                  "description": "The problem solution for the specified input."
+                  "description": "The problem solution for the specified input.",
+                  "example": "2"
                 }
               }
             }
           },
           "400": {
-            "description": "Input was bad with error message returned as response body text.",
+            "description": "Input was bad - the error message is returned as the response body text.",
             "content": {
               "text/plain": {
                 "schema": {
                   "type": "string",
                   "description": "Description of the problem in the input",
-                  "example": "Input error at line 1: invalid digit found in string"
+                  "example": "Line 1: Invalid digit found in string"
                 }
               }
             }

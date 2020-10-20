@@ -1,6 +1,7 @@
 const worker = new Worker("./worker.js", { name: "solver" });
 
-const run_element = document.getElementById('run');
+const run_wasm_element = document.getElementById('run-wasm');
+const run_api_element = document.getElementById('run-api');
 const year_element = document.getElementById('year');
 const day_element = document.getElementById('day');
 const part_element = document.getElementById('part');
@@ -9,15 +10,26 @@ const output_element = document.getElementById('output');
 const executionTime_element = document.getElementById('executionTime');
 
 worker.onmessage = (e) => {
+  if ('wasmWorking' in e.data) {
+    if (!e.data.wasmWorking) {
+        run_wasm_element.disabled = true;
+        run_wasm_element.title = 'Wasm is not working - check console logs';
+    }
+    return;
+  }
   const { isError, output } = e.data;
-  run_element.innerHTML = 'Run';
-  run_element.disabled = false;
-  showMessage(output, isError);
+  run_wasm_element.innerHTML = 'Run Wasm';
+  run_wasm_element.disabled = false;
+  run_wasm_element.classList.remove('in-progress');
+  run_api_element.innerHTML = 'Run API';
+  run_api_element.disabled = false;
+  run_wasm_element.classList.remove('in-progress');
+  showMessage(output, isError, e.data.wasm);
 }
 
-function showMessage(message, isError) {
+function showMessage(message, isError, wasm) {
   const executionTime = performance.now() - window.solveStart;
-  executionTime_element.textContent = ' (in ' + Math.round(executionTime) + ' ms)';
+  executionTime_element.textContent = ' (from ' + (wasm?'Wasm':'API') + ' in ' + Math.round(executionTime) + ' ms)';
   if (isError) {
     output_element.classList.add('error');
     input_element.setCustomValidity(message);
@@ -36,25 +48,24 @@ function clearError() {
   output_element.classList.remove('error');
 }
 
-async function run() {
-  document.querySelector("form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const year = year_element.options[year_element.selectedIndex].value;
-    const day = day_element.options[day_element.selectedIndex].value;
-    const part = part_element.options[part_element.selectedIndex].value;
-    const input = input_element.value;
+function execute(event, wasm) {
+  const year = year_element.options[year_element.selectedIndex].value;
+  const day = day_element.options[day_element.selectedIndex].value;
+  const part = part_element.options[part_element.selectedIndex].value;
+  const input = input_element.value;
 
-    try {
-      window.solveStart = performance.now();
-      run_element.disabled = true;
-      run_element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
-      output_element.classList.remove('blink');
-      worker.postMessage({year, day, part, input});
-    } catch (e) {
-      console.log(e);
-      showMessage(e.message, true);
-    }
-  });
+  window.solveStart = performance.now();
+  let button = event.target;
+  button.disabled = true;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+  button.classList.add('in-progress');
+  output_element.classList.remove('blink');
+  worker.postMessage({year, day, part, input, wasm});
+}
+
+async function run() {
+  run_api_element.addEventListener("click", (event) => execute(event, false));
+  run_wasm_element.addEventListener("click", (event) => execute(event, true));
 
   if (window.showOpenFilePicker) {
     const readFileButton = document.getElementById("read_file");
