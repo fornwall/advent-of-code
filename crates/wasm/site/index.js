@@ -18,18 +18,15 @@ worker.onmessage = (e) => {
     }
     return;
   }
-  const { isError, output, wasm } = e.data;
-  run_wasm_element.innerHTML = 'Run Wasm';
-  run_wasm_element.disabled = false;
-  run_wasm_element.classList.remove('in-progress');
-  run_api_element.innerHTML = 'Run API';
-  run_api_element.disabled = false;
-  run_wasm_element.classList.remove('in-progress');
-  showMessage(output, isError, wasm);
+  const { isError, output, wasm, executionTime } = e.data;
+  let activeButton = document.querySelector('.in-progress');
+  activeButton.innerHTML = 'Run ' + (wasm ? 'Wasm' : 'API');
+  activeButton.disabled = false;
+  activeButton.classList.remove('in-progress');
+  showMessage(output, isError, wasm, executionTime);
 }
 
-function showMessage(message, isError, wasm) {
-  const executionTime = performance.now() - window.solveStart;
+function showMessage(message, isError, wasm, executionTime) {
   executionTime_element.textContent = ' (from ' + (wasm?'Wasm':'API') + ' in ' + Math.round(executionTime) + ' ms)';
   if (isError) {
     output_element.classList.add('error');
@@ -56,7 +53,6 @@ function execute(event, wasm) {
   const part = part_element.options[part_element.selectedIndex].value;
   const input = input_element.value;
 
-  window.solveStart = performance.now();
   let button = event.target;
   button.disabled = true;
   button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';

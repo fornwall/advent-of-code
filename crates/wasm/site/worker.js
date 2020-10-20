@@ -13,6 +13,8 @@ async function run() {
   self.postMessage({wasmWorking});
 
   self.onmessage = async (e) => {
+    const startTime = performance.now();
+
     const { year, day, part, input, wasm } = e.data;
     if (wasm) {
       if (!wasmWorking) {
@@ -21,10 +23,12 @@ async function run() {
       }
       try {
         const output = wasm_bindgen.solve(year, day, part, input);
-        postMessage({output, isError: false, wasm});
+        const executionTime = performance.now() - startTime;
+        postMessage({output, isError: false, wasm, executionTime});
       } catch (e) {
         console.log(e);
-        postMessage({output: e.message, isError: true, wasm});
+        const executionTime = performance.now() - startTime;
+        postMessage({output: e.message, isError: true, wasm, executionTime});
       }
     } else {
       const response = await fetch(`https://aoc.fly.dev/solve/${year}/${day}/${part}/`, {
@@ -33,7 +37,8 @@ async function run() {
         body: input
       });
       const responseText = await response.text();
-      postMessage({output: responseText, isError: !response.ok, wasm});
+      const executionTime = performance.now() - startTime;
+      postMessage({output: responseText, isError: !response.ok, wasm, executionTime});
     }
   }
 }
