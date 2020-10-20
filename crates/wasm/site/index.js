@@ -33,8 +33,6 @@ function showMessage(message, isError, wasm) {
   executionTime_element.textContent = ' (from ' + (wasm?'Wasm':'API') + ' in ' + Math.round(executionTime) + ' ms)';
   if (isError) {
     output_element.classList.add('error');
-    //input_element.setCustomValidity(message);
-    document.querySelector("form").reportValidity();
   } else {
     clearError(false);
   }
@@ -45,12 +43,14 @@ function showMessage(message, isError, wasm) {
 }
 
 function clearError() {
-  //input_element.setCustomValidity('');
   output_element.innerHTML = '&nbsp;';
   output_element.classList.remove('error');
 }
 
 function execute(event, wasm) {
+  if (!document.querySelector("form").reportValidity()) {
+      return;
+  }
   const year = year_element.options[year_element.selectedIndex].value;
   const day = day_element.options[day_element.selectedIndex].value;
   const part = part_element.options[part_element.selectedIndex].value;
