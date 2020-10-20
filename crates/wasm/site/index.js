@@ -67,6 +67,10 @@ async function run() {
   run_api_element.addEventListener("click", (event) => execute(event, false));
   run_wasm_element.addEventListener("click", (event) => execute(event, true));
 
+  [day_element, part_element, input_element].forEach(element => element.addEventListener('input', (event) => {
+    element.setCustomValidity('');
+  }, false));
+
   if (window.showOpenFilePicker) {
     const readFileButton = document.getElementById("read_file");
     readFileButton.classList.remove("hidden");
