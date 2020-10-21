@@ -61,7 +61,7 @@ jobs:
       run: |
         body=$(./.github/workflows/benchcmp-to-diff.py benchcmp.txt)
         body="${body//'%'/'%25'}"
-        body="${body//' '/'%20'}"
+        body="${body//' '/' '}"
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}" 
         echo ::set-output name=body::$body
