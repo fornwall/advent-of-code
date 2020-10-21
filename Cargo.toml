@@ -1,7 +1,9 @@
 [workspace]
 members = [ "crates/*" ]
+default-members = [ "crates/core" ]
 
 [profile.release]
+opt-level = 'z'
 lto = true
 panic = 'abort'
 codegen-units = 1
