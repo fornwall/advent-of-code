@@ -43,8 +43,6 @@ jobs:
     steps:
     - name: Download benchmarks
       uses: actions/download-artifact@v2
-    - name: Check file structure
-      run: ls -R
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
@@ -60,7 +58,7 @@ jobs:
     - name: Format commit comment
       id: get-comment-body
       run: |
-        body=$(.github/workflows/benchcmp-to-diff.py benchcmp.txt)
+        body=$(./crates/core/benches/benchcmp-to-diff.py benchcmp.txt)
         body="${body//'%'/'%25'}"
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}" 
