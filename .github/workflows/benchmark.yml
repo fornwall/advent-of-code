@@ -59,8 +59,9 @@ jobs:
     - name: Format commit comment
       id: get-comment-body
       run: |
-        body=$(./crates/core/benches/benchcmp-to-diff.py benchcmp.txt)
+        body=$(./.github/workflows/benchcmp-to-diff.py benchcmp.txt)
         body="${body//'%'/'%25'}"
+        body="${body//' '/'%20'}"
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}" 
         echo ::set-output name=body::$body
