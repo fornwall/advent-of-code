@@ -55,9 +55,8 @@ jobs:
       run: cargo install cargo-benchcmp
     - name: Compare benchmarks on current and previous commit
       run: |
-        cargo benchcmp old-benchmark.txt new-benchmark.txt > benchcmp.txt
+        cargo benchcmp old-benchmark/old-benchmark.txt new-benchmark/new-benchmark.txt > benchcmp.txt
         cat benchcmp.txt
-        ls -lha .github/workflows/
     - name: Format commit comment
       id: get-comment-body
       run: |
