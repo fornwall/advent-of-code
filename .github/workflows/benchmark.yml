@@ -41,6 +41,7 @@ jobs:
     needs: [benchmark-current, benchmark-previous]
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Download benchmarks
       uses: actions/download-artifact@v2
     - uses: actions/setup-python@v2
@@ -67,4 +68,5 @@ jobs:
       uses: peter-evans/commit-comment@v1
       with:
         body: ${{ steps.get-comment-body.outputs.body }}
+    - run: ls -lha .github/workflows/
 
