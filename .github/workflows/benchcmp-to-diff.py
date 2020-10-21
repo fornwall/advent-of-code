@@ -12,7 +12,7 @@ for line in open(sys.argv[1]):
         start = "# "
     else:
         speedup = float(line.split(" ")[-1])
-        delta = 0.01
+        delta = 0.1
         if speedup < 1 - delta:
             start = "- "
         elif speedup > 1 + delta:
