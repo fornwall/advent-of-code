@@ -34,7 +34,7 @@
   "paths": {
     "/solve/{year}/{day}/{part}": {
       "post": {
-        "summary": "A summary",
+        "summary": "Solve a problem",
         "operationId": "solve",
         "tags": [
           "advent-of-code"

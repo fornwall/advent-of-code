@@ -38,9 +38,9 @@ function showMessage(message, isError, wasm, executionTime) {
   output_element.focus();
 }
 
-function execute(event, wasm) {
+function execute(wasm) {
   if (document.querySelector("form").reportValidity()) {
-      event.target.disabled = true;
+      (wasm ? run_wasm_element : run_api_element).disabled = true;
       output_element.classList.remove('blink');
       const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
       worker.postMessage({year, day, part, input, wasm});
@@ -55,8 +55,8 @@ function updateInputLink() {
 window.addEventListener('pageshow', updateInputLink);
 
 async function run() {
-  run_api_element.addEventListener("click", (event) => execute(event, false));
-  run_wasm_element.addEventListener("click", (event) => execute(event, true));
+  run_api_element.addEventListener("click", (event) => execute(false));
+  run_wasm_element.addEventListener("click", (event) => execute(true));
 
   [year_element, day_element].forEach(element => element.addEventListener('input', updateInputLink, false));
 
