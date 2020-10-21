@@ -52,13 +52,33 @@ function updateInputLink() {
   input_instructions_element.innerHTML = `Your input is at <a href="https://${link}">${link}</a>.`;
 }
 
-window.addEventListener('pageshow', updateInputLink);
+window.addEventListener('pageshow', () => {
+    if (window.localStorage) {
+        const problemString = window.localStorage.getItem("problem");
+        if (problemString) {
+            try {
+                const problem = JSON.parse(problemString)
+                year_element.value = problem.year;
+                day_element.value = problem.day;
+                part_element.value = problem.part;
+            } catch (error) {
+                log.error(error);
+            }
+        }
+    }
+    updateInputLink();
+});
 
 async function run() {
   run_api_element.addEventListener("click", (event) => execute(false));
   run_wasm_element.addEventListener("click", (event) => execute(true));
 
-  [year_element, day_element].forEach(element => element.addEventListener('input', updateInputLink, false));
+  [year_element, day_element, part_element].forEach(element => element.addEventListener('input', () => {
+    updateInputLink();
+    if (window.localStorage) {
+        window.localStorage.setItem('problem', JSON.stringify({year: year_element.value, day: day_element.value, part: part_element.value}));
+    }
+  }, false));
 
   if (navigator.clipboard && navigator.clipboard.readText) {
     const pasteButton = document.getElementById('paste');

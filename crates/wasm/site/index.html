@@ -36,14 +36,14 @@
 	<h2><label for="year">Year</label> - <label for="day">Day</label> - <label for="part">Part</label></h2>
 	<fieldset class="flex three">
 		<label>
-			<select id="year">
+			<select id="year" accesskey="y">
 				<option value="2019">2019</option>
 				<option value="2018">2018</option>
 				<option value="2017">2017</option>
 			</select>
 		</label>
 		<label>
-			<select id="day">
+			<select id="day" accesskey="d">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -72,21 +72,21 @@
 			</select>
 		</label>
 		<label>
-			<select id="part">
+			<select id="part" accesskey="p">
 			  <option value="1">1</option>
 			  <option value="2">2</option>
 			</select>
 		</label>
 	</fieldset>
 
-	<h2><label for="input">Input</label></h2>
+	<h2><label for="input" accesskey="i">Input</label></h2>
   <p id="input-instructions"></p>
   <textarea id="input" rows="3" required="required"></textarea>
 	<div class="buttons">
-		<button id="paste" type="button" class="hidden success">Paste</button>
-		<button id="read_file" type="button" class="hidden success">Read file</button>
-		<button id="run-api" type="button"><span class="available">Run API</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
-		<button id="run-wasm" type="button"><span class="available">Run Wasm</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
+		<button id="paste" type="button" class="hidden success" accesskey="v">Paste</button>
+		<button id="read_file" type="button" class="hidden success" accesskey="f">Read file</button>
+		<button id="run-api" type="button"><span class="available" accesskey="a">Run API</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
+		<button id="run-wasm" type="button"><span class="available" accesskey="w">Run Wasm</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
 	</div>
 
 	<h2>Output<span id="executionTime"></span></h2>
