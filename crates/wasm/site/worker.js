@@ -12,23 +12,22 @@ async function run() {
 
   self.postMessage({wasmWorking});
 
-  self.onmessage = async (e) => {
+  self.onmessage = async (message) => {
+    const { year, day, part, input, wasm } = message.data;
     const startTime = performance.now();
-
-    const { year, day, part, input, wasm } = e.data;
     if (wasm) {
       if (!wasmWorking) {
-        postMessage({output: "WASM is not working", isError: true});
+        postMessage({output: "Wasm is not working", isError: true});
         return;
       }
       try {
         const output = wasm_bindgen.solve(year, day, part, input);
         const executionTime = performance.now() - startTime;
         postMessage({output, isError: false, wasm, executionTime});
-      } catch (e) {
-        console.log(e);
+      } catch (error) {
+        console.log(error);
         const executionTime = performance.now() - startTime;
-        postMessage({output: e.message, isError: true, wasm, executionTime});
+        postMessage({output: error.message, isError: true, wasm, executionTime});
       }
     } else {
       const response = await fetch(`https://aoc.fly.dev/solve/${year}/${day}/${part}/`, {
@@ -36,9 +35,14 @@ async function run() {
         headers: { "content-type": "text/plain" },
         body: input
       });
-      const responseText = await response.text();
-      const executionTime = performance.now() - startTime;
-      postMessage({output: responseText, isError: !response.ok, wasm, executionTime});
+      try {
+          const responseText = await response.text();
+          const executionTime = performance.now() - startTime;
+          postMessage({output: responseText, isError: !response.ok, wasm, executionTime});
+      } catch (error) {
+          const executionTime = performance.now() - startTime;
+          postMessage({output: error.message, isError: true, wasm, executionTime});
+      }
     }
   }
 }

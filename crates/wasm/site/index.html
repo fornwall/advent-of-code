@@ -12,7 +12,7 @@
 	<link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous"/>
 	<link rel="stylesheet" href="/picnic-6.5.3.min.css"/>
 	<style>
-    body { padding: 20px; }
+    body { padding: 1em; }
     .blink { animation: blinker 0.5s linear 3; }
     .error { color: red; }
     @keyframes blinker { 50% { color: rgba(0,0,0,0); } }
@@ -21,6 +21,9 @@
     #output { padding: .3em .6em; background: #f5f5f5; border-radius: .2em; }
     p { margin-top: 0; }
     button { min-width: 8em; }
+    button .in-progress { display: none; }
+    button:disabled:not(.unusable) .available { display: none; }
+    button:disabled:not(.unusable) .in-progress { display: inline; }
 	</style>
 </head>
 
@@ -82,8 +85,8 @@
 	<div class="buttons">
 		<button id="paste" type="button" class="hidden success">Paste</button>
 		<button id="read_file" type="button" class="hidden success">Read file</button>
-		<button id="run-api" type="button">Run API</button>
-		<button id="run-wasm" type="button">Run Wasm</button>
+		<button id="run-api" type="button"><span class="available">Run API</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
+		<button id="run-wasm" type="button"><span class="available">Run Wasm</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
 	</div>
 
 	<h2>Output<span id="executionTime"></span></h2>

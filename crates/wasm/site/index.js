@@ -1,3 +1,4 @@
+'use strict';
 const worker = new Worker("./worker.js", { name: "solver" });
 
 const input_instructions_element = document.getElementById('input-instructions');
@@ -14,24 +15,22 @@ worker.onmessage = (e) => {
   if ('wasmWorking' in e.data) {
     if (!e.data.wasmWorking) {
         run_wasm_element.disabled = true;
+        run_wasm_element.classList.add('unusable');
         run_wasm_element.title = 'Wasm is not working - check console logs';
     }
-    return;
+  } else {
+      const { isError, output, wasm, executionTime } = e.data;
+      (wasm ? run_wasm_element : run_api_element).disabled = false;
+      showMessage(output, isError, wasm, executionTime);
   }
-  const { isError, output, wasm, executionTime } = e.data;
-  let activeButton = document.querySelector('.in-progress');
-  activeButton.innerHTML = 'Run ' + (wasm ? 'Wasm' : 'API');
-  activeButton.disabled = false;
-  activeButton.classList.remove('in-progress');
-  showMessage(output, isError, wasm, executionTime);
 }
 
 function showMessage(message, isError, wasm, executionTime) {
-  executionTime_element.textContent = ' (from ' + (wasm?'Wasm':'API') + ' in ' + Math.round(executionTime) + ' ms)';
+  executionTime_element.textContent = ` (${wasm ? 'Wasm' : 'API'} in ${Math.round(executionTime)} ms)`;
   if (isError) {
     output_element.classList.add('error');
   } else {
-    clearError(false);
+    output_element.classList.remove('error');
   }
   output_element.textContent = message;
   output_element.scrollIntoView();
@@ -39,26 +38,13 @@ function showMessage(message, isError, wasm, executionTime) {
   output_element.focus();
 }
 
-function clearError() {
-  output_element.innerHTML = '&nbsp;';
-  output_element.classList.remove('error');
-}
-
 function execute(event, wasm) {
-  if (!document.querySelector("form").reportValidity()) {
-      return;
+  if (document.querySelector("form").reportValidity()) {
+      event.target.disabled = true;
+      output_element.classList.remove('blink');
+      const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
+      worker.postMessage({year, day, part, input, wasm});
   }
-  const year = year_element.options[year_element.selectedIndex].value;
-  const day = day_element.options[day_element.selectedIndex].value;
-  const part = part_element.options[part_element.selectedIndex].value;
-  const input = input_element.value;
-
-  let button = event.target;
-  button.disabled = true;
-  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
-  button.classList.add('in-progress');
-  output_element.classList.remove('blink');
-  worker.postMessage({year, day, part, input, wasm});
 }
 
 function updateInputLink() {
@@ -66,18 +52,15 @@ function updateInputLink() {
   input_instructions_element.innerHTML = `Your input is at <a href="https://${link}">${link}</a>.`;
 }
 
-window.addEventListener('pageshow', () => updateInputLink());
+window.addEventListener('pageshow', updateInputLink);
 
 async function run() {
   run_api_element.addEventListener("click", (event) => execute(event, false));
   run_wasm_element.addEventListener("click", (event) => execute(event, true));
 
-  [year_element, day_element, part_element, input_element].forEach(element => element.addEventListener('input', (event) => {
-    //element.setCustomValidity('');
-    updateInputLink();
-  }, false));
+  [year_element, day_element].forEach(element => element.addEventListener('input', updateInputLink, false));
 
-  if (navigator.clipboard) {
+  if (navigator.clipboard && navigator.clipboard.readText) {
     const pasteButton = document.getElementById('paste');
     pasteButton.classList.remove('hidden');
     document.getElementById('paste').addEventListener('click', async () => {
