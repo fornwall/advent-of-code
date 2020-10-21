@@ -1,0 +1,42 @@
+name: Benchmark
+
+on: push
+
+jobs:
+  benchmark:
+    defaults:
+      run:
+        working-directory: crates/core
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly
+    - name: Install cargo benchcmp
+      run: cargo install cargo-benchcmp
+    - name: Run benchmark on current commit
+      run: |
+        cargo +nightly bench > new-benchmark
+    - name: Run benchmark on previous commit
+      run: |
+        git checkout HEAD~1
+        cargo +nightly bench > old-benchmark
+    - name: Compare benchmarks on current and previous commit
+      run: |
+        cargo benchcmp old-benchmark new-benchmark > benchcmp.txt
+        cat benchcmp.txt
+    - id: get-comment-body
+      run: |
+        body=$(cat benchcmp.txt)
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}" 
+        echo ::set-output name=body::$body
+    - name: Create commit comment
+      uses: peter-evans/commit-comment@v1
+      with:
+        body: ${{ steps.get-comment-body.outputs.body }}
+

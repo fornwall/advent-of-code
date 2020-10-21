@@ -37,25 +37,6 @@ jobs:
         LLVM_CONFIG=llvm-config-11 make CLIPPY_NIGHTLY=1 check
       if: matrix.rust == 'nightly'
 
-  benchmark:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
-    - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: nightly
-    - name: Install cargo benchcmp
-      run: cargo install cargo-benchcmp
-    - name: Run benchmark
-      run: |
-        cd crates/core
-        cargo +nightly bench > new-benchmark
-        git checkout HEAD~1
-        cargo +nightly bench > old-benchmark
-        cargo benchcmp old-benchmark new-benchmark
-
   test-python:
     runs-on: ubuntu-latest
     strategy:
@@ -91,7 +72,6 @@ jobs:
   build-python-wheels:
     env:
       CIBW_SKIP: "cp27-* cp34-* cp35-* cp36-* pp* *i686 *win32"
-    # name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
