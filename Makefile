@@ -25,16 +25,15 @@ bench:
 
 site:
 	cd crates/wasm && \
-		wasm-pack build $(wasm_pack_profile) --target no-modules --out-dir target/web && \
-		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > target/web/picnic-6.5.3.min.css && \
-		curl https://adventofcode.com/favicon.ico > target/web/favicon.ico && \
-		for i in site/*; do ln -f $$i target/web/`basename $$i`; done
+		wasm-pack build $(wasm_pack_profile) --target no-modules --out-dir site && \
+		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > site/picnic-6.5.3.min.css && \
+		curl https://adventofcode.com/favicon.ico > site/favicon.ico
 
 wasm-size: site
-	ls -la crates/wasm/target/web/advent_of_code_wasm_bg.wasm
+	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
 serve-site: site
-	cd crates/wasm/target/web && devserver --address 192.168.2.30:8080
+	cd crates/wasm/site && devserver
 
 serve-api:
 	cd crates/server && cargo run
