@@ -24,8 +24,5 @@ pub fn solve(
     let year = as_string(year);
     let day = as_string(day);
     let part = as_string(part);
-    match solve_raw(&year, &day, &part, &input) {
-        Ok(value) => Ok(value),
-        Err(error) => Err(js_sys::Error::new(&error).into()),
-    }
+    solve_raw(&year, &day, &part, &input).map_err(|error| JsValue::from(js_sys::Error::new(&error)))
 }
