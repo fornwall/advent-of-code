@@ -1,4 +1,4 @@
-ifeq ($(DEBUG),1)
+ifeq ($(DEBUG_WASM),1)
   wasm_pack_profile=--dev
 else
   wasm_pack_profile=--release
@@ -14,26 +14,39 @@ ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
 endif
 
+WASM_PACK_COMMAND := wasm-pack build $(wasm_pack_profile) --target no-modules --out-dir site
+
 check:
 	$(CLIPPY_CARGO) fmt --all
 	$(CLIPPY_CARGO) clippy --tests $(CLIPPY_PARAMS)
 	$(CLIPPY_CARGO) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
 	$(CLIPPY_CARGO) test
 
+install-cargo-deps:
+	cargo install cargo-benchcmp cargo-watch devserver
+
 bench:
 	cargo +nightly bench
 
-site:
+site-downloads:
 	cd crates/wasm && \
-		wasm-pack build $(wasm_pack_profile) --target no-modules --out-dir site && \
 		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > site/picnic-6.5.3.min.css && \
 		curl https://adventofcode.com/favicon.ico > site/favicon.ico
 
-wasm-size: site
+site-wasmpack:
+	cd crates/wasm && $(WASM_PACK_COMMAND)
+
+wasm-size: site-wasmpack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
-serve-site: site
+run-devserver:
 	cd crates/wasm/site && devserver
+
+watch-and-build-wasm:
+	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND)'
+
+serve-site: site
+	make DEBUG_WASM=1 -j run-devserver watch-and-build-wasm
 
 serve-api:
 	cd crates/server && cargo run
@@ -61,8 +74,10 @@ netlify:
 		sh /tmp/rustup.sh -y && \
 		. $(HOME)/.cargo/env && \
 		make install-wasm-pack && \
-		make site && \
+		make site-wasmpack && \
+		make site-downloads && \
 		make node-package && \
 		cd crates/wasm/functions && npm install
 
-.PHONY: bench check site wasm-size serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
+.PHONY: check install-cargo-deps bench site-downloads site-wasmpack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
+
