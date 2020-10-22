@@ -81,15 +81,22 @@ async function run() {
   }, false));
 
   if (navigator.clipboard && navigator.clipboard.readText) {
-    const pasteButton = document.getElementById('paste');
-    pasteButton.classList.remove('hidden');
-    document.getElementById('paste').addEventListener('click', async () => {
-      try {
-        input_element.value = await navigator.clipboard.readText();
-      } catch (e) {
-        console.log(e);
-      }
-    }, false);
+    let possiblyPermitted = true;
+    if (navigator.permissions) {
+      const permission = await navigator.permissions.query({name: 'clipboard-read'});
+      possiblyPermitted = permission.state != 'denied';
+    }
+    if (possiblyPermitted) {
+      const pasteButton = document.getElementById('paste');
+      pasteButton.classList.remove('hidden');
+      pasteButton.addEventListener('click', async () => {
+        try {
+          input_element.value = await navigator.clipboard.readText();
+        } catch (e) {
+          console.log(e);
+        }
+      }, false);
+    }
   }
 
   if (window.showOpenFilePicker) {
