@@ -1,0 +1,17 @@
+{
+  "name": "AdventOfCode",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": { "DOCKER_IMAGE": "rustlang/rust:nightly-slim" }
+  },
+
+  "settings": { 
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+
+  "extensions": [
+    "matklad.rust-analyzer"
+  ],
+
+  "forwardPorts": [8080]
+}
