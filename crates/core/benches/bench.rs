@@ -30,6 +30,31 @@ macro_rules! run_bench {
         }
     };
 }
+run_bench!(2018, 01);
+run_bench!(2018, 02);
+run_bench!(2018, 03);
+run_bench!(2018, 04);
+run_bench!(2018, 05);
+run_bench!(2018, 06);
+run_bench!(2018, 07);
+run_bench!(2018, 08);
+run_bench!(2018, 09);
+run_bench!(2018, 10);
+run_bench!(2018, 11);
+run_bench!(2018, 12);
+run_bench!(2018, 13);
+run_bench!(2018, 14);
+run_bench!(2018, 15);
+run_bench!(2018, 16);
+run_bench!(2018, 17);
+run_bench!(2018, 18);
+run_bench!(2018, 19);
+run_bench!(2018, 20);
+run_bench!(2018, 21);
+run_bench!(2018, 22);
+run_bench!(2018, 23);
+run_bench!(2018, 24);
+run_bench!(2018, 25);
 
 run_bench!(2019, 01);
 run_bench!(2019, 02);

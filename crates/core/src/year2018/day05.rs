@@ -1,107 +1,47 @@
-use std::cmp;
-use std::collections::HashSet;
+type PolymerUnit = u8;
 
-fn destroys_eachother(a: u8, b: u8) -> bool {
-    a != b && (a as char).to_ascii_lowercase() == (b as char).to_ascii_lowercase()
+fn destroys_each_other(a: PolymerUnit, b: PolymerUnit) -> bool {
+    a.eq_ignore_ascii_case(&b) && a != b
+}
+
+fn solution(input: &str, part1: bool) -> Result<usize, String> {
+    let input_polymer = input.as_bytes();
+    let mut new_polymer = Vec::<PolymerUnit>::with_capacity(input_polymer.len());
+
+    let candidates_for_removal = if part1 { 0..1 } else { b'a'..b'z' };
+
+    candidates_for_removal
+        .map(|to_remove_lower| {
+            new_polymer.clear();
+
+            for &unit in input_polymer
+                .iter()
+                .filter(|unit| !unit.eq_ignore_ascii_case(&to_remove_lower))
+            {
+                let unit_reacts_with_last = new_polymer
+                    .last()
+                    .map(|&last| destroys_each_other(unit, last))
+                    .unwrap_or(false);
+
+                if unit_reacts_with_last {
+                    new_polymer.pop();
+                } else {
+                    new_polymer.push(unit);
+                }
+            }
+
+            new_polymer.len()
+        })
+        .min()
+        .ok_or_else(|| "Internal error".to_string())
 }
 
 pub fn part1(input: &str) -> Result<usize, String> {
-    let bytes = input.as_bytes();
-    let length = fully_react(bytes);
-    Ok(length)
-}
-
-fn fully_react(bytes: &[u8]) -> usize {
-    if bytes.len() < 2 {
-        return bytes.len();
-    }
-
-    let mut destroyed = vec![false; bytes.len()];
-
-    let mut start = 0;
-    let mut end = 1;
-
-    let end_index = bytes.len() - 1;
-
-    'outer: loop {
-        let a = bytes[start];
-        let b = bytes[end];
-
-        if destroys_eachother(a, b) {
-            destroyed[start] = true;
-            destroyed[end] = true;
-
-            while destroyed[start] {
-                if start == 0 {
-                    break;
-                }
-                start -= 1;
-            }
-
-            while destroyed[end] {
-                if end == end_index {
-                    break;
-                }
-                end += 1;
-            }
-
-            if destroyed[start] {
-                if end == end_index {
-                    break 'outer;
-                } else {
-                    start = end;
-                    end += 1;
-                }
-            }
-        } else if end == end_index {
-            break 'outer;
-        } else {
-            start = end;
-            end += 1;
-            while destroyed[end] {
-                if end == end_index {
-                    break 'outer;
-                } else {
-                    end += 1;
-                }
-            }
-
-            if end == end_index {
-                break 'outer;
-            }
-        }
-    }
-
-    destroyed
-        .iter()
-        .filter(|unit_destroyed| !*unit_destroyed)
-        .count()
+    solution(input, true)
 }
 
 pub fn part2(input: &str) -> Result<usize, String> {
-    let bytes = input.as_bytes();
-
-    let mut considered_unit_types_lower = HashSet::new();
-
-    let result = bytes
-        .iter()
-        .fold(input.len() + 1, |shortest_length, unit_type| {
-            let unit_type_lower = unit_type.to_ascii_lowercase();
-
-            if considered_unit_types_lower.insert(unit_type_lower) {
-                let filtered: Vec<u8> = bytes
-                    .iter()
-                    .filter(|b| b.to_ascii_lowercase() != unit_type_lower)
-                    .cloned()
-                    .collect();
-
-                let length = fully_react(&filtered);
-                cmp::min(shortest_length, length)
-            } else {
-                shortest_length
-            }
-        });
-    Ok(result)
+    solution(input, false)
 }
 
 #[test]

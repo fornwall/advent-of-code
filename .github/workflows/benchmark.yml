@@ -1,0 +1,73 @@
+name: Benchmark
+
+on: push
+
+jobs:
+  benchmark-current:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly
+    - name: Run benchmark on current commit
+      run: cd crates/core && cargo +nightly bench > new-benchmark.txt
+    - name: Upload benchmark on current commit
+      uses: actions/upload-artifact@v2
+      with:
+        name: new-benchmark
+        path: crates/core/new-benchmark.txt
+
+  benchmark-previous:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly
+    - name: Checkout previous commit
+      run: git checkout HEAD~1
+    - name: Run benchmark on previous commit
+      run: cd crates/core && cargo +nightly bench > old-benchmark.txt
+    - name: Upload benchmark on previous commit
+      uses: actions/upload-artifact@v2
+      with:
+        name: old-benchmark
+        path: crates/core/old-benchmark.txt
+
+  compare-benchmarks:
+    needs: [benchmark-current, benchmark-previous]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download benchmarks
+      uses: actions/download-artifact@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly
+    - name: Install cargo benchcmp
+      run: cargo install cargo-benchcmp
+    - name: Compare benchmarks on current and previous commit
+      run: |
+        cargo benchcmp old-benchmark/old-benchmark.txt new-benchmark/new-benchmark.txt > benchcmp.txt
+        cat benchcmp.txt
+    - name: Format commit comment
+      id: get-comment-body
+      run: |
+        body=$(./.github/workflows/benchcmp-to-diff.py benchcmp.txt)
+        body="${body//'%'/'%25'}"
+        body="${body//' '/' '}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}" 
+        echo ::set-output name=body::$body
+    - name: Post commit comment
+      uses: peter-evans/commit-comment@v1
+      with:
+        body: ${{ steps.get-comment-body.outputs.body }}
+    - run: ls -lha .github/workflows/
+

@@ -9,10 +9,7 @@ dist/
 /bin/
 node_modules
 
-/crates/wasm/wasm/advent_of_code_rs_bin/package.json
 package-lock.json
-/wasm/html/dist
-/wasm/html/package-lock.json
 
 /crates/python/env
 /crates/python/build/

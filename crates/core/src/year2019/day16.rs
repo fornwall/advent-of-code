@@ -1,5 +1,3 @@
-use std::iter::once;
-
 fn parse_digits(input_string: &str) -> Result<Vec<i32>, String> {
     let result = input_string
         .chars()
@@ -16,25 +14,20 @@ fn parse_digits(input_string: &str) -> Result<Vec<i32>, String> {
 }
 
 pub fn part1(input_string: &str) -> Result<String, String> {
+    const PHASES: usize = 100;
     let mut digits = parse_digits(input_string)?;
     let mut new_digits = vec![0; digits.len()];
-    for _ in 0..100 {
+    for _ in 0..PHASES {
         for (index, digit) in new_digits.iter_mut().enumerate() {
-            *digit = digits
-                .iter()
-                .zip(
-                    once(0)
-                        .cycle()
-                        .take(index + 1)
-                        .chain(once(1).cycle().take(index + 1))
-                        .chain(once(0).cycle().take(index + 1))
-                        .chain(once(-1).cycle().take(index + 1))
-                        .cycle()
-                        .skip(1),
-                )
-                .fold(0, |acc, (&digit, mult)| acc + digit * mult)
-                .abs()
-                % 10;
+            let positives: i32 = (index..digits.len())
+                .step_by((index + 1) * 4)
+                .flat_map(|i| digits.iter().skip(i).take(index + 1))
+                .sum();
+            let negatives: i32 = ((index + ((index + 1) * 2))..digits.len())
+                .step_by((index + 1) * 4)
+                .flat_map(|i| digits.iter().skip(i).take(index + 1))
+                .sum();
+            *digit = (positives - negatives).abs() % 10;
         }
 
         std::mem::swap(&mut digits, &mut new_digits);

@@ -30,10 +30,7 @@ pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<S
     let year_value = try_to_string::<u16>(year);
     let day_value = try_to_string::<u8>(day);
     let part_value = try_to_string::<u8>(part);
-    match solve_raw(&year_value, &day_value, &part_value, input) {
-        Ok(value) => Ok(value),
-        Err(error) => Err(PyValueError::new_err(error)),
-    }
+    solve_raw(&year_value, &day_value, &part_value, input).map_err(PyValueError::new_err)
 }
 
 // This defines a python module. pyo3 will copy the rust doc comment

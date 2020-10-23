@@ -1,4 +1,4 @@
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 use super::permutation::all_permutations;
 use std::cell::RefCell;
 
@@ -11,7 +11,7 @@ fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     };
     let mut strongest_signal = 0;
 
-    all_permutations(&mut phase_settings, &mut |permutation: &[i64]| {
+    all_permutations(&mut phase_settings, &mut |permutation: &[Word]| {
         let mut amplifier_programs = Vec::with_capacity(5);
         for &phase in permutation.iter() {
             let mut new_program = program.clone();

@@ -2,20 +2,16 @@
 This crates provides solutions for Advent of Code problems.
 */
 #![crate_name = "advent_of_code"]
-use std::fmt::Display;
 
 mod year2017;
 mod year2018;
 mod year2019;
 
-fn to_stringer<T: Display>(
+fn to_stringer<T: ToString>(
     function: fn(&str) -> Result<T, String>,
     input: &str,
 ) -> Result<String, String> {
-    match function(input) {
-        Ok(value) => Ok(value.to_string()),
-        Err(error) => Err(error),
-    }
+    function(input).map(|value| value.to_string())
 }
 
 /// Returns the solution for the specified given problem and input.

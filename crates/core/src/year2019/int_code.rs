@@ -14,7 +14,7 @@ pub struct Program {
 }
 
 enum Parameter {
-    Value(i64),
+    Value(Word),
     Address(usize),
 }
 
@@ -68,17 +68,17 @@ impl Program {
         Ok(())
     }
 
-    pub fn run_for_output(&mut self) -> Result<Vec<i64>, String> {
+    pub fn run_for_output(&mut self) -> Result<Vec<Word>, String> {
         self.run_until_halt_or_input(1_000_000_000)?;
         Ok(std::mem::replace(&mut self.output_values, Vec::new()))
     }
 
-    pub fn run_for_output_limited(&mut self, max_instructions: u32) -> Result<Vec<i64>, String> {
+    pub fn run_for_output_limited(&mut self, max_instructions: u32) -> Result<Vec<Word>, String> {
         self.run_until_halt_or_input(max_instructions)?;
         Ok(std::mem::replace(&mut self.output_values, Vec::new()))
     }
 
-    pub fn input(&mut self, input_value: i64) {
+    pub fn input(&mut self, input_value: Word) {
         if let Some(save_address) = self.requires_input_to {
             self.write_memory(save_address, input_value);
             self.requires_input_to = None;
@@ -89,13 +89,13 @@ impl Program {
 
     pub fn input_string(&mut self, input_string: &str) {
         input_string.chars().for_each(|c| {
-            self.input(c as i64);
+            self.input(c as Word);
         });
     }
 
     fn parameter_mode(
         &self,
-        opcode_and_parameter_modes: i64,
+        opcode_and_parameter_modes: Word,
         parameter_position: u32,
     ) -> Parameter {
         let parameter = self.read_memory(self.instruction_pointer + parameter_position as usize);
@@ -110,7 +110,7 @@ impl Program {
 
     fn output_location(
         &self,
-        opcode_and_parameter_modes: i64,
+        opcode_and_parameter_modes: Word,
         parameter_position: u32,
     ) -> Result<usize, String> {
         if let Parameter::Address(location) =
@@ -121,7 +121,7 @@ impl Program {
         Err("Invalid parameter mode for where to write".to_string())
     }
 
-    fn parameter_value(&self, opcode_and_parameter_modes: i64, parameter_position: u32) -> Word {
+    fn parameter_value(&self, opcode_and_parameter_modes: Word, parameter_position: u32) -> Word {
         match self.parameter_mode(opcode_and_parameter_modes, parameter_position) {
             Parameter::Value(value) => value,
             Parameter::Address(location) => self.read_memory(location),
@@ -210,11 +210,11 @@ impl Program {
         Ok(())
     }
 
-    pub fn read_memory(&self, address: usize) -> i64 {
+    pub fn read_memory(&self, address: usize) -> Word {
         *self.memory.get(&address).unwrap_or(&0_i64)
     }
 
-    pub fn write_memory(&mut self, address: usize, value: i64) {
+    pub fn write_memory(&mut self, address: usize, value: Word) {
         self.memory.insert(address, value);
     }
 }

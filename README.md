@@ -10,7 +10,7 @@
 Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust.
 
 # Libraries
-The `solve(year, day, part, input)` library function is published on these package repositories:
+The `solve(year, day, part, input)` library function is published to these package repositories:
 
 - [crates.io](https://crates.io/crates/advent-of-code) for the Rust library.
 - [npm](https://www.npmjs.com/package/advent-of-code-wasm) for a Node.js library using WebAssembly built with [wasm-pack](https://rustwasm.github.io/wasm-pack/).
