@@ -1,14 +1,14 @@
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 use std::collections::VecDeque;
 
-pub fn run_simulation(input_string: &str, part1: bool) -> Result<i64, String> {
+pub fn run_simulation(input_string: &str, part1: bool) -> Result<Word, String> {
     let program = Program::parse(input_string)?;
     let mut programs = vec![program; 50];
-    let mut input_queues = vec![VecDeque::<(i64, i64)>::new(); 50];
+    let mut input_queues = vec![VecDeque::<(Word, Word)>::new(); 50];
 
     // Assign network addresses:
     for (i, program) in programs.iter_mut().enumerate() {
-        program.input(i as i64);
+        program.input(i as Word);
     }
 
     let mut last_packet_to_nat = (-1, -1);
@@ -59,11 +59,11 @@ pub fn run_simulation(input_string: &str, part1: bool) -> Result<i64, String> {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i64, String> {
+pub fn part1(input_string: &str) -> Result<Word, String> {
     run_simulation(input_string, true)
 }
 
-pub fn part2(input_string: &str) -> Result<i64, String> {
+pub fn part2(input_string: &str) -> Result<Word, String> {
     run_simulation(input_string, false)
 }
 

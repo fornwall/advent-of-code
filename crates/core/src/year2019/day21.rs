@@ -1,6 +1,6 @@
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 
-fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<i64, String> {
+fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<Word, String> {
     let mut intcode_program = Program::parse(intcode_program_string)?;
     intcode_program.run_for_output()?;
     intcode_program.input_string(ascii_program_string);
@@ -19,7 +19,7 @@ fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<i64, 
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i64, String> {
+pub fn part1(input_string: &str) -> Result<Word, String> {
     let mut ascii_program = String::new();
     // Jump if there is a hole at A, B or C ...
     ascii_program.push_str("NOT A T\nOR T J\n");
@@ -32,7 +32,7 @@ pub fn part1(input_string: &str) -> Result<i64, String> {
     run(input_string, &ascii_program)
 }
 
-pub fn part2(input_string: &str) -> Result<i64, String> {
+pub fn part2(input_string: &str) -> Result<Word, String> {
     // ABCDEFGH
     // ???_?..?
     // Do not jump to D if E and H are holes, since we cannot jump again.

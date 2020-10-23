@@ -1,10 +1,10 @@
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 use std::collections::{HashSet, VecDeque};
 
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 
 /// The intcode instruction for moving the robot in the specified direction.
-fn instruction_for_direction(direction: (i32, i32)) -> Result<i64, String> {
+fn instruction_for_direction(direction: (i32, i32)) -> Result<Word, String> {
     Ok(match direction {
         (0, 1) => 1,
         (0, -1) => 2,

@@ -1,4 +1,4 @@
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 use std::collections::HashMap;
 use std::env;
 
@@ -13,13 +13,13 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
         .count())
 }
 
-fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
+fn render(current_score: Word, tiles: &HashMap<(Word, Word), Word>) {
     let mut output = String::new();
     output.push_str("\x1b[2J\x1b[H");
-    let mut min_x = std::i64::MAX;
-    let mut max_x = std::i64::MIN;
-    let mut min_y = std::i64::MAX;
-    let mut max_y = std::i64::MIN;
+    let mut min_x = Word::MAX;
+    let mut max_x = Word::MIN;
+    let mut min_y = Word::MAX;
+    let mut max_y = Word::MIN;
     for &(x, y) in tiles.keys() {
         min_x = std::cmp::min(min_x, x);
         max_x = std::cmp::max(max_x, x);
@@ -45,7 +45,7 @@ fn render(current_score: i64, tiles: &HashMap<(i64, i64), i64>) {
     std::thread::sleep(std::time::Duration::from_millis(10));
 }
 
-pub fn part2(input_string: &str) -> Result<i64, String> {
+pub fn part2(input_string: &str) -> Result<Word, String> {
     let mut program = Program::parse(input_string)?;
 
     // "Memory address 0 represents the number of quarters that

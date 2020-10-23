@@ -1,5 +1,5 @@
 use super::character_recognition::recognize;
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -9,7 +9,7 @@ enum Color {
 }
 
 impl Color {
-    fn from(value: i64) -> Result<Self, String> {
+    fn from(value: Word) -> Result<Self, String> {
         Ok(match value {
             0 => Self::Black,
             1 => Self::White,
@@ -58,7 +58,7 @@ fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), C
     }
 
     loop {
-        program.input(*painted.get(&position).unwrap_or(&Color::Black) as i64);
+        program.input(*painted.get(&position).unwrap_or(&Color::Black) as Word);
         let output = program.run_for_output()?;
 
         if program.is_halted() {

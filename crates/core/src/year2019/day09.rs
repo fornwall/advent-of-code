@@ -1,6 +1,6 @@
-use super::int_code::Program;
+use super::int_code::{Program, Word};
 
-fn output_from_input(input_string: &str, input: i64) -> Result<String, String> {
+fn output_from_input(input_string: &str, input: Word) -> Result<String, String> {
     let mut program = Program::parse(input_string)?;
     program.input(input);
 
