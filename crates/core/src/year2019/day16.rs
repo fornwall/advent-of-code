@@ -19,32 +19,15 @@ pub fn part1(input_string: &str) -> Result<String, String> {
     let mut new_digits = vec![0; digits.len()];
     for _ in 0..PHASES {
         for (index, digit) in new_digits.iter_mut().enumerate() {
-            *digit = if index >= digits.len() / 2 {
-                digits.iter().skip(index).sum::<i32>()
-            } else if index >= digits.len() / 3 {
-                digits.iter().skip(index).take(index + 1).sum::<i32>()
-            } else if index >= digits.len() / 4 {
-                let positives: i32 = digits.iter().skip(index).take(index + 1).sum();
-                // index is zero-based, so skip
-                // - index number of zeros
-                // - index + 1 number of ones
-                // - index + 1 number of zeros
-                // = 3 * index + 2
-                let negatives: i32 = digits.iter().skip(3 * index + 2).take(index + 1).sum();
-                positives - negatives
-            } else {
-                let positives: i32 = (index..digits.len())
-                    .step_by((index + 1) * 4)
-                    .flat_map(|i| digits.iter().skip(i).take(index + 1))
-                    .sum();
-                let negatives: i32 = ((index + ((index + 1) * 2))..digits.len())
-                    .step_by((index + 1) * 4)
-                    .flat_map(|i| digits.iter().skip(i).take(index + 1))
-                    .sum();
-                positives - negatives
-            }
-            .abs()
-                % 10;
+            let positives: i32 = (index..digits.len())
+                .step_by((index + 1) * 4)
+                .flat_map(|i| digits.iter().skip(i).take(index + 1))
+                .sum();
+            let negatives: i32 = ((index + ((index + 1) * 2))..digits.len())
+                .step_by((index + 1) * 4)
+                .flat_map(|i| digits.iter().skip(i).take(index + 1))
+                .sum();
+            *digit = (positives - negatives).abs() % 10;
         }
 
         std::mem::swap(&mut digits, &mut new_digits);
