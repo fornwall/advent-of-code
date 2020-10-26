@@ -30,6 +30,10 @@ fn to_stringer<T: ToString>(
 /// assert_eq!(solution, Ok("2".to_string()));
 /// ```
 pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String> {
+    if input.is_empty() {
+        return Err("Empty input".to_string());
+    }
+
     match (year, day, part) {
         (2017, 1, 1) => to_stringer(year2017::day01::part1, input),
         (2017, 1, 2) => to_stringer(year2017::day01::part2, input),
