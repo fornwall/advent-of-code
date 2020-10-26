@@ -6,34 +6,26 @@ const PIXELS_TALL: u32 = 6;
 const LAYER_SIZE: usize = (PIXELS_WIDE * PIXELS_TALL) as usize;
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
+    fn count(slice: &[u8], needle: u8) -> usize {
+        slice
+            .iter()
+            .fold(0, |acc, &b| acc + if b == needle { 1 } else { 0 })
+    }
+
     if input_string.len() % LAYER_SIZE != 0 {
         return Err(format!(
-            "Invalid input - expected to be multiple of layer size {}",
+            "Invalid input - expected to be multiple of layer size ({})",
             LAYER_SIZE
         ));
     }
 
-    let (_, slice) = input_string
+    input_string
         .as_bytes()
         .chunks(LAYER_SIZE)
-        .map(|slice| {
-            let num_zeros = slice
-                .iter()
-                .fold(0, |acc, &b| acc + if b == b'0' { 1 } else { 0 });
-            (num_zeros, slice)
-        })
-        .min_by_key(|(num_zeros, _)| *num_zeros)
-        .ok_or("Nothing found by min_by_key()")?;
-
-    let (count_1, count_2) = slice.iter().fold((0, 0), |acc, &b| {
-        (
-            acc.0 + if b == b'1' { 1 } else { 0 },
-            acc.1 + if b == b'2' { 1 } else { 0 },
-        )
-    });
-    let result = count_1 * count_2;
-
-    Ok(result)
+        .map(|layer| (layer, count(layer, b'0')))
+        .min_by_key(|(_, num_zeros)| *num_zeros)
+        .map(|(layer, _)| count(layer, b'1') * count(layer, b'2'))
+        .ok_or_else(|| "Internal error: No layer".to_string())
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
