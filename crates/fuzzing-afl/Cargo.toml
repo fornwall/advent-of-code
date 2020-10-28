@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-afl-fuzzing"
-version = "2019.12.124"
+version = "2019.12.125"
 keywords = ["advent-of-code", "rust", "afl", "fuzzing"]
 categories = ["algorithms", "rust-patterns"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
