@@ -17,6 +17,7 @@ jobs:
   test-rust:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         rust: [stable]
         experimental: [false]
