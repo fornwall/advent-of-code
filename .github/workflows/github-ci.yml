@@ -18,8 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rust: [stable, nightly]
-    continue-on-error: ${{ matrix.rust == 'nightly' }}
+        rust: [stable]
+        experimental: [false]
+        include:
+        - rust: nightly
+          experimental: true
+    continue-on-error: ${{ matrix.experimental }}
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
