@@ -19,12 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable]
-        experimental: [false]
-        include:
-        - rust: nightly
-          experimental: true
-    continue-on-error: ${{ matrix.experimental }}
+        rust: [stable, nightly]
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
@@ -42,6 +37,7 @@ jobs:
         rustup component add clippy rustfmt --toolchain nightly
         LLVM_CONFIG=llvm-config-11 make CLIPPY_NIGHTLY=1 check
       if: matrix.rust == 'nightly'
+      continue-on-error: true
 
   test-python:
     runs-on: ubuntu-latest
