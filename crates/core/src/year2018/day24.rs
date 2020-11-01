@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 #[derive(Copy, Clone, PartialEq)]
 enum AttackType {
     Bludgeoning,
@@ -10,13 +8,13 @@ enum AttackType {
 }
 
 impl AttackType {
-    fn new(name: &str) -> Result<AttackType, String> {
+    fn new(name: &str) -> Result<Self, String> {
         Ok(match name {
-            "bludgeoning" => AttackType::Bludgeoning,
-            "cold" => AttackType::Cold,
-            "fire" => AttackType::Fire,
-            "radiation" => AttackType::Radiation,
-            "slashing" => AttackType::Slashing,
+            "bludgeoning" => Self::Bludgeoning,
+            "cold" => Self::Cold,
+            "fire" => Self::Fire,
+            "radiation" => Self::Radiation,
+            "slashing" => Self::Slashing,
             _ => {
                 return Err("Invalid attack type".to_string());
             }
@@ -24,6 +22,7 @@ impl AttackType {
     }
 }
 
+#[derive(Clone)]
 struct ArmyGroup {
     id: i32,
     units: i32,
@@ -130,87 +129,81 @@ impl ArmyGroup {
         self.units * self.attack_damage
     }
 
-    fn damage_when_attacking(&self, other_group: &Self) -> i32 {
-        self.effective_power()
-            * if other_group.immunities.contains(&self.attack_type) {
+    fn damage_when_attacked_by(&self, effective_power: i32, attack_type: AttackType) -> i32 {
+        effective_power
+            * if self.immunities.contains(&attack_type) {
                 0
-            } else if other_group.weaknesses.contains(&self.attack_type) {
+            } else if self.weaknesses.contains(&attack_type) {
                 2
             } else {
                 1
             }
     }
 
-    fn attack(&self, other_group: &mut Self) -> bool {
-        let damage = self.damage_when_attacking(other_group);
-        let killed_units = damage / other_group.hit_points;
-        //println!("{} attacks {}, causing damage: {}", self.id, other_group.id, damage);
-        other_group.units -= killed_units;
+    fn resolve_attack(&mut self, attacker_effective_power: i32, attack_type: AttackType) -> bool {
+        let damage = self.damage_when_attacked_by(attacker_effective_power, attack_type);
+        let killed_units = damage / self.hit_points;
+        self.units -= killed_units;
         killed_units > 0
     }
 }
 
-fn execute_battle(groups: Vec<ArmyGroup>) -> Vec<RefCell<ArmyGroup>> {
-    let mut groups: Vec<RefCell<ArmyGroup>> = groups.into_iter().map(RefCell::new).collect();
+fn execute_battle(mut groups: Vec<ArmyGroup>) -> Vec<ArmyGroup> {
     loop {
         // Target selection.
         groups.sort_by(|a, b| {
-            b.borrow()
-                .effective_power()
-                .cmp(&a.borrow().effective_power())
-                .then_with(|| b.borrow().initiative.cmp(&a.borrow().initiative))
+            b.effective_power()
+                .cmp(&a.effective_power())
+                .then_with(|| b.initiative.cmp(&a.initiative))
         });
-        groups.iter().for_each(|g| {
-            g.borrow_mut().attacked_by = -1;
+        groups.iter_mut().for_each(|g| {
+            g.attacked_by = -1;
         });
 
-        for attacking_group in groups.iter() {
-            let attacking_group_id = attacking_group.borrow().id;
-            let immune_system = attacking_group.borrow().immune_system;
+        for i in 0..groups.len() {
+            let (attacker_effective_power, attack_type, attacking_group_id, immune_system) = {
+                let g = &groups[i];
+                (g.effective_power(), g.attack_type, g.id, g.immune_system)
+            };
 
             if let Some(attacked_group) = groups
-                .iter()
+                .iter_mut()
                 // Only consider attacking non-attacked enemies:
-                .filter(|g| {
-                    g.borrow().immune_system != immune_system && g.borrow().attacked_by == -1
-                })
+                .filter(|g| g.immune_system != immune_system && g.attacked_by == -1)
                 // If an attacking group is considering two defending groups to which it would deal equal damage,
                 // it chooses to target the defending group with the largest effective power; if there is still a
                 // tie, it chooses the defending group with the highest initiative:
                 .max_by(|a, b| {
-                    let damage_to_a = attacking_group.borrow().damage_when_attacking(&a.borrow());
-                    let damage_to_b = attacking_group.borrow().damage_when_attacking(&b.borrow());
+                    let damage_to_a =
+                        a.damage_when_attacked_by(attacker_effective_power, attack_type);
+                    let damage_to_b =
+                        b.damage_when_attacked_by(attacker_effective_power, attack_type);
                     damage_to_a
                         .cmp(&damage_to_b)
-                        .then_with(|| {
-                            a.borrow()
-                                .effective_power()
-                                .cmp(&b.borrow().effective_power())
-                        })
-                        .then_with(|| a.borrow().initiative.cmp(&b.borrow().initiative))
+                        .then_with(|| a.effective_power().cmp(&b.effective_power()))
+                        .then_with(|| a.initiative.cmp(&b.initiative))
                 })
             {
                 // If it cannot deal any defending groups damage, it does not choose a target:
-                if attacking_group
-                    .borrow()
-                    .damage_when_attacking(&attacked_group.borrow())
-                    > 0
+                if attacked_group.damage_when_attacked_by(attacker_effective_power, attack_type) > 0
                 {
-                    attacked_group.borrow_mut().attacked_by = attacking_group_id;
+                    attacked_group.attacked_by = attacking_group_id;
                 }
             }
         }
 
         // Attacking.
         let mut any_killed_units = false;
-        groups.sort_by(|a, b| b.borrow().initiative.cmp(&a.borrow().initiative));
-        for attacking_group in groups.iter() {
-            if attacking_group.borrow().is_alive() {
-                let attacking_group_id = attacking_group.borrow().id;
-                for other_group in groups.iter() {
-                    let mut other_group_borrowed = other_group.borrow_mut();
-                    if other_group_borrowed.attacked_by == attacking_group_id
-                        && attacking_group.borrow().attack(&mut other_group_borrowed)
+        groups.sort_by(|a, b| b.initiative.cmp(&a.initiative));
+        for i in 0..groups.len() {
+            let (attacking_group_id, is_alive, effective_power, attack_type) = {
+                let g = &groups[i];
+                (g.id, g.is_alive(), g.effective_power(), g.attack_type)
+            };
+            if is_alive {
+                for other_group in groups.iter_mut() {
+                    if other_group.attacked_by == attacking_group_id
+                        && other_group.resolve_attack(effective_power, attack_type)
                     {
                         any_killed_units = true;
                     }
@@ -222,11 +215,11 @@ fn execute_battle(groups: Vec<ArmyGroup>) -> Vec<RefCell<ArmyGroup>> {
             break;
         }
 
-        groups.retain(|g| g.borrow().is_alive());
+        groups.retain(|g| g.is_alive());
 
         let alive_sides = groups.iter().fold((false, false), |acc, g| {
             let mut result = acc;
-            if g.borrow().immune_system {
+            if g.immune_system {
                 result.0 = true;
             } else {
                 result.1 = true;
@@ -243,7 +236,7 @@ fn execute_battle(groups: Vec<ArmyGroup>) -> Vec<RefCell<ArmyGroup>> {
 
 pub fn part1(input_string: &str) -> Result<i32, String> {
     let groups = execute_battle(ArmyGroup::parse(input_string)?);
-    let result = groups.iter().fold(0, |acc, g| acc + g.borrow().units);
+    let result = groups.iter().fold(0, |acc, g| acc + g.units);
     Ok(result)
 }
 
@@ -259,8 +252,8 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
 
         let groups = execute_battle(groups);
 
-        if groups.iter().all(|g| g.borrow().immune_system) {
-            let result = groups.iter().fold(0, |acc, g| acc + g.borrow().units);
+        if groups.iter().all(|g| g.immune_system) {
+            let result = groups.iter().fold(0, |acc, g| acc + g.units);
             return Ok(result);
         }
 
