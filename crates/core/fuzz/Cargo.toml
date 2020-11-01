@@ -1,0 +1,28 @@
+[package]
+name = "advent-of-code-libfuzzer-fuzzing"
+version = "1.0.0"
+keywords = ["advent-of-code", "rust", "afl", "fuzzing"]
+categories = ["algorithms", "rust-patterns"]
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+repository = "https://github.com/fornwall/advent-of-code"
+description = "Fuzzing of solutions to Advent of Code written in Rust"
+license = "MIT"
+edition = "2018"
+
+[dependencies]
+advent-of-code = { path = ".." }
+libfuzzer-sys = "0.3"
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_target"
+path = "fuzz_targets/fuzz_target.rs"
+
+test = false
+doc = false
+

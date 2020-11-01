@@ -1,4 +1,4 @@
-name: Fuzz with AFL
+name: Fuzz testing
 
 on: push
 
@@ -13,7 +13,7 @@ jobs:
       run: cd crates/fuzzing-afl && timeout 900s ./check-seed.sh
       continue-on-error: true
 
-  fuzz:
+  fuzz-afl:
     runs-on: ubuntu-latest
     steps:
     - name: Check out source code
@@ -30,3 +30,19 @@ jobs:
       with:
         path: ./crates/fuzzing-afl/target/crashes-to-upload/
         name: fuzzing-crashes-afl
+
+  fuzz-libfuzzer:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly
+    - name: Install current LLVM
+      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+    - name: Install cargo-fuzz
+      run: cargo install cargo-fuzz
+    - name: Fuzz with libfuzzer
+      working-directory: crates/core
+      run: cargo fuzz run fuzz_target -max_total_time=1800
