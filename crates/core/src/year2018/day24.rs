@@ -1,7 +1,6 @@
 use std::cell::RefCell;
-use std::collections::HashSet;
 
-#[derive(Copy, Clone, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 enum AttackType {
     Bludgeoning,
     Cold,
@@ -32,8 +31,8 @@ struct ArmyGroup {
     attack_damage: i32,
     attack_type: AttackType,
     initiative: i32,
-    weaknesses: HashSet<AttackType>,
-    immunities: HashSet<AttackType>,
+    weaknesses: Vec<AttackType>,
+    immunities: Vec<AttackType>,
     immune_system: bool,
     attacked_by: i32,
 }
@@ -60,8 +59,8 @@ impl ArmyGroup {
                 // an attack that does 4507 fire damage at initiative 2".
                 let main_parts: Vec<&str> = line.split(|c| c == '(' || c == ')').collect();
 
-                let mut weaknesses = HashSet::new();
-                let mut immunities = HashSet::new();
+                let mut weaknesses = Vec::new();
+                let mut immunities = Vec::new();
                 let units;
                 let hit_points;
                 let attack_damage;
@@ -98,11 +97,11 @@ impl ArmyGroup {
                     for part in main_parts[1].split("; ") {
                         if part.starts_with("weak to") {
                             for s in part[8..].split(", ") {
-                                weaknesses.insert(AttackType::new(s)?);
+                                weaknesses.push(AttackType::new(s)?);
                             }
                         } else {
                             for s in part[10..].split(", ") {
-                                immunities.insert(AttackType::new(s)?);
+                                immunities.push(AttackType::new(s)?);
                             }
                         }
                     }
