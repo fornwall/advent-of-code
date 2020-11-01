@@ -22,7 +22,6 @@ impl AttackType {
     }
 }
 
-#[derive(Clone)]
 struct ArmyGroup {
     id: i32,
     units: i32,

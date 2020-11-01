@@ -2,7 +2,7 @@ use std::collections::{HashMap, VecDeque};
 
 pub type Word = i64;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Program {
     memory: HashMap<usize, Word>,
     instruction_pointer: usize,
