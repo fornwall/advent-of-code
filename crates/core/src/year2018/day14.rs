@@ -4,7 +4,10 @@ where
 {
     const MAX_ITERATIONS: i32 = 100_000_000;
 
-    let mut scores = vec![3_u8, 7_u8];
+    let mut scores = Vec::with_capacity(25_000_000);
+    scores.push(3_u8);
+    scores.push(7_u8);
+
     let push_score = |scores: &mut Vec<u8>, score: u8| {
         scores.push(score);
         condition(scores)
@@ -14,8 +17,9 @@ where
 
     let mut loop_count = 0;
     loop {
-        let current_recipes_score =
-            scores[elf_positions.0 as usize] + scores[elf_positions.1 as usize];
+        let score0 = scores[elf_positions.0 as usize];
+        let score1 = scores[elf_positions.1 as usize];
+        let current_recipes_score = score0 + score1;
 
         let done = if current_recipes_score < 10 {
             push_score(&mut scores, current_recipes_score)
@@ -27,10 +31,8 @@ where
             return Ok(scores);
         }
 
-        elf_positions.0 =
-            (elf_positions.0 + 1 + scores[elf_positions.0 as usize] as u32) % scores.len() as u32;
-        elf_positions.1 =
-            (elf_positions.1 + 1 + scores[elf_positions.1 as usize] as u32) % scores.len() as u32;
+        elf_positions.0 = (elf_positions.0 + 1 + score0 as u32) % scores.len() as u32;
+        elf_positions.1 = (elf_positions.1 + 1 + score1 as u32) % scores.len() as u32;
 
         loop_count += 1;
         if loop_count > MAX_ITERATIONS {
