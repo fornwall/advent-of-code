@@ -1,16 +1,39 @@
 use std::cell::RefCell;
 use std::collections::HashSet;
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Eq, Hash, PartialEq)]
+enum AttackType {
+    Bludgeoning,
+    Cold,
+    Fire,
+    Radiation,
+    Slashing,
+}
+
+impl AttackType {
+    fn new(name: &str) -> Result<AttackType, String> {
+        Ok(match name {
+            "bludgeoning" => AttackType::Bludgeoning,
+            "cold" => AttackType::Cold,
+            "fire" => AttackType::Fire,
+            "radiation" => AttackType::Radiation,
+            "slashing" => AttackType::Slashing,
+            _ => {
+                return Err("Invalid attack type".to_string());
+            }
+        })
+    }
+}
+
 struct ArmyGroup {
     id: i32,
     units: i32,
     hit_points: i32,
     attack_damage: i32,
-    attack_type: String,
+    attack_type: AttackType,
     initiative: i32,
-    weaknesses: HashSet<String>,
-    immunities: HashSet<String>,
+    weaknesses: HashSet<AttackType>,
+    immunities: HashSet<AttackType>,
     immune_system: bool,
     attacked_by: i32,
 }
@@ -54,7 +77,7 @@ impl ArmyGroup {
                     units = words[0].parse::<i32>().map_err(error)?;
                     hit_points = words[4].parse::<i32>().map_err(error)?;
                     attack_damage = words[12].parse::<i32>().map_err(error)?;
-                    attack_type = words[13].to_string();
+                    attack_type = AttackType::new(words[13])?;
                     initiative = words[17].parse::<i32>().map_err(error)?;
                 } else {
                     if main_parts.len() != 3 {
@@ -69,18 +92,18 @@ impl ArmyGroup {
                     units = before_parentheses[0].parse::<i32>().map_err(error)?;
                     hit_points = before_parentheses[4].parse::<i32>().map_err(error)?;
                     attack_damage = after_parentheses[5].parse::<i32>().map_err(error)?;
-                    attack_type = after_parentheses[6].to_string();
+                    attack_type = AttackType::new(after_parentheses[6])?;
                     initiative = after_parentheses[10].parse::<i32>().map_err(error)?;
 
                     for part in main_parts[1].split("; ") {
                         if part.starts_with("weak to") {
-                            part[8..].split(", ").for_each(|s| {
-                                weaknesses.insert(s.to_string());
-                            });
+                            for s in part[8..].split(", ") {
+                                weaknesses.insert(AttackType::new(s)?);
+                            }
                         } else {
-                            part[10..].split(", ").for_each(|s| {
-                                immunities.insert(s.to_string());
-                            });
+                            for s in part[10..].split(", ") {
+                                immunities.insert(AttackType::new(s)?);
+                            }
                         }
                     }
                 }
