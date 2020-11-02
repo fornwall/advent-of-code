@@ -68,8 +68,8 @@ fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     let mut optimal_point = (0, 0);
 
     for square_width in if part1 { 3..=3 } else { 1..=300 } {
-        for x in 1..=(SummedAreaTable::SIZE - square_width) {
-            for y in 1..=(SummedAreaTable::SIZE - square_width) {
+        for y in 1..=(SummedAreaTable::SIZE - square_width) {
+            for x in 1..=(SummedAreaTable::SIZE - square_width) {
                 let square_power = table.square_power(x, y, square_width);
                 if square_power > optimal_power {
                     optimal_square_width = square_width;
