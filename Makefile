@@ -67,7 +67,12 @@ install-wasm-pack:
 
 fuzz-afl:
 	cargo install afl
-	cd crates/fuzzing-afl/ && ./fuzz.sh
+	cd crates/fuzzing-afl/ && \
+		cargo afl build && \
+		rm -Rf target/fuzz-findings && \
+		mkdir -p target/fuzz-findings && \
+		cargo afl fuzz -i testcase-dir -o target/fuzz-findings ../../target/debug/advent-of-code-fuzzing-afl && \
+		rm -Rf rm -Rf target/fuzz-findings/crashes/README.txt
 
 fuzz-hfuzz:
 	cargo install honggfuzz
