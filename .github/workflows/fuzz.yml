@@ -22,7 +22,7 @@ jobs:
     - name: Install current LLVM
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Fuzz with AFL
-      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 make fuzz-afl
+      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
     - name: List crashes found by fuzzing
       run: ls -lha ./crates/fuzzing-afl/target/crashes-to-upload/
     - name: Upload crashes found by fuzzing
