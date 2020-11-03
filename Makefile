@@ -45,7 +45,7 @@ run-devserver:
 watch-and-build-wasm:
 	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND)'
 
-serve-site: site
+serve-site: site-wasmpack
 	make DEBUG_WASM=1 -j run-devserver watch-and-build-wasm
 
 serve-api:
