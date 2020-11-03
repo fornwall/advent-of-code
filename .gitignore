@@ -7,7 +7,9 @@ target/
 /.idea/
 dist/
 /bin/
-node_modules
+node_modules/
+hfuzz_workspace/
+hfuzz_target/
 
 package-lock.json
 
