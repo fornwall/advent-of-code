@@ -76,7 +76,7 @@ fuzz-afl:
 
 fuzz-hfuzz:
 	cargo install honggfuzz
-	cd crates/fuzzing-hfuzz/ && cargo hfuzz run advent-of-code-honggfuzz-fuzzing
+	cd crates/fuzzing-hfuzz/ && cargo hfuzz run advent-of-code-fuzzing-hfuzz
 
 fuzz-libfuzzer:
 	cargo install cargo-fuzz
