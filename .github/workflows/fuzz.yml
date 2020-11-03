@@ -64,6 +64,8 @@ jobs:
     - name: Fuzz with honggfuzz
       run: timeout 1800s make fuzz-honggfuzz
       continue-on-error: true
+      env:
+        HFUZZ_RUN_ARGS: "-t 10 --exit_upon_crash"
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v2
       with:
