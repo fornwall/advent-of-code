@@ -45,7 +45,7 @@ jobs:
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v2
       with:
-        path: crates/core/fuzz/artifacts/fuzz_target/
+        path: crates/fuzzing-libfuzzer/fuzz/artifacts/fuzz_target/
         name: fuzzing-crashes-libfuzzer
 
   fuzz-honggfuzz:
