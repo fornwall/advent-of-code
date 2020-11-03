@@ -41,11 +41,8 @@ jobs:
         rust-version: nightly
     - name: Install current LLVM
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-    - name: Install cargo-fuzz
-      run: cargo install cargo-fuzz
     - name: Fuzz with libfuzzer
-      working-directory: crates/core
-      run: cargo fuzz run fuzz_target -- -max_total_time=1800
+      run: timeout 1800s make fuzz-libfuzzer
       continue-on-error: true
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v2
@@ -62,12 +59,12 @@ jobs:
     - name: Install honggfuzz dependencies
       run: sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
     - name: Fuzz with honggfuzz
-      run: timeout 1800s make fuzz-honggfuzz
+      run: timeout 1800s make fuzz-hfuzz
       continue-on-error: true
       env:
         HFUZZ_RUN_ARGS: "-t 10 --exit_upon_crash"
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v2
       with:
-        path: crates/fuzzing-honggfuzz/hfuzz_workspace/advent-of-code-honggfuzz-fuzzing/*.fuzz
+        path: crates/fuzzing-hfuzz/hfuzz_workspace/advent-of-code-fuzzing-hfuzz/*.fuzz
         name: fuzzing-crashes-honggfuzz

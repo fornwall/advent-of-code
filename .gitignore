@@ -10,6 +10,7 @@ dist/
 node_modules/
 hfuzz_workspace/
 hfuzz_target/
+fuzz_target/
 
 package-lock.json
 

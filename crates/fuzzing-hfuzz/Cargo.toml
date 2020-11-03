@@ -1,5 +1,5 @@
 [package]
-name = "advent-of-code-honggfuzz-fuzzing"
+name = "advent-of-code-fuzzing-hfuzz"
 version = "1.0.0"
 keywords = ["advent-of-code", "rust", "honggfuzz", "fuzzing"]
 categories = ["algorithms", "rust-patterns"]

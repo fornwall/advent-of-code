@@ -69,9 +69,13 @@ fuzz-afl:
 	cargo install afl
 	cd crates/fuzzing-afl/ && ./fuzz.sh
 
-fuzz-honggfuzz:
+fuzz-hfuzz:
 	cargo install honggfuzz
-	cd crates/fuzzing-honggfuzz/ && cargo hfuzz run advent-of-code-honggfuzz-fuzzing
+	cd crates/fuzzing-hfuzz/ && cargo hfuzz run advent-of-code-honggfuzz-fuzzing
+
+fuzz-libfuzzer:
+	cargo install cargo-fuzz
+	cd crates/fuzzing-libfuzzer/ && cargo +nightly fuzz run fuzz_target
 
 netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
