@@ -149,7 +149,7 @@ pub fn part1(input_string: &str) -> Result<SolutionType, String> {
                 let mut new_directions = directions_to_reach_here.clone();
                 new_directions.push(direction);
 
-                if new_room.id.as_str() == "== Security Checkpoint ==" {
+                if new_room.id == "== Security Checkpoint ==" {
                     directions_to_security_checkpoint = new_directions.clone();
                 }
 

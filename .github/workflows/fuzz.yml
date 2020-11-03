@@ -46,3 +46,9 @@ jobs:
     - name: Fuzz with libfuzzer
       working-directory: crates/core
       run: cargo fuzz run fuzz_target -- -max_total_time=1800
+      continue-on-error: true
+    - name: Upload crashes found by fuzzing
+      uses: actions/upload-artifact@v2
+      with:
+        path: crates/core/fuzz/artifacts/fuzz_target/
+        name: fuzzing-crashes-libfuzzer
