@@ -59,6 +59,8 @@ jobs:
     - name: Check out source code
       uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+    - name: Install honggfuzz dependencies
+      run: sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
     - name: Fuzz with honggfuzz
       run: timeout 1800s make fuzz-honggfuzz
       continue-on-error: true
