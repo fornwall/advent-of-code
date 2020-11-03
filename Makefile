@@ -72,7 +72,7 @@ fuzz-afl:
 		rm -Rf target/fuzz-findings && \
 		mkdir -p target/fuzz-findings && \
 		cargo afl fuzz -i testcase-dir -o target/fuzz-findings ../../target/debug/advent-of-code-fuzzing-afl && \
-		rm -Rf rm -Rf target/fuzz-findings/crashes/README.txt
+		./process-files-for-upload.sh target/fuzz-findings/crashes
 
 fuzz-hfuzz:
 	cargo install honggfuzz
@@ -90,7 +90,8 @@ netlify:
 		make site-wasmpack && \
 		make site-downloads && \
 		make node-package && \
-		cd crates/wasm/functions && npm install
+		cd crates/wasm/functions && \
+		npm install
 
 .PHONY: check install-cargo-deps bench site-downloads site-wasmpack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
 
