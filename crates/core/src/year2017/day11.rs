@@ -45,5 +45,5 @@ fn test_part1() {
 
 #[test]
 fn test_part2() {
-    assert_eq!(Ok(0), part2(include_str!("day11_input.txt")));
+    assert_eq!(Ok(1465), part2(include_str!("day11_input.txt")));
 }
