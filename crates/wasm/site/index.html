@@ -15,11 +15,11 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" />
 
 	<style>
-		.input-group>.input-group-prepend {
-			flex: 0 0 8%;
+		.input-group .input-group-text {
+			min-width: 4em;
 		}
 
-		.input-group .input-group-text {
+		.input-group-prepend label {
 			width: 100%;
 		}
 
@@ -72,8 +72,11 @@
 
 			<div class="form-group">
 				<div class="input-group">
+
 					<div class="input-group-prepend">
-						<span class="input-group-text">Year</span>
+						<label for="year">
+							<span class="input-group-text">Year</span>
+						</label>
 					</div>
 					<select id="year" accesskey="y" class="form-control">
 						<option value="2019">2019</option>
@@ -86,7 +89,10 @@
 			<div class="form-group">
 				<div class="input-group">
 					<div class="input-group-prepend">
-						<span class="input-group-text">Day</span>
+						<label for="day">
+
+							<span class="input-group-text">Day</span>
+						</label>
 					</div>
 					<select id="day" accesskey="d" class="form-control">
 						<option value="1">1</option>
@@ -121,7 +127,9 @@
 			<div class="form-group">
 				<div class="input-group">
 					<div class="input-group-prepend">
-						<span class="input-group-text">Part</span>
+						<label for="part">
+							<span class="input-group-text">Part</span>
+						</label>
 					</div>
 					<select id="part" accesskey="p" class="form-control">
 						<option value="1">1</option>
