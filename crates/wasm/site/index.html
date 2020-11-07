@@ -2,101 +2,162 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8"/>
+	<meta charset="utf-8" />
 	<title>Advent of Code solver</title>
-	<meta name="description" content="A solver of Advent of Code problems"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<link rel="preload" href="/index.js" as="script" crossorigin="anonymous"/>
-	<link rel="modulepreload" href="/worker.js"/>
-	<link rel="modulepreload" href="/advent_of_code_wasm.js"/>
-	<link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous"/>
-	<link rel="stylesheet" href="/picnic-6.5.3.min.css"/>
+	<meta name="description" content="A solver of Advent of Code problems" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="preload" href="/index.js" as="script" crossorigin="anonymous" />
+	<link rel="modulepreload" href="/worker.js" />
+	<link rel="modulepreload" href="/advent_of_code_wasm.js" />
+	<link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+		integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" />
+
 	<style>
-    h1 { padding-top: 0; }
-    .content { padding: 1em; }
-    .blink { animation: blinker 0.5s linear 3; }
-    .error { color: red; }
-    @keyframes blinker { 50% { color: rgba(0,0,0,0); } }
-    .buttons { text-align: right; }
-    .hidden { display: none; }
-    #output { padding: .3em .6em; background: #f5f5f5; border-radius: .2em; }
-    p { margin-top: 0; }
-    button { min-width: 8em; }
-    button .in-progress { display: none; }
-    button:disabled:not(.unusable) .available { display: none; }
-    button:disabled:not(.unusable) .in-progress { display: inline; }
+		.input-group>.input-group-prepend {
+			flex: 0 0 8%;
+		}
+
+		.input-group .input-group-text {
+			width: 100%;
+		}
+
+		.blink {
+			animation: blinker 0.5s linear 3;
+		}
+
+		.error {
+			color: red;
+		}
+
+		@keyframes blinker {
+			50% {
+				color: rgba(0, 0, 0, 0);
+			}
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		button {
+			min-width: 10em;
+		}
+
+		button .in-progress {
+			display: none;
+		}
+
+		button:disabled:not(.unusable) .available {
+			display: none;
+		}
+
+		button:disabled:not(.unusable) .in-progress {
+			display: inline;
+		}
 	</style>
 </head>
 
 <body>
-	<form class="content">
+	<main class="container">
+		<form>
+			<div class="py-3 text-center">
+				<h1 class="mt-0">Advent of Code solver</h1>
+				<p>Solve <a href="https://adventofcode.com/">Advent of Code</a> problems using either Wasm or a <a
+						href="/api.html">HTTP API</a>. See <a href="https://github.com/fornwall/advent-of-code">the
+						GitHub
+						repository</a> for more information.</p>
+			</div>
 
-	<h1>Advent of Code solver</h1>
-  <p>Solve <a href="https://adventofcode.com/">Advent of Code</a> problems using either Wasm or a <a href="/api.html">HTTP API</a>. See <a href="https://github.com/fornwall/advent-of-code">the GitHub repository</a> for more information.</p>
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">Year</span>
+					</div>
+					<select id="year" accesskey="y" class="form-control">
+						<option value="2019">2019</option>
+						<option value="2018">2018</option>
+						<option value="2017">2017</option>
+					</select>
+				</div>
+			</div>
 
-	<h2><label for="year">Year</label> - <label for="day">Day</label> - <label for="part">Part</label></h2>
-	<fieldset class="flex three">
-		<label>
-			<select id="year" accesskey="y">
-				<option value="2019">2019</option>
-				<option value="2018">2018</option>
-				<option value="2017">2017</option>
-			</select>
-		</label>
-		<label>
-			<select id="day" accesskey="d">
-				<option value="1">1</option>
-				<option value="2">2</option>
-				<option value="3">3</option>
-				<option value="4">4</option>
-				<option value="5">5</option>
-				<option value="6">6</option>
-				<option value="7">7</option>
-				<option value="8">8</option>
-				<option value="9">9</option>
-				<option value="10">10</option>
-				<option value="11">11</option>
-				<option value="12">12</option>
-				<option value="13">13</option>
-				<option value="14">14</option>
-				<option value="15">15</option>
-				<option value="16">16</option>
-				<option value="17">17</option>
-				<option value="18">18</option>
-				<option value="19">19</option>
-				<option value="20">20</option>
-				<option value="21">21</option>
-				<option value="22">22</option>
-				<option value="23">23</option>
-				<option value="24">24</option>
-				<option value="25">25</option>
-			</select>
-		</label>
-		<label>
-			<select id="part" accesskey="p">
-			  <option value="1">1</option>
-			  <option value="2">2</option>
-			</select>
-		</label>
-	</fieldset>
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">Day</span>
+					</div>
+					<select id="day" accesskey="d" class="form-control">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15</option>
+						<option value="16">16</option>
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23">23</option>
+						<option value="24">24</option>
+						<option value="25">25</option>
+					</select>
+				</div>
+			</div>
 
-	<h2><label for="input" accesskey="i">Input</label></h2>
-  <p id="input-instructions"></p>
-  <textarea id="input" rows="3" required="required"></textarea>
-	<div class="buttons">
-		<button id="paste" type="button" class="hidden success" accesskey="v">Paste</button>
-		<button id="read_file" type="button" class="hidden success" accesskey="f">Read file</button>
-		<button id="run-api" type="button"><span class="available" accesskey="a">Run API</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
-		<button id="run-wasm" type="button"><span class="available" accesskey="w">Run Wasm</span><span class="in-progress"><i class="fas fa-spinner fa-spin"></i> Running...</span></button>
-	</div>
+			<div class="form-group">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">Part</span>
+					</div>
+					<select id="part" accesskey="p" class="form-control">
+						<option value="1">1</option>
+						<option value="2">2</option>
+					</select>
+				</div>
+			</div>
 
-	<h2>Output<span id="executionTime"></span></h2>
-	<div id="output">&nbsp;</div>
+			<div class="form-group">
+				<label for="input">Problem input <span id="input-instructions"></span></label>
+				<textarea id="input" class="form-control" rows="3" required="required"></textarea>
+			</div>
 
-	<script type="module" src="index.js"></script>
-	</form>
+			<div class="form-group buttons text-right">
+				<button id="paste" type="button" class="btn btn-secondary hidden neutral" accesskey="v">Paste</button>
+				<button id="read_file" type="button" class="btn btn-secondary hidden neutral" accesskey="f">Read
+					file</button>
+				<button id="run-api" type="button" class="btn btn-primary"><span class="available" accesskey="a">Run
+						API <span id="api-execution-time" class="badge badge-light"></span></span><span
+						class="in-progress"><i class="fas fa-spinner fa-spin"></i>
+						Running...</span></button>
+				<button id="run-wasm" type="button" class="btn btn-primary"><span class="available" accesskey="w">Run
+						Wasm <span id="wasm-execution-time" class="badge badge-light"></span></span><span
+						class="in-progress"><i class="fas fa-spinner fa-spin"></i>
+						Running...</span></button>
+			</div>
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css"/>
+			<div class="form-group py-3">
+				<div id="output" class="alert alert-info" role="alert">
+					The problem answer will be shown here.
+				</div>
+			</div>
+
+			<script type="module" src="index.js"></script>
+		</form>
+	</main>
 </body>
 
 </html>

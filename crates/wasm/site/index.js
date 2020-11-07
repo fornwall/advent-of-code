@@ -9,7 +9,8 @@ const day_element = document.getElementById('day');
 const part_element = document.getElementById('part');
 const input_element = document.getElementById('input');
 const output_element = document.getElementById('output');
-const executionTime_element = document.getElementById('executionTime');
+const api_execution_time = document.getElementById('api-execution-time');
+const wasm_execution_time = document.getElementById('wasm-execution-time');
 
 worker.onmessage = (e) => {
   if ('wasmWorking' in e.data) {
@@ -26,11 +27,16 @@ worker.onmessage = (e) => {
 }
 
 function showMessage(message, isError, wasm, executionTime) {
-  executionTime_element.textContent = ` (${wasm ? 'Wasm' : 'API'} in ${Math.round(executionTime)} ms)`;
+  const execution_time = wasm ? wasm_execution_time : api_execution_time;
+  execution_time.textContent = `${Math.round(executionTime)} ms`;
   if (isError) {
-    output_element.classList.add('error');
+    output_element.classList.add('alert-danger');
+    output_element.classList.remove('alert-info');
+    output_element.classList.remove('alert-success');
   } else {
-    output_element.classList.remove('error');
+    output_element.classList.add('alert-success');
+    output_element.classList.remove('alert-info');
+    output_element.classList.remove('alert-danger');
   }
   output_element.textContent = message;
   output_element.scrollIntoView();
@@ -49,7 +55,7 @@ function execute(wasm) {
 
 function updateInputLink() {
   const link = `adventofcode.com/${year_element.value}/day/${day_element.value}/input`;
-  input_instructions_element.innerHTML = `Your input is at <a href="https://${link}">${link}</a>.`;
+  input_instructions_element.innerHTML = `(<a href="https://${link}">${link}</a>)`;
 }
 
 window.addEventListener('pageshow', () => {
@@ -69,6 +75,17 @@ window.addEventListener('pageshow', () => {
     updateInputLink();
 });
 
+async function clipboardMayWork() {
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    if (navigator.permissions) {
+      const permission = await navigator.permissions.query({name: 'clipboard-read'});
+      return permission.state !== 'denied';
+    }
+    return true;
+  }
+  return false;
+}
+
 async function run() {
   run_api_element.addEventListener("click", (event) => execute(false));
   run_wasm_element.addEventListener("click", (event) => execute(true));
@@ -80,23 +97,16 @@ async function run() {
     }
   }, false));
 
-  if (navigator.clipboard && navigator.clipboard.readText) {
-    let possiblyPermitted = true;
-    if (navigator.permissions) {
-      const permission = await navigator.permissions.query({name: 'clipboard-read'});
-      possiblyPermitted = permission.state != 'denied';
-    }
-    if (possiblyPermitted) {
-      const pasteButton = document.getElementById('paste');
-      pasteButton.classList.remove('hidden');
-      pasteButton.addEventListener('click', async () => {
-        try {
-          input_element.value = await navigator.clipboard.readText();
-        } catch (e) {
-          console.log(e);
-        }
-      }, false);
-    }
+  if (await clipboardMayWork()) {
+    const pasteButton = document.getElementById('paste');
+    pasteButton.classList.remove('hidden');
+    pasteButton.addEventListener('click', async () => {
+      try {
+        input_element.value = await navigator.clipboard.readText();
+      } catch (e) {
+        console.log(e);
+      }
+    }, false);
   }
 
   if (window.showOpenFilePicker) {
