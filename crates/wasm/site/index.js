@@ -15,14 +15,14 @@ const wasm_execution_time = document.getElementById('wasm-execution-time');
 worker.onmessage = (e) => {
   if ('wasmWorking' in e.data) {
     if (!e.data.wasmWorking) {
-        run_wasm_element.disabled = true;
-        run_wasm_element.classList.add('unusable');
-        run_wasm_element.title = 'Wasm is not working - check console logs';
+      run_wasm_element.disabled = true;
+      run_wasm_element.classList.add('unusable');
+      run_wasm_element.title = 'Wasm is not working - check console logs';
     }
   } else {
-      const { isError, output, wasm, executionTime } = e.data;
-      (wasm ? run_wasm_element : run_api_element).disabled = false;
-      showMessage(output, isError, wasm, executionTime);
+    const { isError, output, wasm, executionTime } = e.data;
+    (wasm ? run_wasm_element : run_api_element).disabled = false;
+    showMessage(output, isError, wasm, executionTime);
   }
 }
 
@@ -46,10 +46,10 @@ function showMessage(message, isError, wasm, executionTime) {
 
 function execute(wasm) {
   if (document.querySelector("form").reportValidity()) {
-      (wasm ? run_wasm_element : run_api_element).disabled = true;
-      output_element.classList.remove('blink');
-      const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
-      worker.postMessage({year, day, part, input, wasm});
+    (wasm ? run_wasm_element : run_api_element).disabled = true;
+    output_element.classList.remove('blink');
+    const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
+    worker.postMessage({ year, day, part, input, wasm });
   }
 }
 
@@ -59,26 +59,26 @@ function updateInputLink() {
 }
 
 window.addEventListener('pageshow', () => {
-    if (window.localStorage) {
-        const problemString = window.localStorage.getItem("problem");
-        if (problemString) {
-            try {
-                const problem = JSON.parse(problemString)
-                year_element.value = problem.year;
-                day_element.value = problem.day;
-                part_element.value = problem.part;
-            } catch (error) {
-                log.error(error);
-            }
-        }
+  if (window.localStorage) {
+    const problemString = window.localStorage.getItem("problem");
+    if (problemString) {
+      try {
+        const problem = JSON.parse(problemString)
+        year_element.value = problem.year;
+        day_element.value = problem.day;
+        part_element.value = problem.part;
+      } catch (error) {
+        log.error(error);
+      }
     }
-    updateInputLink();
+  }
+  updateInputLink();
 });
 
 async function clipboardMayWork() {
   if (navigator.clipboard && navigator.clipboard.readText) {
     if (navigator.permissions) {
-      const permission = await navigator.permissions.query({name: 'clipboard-read'});
+      const permission = await navigator.permissions.query({ name: 'clipboard-read' });
       return permission.state !== 'denied';
     }
     return true;
@@ -93,7 +93,7 @@ async function run() {
   [year_element, day_element, part_element].forEach(element => element.addEventListener('input', () => {
     updateInputLink();
     if (window.localStorage) {
-        window.localStorage.setItem('problem', JSON.stringify({year: year_element.value, day: day_element.value, part: part_element.value}));
+      window.localStorage.setItem('problem', JSON.stringify({ year: year_element.value, day: day_element.value, part: part_element.value }));
     }
   }, false));
 

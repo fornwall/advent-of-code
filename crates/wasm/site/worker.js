@@ -1,3 +1,4 @@
+'use strict';
 self.importScripts("/advent_of_code_wasm.js");
 
 async function run() {
