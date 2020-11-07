@@ -30,7 +30,6 @@ bench:
 
 site-downloads:
 	cd crates/wasm && \
-		curl https://unpkg.com/picnic@6.5.3/picnic.min.css > site/picnic-6.5.3.min.css && \
 		curl https://adventofcode.com/favicon.ico > site/favicon.ico
 
 site-wasmpack:
