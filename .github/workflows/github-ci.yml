@@ -135,7 +135,7 @@ jobs:
         git config --global user.name 'Bump version workflow'
         git config --global user.email 'bumpversion@users.noreply.github.com'
     - name: Bump version and commit
-      run: bump2version --commit --message "Bump version: {current_version} → {new_version}\n[skip ci]" patch
+      run: 'bump2version --commit --message "Bump version: {current_version} → {new_version}\n[skip ci]" patch'
     - name: Push changes to git
       run: git push
 
