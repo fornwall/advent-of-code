@@ -49,8 +49,6 @@ def replace_include_str(path, src):
         f"https://github.com/fornwall/advent-of-code/tree/master/crates/core/{path}"
     )
 
-    newstring = ""
-
     def replace(match):
         included_file = match.group(1)
         replacement_file = os.path.join(os.path.dirname(path), included_file)
@@ -72,6 +70,7 @@ def set_gist(year, day, src, gist_id=None):
     }
 
     if gist_id:
+        gist_method = "PATCH"
         GIST_API = f"https://api.github.com/gists/{gist_id}"
         get_response = requests.get(GIST_API, headers=headers)
         existing_src = get_response.json()["files"][file_name]["content"]
@@ -79,6 +78,7 @@ def set_gist(year, day, src, gist_id=None):
             print("Unmodified")
             return gist_id
     else:
+        gist_method = "POST"
         GIST_API = "https://api.github.com/gists"
 
     payload = {
@@ -89,13 +89,8 @@ def set_gist(year, day, src, gist_id=None):
     if not gist_id:
         payload["public"] = False
 
-    if gist_id:
-        res = requests.patch(GIST_API, headers=headers, json=payload)
-    else:
-        res = requests.post(GIST_API, headers=headers, json=payload)
-
-    j = json.loads(res.text)
-    return j["id"]
+    response = requests.request(gist_method, GIST_API, headers=headers, json=payload)
+    return response.json()["id"]
 
 
 with open(MAPPING_FILE_NAME, "r") as infile:
@@ -131,5 +126,5 @@ for year in years:
                 gist_mapping[year_str] = {}
             gist_mapping[year_str][day_str] = new_id
 
-with open(MAPPING_FILE_NAME, 'w') as outfile:
+with open(MAPPING_FILE_NAME, "w") as outfile:
     json.dump(gist_mapping, outfile, indent=2)
