@@ -87,8 +87,20 @@ async function clipboardMayWork() {
 }
 
 async function run() {
-  run_api_element.addEventListener("click", (event) => execute(false));
-  run_wasm_element.addEventListener("click", (event) => execute(true));
+  run_api_element.addEventListener("click", () => execute(false));
+  run_wasm_element.addEventListener("click", () => execute(true));
+
+  const gists = {};
+
+  document.getElementById('open-playground').addEventListener("click", () => {
+    const gist_id = gists['mapping']?.[year_element.value]?.[day_element.value];
+    if (gist_id) {
+      const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=${gist_id}`;
+      window.open(link)
+    } else {
+      alert('Not available yet!');
+    }
+  });
 
   [year_element, day_element, part_element].forEach(element => element.addEventListener('input', () => {
     if (window.localStorage) {
@@ -115,23 +127,9 @@ async function run() {
     disableButton(pasteButton);
   }
 
-  const readFileButton = document.getElementById("read-file");
-  if (window.showOpenFilePicker) {
-    readFileButton.classList.remove("hidden");
-    readFileButton.addEventListener("click", async () => {
-      try {
-        let fileHandle;
-        [fileHandle] = await window.showOpenFilePicker();
-        const file = await fileHandle.getFile();
-        const contents = await file.text();
-        document.getElementById('input').value = contents;
-      } catch (e) {
-        console.log(e);
-      }
-    });
-  } else {
-    disableButton(readFileButton);
-  }
+  fetch('gist-mapping.json')
+    .then(response => response.json())
+    .then(data => gists['mapping'] = data);
 }
 
 run();

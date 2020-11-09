@@ -10,11 +10,19 @@
 	<link rel="modulepreload" href="/worker.js" />
 	<link rel="modulepreload" href="/advent_of_code_wasm.js" />
 	<link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css"
 		integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" />
 
 	<style>
+		a {
+			color: #006bff;
+		}
+
+		.btn-primary {
+			background: #006bff;
+		}
+
 		.input-group .input-group-text {
 			min-width: 4em;
 		}
@@ -116,24 +124,6 @@
 				</select>
 			</div>
 
-			<div class="container mb-3">
-				<div class="row">
-					<div class="col p-0">
-						<button id="open-input" type="button" class="btn btn-block btn-secondary neutral"
-							accesskey="o">Open Input</button>
-					</div>
-					<div class="col">
-						<button id="paste" type="button" class="btn btn-block btn-secondary neutral"
-							accesskey="v">Paste</button>
-					</div>
-					<div class="col p-0">
-						<button id="read-file" type="button" class="btn btn-block btn-secondary neutral"
-							accesskey="f">Read
-							File</button>
-					</div>
-				</div>
-			</div>
-
 			<div class="input-group mb-3">
 				<div class="input-group-prepend">
 					<label for="input" class="input-group-text">Input</label>
@@ -142,16 +132,34 @@
 					accesskey="i"></textarea>
 			</div>
 
+			<div class="container mb-3">
+				<div class="row">
+					<div class="col p-0">
+						<button id="open-input" type="button" class="btn btn-block btn-secondary" accesskey="o">Open
+							Input</button>
+					</div>
+					<div class="col pl-2 pr-2">
+						<button id="paste" type="button" class="btn btn-block btn-secondary"
+							accesskey="v">Paste</button>
+					</div>
+					<div class="col p-0">
+						<button id="open-playground" type="button" class="btn btn-block btn-secondary" accesskey="e">
+							Playground</button>
+					</div>
+				</div>
+			</div>
+			</div>
+
 			<div class="mb-3 container">
 				<div class="row">
 					<div class="col p-0">
 						<button id="run-api" type="button" class="btn btn-block btn-primary" accesskey="a"><span
-								class="available">Run
+								class="available">Call
 								API <span id="api-execution-time" class="badge badge-light"></span></span><span
 								class="in-progress"><i class="fas fa-spinner fa-spin"></i>
 								Running...</span></button>
 					</div>
-					<div class="col pr-0">
+					<div class="col pr-0 pl-2">
 						<button id="run-wasm" type="button" class="btn btn-block btn-primary" accesskey="w"><span
 								class="available">Run
 								Wasm <span id="wasm-execution-time" class="badge badge-light"></span></span><span
@@ -166,6 +174,7 @@
 					The problem answer will be shown here.
 				</div>
 			</div>
+
 
 			<script type="module" src="index.js"></script>
 		</form>
