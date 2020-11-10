@@ -33,13 +33,12 @@ worker.onmessage = (e) => {
 function showMessage(message, isError, wasm, executionTime) {
   const execution_time = wasm ? wasm_execution_time : api_execution_time;
   execution_time.textContent = `${Math.round(executionTime)} ms`;
+  output_element.classList.remove('alert-info');
   if (isError) {
     output_element.classList.add('alert-danger');
-    output_element.classList.remove('alert-info');
     output_element.classList.remove('alert-success');
   } else {
     output_element.classList.add('alert-success');
-    output_element.classList.remove('alert-info');
     output_element.classList.remove('alert-danger');
   }
   output_element.textContent = message;
@@ -69,7 +68,7 @@ window.addEventListener('pageshow', () => {
         day_element.value = problem.day;
         part_element.value = problem.part;
       } catch (error) {
-        log.error(error);
+        console.error(error);
       }
     }
   }
@@ -80,20 +79,22 @@ async function clipboardMayWork() {
     if (navigator.permissions) {
       const permission = await navigator.permissions.query({ name: 'clipboard-read' });
       return permission.state !== 'denied';
+    } else {
+      return true;
     }
-    return true;
+  } else {
+    return false;
   }
-  return false;
 }
 
-async function run() {
+function run() {
   run_api_element.addEventListener("click", () => execute(false));
   run_wasm_element.addEventListener("click", () => execute(true));
 
-  const gists = {};
+  const state = {};
 
   document.getElementById('open-playground').addEventListener("click", () => {
-    const gist_id = gists['mapping']?.[year_element.value]?.[day_element.value];
+    const gist_id = state['mapping']?.[year_element.value]?.[day_element.value];
     if (gist_id) {
       const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=${gist_id}`;
       window.open(link)
@@ -113,23 +114,34 @@ async function run() {
     window.open(link)
   }, false);
 
-  const pasteButton = document.getElementById('paste');
-  if (await clipboardMayWork()) {
-    pasteButton.classList.remove('hidden');
-    pasteButton.addEventListener('click', async () => {
-      try {
-        input_element.value = await navigator.clipboard.readText();
-      } catch (e) {
-        console.log(e);
-      }
-    }, false);
-  } else {
-    disableButton(pasteButton);
-  }
+  document.getElementById('output').addEventListener('click', (event) => {
+    if (state['copiedTimeout']) {
+      clearTimeout(state['copiedTimeout']);
+    }
+    navigator.clipboard.writeText(event.target.textContent);
+    event.target.classList.add('copied');
+    state['copiedTimeout'] = setTimeout(() => event.target.classList.remove('copied'), 2000);
+  });
+
+  clipboardMayWork().then((enabled) => {
+    const pasteButton = document.getElementById('paste');
+    if (enabled) {
+      pasteButton.classList.remove('hidden');
+      pasteButton.addEventListener('click', async () => {
+        try {
+          input_element.value = await navigator.clipboard.readText();
+        } catch (e) {
+          console.log(e);
+        }
+      }, false);
+    } else {
+      disableButton(pasteButton);
+    }
+  });
 
   fetch('gist-mapping.json')
     .then(response => response.json())
-    .then(data => gists['mapping'] = data);
+    .then(data => state['mapping'] = data);
 }
 
 run();

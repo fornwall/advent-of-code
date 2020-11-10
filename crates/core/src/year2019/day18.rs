@@ -5,14 +5,14 @@ const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
 
 #[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
 struct Key {
-    value: char,
+    value: u8,
 }
 
 /// Keys represented as a bit mask where bit 0 is set for 'a', bit 1 is set for 'b' and so on.
 type KeyBitset = u32;
 
 impl Key {
-    const fn new(value: char) -> Self {
+    const fn new(value: u8) -> Self {
         Self { value }
     }
 
@@ -31,42 +31,46 @@ struct Edge {
     needed_keys: KeyBitset,
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    steps_to_gather_all_keys(input_string)
-}
-
 pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
-    let mut map: HashMap<(i32, i32), char> = HashMap::new();
+    let rows = input_string.lines().count();
+    let cols = input_string.lines().next().ok_or("Empty input")?.len();
+    let mut map = vec![b'#'; rows * cols];
     let mut found_keys = HashMap::new();
     let mut all_keys_bitset = 0 as KeyBitset;
 
-    input_string.lines().enumerate().for_each(|(y, line)| {
+    let index_of = |x, y| x + y * cols;
+
+    for (y, line) in input_string.lines().enumerate() {
+        if line.len() != cols {
+            return Err("Not all rows have same width".to_string());
+        }
         line.chars().enumerate().for_each(|(x, c)| {
+            let byte = c as u8;
             let current_position = (x as i32, y as i32);
             let char_to_insert = match c {
                 '@' => {
                     // The single entrance.
-                    found_keys.insert(Key::new('@'), current_position);
-                    '.'
+                    found_keys.insert(Key::new(b'@'), current_position);
+                    b'.'
                 }
                 'a'..='z' => {
                     // A key.
-                    let found_key = Key::new(c);
+                    let found_key = Key::new(byte);
                     all_keys_bitset |= found_key.bit_mask();
                     found_keys.insert(found_key, current_position);
-                    c
+                    byte
                 }
                 '#' => {
                     // Stone wall.
                     return;
                 }
-                _ => c,
+                _ => byte,
             };
-            map.insert(current_position, char_to_insert);
+            map[index_of(x, y)] = char_to_insert;
         });
-    });
+    }
 
-    if !found_keys.contains_key(&Key::new('@')) {
+    if !found_keys.contains_key(&Key::new(b'@')) {
         return Err("No entrance ('@') found".to_string());
     }
 
@@ -86,11 +90,14 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
         while let Some((position, needed_keys, steps)) = to_visit.pop_front() {
             'key_direction_loop: for direction in DIRECTIONS.iter() {
                 let new_position = (position.0 + direction.0, position.1 + direction.1);
+                if new_position.0 < 0 || new_position.1 < 0 {
+                    continue 'key_direction_loop;
+                }
                 let mut new_needed_keys = needed_keys;
                 let mut found_key = None;
 
-                match map.get(&new_position) {
-                    Some(&char_at_position @ 'A'..='Z') => {
+                match map.get(index_of(new_position.0 as usize, new_position.1 as usize)) {
+                    Some(&char_at_position @ b'A'..=b'Z') => {
                         let needed_key = Key::new(char_at_position.to_ascii_lowercase());
                         if found_keys.contains_key(&needed_key) {
                             // Only consider door as necessary if key is in quadrant.
@@ -99,35 +106,30 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                             new_needed_keys |= needed_key.bit_mask();
                         }
                     }
-                    Some(&char_at_position @ 'a'..='z') => {
+                    Some(&char_at_position @ b'a'..=b'z') => {
                         found_key = Some(Key::new(char_at_position));
                     }
-                    Some('.') => {
+                    Some(b'.') => {
                         // Free to enter.
                     }
-                    None => {
+                    _ => {
                         continue 'key_direction_loop;
-                    }
-                    Some(c) => {
-                        return Err(format!("Invalid map entry: {}", c));
                     }
                 }
 
                 let new_steps = steps + 1;
-                let new_state = (new_position, new_needed_keys, new_steps);
-                if visited_positions.insert(new_position) {
+                if let Some(target_key) = found_key {
+                    adjacency_list
+                        .entry(this_key)
+                        .or_insert_with(Vec::new)
+                        .push(Edge {
+                            steps: new_steps as usize,
+                            needed_keys: new_needed_keys,
+                            target_key,
+                        });
+                } else if visited_positions.insert(new_position) {
+                    let new_state = (new_position, new_needed_keys, new_steps);
                     to_visit.push_back(new_state);
-
-                    if let Some(target_key) = found_key {
-                        adjacency_list
-                            .entry(this_key)
-                            .or_insert_with(Vec::new)
-                            .push(Edge {
-                                steps: new_steps as usize,
-                                needed_keys: new_needed_keys,
-                                target_key,
-                            });
-                    }
                 }
             }
         }
@@ -166,7 +168,7 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     let mut to_visit = BinaryHeap::new();
 
     to_visit.push(Vertex {
-        at_key: Key::new('@'),
+        at_key: Key::new(b'@'),
         steps: 0,
         gathered_keys: 0,
     });
@@ -201,6 +203,10 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     }
 
     None
+}
+
+pub fn part1(input_string: &str) -> Result<usize, String> {
+    steps_to_gather_all_keys(input_string)
 }
 
 pub fn part2(input_string: &str) -> Result<usize, String> {
@@ -264,8 +270,8 @@ pub fn tests_part1() {
     assert_eq!(
         part1(
             "#########
-    #b.A.@.a#
-    #########"
+#b.A.@.a#
+#########"
         ),
         Ok(8)
     );

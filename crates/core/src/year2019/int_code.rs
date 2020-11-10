@@ -1,10 +1,10 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 
 pub type Word = i64;
 
 #[derive(Clone)]
 pub struct Program {
-    memory: HashMap<usize, Word>,
+    memory: Vec<Word>,
     instruction_pointer: usize,
     output_values: Vec<Word>,
     input_values: VecDeque<Word>,
@@ -35,7 +35,7 @@ impl Program {
             }
         }
         Ok(Self {
-            memory: memory.into_iter().enumerate().collect(),
+            memory,
             instruction_pointer: 0,
             output_values: Vec::new(),
             input_values: VecDeque::new(),
@@ -93,14 +93,10 @@ impl Program {
         });
     }
 
-    fn parameter_mode(
-        &self,
-        opcode_and_parameter_modes: Word,
-        parameter_position: u32,
-    ) -> Parameter {
+    fn parameter_mode(&self, instruction: Word, parameter_position: u32) -> Parameter {
         let parameter = self.read_memory(self.instruction_pointer + parameter_position as usize);
         let divider = 10_i64.pow(parameter_position + 1);
-        let mode = ((opcode_and_parameter_modes / divider) % 10) as u8;
+        let mode = ((instruction / divider) % 10) as u8;
         match mode {
             1 => Parameter::Value(parameter),
             2 => Parameter::Address((parameter + self.relative_base) as usize),
@@ -121,21 +117,22 @@ impl Program {
         Err("Invalid parameter mode for where to write".to_string())
     }
 
-    fn parameter_value(&self, opcode_and_parameter_modes: Word, parameter_position: u32) -> Word {
-        match self.parameter_mode(opcode_and_parameter_modes, parameter_position) {
+    fn parameter_value(&self, instruction: Word, parameter_position: u32) -> Word {
+        match self.parameter_mode(instruction, parameter_position) {
             Parameter::Value(value) => value,
             Parameter::Address(location) => self.read_memory(location),
         }
     }
 
     fn evaluate(&mut self) -> Result<(), String> {
-        let opcode_and_parameter_modes = self.read_memory(self.instruction_pointer);
-        let opcode = opcode_and_parameter_modes % 100;
+        let instruction = self.read_memory(self.instruction_pointer);
+        let opcode = instruction % 100;
+
         match opcode {
             1 | 2 => {
-                let parameter1 = self.parameter_value(opcode_and_parameter_modes, 1);
-                let parameter2 = self.parameter_value(opcode_and_parameter_modes, 2);
-                let output_location = self.output_location(opcode_and_parameter_modes, 3)?;
+                let parameter1 = self.parameter_value(instruction, 1);
+                let parameter2 = self.parameter_value(instruction, 2);
+                let output_location = self.output_location(instruction, 3)?;
                 self.write_memory(
                     output_location as usize,
                     if opcode == 1 {
@@ -148,7 +145,7 @@ impl Program {
             }
             3 => {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
-                let output_location = self.output_location(opcode_and_parameter_modes, 1)?;
+                let output_location = self.output_location(instruction, 1)?;
                 if let Some(input_value) = self.input_values.pop_front() {
                     self.write_memory(output_location as usize, input_value);
                 } else {
@@ -159,7 +156,7 @@ impl Program {
             4 => {
                 // Opcode 4 outputs the value of its only parameter.
                 self.output_values
-                    .push(self.parameter_value(opcode_and_parameter_modes, 1));
+                    .push(self.parameter_value(instruction, 1));
                 self.instruction_pointer += 2;
             }
             5 | 6 => {
@@ -168,10 +165,9 @@ impl Program {
                 // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer
                 // to the value from the second parameter. Otherwise, it does nothing.
                 let jump_if = opcode == 5;
-                let parameter_1_true = self.parameter_value(opcode_and_parameter_modes, 1) != 0;
+                let parameter_1_true = self.parameter_value(instruction, 1) != 0;
                 if parameter_1_true == jump_if {
-                    self.instruction_pointer =
-                        self.parameter_value(opcode_and_parameter_modes, 2) as usize;
+                    self.instruction_pointer = self.parameter_value(instruction, 2) as usize;
                 } else {
                     self.instruction_pointer += 3;
                 }
@@ -181,8 +177,8 @@ impl Program {
                 // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
                 // Opcode 8 is equals: if the first parameter is equal to the second parameter,
                 // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-                let parameter_1 = self.parameter_value(opcode_and_parameter_modes, 1);
-                let parameter_2 = self.parameter_value(opcode_and_parameter_modes, 2);
+                let parameter_1 = self.parameter_value(instruction, 1);
+                let parameter_2 = self.parameter_value(instruction, 2);
                 let output_value = if (opcode == 7 && (parameter_1 < parameter_2))
                     || (opcode == 8 && (parameter_1 == parameter_2))
                 {
@@ -191,12 +187,12 @@ impl Program {
                     0
                 };
 
-                let output_location = self.output_location(opcode_and_parameter_modes, 3)?;
+                let output_location = self.output_location(instruction, 3)?;
                 self.write_memory(output_location as usize, output_value);
                 self.instruction_pointer += 4;
             }
             9 => {
-                self.relative_base += self.parameter_value(opcode_and_parameter_modes, 1);
+                self.relative_base += self.parameter_value(instruction, 1);
                 self.instruction_pointer += 2;
             }
             99 => {
@@ -211,10 +207,13 @@ impl Program {
     }
 
     pub fn read_memory(&self, address: usize) -> Word {
-        *self.memory.get(&address).unwrap_or(&0_i64)
+        *self.memory.get(address).unwrap_or(&0_i64)
     }
 
     pub fn write_memory(&mut self, address: usize, value: Word) {
-        self.memory.insert(address, value);
+        if self.memory.len() <= address {
+            self.memory.resize(address + 1, 0);
+        }
+        self.memory[address] = value;
     }
 }

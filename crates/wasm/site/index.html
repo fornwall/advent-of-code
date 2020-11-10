@@ -12,7 +12,6 @@
 	<link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css"
 		integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" />
 
 	<style>
 		a {
@@ -55,6 +54,22 @@
 
 		button:disabled:not(.unusable) .in-progress {
 			display: inline;
+		}
+
+		#output {
+			cursor: pointer;
+		}
+
+		#output::before {
+			float: right;
+		}
+
+		#output:not(.copied):not(.alert-info)::before {
+			content: url('data:image/svg+xml,<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-clipboard" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>');
+		}
+
+		#output.copied::before {
+			content: url('data:image/svg+xml,<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/></svg>');
 		}
 	</style>
 </head>
@@ -148,37 +163,47 @@
 					</div>
 				</div>
 			</div>
-			</div>
 
 			<div class="mb-3 container">
 				<div class="row">
 					<div class="col p-0">
-						<button id="run-api" type="button" class="btn btn-block btn-primary" accesskey="a"><span
-								class="available">Call
-								API <span id="api-execution-time" class="badge badge-light"></span></span><span
-								class="in-progress"><i class="fas fa-spinner fa-spin"></i>
-								Running...</span></button>
+						<button id="run-api" type="button" class="btn btn-block btn-primary" accesskey="a">
+							<span class="available">
+								Call API
+								<span id="api-execution-time" class="badge badge-light"></span>
+							</span>
+							<span class="in-progress">
+								<span class="spinner-border spinner-border-sm" role="status">
+									<span class="sr-only">Running...</span>
+								</span>
+							</span>
+						</button>
 					</div>
 					<div class="col pr-0 pl-2">
-						<button id="run-wasm" type="button" class="btn btn-block btn-primary" accesskey="w"><span
-								class="available">Run
-								Wasm <span id="wasm-execution-time" class="badge badge-light"></span></span><span
-								class="in-progress"><i class="fas fa-spinner fa-spin"></i>
-								Running...</span></button>
+						<button id="run-wasm" type="button" class="btn btn-block btn-primary" accesskey="w">
+							<span class="available">
+								Run Wasm
+								<span id="wasm-execution-time" class="badge badge-light"></span>
+							</span>
+							<span class="in-progress">
+								<span class="spinner-border spinner-border-sm" role="status">
+									<span class="sr-only">Running...</span>
+								</span>
+							</span>
+						</button>
 					</div>
 				</div>
 			</div>
 
-			<div class="form-group">
+			<div class="form-group output">
 				<div id="output" class="alert alert-info" role="alert">
 					The problem answer will be shown here.
 				</div>
 			</div>
-
-
-			<script type="module" src="index.js"></script>
 		</form>
 	</main>
+
+	<script type="module" src="index.js"></script>
 </body>
 
 </html>

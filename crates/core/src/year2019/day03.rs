@@ -79,7 +79,7 @@ fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
 
 fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let (first_line, second_line) = input_lines(input_string)?;
-    let mut first_wire_points = HashMap::new();
+    let mut first_wire_points = HashMap::with_capacity(first_line.len() / 5);
 
     parse_wire_points(first_line, |point, step| {
         first_wire_points.entry(point).or_insert(step);
@@ -88,14 +88,12 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let mut best = std::u32::MAX;
     parse_wire_points(second_line, |point, step| {
         if let Some(&value) = first_wire_points.get(&point) {
-            best = cmp::min(
-                best,
-                if part1 {
-                    point.distance_from_origin()
-                } else {
-                    step + value
-                },
-            );
+            let intersection_value = if part1 {
+                point.distance_from_origin()
+            } else {
+                step + value
+            };
+            best = cmp::min(best, intersection_value);
         }
     })?;
 
