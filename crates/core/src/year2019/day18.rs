@@ -118,20 +118,18 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                 }
 
                 let new_steps = steps + 1;
-                let new_state = (new_position, new_needed_keys, new_steps);
-                if visited_positions.insert(new_position) {
+                if let Some(target_key) = found_key {
+                    adjacency_list
+                        .entry(this_key)
+                        .or_insert_with(Vec::new)
+                        .push(Edge {
+                            steps: new_steps as usize,
+                            needed_keys: new_needed_keys,
+                            target_key,
+                        });
+                } else if visited_positions.insert(new_position) {
+                    let new_state = (new_position, new_needed_keys, new_steps);
                     to_visit.push_back(new_state);
-
-                    if let Some(target_key) = found_key {
-                        adjacency_list
-                            .entry(this_key)
-                            .or_insert_with(Vec::new)
-                            .push(Edge {
-                                steps: new_steps as usize,
-                                needed_keys: new_needed_keys,
-                                target_key,
-                            });
-                    }
                 }
             }
         }
