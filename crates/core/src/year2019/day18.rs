@@ -40,7 +40,10 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
 
     let index_of = |x, y| x + y * cols;
 
-    input_string.lines().enumerate().for_each(|(y, line)| {
+    for (y, line) in input_string.lines().enumerate() {
+        if line.len() != cols {
+            return Err("Not all rows have same width".to_string());
+        }
         line.chars().enumerate().for_each(|(x, c)| {
             let byte = c as u8;
             let current_position = (x as i32, y as i32);
@@ -65,7 +68,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
             };
             map[index_of(x, y)] = char_to_insert;
         });
-    });
+    }
 
     if !found_keys.contains_key(&Key::new(b'@')) {
         return Err("No entrance ('@') found".to_string());
