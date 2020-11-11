@@ -21,6 +21,7 @@ for line in open(sys.argv[1]):
         # new-benchmark.txt ns/iter
         # diff ns/iter
         # diff %
+        print('Columns: ' + str(columns))
         benchmark_name = columns[0]
         benchmark_new_time = int(columns[3].replace(',', ''))
         total_time += benchmark_new_time
