@@ -11,7 +11,7 @@ jobs:
       with:
         rust-version: nightly
     - name: Run benchmark on current commit
-      run: cd crates/core && cargo +nightly bench problem_2018_0 > new-benchmark.txt
+      run: cd crates/core && cargo +nightly bench > new-benchmark.txt
     - name: Upload benchmark on current commit
       uses: actions/upload-artifact@v2
       with:
@@ -30,7 +30,7 @@ jobs:
     - name: Checkout previous commit
       run: git checkout HEAD~1
     - name: Run benchmark on previous commit
-      run: cd crates/core && cargo +nightly bench problem_2018_0 > old-benchmark.txt
+      run: cd crates/core && cargo +nightly bench > old-benchmark.txt
     - name: Upload benchmark on previous commit
       uses: actions/upload-artifact@v2
       with:
