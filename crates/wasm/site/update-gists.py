@@ -10,14 +10,17 @@ import requests
 
 MAPPING_FILE_NAME = "gist-mapping.json"
 
+dry_run = bool(os.environ.get('DRY_RUN'))
 
 def add_header(src, year, day):
     link_to_file = f"https://github.com/fornwall/advent-of-code/tree/master/crates/core/src/year{year}/day{str(day).rjust(2, '0')}.rs"
-    header = f"// Solution to Advent of Code {year}, day {day}"
-    header += f"\n// This is the following file:"
+    header = f"// Solution to Advent of Code {year}, day {day}: https://adventofcode.com/{year}/day/{day}"
+    header += "\n//"
+    header += "\n// This is the following file extracted into a gist for use in the Rust playground:"
     header += f"\n// {link_to_file}"
-    header += "\n// Create a PR or open an issue against https://github.com/fornwall/advent-of-code"
-    header += "\n// to suggest or discuss possible changes."
+    header += "\n//"
+    header += "\n// To suggest or discuss possible changes, open an issue or pull request at:"
+    header += "\n// https://github.com/fornwall/advent-of-code"
 
     inlined_modules = set()
     pattern = re.compile(r"use super::(.*?)::")
@@ -60,7 +63,7 @@ def replace_include_str(path, src):
 
 
 def set_gist(year, day, src, gist_id=None):
-    API_TOKEN = os.environ["GITHUB_API_TOKEN"]
+    API_TOKEN = os.environ["GIST_API_TOKEN"]
 
     file_name = f"year{year}_day{day}.rs"
     headers = {
@@ -96,19 +99,17 @@ def set_gist(year, day, src, gist_id=None):
 with open(MAPPING_FILE_NAME, "r") as infile:
     gist_mapping = json.load(infile)
 
-if "AOC_YEAR" in os.environ:
-    years = [int(os.environ["AOC_YEAR"])]
-else:
-    years = [2018, 2019]
-if "AOC_DAY" in os.environ:
-    days = [int(os.environ["AOC_DAY"])]
-else:
-    days = range(1, 26)
+for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
+    if not 'year' in dirpath:
+        continue
+    year = int(dirpath.split('/')[-1][4:])
+    for filename in filenames:
+        if not (filename.endswith('.rs') and filename.startswith('day')):
+            continue
+        day = int(filename[3:][:-3])
+        path = os.path.join(dirpath, filename)
 
-for year in years:
-    for day in days:
         print(f"{year} - {day}")
-        path = f"../../core/src/year{year}/day{str(day).rjust(2, '0')}.rs"
 
         src = Path(path).read_text()
         src = replace_include_str(path, src)
@@ -119,12 +120,19 @@ for year in years:
 
         if year_str in gist_mapping and day_str in gist_mapping[year_str]:
             existing_id = gist_mapping[year_str][day_str]
-            set_gist(year, day, src, existing_id)
-        elif False:
-            new_id = set_gist(year, day, src)
-            if year_str not in gist_mapping:
-                gist_mapping[year_str] = {}
-            gist_mapping[year_str][day_str] = new_id
+            if dry_run:
+                print(f'Would reuse existing id {existing_id}');
+            else:
+                set_gist(year, day, src, existing_id)
+        else:
+            if dry_run:
+                print('Would create new!');
+            else:
+                new_id = set_gist(year, day, src)
+                if year_str not in gist_mapping:
+                    gist_mapping[year_str] = {}
+                gist_mapping[year_str][day_str] = new_id
 
-with open(MAPPING_FILE_NAME, "w") as outfile:
-    json.dump(gist_mapping, outfile, indent=2)
+if not dry_run:
+    with open(MAPPING_FILE_NAME, "w") as outfile:
+        json.dump(gist_mapping, outfile, indent=2)
