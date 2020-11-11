@@ -22,7 +22,7 @@ for line in open(sys.argv[1]):
         # diff ns/iter
         # diff %
         benchmark_name = columns[0]
-        benchmark_new_time = int(columns[2].replace(',', ''))
+        benchmark_new_time = int(columns[3].replace(',', ''))
         total_time += benchmark_new_time
         speedup = float(columns[-1])
 
@@ -42,9 +42,9 @@ print("```")
 new_results.sort(reverse=True)
 print('')
 print('Benchmark | Time (μs) | Time (%)')
-print('--- | --- | ---')
+print('--- | --: | --:')
 for (time, name) in new_results:
-    time_in_microseconds = time / 1000.
+    time_in_microseconds = time / 1000
     percentage_time = (100. * time) / total_time
     print(f"{name} | {time_in_microseconds:.2f} | {percentage_time:.2f}")
 
