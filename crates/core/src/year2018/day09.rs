@@ -1,16 +1,8 @@
 use std::collections::VecDeque;
 
-fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, String> {
-    let parts: Vec<&str> = input_string.split_whitespace().collect();
-    if parts.len() != 8 {
-        return Err("Invalid input".to_string());
-    }
-    let num_players = parts[0].parse::<usize>().map_err(|_| "Invalid input")?;
-    let last_marble_points = parts[6].parse::<usize>().map_err(|_| "Invalid input")?;
-    let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.
+type MarbleValue = u32;
 
-    let mut player_scores = vec![0; num_players];
-
+struct MarbleCircle {
     // A double-ended queue representing the circular structure with the front
     // of the queue being the current marble and the ordering from front to back
     // of the queue represents clockwise ordering of the marbles. This means the
@@ -18,10 +10,53 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
     // - Inserting at the current position: push_front().
     // - Moving clockwise: push_back(pop_front()).
     // - Moving counter-clockwise: push_front(pop_back()).
-    let mut marbles = VecDeque::with_capacity(num_marbles);
+    marbles: VecDeque<MarbleValue>,
+}
+
+impl MarbleCircle {
+    fn new(size: u32) -> Self {
+        Self {
+            marbles: VecDeque::with_capacity(size as usize),
+        }
+    }
+
+    fn add(&mut self, marble_number: MarbleValue) {
+        self.marbles.push_front(marble_number);
+    }
+
+    fn move_clockwise(&mut self) -> Result<(), String> {
+        let popped = self.marbles.pop_front().ok_or("No marble to pop")?;
+        self.marbles.push_back(popped);
+        Ok(())
+    }
+
+    fn move_counter_clockwise(&mut self) -> Result<(), String> {
+        let popped = self.marbles.pop_back().ok_or("No marble to pop")?;
+        self.marbles.push_front(popped);
+        Ok(())
+    }
+
+    fn take_current(&mut self) -> Option<MarbleValue> {
+        self.marbles.pop_front()
+    }
+}
+
+fn solve(input_string: &str, last_marble_multiplier: u32) -> Result<u32, String> {
+    let parts: Vec<&str> = input_string.split_whitespace().collect();
+    if parts.len() != 8 {
+        return Err("Invalid input".to_string());
+    }
+    let num_players = parts[0].parse::<u32>().map_err(|_| "Invalid input")?;
+    let last_marble_points = parts[6]
+        .parse::<MarbleValue>()
+        .map_err(|_| "Invalid input")?;
+    let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.
+
+    let mut player_scores = vec![0; num_players as usize];
+    let mut marbles = MarbleCircle::new(num_marbles);
 
     // "First, the marble numbered 0 is placed in the circle."
-    marbles.push_back(0);
+    marbles.add(0);
 
     for marble_number in 1..=num_marbles {
         let normal_case = marble_number % 23 != 0;
@@ -32,27 +67,26 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
             // just placed and the current marble.) The marble that was just placed then becomes the
             // current marble."
             for _ in 0..2 {
-                let popped = marbles.pop_front().ok_or("No marble to pop")?;
-                marbles.push_back(popped);
+                marbles.move_clockwise()?;
             }
-            marbles.push_front(marble_number);
+            marbles.add(marble_number);
         } else {
             // "However, if the marble that is about to be placed has a number which is a multiple of 23,
             // something entirely different happens.
 
             // "First, the current player keeps the marble they would have placed, adding it to their score":
             let player_number = marble_number % num_players;
-            player_scores[player_number] += marble_number;
+            player_scores[player_number as usize] += marble_number;
 
             // "In addition, the marble 7 marbles counter-clockwise
             // from the current marble is removed from the circle and also added to the current player's
             // score. The marble located immediately clockwise of the marble that was removed becomes
             // the new current marble."
             for _ in 0..7 {
-                let popped = marbles.pop_back().ok_or("No marble to pope")?;
-                marbles.push_front(popped);
+                marbles.move_counter_clockwise()?;
             }
-            player_scores[player_number] += marbles.pop_front().ok_or("No marble to pop")?;
+            player_scores[player_number as usize] +=
+                marbles.take_current().ok_or("No marble to pop")?;
         };
     }
 
@@ -63,11 +97,11 @@ fn solve(input_string: &str, last_marble_multiplier: usize) -> Result<usize, Str
         .map(|value| *value)
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
+pub fn part1(input_string: &str) -> Result<u32, String> {
     solve(input_string, 1)
 }
 
-pub fn part2(input_string: &str) -> Result<usize, String> {
+pub fn part2(input_string: &str) -> Result<u32, String> {
     solve(input_string, 100)
 }
 
