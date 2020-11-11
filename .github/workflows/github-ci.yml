@@ -140,7 +140,7 @@ jobs:
       env:
         GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
     - name: Bump version and commit
-      run: "bump2version --commit --message $'Bump version: {current_version} → {new_version}\n[skip ci]' patch"
+      run: "bump2version --commit --allow-dirty --message $'Bump version: {current_version} → {new_version}\n[skip ci]' patch"
     - name: Push changes to git
       run: git push
 
