@@ -134,6 +134,11 @@ jobs:
       run: |
         git config --global user.name 'Bump version workflow'
         git config --global user.email 'bumpversion@users.noreply.github.com'
+    - name: Update gist mapping
+      run: ./update-gists.py && git add gist-mapping.json
+      working-directory: crates/wasm/site
+      env:
+        GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
     - name: Bump version and commit
       run: "bump2version --commit --message $'Bump version: {current_version} → {new_version}\n[skip ci]' patch"
     - name: Push changes to git
