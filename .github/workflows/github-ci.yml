@@ -135,7 +135,7 @@ jobs:
         git config --global user.name 'Bump version workflow'
         git config --global user.email 'bumpversion@users.noreply.github.com'
     - name: Update gist mapping
-      run: ./update-gists.py && git add gist-mapping.json
+      run: pip install requests && ./update-gists.py && git add gist-mapping.json
       working-directory: crates/wasm/site
       env:
         GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
