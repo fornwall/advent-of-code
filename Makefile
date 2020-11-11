@@ -4,11 +4,13 @@ else
   wasm_pack_profile=--release
 endif
 
-CLIPPY_PARAMS =  --all-features -- -D warnings -W clippy::cargo -W clippy::nursery -D clippy::expect_used -D clippy::unwrap_used -D clippy::items_after_statements -D clippy::if_not_else -D clippy::trivially_copy_pass_by_ref -D clippy::match_same_arms
+CLIPPY_PARAMS =  --all-features -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
 CLIPPY_CARGO = cargo
 ifeq ($(CLIPPY_NIGHTLY),1)
   CLIPPY_CARGO += +nightly
   CLIPPY_PARAMS := --benches $(CLIPPY_PARAMS)
+else
+  CLIPPY_PARAMS += -D warnings
 endif
 ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
