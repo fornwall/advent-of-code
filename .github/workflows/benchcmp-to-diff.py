@@ -44,7 +44,7 @@ print('')
 print('Benchmark | Time (μs) | Time (%)')
 print('--- | --: | --:')
 for (time, name) in new_results:
-    time_in_microseconds = time / 1000
+    time_in_microseconds = time // 1000
     percentage_time = (100. * time) / total_time
-    print(f"{name} | {time_in_microseconds} | {percentage_time:.2f}")
+    print(f"{name} | {time_in_microseconds:,} | {percentage_time:.1f}")
 
