@@ -14,15 +14,15 @@ for line in open(sys.argv[1]):
         print("@@" + "Benchmark Diff".center(len(line) - 2) + "@@")
         start = "# "
     else:
-        columns = line.split(" ")
+        columns = list(filter(None, line.split(' ')))
 
         # name
         # old-benchmark.txt ns/iter
         # new-benchmark.txt ns/iter
         # diff ns/iter
         # diff %
-        benchmark_name = str(columns)
-        benchmark_new_time = int(columns[2].replace(',', ''))
+        benchmark_name = columns[0]
+        benchmark_new_time = int(columns[3].replace(',', ''))
         total_time += benchmark_new_time
         speedup = float(columns[-1])
 
