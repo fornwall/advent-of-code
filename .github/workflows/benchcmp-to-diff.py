@@ -36,7 +36,7 @@ for line in open(sys.argv[1]):
         else:
             start = "  "
 
-    print(start + line)
+    print((start + line).replace(' ', ' ')) # Non-breaking space for diff alignment
 print("```")
 
 new_results.sort(reverse=True)
