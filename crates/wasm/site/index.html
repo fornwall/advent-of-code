@@ -44,12 +44,12 @@
 			display: none;
 		}
 
-		button:disabled:not(.unusable) .available {
+		button.in-progress .when-idle {
 			display: none;
 		}
 
-		button:disabled:not(.unusable) .in-progress {
-			display: inline;
+		button:not(.in-progress) .when-in-progress {
+			display: none;
 		}
 
 		#output {
@@ -164,11 +164,11 @@
 				<div class="row">
 					<div class="col p-0">
 						<button id="run-api" type="button" class="btn btn-block btn-primary" accesskey="a">
-							<span class="available">
+							<span class="when-idle">
 								Call API
 								<span id="api-execution-time" class="badge badge-light"></span>
 							</span>
-							<span class="in-progress">
+							<span class="when-in-progress">
 								<span class="spinner-border spinner-border-sm" role="status">
 									<span class="sr-only">Running...</span>
 								</span>
@@ -177,11 +177,11 @@
 					</div>
 					<div class="col pr-0 pl-2">
 						<button id="run-wasm" type="button" class="btn btn-block btn-primary" accesskey="w">
-							<span class="available">
+							<span class="when-idle">
 								Run Wasm
 								<span id="wasm-execution-time" class="badge badge-light"></span>
 							</span>
-							<span class="in-progress">
+							<span class="when-in-progress">
 								<span class="spinner-border spinner-border-sm" role="status">
 									<span class="sr-only">Running...</span>
 								</span>
@@ -192,7 +192,7 @@
 			</div>
 
 			<div class="form-group output">
-				<div id="output" class="alert alert-info" role="alert">
+				<div id="output" class="alert alert-info" role="alert" accesskey="c">
 					The problem answer will be shown here.
 				</div>
 			</div>
