@@ -126,7 +126,6 @@ function run() {
   clipboardMayWork().then((enabled) => {
     const pasteButton = document.getElementById('paste');
     if (enabled) {
-      pasteButton.classList.remove('hidden');
       pasteButton.addEventListener('click', async () => {
         try {
           input_element.value = await navigator.clipboard.readText();
