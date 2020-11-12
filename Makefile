@@ -91,6 +91,7 @@ netlify:
 		make site-wasmpack && \
 		make site-downloads && \
 		make node-package && \
+		mkdir crates/wasm/site/cached-${CACHED_COMMIT_REF} && cp crates/wasm/site/*.* crates/wasm/site/cached-${CACHED_COMMIT_REF} && \
 		cd crates/wasm/functions && \
 		npm install
 
