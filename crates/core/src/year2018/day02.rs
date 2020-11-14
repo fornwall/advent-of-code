@@ -19,6 +19,12 @@ pub fn part1(input_string: &str) -> Result<i64, String> {
 }
 
 pub fn part2(input_string: &str) -> Result<String, String> {
+    fn common_chars<'a>(s1: &'a str, s2: &'a str) -> impl Iterator<Item = char> + 'a {
+        s1.chars()
+            .zip(s2.chars())
+            .filter_map(|(c1, c2)| if c1 == c2 { Some(c1) } else { None })
+    };
+
     let input: Vec<&str> = input_string.lines().collect();
 
     for i in 0..input.len() {
@@ -26,22 +32,12 @@ pub fn part2(input_string: &str) -> Result<String, String> {
             let s1 = input[i];
             let s2 = input[j];
 
-            let diffs = s1
-                .chars()
-                .zip(s2.chars())
-                .filter(|(c1, c2)| c1 != c2)
-                .count();
-
-            if diffs == 1 {
-                return Ok(s1
-                    .chars()
-                    .zip(s2.chars())
-                    .filter(|pair| pair.0 == pair.1)
-                    .map(|pair| pair.0)
-                    .collect::<String>());
+            if common_chars(s1, s2).count() == s1.len() - 1 {
+                return Ok(common_chars(s1, s2).collect::<String>());
             }
         }
     }
+
     Err("No solution found".to_string())
 }
 

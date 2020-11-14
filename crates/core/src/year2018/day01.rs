@@ -1,39 +1,46 @@
 use std::collections::HashSet;
 
-fn parse_input(input_string: &str) -> Result<Vec<i32>, String> {
-    input_string
-        .lines()
-        .enumerate()
-        .map(|(line_index, line)| {
-            line.parse::<i32>().map_err(|error| {
-                format!(
-                    "Invalid input on line {}: {}",
-                    line_index + 1,
-                    error.to_string()
-                )
-            })
+type Frequency = i32;
+
+fn parse_frequency_changes<'a>(
+    input_string: &'a str,
+) -> impl Iterator<Item = Result<Frequency, String>> + Clone + 'a {
+    input_string.lines().enumerate().map(|(line_index, line)| {
+        line.parse::<Frequency>().map_err(|error| {
+            format!(
+                "Invalid input on line {}: {}",
+                line_index + 1,
+                error.to_string()
+            )
         })
-        .collect::<Result<_, _>>()
+    })
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    Ok(parse_input(input_string)?.iter().sum())
+pub fn part1(input_string: &str) -> Result<Frequency, String> {
+    Ok(parse_frequency_changes(input_string).sum::<Result<_, _>>()?)
 }
 
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let input = parse_input(input_string)?;
+pub fn part2(input_string: &str) -> Result<Frequency, String> {
+    const MAX_ITERATIONS: usize = 1_000_000;
 
-    let mut frequency: i32 = 0;
+    let mut frequency: Frequency = 0;
     let mut seen_frequencies = HashSet::new();
 
-    for &value in input.iter().cycle() {
-        if !seen_frequencies.insert(frequency) {
-            break;
+    for change in parse_frequency_changes(input_string)
+        .cycle()
+        .take(MAX_ITERATIONS)
+    {
+        if seen_frequencies.insert(frequency) {
+            frequency = frequency.checked_add(change?).ok_or("Too high frequency")?;
+        } else {
+            return Ok(frequency);
         }
-        frequency = frequency.checked_add(value).ok_or("Too high frequency")?;
     }
 
-    Ok(frequency)
+    Err(format!(
+        "Frequency not repeated after {} iterations",
+        MAX_ITERATIONS
+    ))
 }
 
 #[test]
