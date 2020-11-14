@@ -44,8 +44,8 @@ impl Maze {
             start_location: (0, 0),
         };
         input.lines().enumerate().for_each(|(y, line)| {
-            line.chars().enumerate().for_each(|(x, tile)| {
-                maze.set_tile(x, y, tile as u8);
+            line.bytes().enumerate().for_each(|(x, tile)| {
+                maze.set_tile(x, y, tile);
             });
         });
 
