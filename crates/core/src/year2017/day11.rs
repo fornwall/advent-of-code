@@ -26,7 +26,6 @@ pub fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
             furthest = std::cmp::max(furthest, distance(location));
         }
     }
-    println!("location: {:?}", location);
     Ok(if part1 { distance(location) } else { furthest })
 }
 
