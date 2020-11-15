@@ -16,7 +16,12 @@ with open(sessions_file) as f:
     SESSIONS = json.load(f)
 
 if "AOC_YEAR" in os.environ:
-    years = [int(os.environ["AOC_YEAR"])]
+    years_string = os.environ['AOC_YEAR']
+    if "-" in years_string:
+        (years_start, years_end) = years_string.split("-")
+        years = range(int(years_start), int(years_end) + 1)
+    else:
+        years = [int(years_string)]
 else:
     years = [2018, 2019]
 
