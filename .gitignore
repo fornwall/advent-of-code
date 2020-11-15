@@ -4,6 +4,8 @@ target/
 **/*.rs.bk
 *.swp
 *.log
+*.wasm
+*.wasi
 /.idea/
 dist/
 /bin/
