@@ -30,6 +30,20 @@ macro_rules! run_bench {
         }
     };
 }
+
+run_bench!(2017, 01);
+run_bench!(2017, 02);
+run_bench!(2017, 03);
+run_bench!(2017, 04);
+run_bench!(2017, 05);
+run_bench!(2017, 06);
+run_bench!(2017, 07);
+run_bench!(2017, 08);
+run_bench!(2017, 09);
+run_bench!(2017, 10);
+run_bench!(2017, 11);
+run_bench!(2017, 12);
+
 run_bench!(2018, 01);
 run_bench!(2018, 02);
 run_bench!(2018, 03);
