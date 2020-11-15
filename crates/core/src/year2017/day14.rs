@@ -2,56 +2,53 @@ use super::day10::part2 as knot_hash;
 use super::disjoint_set::DisjointSet;
 use std::collections::BTreeMap;
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    let mut used_count = 0;
+fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
+    // Mapping from (x,y) coordinate of a used square to an identifier
+    // constructed from a zero-based sequence to be used as set identifiers
+    // in a disjoint set for part 2.
+    let mut location_to_set_identifier = BTreeMap::new();
+    let mut used_counter = 0;
+
     for row in 0..=127 {
         let hash_input = format!("{}-{}", input_string, row);
         let hash = knot_hash(&hash_input)?;
-        used_count += hash
-            .chars()
-            .map(|b| {
-                u32::from_str_radix(&b.to_string(), 16)
-                    .expect("ok")
-                    .count_ones()
-            })
-            .sum::<u32>();
-    }
-    Ok(used_count)
-}
-
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    let mut hash_map = BTreeMap::new();
-
-    let mut counter = 0;
-    for row in 0..=127 {
-        let hash_input = format!("{}-{}", input_string, row);
-        let hash = knot_hash(&hash_input)?;
-        for (index, byte) in hash
-            .chars()
-            .map(|b| u32::from_str_radix(&b.to_string(), 16).expect("ok"))
-            .enumerate()
-        {
+        for (index, digit) in hash.chars().enumerate() {
+            let byte = u32::from_str_radix(&digit.to_string(), 16)
+                .map_err(|_| "Internal error - invalid digit in hash")?;
             for bit in 0..4 {
                 if byte & (0b1000 >> bit) != 0 {
                     let col = (index * 4 + bit) as i32;
-                    hash_map.insert((col, row), counter);
-                    counter += 1;
+                    location_to_set_identifier.insert((col, row), used_counter);
+                    used_counter += 1;
                 }
             }
         }
     }
 
-    let mut disjoint_set = DisjointSet::new(counter);
-    for ((x, y), &value) in hash_map.iter() {
-        for (dx, dy) in &[(1, 0), (0, 1)] {
-            let next = (x + dx, y + dy);
-            if let Some(&other) = hash_map.get(&next) {
-                disjoint_set.join(value, other);
+    Ok(if part1 {
+        used_counter as u32
+    } else {
+        let mut disjoint_set = DisjointSet::new(used_counter);
+        for ((x, y), &this_set) in location_to_set_identifier.iter() {
+            // Since coordinates are stored in an ordered set we only need to consider
+            // neighbors to the right and below:
+            for (dx, dy) in &[(1, 0), (0, 1)] {
+                let next = (x + dx, y + dy);
+                if let Some(&other_set) = location_to_set_identifier.get(&next) {
+                    disjoint_set.join(this_set, other_set);
+                }
             }
         }
-    }
+        disjoint_set.num_groups() as u32
+    })
+}
 
-    Ok(disjoint_set.num_groups())
+pub fn part1(input_string: &str) -> Result<u32, String> {
+    solution(input_string, true)
+}
+
+pub fn part2(input_string: &str) -> Result<u32, String> {
+    solution(input_string, false)
 }
 
 #[test]
