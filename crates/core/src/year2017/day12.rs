@@ -43,28 +43,25 @@ impl DisjointSet {
         let root2 = self.find(j);
 
         if root1 == root2 {
-            // Already same.
             return;
         }
 
         let r1 = self.elements[root1];
         let r2 = self.elements[root2];
+
+        // Join smaller tree with bigger:
         if r1 < r2 {
-            // r2 has smaller depth, add it to r1.
+            self.elements[root1] += r2;
             self.elements[root2] = root1 as i32;
         } else {
-            if r1 == r2 {
-                self.elements[root2] -= 1;
-            }
+            self.elements[root2] += r1;
             self.elements[root1] = root2 as i32;
         }
     }
 
     fn size(&mut self, i: usize) -> usize {
         let root = self.find(i);
-        (0..self.elements.len())
-            .filter(|&i| self.find(i) == root)
-            .count()
+        -self.elements[root] as usize
     }
 
     fn num_groups(&mut self) -> usize {
