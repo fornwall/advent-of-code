@@ -100,6 +100,7 @@ impl Direction {
     }
 }
 
+// Solution taken from https://github.com/emlun/adventofcode-2019/blob/master/src/days/day17.rs
 pub fn part2(input_string: &str) -> Result<String, String> {
     let mut program = Program::parse(input_string)?;
 
@@ -252,10 +253,7 @@ where
     (0..(seq.len() - subseq.len())).any(|i| seq[i..].starts_with(subseq))
 }
 
-fn find_longest_repeated_subsequence<T>(sequence: &[T]) -> Option<&[T]>
-where
-    T: PartialEq,
-{
+fn find_longest_repeated_subsequence(sequence: &[String]) -> Option<&[String]> {
     let mut end_min = 0;
     let mut end_max = sequence.len();
 
@@ -277,10 +275,7 @@ where
     }
 }
 
-fn find_subseq_covering<T>(seq: &[T], subseqs: &[&[T]]) -> Option<LinkedList<usize>>
-where
-    T: PartialEq,
-{
+fn find_subseq_covering(seq: &[String], subseqs: &[&[String]]) -> Option<LinkedList<usize>> {
     if seq.is_empty() {
         Some(LinkedList::new())
     } else {
@@ -297,21 +292,15 @@ where
     }
 }
 
-fn find_covering_subsequences<T>(
-    seq: &[T],
+fn find_covering_subsequences(
+    seq: &[String],
     num_subsequences: usize,
-) -> Option<(Vec<&[T]>, LinkedList<usize>)>
-where
-    T: PartialEq,
-{
-    fn fill_subsequences<'a, T>(
-        seq: &'a [T],
+) -> Option<(Vec<&[String]>, LinkedList<usize>)> {
+    fn fill_subsequences<'a>(
+        seq: &'a [String],
         num_subsequences: usize,
-        mut subsequences: Vec<&'a [T]>,
-    ) -> Option<Vec<&'a [T]>>
-    where
-        T: PartialEq,
-    {
+        mut subsequences: Vec<&'a [String]>,
+    ) -> Option<Vec<&'a [String]>> {
         if seq.is_empty() || subsequences.len() == num_subsequences {
             Some(subsequences)
         } else if let Some(prefix) = subsequences.iter().find(|subseq| seq.starts_with(subseq)) {
@@ -323,26 +312,28 @@ where
         }
     }
 
-    let mut subsequences: Vec<&[T]> = fill_subsequences(seq, num_subsequences, Vec::new())?;
+    let mut subsequences: Vec<&[String]> = fill_subsequences(seq, num_subsequences, Vec::new())?;
 
     while !subsequences[0].is_empty() {
         if let Some(covering) = find_subseq_covering(seq, &subsequences) {
-            return Some((subsequences, covering));
-        } else {
-            while !subsequences.is_empty() {
-                let i = subsequences.len() - 1;
-                subsequences[i] = subsequences[i].split_last()?.1;
-                if subsequences[subsequences.len() - 1].is_empty() {
-                    subsequences.pop();
-                } else {
-                    subsequences = fill_subsequences(seq, num_subsequences, subsequences)?;
-                    break;
-                }
+            if !subsequences.iter().any(|s| s.join(",").len() > 20) {
+                return Some((subsequences, covering));
             }
+        }
 
-            if subsequences.is_empty() {
-                return None;
+        while !subsequences.is_empty() {
+            let i = subsequences.len() - 1;
+            subsequences[i] = subsequences[i].split_last()?.1;
+            if subsequences[subsequences.len() - 1].is_empty() {
+                subsequences.pop();
+            } else {
+                subsequences = fill_subsequences(seq, num_subsequences, subsequences)?;
+                break;
             }
+        }
+
+        if subsequences.is_empty() {
+            return None;
         }
     }
     None
