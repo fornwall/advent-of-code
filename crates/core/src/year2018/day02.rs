@@ -32,7 +32,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
             let s1 = input[i];
             let s2 = input[j];
 
-            if common_chars(s1, s2).count() == s1.len() - 1 {
+            if common_chars(s1, s2).count() + 1 == s1.len() {
                 return Ok(common_chars(s1, s2).collect::<String>());
             }
         }
