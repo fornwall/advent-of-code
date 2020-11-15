@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 use std::env;
 use std::io::Read;
 

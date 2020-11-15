@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 /*!
 This crates provides solutions for Advent of Code problems.
 */
