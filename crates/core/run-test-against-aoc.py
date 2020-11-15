@@ -82,4 +82,8 @@ for session in SESSIONS:
                         else:
                             puzzle.answer_b = result
                 except subprocess.CalledProcessError:
-                    sys.exit("Failed running")
+                    output = "failing-input.txt"
+                    with open(output, "w") as outfile:
+                        outfile.write(input_data)
+
+                    sys.exit(f"Failed running - input data written to {output}")
