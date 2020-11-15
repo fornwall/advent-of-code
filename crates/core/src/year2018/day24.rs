@@ -48,7 +48,7 @@ impl ArmyGroup {
         let error = |_| "Invalid input";
 
         for line in input_string.lines().skip(1) {
-            if line == "" {
+            if line.is_empty() {
                 // Skip empty line.
             } else if line == "Infection:" {
                 immune_system = false;
