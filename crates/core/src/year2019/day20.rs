@@ -60,7 +60,7 @@ impl Maze {
                 maze.tile_at(x, y)
             };
 
-            if tile >= b'A' && tile <= b'Z' {
+            if (b'A'..=b'Z').contains(&tile) {
                 current_string.push(tile as char);
             } else {
                 if current_string.len() == 2 {
