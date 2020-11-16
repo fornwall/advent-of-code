@@ -30,14 +30,8 @@ fn solution(input_string: &str, part1: bool) -> Result<usize, String> {
         for (position, &current_range) in scanner_ranges.iter().enumerate() {
             if current_range != 0 {
                 let time = delay + position;
-                let modulo = time % (2 * (current_range - 1));
-                let scanner_position = if modulo < current_range {
-                    modulo
-                } else {
-                    current_range - 2 - (modulo % current_range)
-                };
-
-                if scanner_position == 0 {
+                let caught = time % (2 * (current_range - 1)) == 0;
+                if caught {
                     if part1 {
                         trip_severity += position * current_range;
                     } else {
