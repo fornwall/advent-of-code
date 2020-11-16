@@ -47,14 +47,10 @@ def add_header(src, year, day):
     return header + "\n\n" + src
 
 
-def replace_include_str(path, src):
-    link_to_file = (
-        f"https://github.com/fornwall/advent-of-code/tree/master/crates/core/{path}"
-    )
-
+def replace_include_str(dirpath, src):
     def replace(match):
         included_file = match.group(1)
-        replacement_file = os.path.join(os.path.dirname(path), included_file)
+        replacement_file = os.path.join(dirpath, included_file)
         included_src = Path(replacement_file).read_text()
         included_src = included_src.replace("\\", "\\\\").replace("\n", "\\n")
         return f'"{included_src}"'
@@ -112,8 +108,8 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         print(f"{year} - {day}")
 
         src = Path(path).read_text()
-        src = replace_include_str(path, src)
         src = add_header(src, year, day)
+        src = replace_include_str(dirpath, src)
 
         year_str = str(year)
         day_str = str(day)
