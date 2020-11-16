@@ -12,9 +12,8 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     for row in 0..=127 {
         let hash_input = format!("{}-{}", input_string, row);
         let hash = knot_hash(&hash_input)?;
-        for (index, digit) in hash.chars().enumerate() {
-            let byte = u32::from_str_radix(&digit.to_string(), 16)
-                .map_err(|_| "Internal error - invalid digit in hash")?;
+        for (index, digit) in hash.bytes().enumerate() {
+            let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
             for bit in 0..4 {
                 if byte & (0b1000 >> bit) != 0 {
                     let col = (index * 4 + bit) as i32;
