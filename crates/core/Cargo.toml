@@ -17,6 +17,21 @@ name = "advent_of_code"
 
 [features]
 debug-output = []
+visualization = ["wasm-bindgen", "web-sys"]
+
+[dependencies]
+wasm-bindgen = { version = "0.2", optional = true }
+
+[dependencies.web-sys]
+version = "0.3"
+optional = true
+features = [
+  'CanvasRenderingContext2d',
+  'Document',
+  'Element',
+  'HtmlCanvasElement',
+  'Window',
+]
 
 [dev-dependencies]
 paste = "1.0"

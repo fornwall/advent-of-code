@@ -12,6 +12,9 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+visualization = [ "advent-of-code/visualization" ]
+
 [dependencies]
 advent-of-code = { path = "../core" }
 wasm-bindgen = "*"
