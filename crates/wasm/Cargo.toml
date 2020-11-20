@@ -23,4 +23,7 @@ js-sys = "*"
 
 [package.metadata.wasm-pack.profile.release]
 # https://github.com/rustwasm/wasm-pack/issues/886
-wasm-opt = ["-Oz", "--enable-mutable-globals"]
+# is fixed with ""--enable-mutable-globals".
+# But without "--no-validation" the build using nightly for the
+# visualisation fails with "Fatal: module features do not match specified features"
+wasm-opt = ["-O4", "--no-validation"]
