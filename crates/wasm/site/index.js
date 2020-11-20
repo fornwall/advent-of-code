@@ -65,7 +65,7 @@ function visualize() {
     } else {
         const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
         const visualizerUrl = `/show/#year=${year}&day=${day}&part=${part}&input=${encodeURIComponent(input)}`;
-        window.open(visualizerUrl);
+        window.location = visualizerUrl;
     }
 }
 
