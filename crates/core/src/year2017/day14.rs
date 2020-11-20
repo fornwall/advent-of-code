@@ -1,5 +1,7 @@
 use super::day10::part2 as knot_hash;
 use super::disjoint_set::DisjointSet;
+#[cfg(feature = "visualization")]
+use advent_of_code_painter::drawer::ToBufferDrawer;
 use std::collections::BTreeMap;
 
 fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
@@ -9,19 +11,39 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let mut location_to_set_identifier = BTreeMap::new();
     let mut used_counter = 0;
 
+    #[cfg(feature = "visualization")]
+    let mut drawer = {
+        let mut drawer = ToBufferDrawer::new();
+        drawer.clear();
+        drawer.fill_style_rgb(255, 0, 0);
+        drawer
+    };
+
     for row in 0..=127 {
         let hash_input = format!("{}-{}", input_string, row);
         let hash = knot_hash(&hash_input)?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
             for bit in 0..4 {
-                if byte & (0b1000 >> bit) != 0 {
+                let bit_is_set = byte & (0b1000 >> bit) != 0;
+                if bit_is_set {
                     let col = (index * 4 + bit) as i32;
                     location_to_set_identifier.insert((col, row), used_counter);
                     used_counter += 1;
                 }
+
+                #[cfg(feature = "visualization")]
+                {
+                    if bit_is_set {
+                        let canvas_x = (index * 4 + bit) * 4;
+                        let canvas_y = row * 4;
+                        drawer.fill_square(canvas_x as i32, canvas_y, 4);
+                    }
+                }
             }
         }
+        #[cfg(feature = "visualization")]
+        drawer.end_frame();
     }
 
     Ok(if part1 {

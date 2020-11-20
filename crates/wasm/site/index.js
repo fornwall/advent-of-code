@@ -1,3 +1,6 @@
+import CanvasRecorder from './CanvasRecorder.js';
+import Renderer from './renderer.js';
+
 const worker = new Worker("./worker.js", { name: "solver" });
 
 const run_wasm_element = document.getElementById('run-wasm');
@@ -57,6 +60,36 @@ function execute(wasm) {
   }
 }
 
+function visualize() {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext('2d');
+    canvas.style.display = 'block';
+
+    canvas.addEventListener('dblclick', () => {
+      if (!document.fullscreenElement) {
+          canvas.requestFullscreen();
+      }
+    });
+
+    new ResizeObserver(() => {
+      console.log('resize', canvas.width, canvas.height);
+      canvas.width = canvas.clientWidth;;
+      canvas.height = canvas.clientHeight;
+    }).observe(canvas);
+
+    const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
+    const visualizerWorker = new Worker("./worker-visualizer.js", { name: "visualizer" });
+    visualizerWorker.postMessage({ year, day, part, input });
+    visualizerWorker.onmessage = (message) => {
+        const renderer = new Renderer(message, ctx);
+        function render(time) {
+          renderer.render();
+          requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+    };
+}
+
 window.addEventListener('pageshow', () => {
   if (window.localStorage) {
     const problemString = window.localStorage.getItem("problem");
@@ -89,6 +122,7 @@ async function clipboardReadMayWork() {
 function run() {
   run_api_element.addEventListener("click", () => execute(false));
   run_wasm_element.addEventListener("click", () => execute(true));
+  document.getElementById('run-visualizer').addEventListener('click', visualize);
 
   [year_element, day_element, part_element].forEach(element => element.addEventListener('input', () => {
     if (window.localStorage) {

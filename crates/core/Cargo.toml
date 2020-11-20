@@ -17,21 +17,10 @@ name = "advent_of_code"
 
 [features]
 debug-output = []
-visualization = ["wasm-bindgen", "web-sys"]
+visualization = ["advent-of-code-painter"]
 
 [dependencies]
-wasm-bindgen = { version = "0.2", optional = true }
-
-[dependencies.web-sys]
-version = "0.3"
-optional = true
-features = [
-  'CanvasRenderingContext2d',
-  'Document',
-  'Element',
-  'HtmlCanvasElement',
-  'Window',
-]
+advent-of-code-painter = { path = "../painter", optional = true }
 
 [dev-dependencies]
 paste = "1.0"

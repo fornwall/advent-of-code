@@ -4,7 +4,7 @@ else
   wasm_pack_profile=--release
 endif
 
-CLIPPY_PARAMS =  --all-features -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
+CLIPPY_PARAMS =  -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
 CLIPPY_CARGO = cargo
 ifeq ($(CLIPPY_NIGHTLY),1)
   CLIPPY_CARGO += +nightly
@@ -16,7 +16,20 @@ ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
 endif
 
-WASM_PACK_COMMAND := wasm-pack build $(wasm_pack_profile) --target no-modules --out-dir site
+WASM_PACK_COMMAND := wasm-pack \
+	build $(wasm_pack_profile) \
+	--target no-modules \
+	--out-dir site
+
+NIGHTLY_DATE=2020-10-13
+NIGHTLY_TOOLCHAIN=nightly-${NIGHTLY_DATE}
+WASM_PACK_COMMAND_VISUALIZER := RUSTFLAGS="-C target-feature=+atomics,+bulk-memory" \
+	rustup run $(NIGHTLY_TOOLCHAIN) \
+	wasm-pack build \
+	$(wasm_pack_profile) \
+	--target no-modules \
+	--out-dir site/show \
+	-- --features visualization -Z build-std=std,panic_abort
 
 check:
 	$(CLIPPY_CARGO) fmt --all
@@ -37,17 +50,26 @@ site-downloads:
 site-wasmpack:
 	cd crates/wasm && $(WASM_PACK_COMMAND)
 
+site-wasmpack-visualization:
+	cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)
+
 wasm-size: site-wasmpack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
 run-devserver:
-	cd crates/wasm/site && devserver
+	cd crates/wasm/site && devserver --header "Cross-Origin-Opener-Policy: same-origin" --header "Cross-Origin-Embedder-Policy: require-corp"
 
 watch-and-build-wasm:
 	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND)'
 
-serve-site: site-wasmpack
+watch-and-build-wasm-visualization:
+	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)'
+
+serve-site:
 	make DEBUG_WASM=1 -j run-devserver watch-and-build-wasm
+
+serve-site-visualization:
+	make DEBUG_WASM=1 -j run-devserver watch-and-build-wasm-visualization
 
 serve-api:
 	cd crates/server && cargo run
@@ -87,8 +109,11 @@ netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
 		. $(HOME)/.cargo/env && \
+		rustup toolchain install $(NIGHTLY_TOOLCHAIN) && \
+		rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src && \
 		make install-wasm-pack && \
 		make site-wasmpack && \
+		make site-wasmpack-visualization && \
 		make site-downloads && \
 		make node-package && \
 		cd crates/wasm/functions && \
