@@ -1,4 +1,3 @@
-import CanvasRecorder from './CanvasRecorder.js';
 import Renderer from './renderer.js';
 
 const worker = new Worker("./worker.js", { name: "solver" });
@@ -76,6 +75,8 @@ function visualize() {
       canvas.width = canvas.clientWidth;;
       canvas.height = canvas.clientHeight;
     }).observe(canvas);
+
+    // import CanvasRecorder from './CanvasRecorder.js';
 
     const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
     const visualizerWorker = new Worker("./worker-visualizer.js", { name: "visualizer" });
