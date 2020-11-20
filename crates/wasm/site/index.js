@@ -1,5 +1,3 @@
-import Renderer from './renderer.js';
-
 const worker = new Worker("./worker.js", { name: "solver" });
 
 const run_wasm_element = document.getElementById('run-wasm');
@@ -60,35 +58,15 @@ function execute(wasm) {
 }
 
 function visualize() {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext('2d');
-    canvas.style.display = 'block';
-
-    canvas.addEventListener('dblclick', () => {
-      if (!document.fullscreenElement) {
-          canvas.requestFullscreen();
-      }
-    });
-
-    new ResizeObserver(() => {
-      console.log('resize', canvas.width, canvas.height);
-      canvas.width = canvas.clientWidth;;
-      canvas.height = canvas.clientHeight;
-    }).observe(canvas);
-
-    // import CanvasRecorder from './CanvasRecorder.js';
-
-    const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
-    const visualizerWorker = new Worker("./worker-visualizer.js", { name: "visualizer" });
-    visualizerWorker.postMessage({ year, day, part, input });
-    visualizerWorker.onmessage = (message) => {
-        const renderer = new Renderer(message, ctx);
-        function render(time) {
-          renderer.render();
-          requestAnimationFrame(render);
-        }
-        requestAnimationFrame(render);
-    };
+    if (!window.SharedArrayBuffer) {
+        alert('Sorry - SharedArrayBuffer is not supported by your browser!');
+    } else if (!window.Atomics) {
+        alert('Sorry - Atomics is not supported by your browser!');
+    } else {
+        const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
+        const visualizerUrl = `/show/#year=${year}&day=${day}&part=${part}&input=${encodeURIComponent(input)}`;
+        window.open(visualizerUrl);
+    }
 }
 
 window.addEventListener('pageshow', () => {
