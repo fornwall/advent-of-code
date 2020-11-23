@@ -1,3 +1,5 @@
+#[cfg(feature = "visualization")]
+use advent_of_code_painter::drawer::ToBufferDrawer;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
@@ -29,9 +31,20 @@ struct Edge {
     steps: usize,
     /// The keys needed to traverse this path.
     needed_keys: KeyBitset,
+    #[cfg(feature = "visualization")]
+    x: i32,
+    #[cfg(feature = "visualization")]
+    y: i32,
 }
 
 pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
+    #[cfg(feature = "visualization")]
+    let mut drawer = {
+        let mut drawer = ToBufferDrawer::new();
+        drawer.fill_style_rgb(255, 0, 0);
+        drawer
+    };
+
     let rows = input_string.lines().count();
     let cols = input_string.lines().next().ok_or("Empty input")?.len();
     let mut map = vec![b'#'; rows * cols];
@@ -47,10 +60,30 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
         line.chars().enumerate().for_each(|(x, c)| {
             let byte = c as u8;
             let current_position = (x as i32, y as i32);
+
+            #[cfg(feature = "visualization")]
+            let canvas_x = (x as f64 / cols as f64) * 100.0;
+            #[cfg(feature = "visualization")]
+            let canvas_y = (y as f64 / rows as f64) * 100.0;
+            #[cfg(feature = "visualization")]
+            let draw_width = 95.0 / cols as f64;
+            #[cfg(feature = "visualization")]
+            let draw_height = (95.0 / rows as f64);
+            #[cfg(feature = "visualization")]
+            let draw = |drawer: &mut ToBufferDrawer| {
+                drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
+            };
+
             let char_to_insert = match c {
                 '@' => {
                     // The single entrance.
                     found_keys.insert(Key::new(b'@'), current_position);
+                    #[cfg(feature = "visualization")]
+                    {
+                        drawer.fill_style_rgb(0, 0, 255);
+                        draw(&mut drawer);
+                        drawer.fill_style_rgb(255, 0, 0);
+                    }
                     b'.'
                 }
                 'a'..='z' => {
@@ -58,16 +91,40 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     let found_key = Key::new(byte);
                     all_keys_bitset |= found_key.bit_mask();
                     found_keys.insert(found_key, current_position);
+                    #[cfg(feature = "visualization")]
+                    {
+                        drawer.fill_style_rgb(0, 255, 0);
+                        draw(&mut drawer);
+                        drawer.fill_style_rgb(255, 0, 0);
+                    }
                     byte
                 }
                 '#' => {
+                    #[cfg(feature = "visualization")]
+                    {
+                        draw(&mut drawer);
+                    }
                     // Stone wall.
                     return;
                 }
-                _ => byte,
+                _ => {
+                    #[cfg(feature = "visualization")]
+                    {
+                        if ('A'..='Z').contains(&c) {
+                            drawer.fill_style_rgb(0, 255, 255);
+                            drawer.fill_square(canvas_x, canvas_y, 1.0);
+                            drawer.fill_style_rgb(255, 0, 0);
+                        }
+                    }
+                    byte
+                }
             };
             map[index_of(x, y)] = char_to_insert;
         });
+        #[cfg(feature = "visualization")]
+        {
+            drawer.end_frame();
+        }
     }
 
     if !found_keys.contains_key(&Key::new(b'@')) {
@@ -126,6 +183,10 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                             steps: new_steps as usize,
                             needed_keys: new_needed_keys,
                             target_key,
+                            #[cfg(feature = "visualization")]
+                            x: new_position.0,
+                            #[cfg(feature = "visualization")]
+                            y: new_position.1,
                         });
                 } else if visited_positions.insert(new_position) {
                     let new_state = (new_position, new_needed_keys, new_steps);
@@ -135,16 +196,35 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
         }
     }
 
-    shortest_path(&adjacency_list, all_keys_bitset)
-        .ok_or_else(|| "Not possible to gather all keys".to_string())
+    shortest_path(
+        &adjacency_list,
+        all_keys_bitset,
+        #[cfg(feature = "visualization")]
+        &mut drawer,
+        #[cfg(feature = "visualization")]
+        cols,
+        #[cfg(feature = "visualization")]
+        rows,
+    )
+    .ok_or_else(|| "Not possible to gather all keys".to_string())
 }
 
-fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) -> Option<usize> {
+fn shortest_path(
+    adjacency_list: &HashMap<Key, Vec<Edge>>,
+    all_keys: KeyBitset,
+    #[cfg(feature = "visualization")] drawer: &mut ToBufferDrawer,
+    #[cfg(feature = "visualization")] cols: usize,
+    #[cfg(feature = "visualization")] rows: usize,
+) -> Option<usize> {
     #[derive(Copy, Clone, Eq, PartialEq)]
     struct Vertex {
         at_key: Key,
         steps: usize,
         gathered_keys: KeyBitset,
+        #[cfg(feature = "visualization")]
+        x: i32,
+        #[cfg(feature = "visualization")]
+        y: i32,
     }
 
     impl Ord for Vertex {
@@ -167,15 +247,38 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
     let mut cost_for_keys: HashMap<(Key, KeyBitset), usize> = HashMap::new();
     let mut to_visit = BinaryHeap::new();
 
+    #[cfg(feature = "visualization")]
+    let mut visited_locations = HashSet::new();
+
     to_visit.push(Vertex {
         at_key: Key::new(b'@'),
         steps: 0,
         gathered_keys: 0,
+        #[cfg(feature = "visualization")]
+        x: 0,
+        #[cfg(feature = "visualization")]
+        y: 0,
     });
 
     while let Some(current) = to_visit.pop() {
         if current.gathered_keys == all_keys {
+            #[cfg(feature = "visualization")]
+            drawer.done();
+
             return Some(current.steps);
+        }
+
+        #[cfg(feature = "visualization")]
+        {
+            if visited_locations.insert((current.x, current.y)) {
+                let canvas_x = (current.x as f64 / cols as f64) * 100.0;
+                let canvas_y = (current.y as f64 / rows as f64) * 100.0;
+                let draw_width = 95.0 / cols as f64;
+                let draw_height = 95.0 / rows as f64;
+                drawer.fill_style_rgb(255, 255, 255);
+                drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
+                drawer.end_frame();
+            }
         }
 
         for edge in adjacency_list.get(&current.at_key)? {
@@ -189,6 +292,10 @@ fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) 
                 steps: current.steps + edge.steps,
                 at_key: edge.target_key,
                 gathered_keys: current.gathered_keys | edge.target_key.bit_mask(),
+                #[cfg(feature = "visualization")]
+                x: edge.x,
+                #[cfg(feature = "visualization")]
+                y: edge.y,
             };
 
             let current_cost = cost_for_keys

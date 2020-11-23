@@ -69,18 +69,21 @@ function visualize() {
     }
 }
 
+function storeForm() {
+  window.localStorage.setItem('problem', JSON.stringify({ year: year_element.value, day: day_element.value, part: part_element.value, input: input_element.value }));
+}
+
 window.addEventListener('pageshow', () => {
-  if (window.localStorage) {
-    const problemString = window.localStorage.getItem("problem");
-    if (problemString) {
-      try {
-        const problem = JSON.parse(problemString)
-        year_element.value = problem.year;
-        day_element.value = problem.day;
-        part_element.value = problem.part;
-      } catch (error) {
-        console.error(error);
-      }
+  const problemString = window.localStorage.getItem("problem");
+  if (problemString) {
+    try {
+      const problem = JSON.parse(problemString)
+      year_element.value = problem.year;
+      day_element.value = problem.day;
+      part_element.value = problem.part;
+      if (problem.input) input_element.value = problem.input;
+    } catch (error) {
+      console.error(error);
     }
   }
 });
@@ -103,16 +106,12 @@ function run() {
   run_wasm_element.addEventListener("click", () => execute(true));
   document.getElementById('run-visualizer').addEventListener('click', visualize);
 
-  [year_element, day_element, part_element].forEach(element => element.addEventListener('input', () => {
-    if (window.localStorage) {
-      window.localStorage.setItem('problem', JSON.stringify({ year: year_element.value, day: day_element.value, part: part_element.value }));
-    }
-  }, false));
+  [year_element, day_element, part_element, input_element].forEach(element => element.addEventListener('change', storeForm));
 
   document.getElementById('open-input').addEventListener('click', () => {
     const link = `https://adventofcode.com/${year_element.value}/day/${day_element.value}/input`;
     window.open(link)
-  }, false);
+  });
 
   const savedInterval = {value: null};
   document.getElementById('output').addEventListener('click', (event) => {
@@ -128,12 +127,9 @@ function run() {
     const pasteButton = document.getElementById('paste');
     if (enabled) {
       pasteButton.addEventListener('click', async () => {
-        try {
-          input_element.value = await navigator.clipboard.readText();
-        } catch (e) {
-          console.log(e);
-        }
-      }, false);
+        input_element.value = await navigator.clipboard.readText();
+        storeForm();
+      });
     } else {
       pasteButton.disabled = true;
     }

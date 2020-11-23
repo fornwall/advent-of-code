@@ -14,7 +14,6 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     #[cfg(feature = "visualization")]
     let mut drawer = {
         let mut drawer = ToBufferDrawer::new();
-        drawer.clear();
         drawer.fill_style_rgb(255, 0, 0);
         drawer
     };
@@ -30,20 +29,31 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
                     let col = (index * 4 + bit) as i32;
                     location_to_set_identifier.insert((col, row), used_counter);
                     used_counter += 1;
-                }
 
-                #[cfg(feature = "visualization")]
-                {
-                    if bit_is_set {
-                        let canvas_x = (index * 4 + bit) * 4;
-                        let canvas_y = row * 4;
-                        drawer.fill_square(canvas_x as i32, canvas_y, 4);
+                    #[cfg(feature = "visualization")]
+                    {
+                        let canvas_x = index * 4 + bit;
+                        let canvas_y = row;
+                        if canvas_x == 127 {
+                            drawer.fill_style_rgb(0, 255, 0);
+                        }
+                        drawer.fill_square(
+                            canvas_x as f64 / 1.28,
+                            canvas_y as f64 / 1.28,
+                            1.0 / 1.28,
+                        );
+                        if canvas_x == 127 {
+                            drawer.fill_style_rgb(255, 0, 0);
+                        }
                     }
                 }
             }
         }
+
         #[cfg(feature = "visualization")]
-        drawer.end_frame();
+        {
+            drawer.end_frame();
+        }
     }
 
     Ok(if part1 {

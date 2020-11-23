@@ -11,9 +11,6 @@ export default function CanvasRecorder(canvas, video_bits_per_sec) {
     var mediaRecorder = null;
 
     var stream = canvas.captureStream();
-    if (typeof stream == undefined || !stream) {
-        return;
-    }
 
     const video = document.createElement('video');
     video.style.display = 'none';
@@ -29,16 +26,18 @@ export default function CanvasRecorder(canvas, video_bits_per_sec) {
             "video/mpeg"
         ];
 
-        for (let i in types) {
-            if (MediaRecorder.isTypeSupported(types[i])) {
-                supportedType = types[i];
+        for (let type of types) {
+            if (MediaRecorder.isTypeSupported(type)) {
+                supportedType = type;
                 break;
             }
         }
+
         if (supportedType == null) {
-            console.log("No supported type found for MediaRecorder");
+            console.error("No supported type found for MediaRecorder");
         }
-        let options = { 
+
+        const options = {
             mimeType: supportedType,
             videoBitsPerSecond: video_bits_per_sec || 2500000 // 2.5Mbps
         };

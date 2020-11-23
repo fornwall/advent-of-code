@@ -1,3 +1,4 @@
+#[macro_use]
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
@@ -10,9 +11,13 @@ const HEADER_WRITE_OFFSET: usize = 2;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
+    pub fn log(s: &str);
+
+// #[wasm_bindgen]
+// fn do_wait(offset: u32, value: i32);
 }
 
+#[macro_export]
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
@@ -24,7 +29,7 @@ pub struct CircularOutputBuffer {
 
 impl CircularOutputBuffer {
     pub fn data_len(&self) -> usize {
-        return self.shared_buffer.len() - HEADER_ELEMENT_LENGTH;
+        self.shared_buffer.len() - HEADER_ELEMENT_LENGTH
     }
 
     pub fn new() -> Self {
@@ -33,7 +38,7 @@ impl CircularOutputBuffer {
             non_flushed_writes: 0,
         };
 
-        let data_buffer_offset = unsafe { result.shared_buffer.as_mut_ptr() as u32 };
+        let data_buffer_offset = result.shared_buffer.as_mut_ptr() as u32;
         let data_buffer_byte_length = result.shared_buffer.len() as u32 * 4;
         let memory_buffer = wasm_bindgen::memory()
             .unchecked_into::<js_sys::WebAssembly::Memory>()
@@ -60,17 +65,17 @@ impl CircularOutputBuffer {
         self.non_flushed_writes += 1;
     }
 
-    pub fn write_float(&mut self, value: f32) {
-        self.write(value.to_bits() as i32);
+    pub fn write_float(&mut self, value: f64) {
+        self.write((value as f32).to_bits() as i32);
     }
 
-    pub fn write_float3(&mut self, a: f32, b: f32, c: f32) {
+    pub fn write_float3(&mut self, a: f64, b: f64, c: f64) {
         self.write_float(a);
         self.write_float(b);
         self.write_float(c);
     }
 
-    pub fn write_float4(&mut self, a: f32, b: f32, c: f32, d: f32) {
+    pub fn write_float4(&mut self, a: f64, b: f64, c: f64, d: f64) {
         self.write_float(a);
         self.write_float(b);
         self.write_float(c);
@@ -96,14 +101,37 @@ impl CircularOutputBuffer {
     pub fn wait(&mut self) {
         self.shared_buffer[HEADER_READER_WANT_MORE_OFFSET] = 0;
 
+        let read_offset = self.shared_buffer[HEADER_READ_OFFSET];
+        let write_offset = self.shared_buffer[HEADER_WRITE_OFFSET];
+        let used = if read_offset > write_offset {
+            write_offset - read_offset + self.data_len() as i32
+        } else {
+            write_offset - read_offset
+        };
+        if used < (self.data_len() as i32 / 3) {
+            return;
+        } else {
+            console_log!(
+                "[rust] Waiting, use ratio {}",
+                used as f32 / self.data_len() as f32
+            );
+        }
+
+        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
         unsafe {
             // Firefox issue? i64::MAX makes memory_atomic_wait32() return 2 directly:
             let timeout_ns = 100_000_000_000_000_000;
-
             let raw_pointer: *mut i32 = self.shared_buffer.as_mut_ptr();
+
             // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
             // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+
+            // A variant calling out to javascript, requires lines to be uncommented in
+            // worker-visualiser.js. Still needs nightly build with atomics feature to
+            // make wasm-bindgen create the wasm memory with the shared flag:
+            // let data_buffer_offset = unsafe { self.shared_buffer.as_mut_ptr() as u32 } / 4;
+            // do_wait(data_buffer_offset, 0);
         }
     }
 }

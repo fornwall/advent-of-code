@@ -14,6 +14,7 @@ enum Command {
     COMMAND_FILL_TEXT,
     COMMAND_SHADOW_BLUR,
     COMMAND_SHADOW_COLOR,
+    COMMAND_DONE,
 }
 
 const COMMAND_CLEAR_EVERYTHING: i32 = 0;
@@ -47,22 +48,19 @@ impl ToBufferDrawer {
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillRect
     pub fn fill_rect(&mut self, x: f64, y: f64, w: f64, h: f64) {
         self.output_buffer.write(Command::COMMAND_FILL_RECT as i32);
-        self.output_buffer
-            .write_float4(x as f32, y as f32, w as f32, h as f32);
+        self.output_buffer.write_float4(x, y, w, h);
     }
 
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillRect
-    pub fn fill_square(&mut self, x: i32, y: i32, size: i32) {
+    pub fn fill_square(&mut self, x: f64, y: f64, size: f64) {
         self.output_buffer
             .write(Command::COMMAND_FILL_SQUARE as i32);
-        self.output_buffer.write(x);
-        self.output_buffer.write(y);
-        self.output_buffer.write(size);
+        self.output_buffer.write_float3(x, y, size);
     }
 
-    pub fn fill_text(&mut self, text: &str, x: i32, y: i32) {
+    pub fn fill_text(&mut self, _text: &str, _x: i32, _y: i32) {
         self.output_buffer.write(Command::COMMAND_FILL_TEXT as i32);
-        // TODO:
+        unimplemented!();
     }
 
     pub fn stroke_square(&mut self, x: i32, y: i32, size: i32) {
@@ -115,5 +113,10 @@ impl ToBufferDrawer {
         self.output_buffer.write(Command::COMMAND_END_FRAME as i32);
         self.output_buffer.flush();
         self.output_buffer.wait();
+    }
+
+    pub fn done(&mut self) {
+        self.output_buffer.write(Command::COMMAND_DONE as i32);
+        self.output_buffer.flush();
     }
 }
