@@ -2,7 +2,7 @@ CARGO_COMMAND = cargo
 CLIPPY_PARAMS = -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
 ifeq ($(NIGHTLY),1)
   CARGO_COMMAND += +nightly
-  CLIPPY_PARAMS := --benches $(CLIPPY_PARAMS)
+  CLIPPY_PARAMS := --all-features --all-targets $(CLIPPY_PARAMS)
 else
   CLIPPY_PARAMS += -D warnings
 endif
