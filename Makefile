@@ -1,13 +1,7 @@
-ifeq ($(DEBUG_WASM),1)
-  wasm_pack_profile=--dev
-else
-  wasm_pack_profile=--release
-endif
-
-CLIPPY_PARAMS =  -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
-CLIPPY_CARGO = cargo
-ifeq ($(CLIPPY_NIGHTLY),1)
-  CLIPPY_CARGO += +nightly
+CARGO_COMMAND = cargo
+CLIPPY_PARAMS = -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
+ifeq ($(NIGHTLY),1)
+  CARGO_COMMAND += +nightly
   CLIPPY_PARAMS := --benches $(CLIPPY_PARAMS)
 else
   CLIPPY_PARAMS += -D warnings
@@ -16,14 +10,18 @@ ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
 endif
 
-WASM_PACK_COMMAND := wasm-pack \
+ifeq ($(WASM_RELEASE),1)
+  wasm_pack_profile = --release
+else
+  wasm_pack_profile = --dev
+endif
+WASM_PACK_COMMAND = wasm-pack \
 	build $(wasm_pack_profile) \
 	--target no-modules \
 	--out-dir site
-
-NIGHTLY_DATE=2020-10-13
-NIGHTLY_TOOLCHAIN=nightly-${NIGHTLY_DATE}
-WASM_PACK_COMMAND_VISUALIZER := RUSTFLAGS="-C target-feature=+atomics,+bulk-memory" \
+NIGHTLY_DATE = 2020-11-21
+NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
+WASM_PACK_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory" \
 	rustup run $(NIGHTLY_TOOLCHAIN) \
 	wasm-pack build \
 	$(wasm_pack_profile) \
@@ -32,10 +30,10 @@ WASM_PACK_COMMAND_VISUALIZER := RUSTFLAGS="-C target-feature=+atomics,+bulk-memo
 	-- --features visualization -Z build-std=std,panic_abort
 
 check:
-	$(CLIPPY_CARGO) fmt --all
-	$(CLIPPY_CARGO) clippy --tests $(CLIPPY_PARAMS)
-	$(CLIPPY_CARGO) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
-	$(CLIPPY_CARGO) test
+	$(CARGO_COMMAND) fmt --all
+	$(CARGO_COMMAND) clippy --tests $(CLIPPY_PARAMS)
+	$(CARGO_COMMAND) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
+	$(CARGO_COMMAND) test
 
 install-cargo-deps:
 	cargo install cargo-benchcmp cargo-watch devserver
@@ -66,10 +64,10 @@ watch-and-build-wasm-visualization:
 	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)'
 
 serve-site:
-	make DEBUG_WASM=1 -j run-devserver watch-and-build-wasm
+	make -j run-devserver watch-and-build-wasm
 
 serve-site-visualization:
-	make DEBUG_WASM=1 -j run-devserver watch-and-build-wasm-visualization
+	make -j run-devserver watch-and-build-wasm-visualization
 
 serve-api:
 	cd crates/server && cargo run
@@ -105,15 +103,18 @@ fuzz-libfuzzer:
 	cargo install cargo-fuzz
 	cd crates/fuzzing-libfuzzer/ && cargo +nightly fuzz run fuzz_target
 
+install-nightly:
+	rustup toolchain install $(NIGHTLY_TOOLCHAIN) && \
+	rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src
+
 netlify:
 	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
 		sh /tmp/rustup.sh -y && \
 		. $(HOME)/.cargo/env && \
-		rustup toolchain install $(NIGHTLY_TOOLCHAIN) && \
-		rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src && \
+		make install-nightly && \
 		make install-wasm-pack && \
-		make site-wasmpack && \
-		make site-wasmpack-visualization && \
+		make WASM_RELEASE=1 site-wasmpack && \
+		make WASM_RELEASE=1 site-wasmpack-visualization && \
 		make site-downloads && \
 		make node-package && \
 		cd crates/wasm/functions && \

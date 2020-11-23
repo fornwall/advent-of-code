@@ -35,7 +35,7 @@ jobs:
     - name: Test and check (nightly)
       run: |
         rustup component add clippy rustfmt --toolchain nightly
-        LLVM_CONFIG=llvm-config-11 make CLIPPY_NIGHTLY=1 check
+        LLVM_CONFIG=llvm-config-11 make NIGHTLY=1 check
       if: matrix.rust == 'nightly'
       continue-on-error: true
 
