@@ -1,3 +1,15 @@
+// See https://github.com/legokichi/ts-ebml for making videos seekable:
+// $  npm install --global ts-ebml
+// $ ts-ebml -s advent-of-code-2019-13-part2.webm > s.webm
+//
+// Also:
+// $ ffmpeg -i in.webm -c copy out.webm
+//
+// Then https://www.matroska.org/downloads/mkclean.html:
+// $ mkclean --optimize
+//
+// Or use the webm-cleaner scirpt:
+// $ webm-cleaner in.webm
 export default function CanvasRecorder(canvas, videoBitsPerSecond) {
     this.start = () => {
         const mimeType = [
