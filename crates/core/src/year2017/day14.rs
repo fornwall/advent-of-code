@@ -34,22 +34,15 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
                     {
                         let canvas_x = index * 4 + bit;
                         let canvas_y = row;
-                        if canvas_x == 127 {
-                            drawer.fill_style_rgb(0, 255, 0);
-                        }
                         drawer.fill_square(
-                            canvas_x as f64 / 1.28,
-                            canvas_y as f64 / 1.28,
-                            1.0 / 1.28,
+                            canvas_x as f64 / 128.,
+                            canvas_y as f64 / 128.,
+                            1.0 / 128.,
                         );
-                        if canvas_x == 127 {
-                            drawer.fill_style_rgb(255, 0, 0);
-                        }
                     }
                 }
             }
         }
-
         #[cfg(feature = "visualization")]
         {
             drawer.end_frame();

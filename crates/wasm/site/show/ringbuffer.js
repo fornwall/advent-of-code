@@ -5,38 +5,52 @@ const HEADER_READER_WANT_MORE_OFFSET = 0;
 const HEADER_READ_OFFSET = 1;
 const HEADER_WRITE_OFFSET = 2;
 
-export function ReaderWithBuffer(sharedArrayBuffer, offset, length) {
-  const headerBuffer = new Int32Array(sharedArrayBuffer, offset, HEADER_ELEMENTS_LENGTH); // FIXME: offset in bytes?
-  const dataBuffer = new Int32Array(sharedArrayBuffer, offset + HEADER_BYTE_LENGTH, (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT);
-  const dataFloatBuffer = new Float32Array(sharedArrayBuffer, offset + HEADER_BYTE_LENGTH, (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT);
+export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, length) {
+  const headerBuffer = new Int32Array(sharedArrayBuffer, sharedArrayBufferOffset, HEADER_ELEMENTS_LENGTH); // FIXME: offset in bytes?
+  const dataBuffer = new Int32Array(sharedArrayBuffer, sharedArrayBufferOffset + HEADER_BYTE_LENGTH, (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT);
+  const dataFloatBuffer = new Float32Array(sharedArrayBuffer, sharedArrayBufferOffset + HEADER_BYTE_LENGTH, (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT);
   let unflushedReads = 0;
 
-  this.report = function() {
+  const utf8decoder = new TextDecoder();
+
+  this.report = () => {
       console.info("readerOffset=" + headerBuffer[HEADER_READ_OFFSET] + ', unflushedReads=' + unflushedReads + ', writerOffset=' +headerBuffer[HEADER_WRITE_OFFSET] + ', length=' + dataBuffer.length);
   }
 
-  this.hasNext = function() {
-      const writerOffset = headerBuffer[HEADER_WRITE_OFFSET];
+  this.hasNext = () => {
+      const writerOffset = Atomics.load(headerBuffer, HEADER_WRITE_OFFSET);
       const readerOffset = (headerBuffer[HEADER_READ_OFFSET] + unflushedReads) % dataBuffer.length;
       return writerOffset != readerOffset;
   };
 
-  this.next = function() {
+  this._readerPosition = () => {
+    return headerBuffer[HEADER_READ_OFFSET] + unflushedReads;
+  };
+
+  this.next = () => {
       if (!this.hasNext()) {
           throw new Error("next() called with !hasNext(). readerOffset=" + headerBuffer[HEADER_READ_OFFSET] + ', unflushedReads=' + unflushedReads + ', writerOffset=' +headerBuffer[HEADER_WRITE_OFFSET]);
       }
-      const readerOffset = (headerBuffer[HEADER_READ_OFFSET] + unflushedReads) % dataBuffer.length;
+      const readerOffset = this._readerPosition() % dataBuffer.length;
       unflushedReads += 1;
       return dataBuffer[readerOffset];
   };
 
-  this.nextFloat = function() {
+  this.nextFloat = () => {
       if (!this.hasNext()) {
           throw new Error("nextFloat() called with !hasNext(). readerOffset=" + headerBuffer[HEADER_READ_OFFSET] + ', unflushedReads=' + unflushedReads + ', writerOffset=' +headerBuffer[HEADER_WRITE_OFFSET]);
       }
-      const readerOffset = (headerBuffer[HEADER_READ_OFFSET] + unflushedReads) % dataBuffer.length;
+      const readerOffset = this._readerPosition() % dataBuffer.length;
       unflushedReads += 1;
       return dataFloatBuffer[readerOffset];
+  };
+
+  this.nextString = () => {
+      const stringLengthInBytes = this.next();
+      const stringLengthInI32 = stringLengthInBytes / 4;
+      unflushedReads += stringLengthInI32;
+      const stringArray = dataBuffer.slice(this._readerPosition(), this._readerPosition() + stringLengthInI32);
+      return utf8decoder.decode(stringArray);
   };
 
   this.wantMore = () => {

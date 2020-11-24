@@ -62,13 +62,13 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
             let current_position = (x as i32, y as i32);
 
             #[cfg(feature = "visualization")]
-            let canvas_x = (x as f64 / cols as f64) * 100.0;
+            let canvas_x = x as f64 / cols as f64;
             #[cfg(feature = "visualization")]
-            let canvas_y = (y as f64 / rows as f64) * 100.0;
+            let canvas_y = y as f64 / rows as f64;
             #[cfg(feature = "visualization")]
-            let draw_width = 95.0 / cols as f64;
+            let draw_width = 0.95 / cols as f64;
             #[cfg(feature = "visualization")]
-            let draw_height = (95.0 / rows as f64);
+            let draw_height = 0.95 / rows as f64;
             #[cfg(feature = "visualization")]
             let draw = |drawer: &mut ToBufferDrawer| {
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
@@ -102,6 +102,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                 '#' => {
                     #[cfg(feature = "visualization")]
                     {
+                        drawer.fill_text("12ab1234", 0.1, 0.1);
                         draw(&mut drawer);
                     }
                     // Stone wall.
@@ -112,7 +113,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     {
                         if ('A'..='Z').contains(&c) {
                             drawer.fill_style_rgb(0, 255, 255);
-                            drawer.fill_square(canvas_x, canvas_y, 1.0);
+                            draw(&mut drawer);
                             drawer.fill_style_rgb(255, 0, 0);
                         }
                     }
@@ -121,10 +122,11 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
             };
             map[index_of(x, y)] = char_to_insert;
         });
-        #[cfg(feature = "visualization")]
-        {
-            drawer.end_frame();
-        }
+    }
+
+    #[cfg(feature = "visualization")]
+    {
+        drawer.end_frame();
     }
 
     if !found_keys.contains_key(&Key::new(b'@')) {
@@ -262,22 +264,32 @@ fn shortest_path(
 
     while let Some(current) = to_visit.pop() {
         if current.gathered_keys == all_keys {
-            #[cfg(feature = "visualization")]
-            drawer.done();
-
             return Some(current.steps);
         }
 
         #[cfg(feature = "visualization")]
         {
-            if visited_locations.insert((current.x, current.y)) {
-                let canvas_x = (current.x as f64 / cols as f64) * 100.0;
-                let canvas_y = (current.y as f64 / rows as f64) * 100.0;
-                let draw_width = 95.0 / cols as f64;
-                let draw_height = 95.0 / rows as f64;
-                drawer.fill_style_rgb(255, 255, 255);
+            if visited_locations.insert((current.x, current.y)) && current.at_key.value != b'@' {
+                let canvas_x = current.x as f64 / cols as f64;
+                let canvas_y = current.y as f64 / rows as f64;
+                let draw_width = 0.95 / cols as f64;
+                let draw_height = 0.95 / rows as f64;
+                drawer.fill_style_rgb(80, 0, 80);
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
+                drawer.meta_delay(200);
                 drawer.end_frame();
+
+                /*
+                drawer.meta_switch_layer(1);
+                drawer.clear();
+                drawer.fill_style_rgba(80, 0, 0, 0.5);
+                if current.x < cols as i32 / 2 {
+                    drawer.fill_rect(0., 0., 50., 50.);
+                } else {
+                    drawer.fill_rect(50., 0., 50., 50.);
+                }
+                drawer.meta_switch_layer(0);
+                 */
             }
         }
 

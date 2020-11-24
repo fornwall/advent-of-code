@@ -1,5 +1,6 @@
-#[macro_use]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 use wasm_bindgen::prelude::*;
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 use wasm_bindgen::JsCast;
 
 const HEADER_ELEMENT_LENGTH: usize = 3;
@@ -8,15 +9,17 @@ const HEADER_READER_WANT_MORE_OFFSET: usize = 0;
 const HEADER_READ_OFFSET: usize = 1;
 const HEADER_WRITE_OFFSET: usize = 2;
 
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     pub fn log(s: &str);
 
-// #[wasm_bindgen]
-// fn do_wait(offset: u32, value: i32);
+    #[wasm_bindgen]
+    fn do_wait(offset: u32, value: i32);
 }
 
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 #[macro_export]
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
@@ -38,29 +41,37 @@ impl CircularOutputBuffer {
             non_flushed_writes: 0,
         };
 
-        let data_buffer_offset = result.shared_buffer.as_mut_ptr() as u32;
-        let data_buffer_byte_length = result.shared_buffer.len() as u32 * 4;
-        let memory_buffer = wasm_bindgen::memory()
-            .unchecked_into::<js_sys::WebAssembly::Memory>()
-            .buffer();
+        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+        {
+            let data_buffer_offset = result.shared_buffer.as_mut_ptr() as u32;
+            let data_buffer_byte_length = result.shared_buffer.len() as u32 * 4;
+            let memory_buffer = wasm_bindgen::memory()
+                .unchecked_into::<js_sys::WebAssembly::Memory>()
+                .buffer();
 
-        let message = js_sys::Object::new();
-        js_sys::Reflect::set(&message, &"type".into(), &"buffer".into());
-        js_sys::Reflect::set(&message, &"buffer".into(), &memory_buffer);
-        js_sys::Reflect::set(&message, &"offset".into(), &data_buffer_offset.into());
-        js_sys::Reflect::set(&message, &"length".into(), &data_buffer_byte_length.into());
+            let message = js_sys::Object::new();
+            js_sys::Reflect::set(&message, &"type".into(), &"buffer".into()).unwrap();
+            js_sys::Reflect::set(&message, &"buffer".into(), &memory_buffer).unwrap();
+            js_sys::Reflect::set(&message, &"offset".into(), &data_buffer_offset.into()).unwrap();
+            js_sys::Reflect::set(&message, &"length".into(), &data_buffer_byte_length.into())
+                .unwrap();
 
-        let worker_scope: web_sys::DedicatedWorkerGlobalScope = js_sys::global().unchecked_into();
-        worker_scope.post_message(&message);
+            let worker_scope: web_sys::DedicatedWorkerGlobalScope =
+                js_sys::global().unchecked_into();
+            worker_scope.post_message(&message).unwrap();
+        }
 
         result
     }
 
+    fn writer_offset(&self) -> usize {
+        (self.shared_buffer[HEADER_WRITE_OFFSET] + self.non_flushed_writes) as usize
+            % self.data_len()
+            + HEADER_ELEMENT_LENGTH
+    }
+
     pub fn write(&mut self, value: i32) {
-        let mut write_offset = ((self.shared_buffer[HEADER_WRITE_OFFSET] + self.non_flushed_writes)
-            as usize
-            % self.data_len())
-            + HEADER_ELEMENT_LENGTH;
+        let write_offset = self.writer_offset();
         self.shared_buffer[write_offset] = value;
         self.non_flushed_writes += 1;
     }
@@ -91,6 +102,15 @@ impl CircularOutputBuffer {
         }
     }
 
+    pub fn report_stats(&self) {
+        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+        console_log!(
+            "[buffer.rs] write={}, read={}",
+            self.shared_buffer[HEADER_WRITE_OFFSET],
+            self.shared_buffer[HEADER_READ_OFFSET]
+        )
+    }
+
     pub fn write4(&mut self, a: i32, b: i32, c: i32, d: i32) {
         self.write(a);
         self.write(b);
@@ -98,7 +118,21 @@ impl CircularOutputBuffer {
         self.write(d);
     }
 
-    pub fn wait(&mut self) {
+    pub fn write_text(&mut self, text: &str) {
+        self.write(text.len() as i32);
+
+        unsafe {
+            let mut as_bytes =
+                std::mem::transmute::<&mut Vec<i32>, &mut Vec<u8>>(&mut self.shared_buffer);
+            // TODO:
+            let buffer_start = self.writer_offset() * 4;
+            let buffer_end = buffer_start + text.len();
+            as_bytes[buffer_start..buffer_end].copy_from_slice(text.as_bytes());
+            self.non_flushed_writes += (text.len() / 4) as i32;
+        }
+    }
+
+    pub fn perhaps_wait(&mut self) {
         self.shared_buffer[HEADER_READER_WANT_MORE_OFFSET] = 0;
 
         let read_offset = self.shared_buffer[HEADER_READ_OFFSET];
@@ -111,10 +145,13 @@ impl CircularOutputBuffer {
         if used < (self.data_len() as i32 / 3) {
             return;
         } else {
+            /*
+            #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
             console_log!(
                 "[rust] Waiting, use ratio {}",
                 used as f32 / self.data_len() as f32
             );
+             */
         }
 
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
@@ -134,4 +171,28 @@ impl CircularOutputBuffer {
             // do_wait(data_buffer_offset, 0);
         }
     }
+
+    /// Avoid exiting program while the worker javascript has not finished reading the output buffer.
+    pub fn wait_forever(&mut self) {
+        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+        unsafe {
+            let timeout_ns = 100_000_000_000_000_000;
+            let mut zero = [0; 1];
+            let raw_pointer: *mut i32 = zero.as_mut_ptr();
+
+            // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
+            // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
+            core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+        }
+    }
+}
+
+#[test]
+fn basic_buffer() {
+    let mut buffer = CircularOutputBuffer::new();
+    //assert_eq!(buffer.shared_buffer[HEADER_READ_OFFSET], 1);
+
+    buffer.write(12345);
+
+    // Ok.
 }

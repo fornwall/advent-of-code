@@ -14,18 +14,26 @@ const COMMAND_FILL_TEXT = 11;
 const COMMAND_SHADOW_BLUR = 12;
 const COMMAND_SHADOW_COLOR = 13;
 const COMMAND_DONE = 14;
+const COMMAND_DELAY = 15;
+const COMMAND_SWITCH_LAYER = 16;
+const COMMAND_FILL_STYLE_RGBA = 17;
+const COMMAND_SET_ASPECT_RATIO = 18;
 
-export default function Renderer(message, ctx) {
+export default function Renderer(message, layers) {
     const { buffer, offset, length } = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
+    let ctx = layers[0];
+
     // Non-transparent background to look better when saving:
     ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    //ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    const scale = ctx.canvas.width / 100.0;
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    for (let layer of layers) {
+        const scale = layer.canvas.width;
+        layer.setTransform(scale, 0, 0, scale, 0, 0);
+    }
 
     this.done = false;
 
@@ -58,6 +66,11 @@ export default function Renderer(message, ctx) {
                     ctx.fillStyle = 'rgb(' + r + ', ' + g + ',' + b + ')';
                     break;
                 }
+                case COMMAND_FILL_STYLE_RGBA: {
+                    let [r, g, b, a] = [reader.next(), reader.next(), reader.next(), reader.nextFloat()];
+                    ctx.fillStyle = 'rgba(' + r + ', ' + g + ',' + b + ', ' + a + ')';
+                    break;
+                }
                 case COMMAND_LINE_WIDTH: {
                     ctx.lineWidth = reader.next();
                     break;
@@ -73,7 +86,11 @@ export default function Renderer(message, ctx) {
                     break;
                 }
                 case COMMAND_FILL_TEXT: {
-                    // TODO:
+                    const text = reader.nextString();
+                    console.log('Got text', text);
+                    const x = reader.nextFloat();
+                    const y = reader.nextFloat();
+                    ctx.fillText(text, x, y);
                     break;
                 }
                 case COMMAND_SHADOW_BLUR: {
@@ -86,11 +103,30 @@ export default function Renderer(message, ctx) {
                     break;
                 }
                 case COMMAND_DONE: {
+                    console.log('done rendering');
                     this.done = true;
                     break;
                 }
+                case COMMAND_DELAY: {
+                    this.delay = reader.next();
+                    return;
+                }
+                case COMMAND_SWITCH_LAYER: {
+                    const activeLayer = reader.next();
+                    ctx = layers[activeLayer];
+                    return;
+                }
+                case COMMAND_SET_ASPECT_RATIO: {
+                    const newAspectRatio = reader.nextFloat();
+                    if (!window.aspectRatio) {
+                        window.reloadWithParameters({aspectRatio: newAspectRatio});
+                        this.done = true;
+                        return;
+                    }
+                    break;
+                }
                 default:
-                    throw new Error('Unhandled command: ' + command);
+                    throw new Error('Unhandled command: ' + command + ', done=' + this.done);
             }
         }
 
