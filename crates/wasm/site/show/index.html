@@ -7,22 +7,27 @@
 	<meta name="description" content="A visualizer of Advent of Code problems" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<style>
-	html {
-		background: black;
-	}
-	canvas {
-		width: 100vw;
-		height: 100vw;
-		max-height: 100vh;
-		max-width: 100vh;
-		margin: auto;
-		position: absolute;
-		top:0;bottom:0; /* vertical center */
-		left:0;right:0; /* horizontal center */
-	}
+		html {
+			background: black;
+		}
+		canvas {
+			height: 100vw;
+			max-width: 100vh;
+			width: 100vw;
+			max-height: 100vh;
+			margin: auto;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
 	</style>
+
 <body>
-	<canvas></canvas>
+	<canvas id="mainCanvas" style="display"></canvas>
+	<canvas id="layer1" style="z-index: 1;"></canvas>
+	<canvas id="composed" style="z-index: -1"></canvas>
 	<script type="module" src="index.js"></script>
 </body>
 
