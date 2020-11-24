@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title>Advent of Code solver</title>
+	<title>Advent of Code Solver</title>
 	<meta name="description" content="A solver of Advent of Code problems" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="preload" href="/index.js" as="script" crossorigin="anonymous" />
@@ -78,7 +78,7 @@
 	<main class="container">
 		<form>
 			<div class="py-3 text-center">
-				<h1 class="mt-0">Advent of Code solver</h1>
+				<h1 class="mt-0">Advent of Code Solver</h1>
 				<p>Solve <a href="https://adventofcode.com/">Advent of Code</a> problems using either Wasm or a <a
 						href="/api/">HTTP API</a>. See <a href="https://github.com/fornwall/advent-of-code">the
 						GitHub
@@ -139,14 +139,6 @@
 				</select>
 			</div>
 
-			<div class="input-group mb-3">
-				<div class="input-group-prepend">
-					<label for="input" class="input-group-text">Input</label>
-				</div>
-				<textarea id="input" class="form-control" rows="3" required="required" spellcheck="false"
-					accesskey="i" maxlength="100000"></textarea>
-			</div>
-
 			<div class="container mb-3">
 				<div class="row">
 					<div class="col p-0">
@@ -164,9 +156,22 @@
 				</div>
 			</div>
 
+
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<label for="input" class="input-group-text">Input</label>
+				</div>
+				<textarea id="input" class="form-control" rows="3" required="required" spellcheck="false" accesskey="i"
+					maxlength="100000"></textarea>
+			</div>
+
 			<div class="mb-3 container">
 				<div class="row">
 					<div class="col p-0">
+						<button id="run-visualizer" type="button" class="btn btn-block btn-primary"
+							accesskey="v">Visualize</button>
+					</div>
+					<div class="col p-0 pl-2">
 						<button id="run-api" type="button" class="btn btn-block btn-primary" accesskey="a">
 							<span class="when-idle">
 								Call API
@@ -201,10 +206,6 @@
 				</div>
 			</div>
 
-			<div class="form-group">
-				<button id="run-visualizer" type="button" class="btn btn-block btn-primary"
-					accesskey="v">Visualize</button>
-			</div>
 		</form>
 	</main>
 
