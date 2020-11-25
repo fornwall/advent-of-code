@@ -18,6 +18,7 @@ const COMMAND_DELAY = 15;
 const COMMAND_SWITCH_LAYER = 16;
 const COMMAND_FILL_STYLE_RGBA = 17;
 const COMMAND_SET_ASPECT_RATIO = 18;
+const COMMAND_ARC = 19;
 
 export default function Renderer(message, layers) {
     const { buffer, offset, length } = message.data;
@@ -25,10 +26,7 @@ export default function Renderer(message, layers) {
 
     let ctx = layers[0];
 
-    // Non-transparent background to look better when saving:
-    ctx.fillStyle = 'black';
-    //ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.imageSmoothingEnabled = false;
 
     for (let layer of layers) {
         const scale = layer.canvas.width;
@@ -38,6 +36,7 @@ export default function Renderer(message, layers) {
     this.done = false;
 
     this.render = () => {
+        if (this.paused) return;
         let end_of_frame = false;
         outer:
         while (reader.hasNext()) {
@@ -50,6 +49,14 @@ export default function Renderer(message, layers) {
                 case COMMAND_END_FRAME: {
                     end_of_frame = true;
                     break outer;
+                }
+                case COMMAND_BEGIN_PATH: {
+                    ctx.beginPath();
+                    break;
+                }
+                case COMMAND_CLOSE_PATH: {
+                    ctx.closePath();
+                    break;
                 }
                 case COMMAND_FILL_SQUARE: {
                     let [x, y, size] = [reader.nextFloat(), reader.nextFloat(), reader.nextFloat()];
@@ -100,6 +107,10 @@ export default function Renderer(message, layers) {
                 case COMMAND_SHADOW_COLOR: {
                     let [r, g, b] = [reader.next(), reader.next(), reader.next()];
                     ctx.shadowColor = 'rgb(' + r + ', ' + g + ',' + b + ')';
+                    break;
+                }
+                case COMMAND_ARC: {
+                    ctx.arc(reader.nextFloat(), reader.nextFloat(), reader.nextFloat(), reader.nextFloat(), reader.nextFloat());
                     break;
                 }
                 case COMMAND_DONE: {
