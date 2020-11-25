@@ -4,32 +4,33 @@ import CanvasRecorder from './CanvasRecorder.js';
 let visualizerWorker = null;
 
 function terminateWorker() {
-    visualizerWorker.terminated = true;
-    visualizerWorker.terminate();
-    visualizerWorker = null;
-}
-
-function reloadWorker() {
-    if (visualizerWorker) terminateWorker();
-    visualizerWorker = new Worker("./worker-visualizer.js", { name: "visualizer" });
+  visualizerWorker.terminated = true;
+  visualizerWorker.terminate();
+  visualizerWorker = null;
 }
 
 let hash = location.hash.substring(1);
 let params = {};
+
 for (let part of hash.split('&')) {
-    let [key,value] = part.split('=');
-    params[key] = decodeURIComponent(value);
+  let [key, value] = part.split('=');
+  params[key] = decodeURIComponent(value);
 }
 
 window.reloadWithParameters = (parameters) => {
-    Object.assign(params, parameters);
-    let hashString = '';
-    for (const [key, value] of Object.entries(params)) {
-        if (hashString) hashString += '&';
-        hashString += key + '=' + encodeURIComponent(value);
-    }
-    window.location.hash = hashString;
-    window.location.reload();
+  updateHash(parameters);
+  window.location.reload();
+}
+
+function updateHash(parameters) {
+  Object.assign(params, parameters);
+  let hashString = '';
+  for (const [key, value] of Object.entries(params)) {
+    if (hashString) hashString += '&';
+    hashString += key + '=' + encodeURIComponent(value);
+  }
+  console.log('updated params: ', params.download);
+  window.location.hash = hashString;
 }
 
 const canvas = document.getElementById("mainCanvas");
@@ -41,98 +42,126 @@ const composedCanvas = document.getElementById("composed");
 const composedCtx = composedCanvas.getContext('2d');
 
 if (params.aspectRatio) {
-    window.aspectRatio = parseFloat(params.aspectRatio);
-    for (let canvas of document.querySelectorAll('canvas')) {
-        canvas.style.height = (100 / window.aspectRatio) + 'vw';
-        canvas.style.maxWidth = (100 * window.aspectRatio) + 'vh';
-    }
+  window.aspectRatio = parseFloat(params.aspectRatio);
+  for (let canvas of document.querySelectorAll('canvas')) {
+    canvas.style.height = (100 / window.aspectRatio) + 'vw';
+    canvas.style.maxWidth = (100 * window.aspectRatio) + 'vh';
+  }
 }
 
 function visualize() {
-    const {year, day, part, input} = params;
-    visualizerWorker.postMessage({ year, day, part, input });
-    let myWorker = visualizerWorker;
+  if (visualizerWorker) terminateWorker();
+  visualizerWorker = new Worker("./worker-visualizer.js", { name: "visualizer" });
 
-    myWorker.onmessage = (message) => {
-        const renderer = new Renderer(message, [ctx, layer1Ctx]);
+  const { year, day, part, input } = params;
+  visualizerWorker.postMessage({ year, day, part, input });
+  let myWorker = visualizerWorker;
 
-        const recorder = params.download ? new CanvasRecorder(canvas) : null;
-        if (recorder) recorder.start();
+  myWorker.onmessage = (message) => {
+    const renderer = new Renderer(message, [ctx, layer1Ctx]);
+    window.renderer = renderer;
 
-        function render(time) {
-          if (myWorker.terminated) {
-            console.log('[main] Aborting rendering from terminated');
-          } else if (renderer.done) {
-            console.log('[main] Rendering done');
-            if (recorder) {
-                recorder.stopAndSave(`Advent-of-Code-${year}-Day-${day}-Part-${part}.webm`);
-                window.location.hash = window.location.hash.replace('&download=true', '');
-                console.log('reloading');
-                window.location.reload();
-            } else {
-                terminateWorker();
-            }
-          } else {
-              try {
-                renderer.render();
+    const recorder = params.download ? new CanvasRecorder(canvas) : null;
+    if (recorder) {
+      recorder.start();
+      document.getElementById('spinnerImage').src = 'recording.svg';
+    } else {
+      document.getElementById('spinner').style.visibility = 'hidden';
+    }
 
-                /*
-                if (recorder) {
-                    composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
-                    composedCtx.drawImage(canvas, 0, 0);
-                    composedCtx.drawImage(layer1Canvas, 0, 0);
-                }
-                */
-
-                if (renderer.delay) {
-                    setTimeout(render, renderer.delay);
-                    renderer.delay = false;
-                } else {
-                    requestAnimationFrame(render);
-                }
-              } catch (e) {
-                console.error('Error when rendering', e);
-                alert('Error when rendering: ' + e.message);
-              }
-          }
+    function render(time) {
+      if (myWorker.terminated) {
+        console.log('[main] Aborting rendering from terminated');
+      } else if (renderer.done) {
+        console.log('[main] Rendering done');
+        if (recorder) {
+          recorder.stopAndSave(`Advent-of-Code-${year}-Day-${day}-Part-${part}.webm`);
+          updateHash({ download: '' });
         }
+        document.getElementById('spinner').style.visibility = 'hidden';
+        terminateWorker();
+      } else {
+        try {
+          renderer.render();
+          /*
+          if (recorder) {
+              composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+              composedCtx.drawImage(canvas, 0, 0);
+              composedCtx.drawImage(layer1Canvas, 0, 0);
+          }
+          */
+          if (renderer.delay) {
+            setTimeout(render, renderer.delay);
+            renderer.delay = false;
+          } else {
+            requestAnimationFrame(render);
+          }
+        } catch (e) {
+          console.error('Error when rendering', e);
+          alert('Error when rendering: ' + e.message);
+        }
+      }
+    }
 
-        requestAnimationFrame(render);
-    };
+    requestAnimationFrame(render);
+  };
 }
 
-function goFullScreen() {
+async function toggleFullScreen() {
   if (document.fullscreenElement) {
     document.exitFullscreen();
   } else {
     document.documentElement.requestFullscreen();
+    //if ('orientation' in window.screen) 
+    // TODO: Only lock orientation if non-square aspect ratio?
+
+    if (window.aspectRatio && window.aspectRatio > 1.0) {
+      await window.screen.orientation.lock("landscape-primary");
+    }
   }
 }
 
-document.body.addEventListener('keyup', function (e) {
-  if (e.keyCode == 13) {
-    goFullScreen();
-  } else if (e.key == 's') {
-    window.reloadWithParameters({download:true});
+function togglePause() {
+  window.renderer.paused = !window.renderer.paused;
+}
+
+document.body.addEventListener('keyup', (e) => {
+  switch (e.key) {
+    case 'Escape':
+      window.location = '..';
+      break;
+    case 'Enter':
+      toggleFullScreen();
+      break;
+    case 'p':
+    case ' ':
+      togglePause();
+      break;
+    case 'r':
+      visualize();
+      break;
+    case 's':
+      window.reloadWithParameters({ download: true });
+      break;
   }
 });
 
-//canvas.addEventListener('dblclick', goFullScreen);
+document.body.addEventListener('dblclick', toggleFullScreen);
+
 setTimeout(() => {
-new ResizeObserver(() => {
-  //const scaleFactor = params.download ? 1 : window.devicePixelRatio;
-  const scaleFactor = window.devicePixelRatio;
-  canvas.width = canvas.clientWidth * scaleFactor;
-  canvas.height = canvas.clientHeight * scaleFactor;
+  new ResizeObserver(() => {
+    //const scaleFactor = params.download ? 1 : window.devicePixelRatio;
+    const scaleFactor = window.devicePixelRatio;
+    canvas.width = canvas.clientWidth * scaleFactor;
+    canvas.height = canvas.clientHeight * scaleFactor;
 
-  layer1Canvas.width = canvas.width;
-  layer1Canvas.height = canvas.height;
-  // TODO: Only have a compose canvas if recording.
-  composedCanvas.width = canvas.width;
-  composedCanvas.height = canvas.height;
+    layer1Canvas.width = canvas.width;
+    layer1Canvas.height = canvas.height;
+    // TODO: Only have a compose canvas if recording.
+    composedCanvas.width = canvas.width;
+    composedCanvas.height = canvas.height;
 
-  reloadWorker();
-  visualize();
-}).observe(canvas);
+    visualize();
+  }).observe(canvas);
 }, 0);
 

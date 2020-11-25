@@ -28,7 +28,7 @@ worker.onmessage = (e) => {
 
 function showMessage(message, isError, wasm, executionTime) {
   const execution_time = wasm ? wasm_execution_time : api_execution_time;
-  execution_time.textContent = `${Math.round(executionTime)} ms`;
+  execution_time.textContent = `${Math.round(executionTime)}`;
 
   output_element.classList.remove('alert-info');
   if (isError) {
@@ -45,6 +45,7 @@ function showMessage(message, isError, wasm, executionTime) {
 }
 
 function execute(wasm) {
+  console.log('executing');
   part_element.setCustomValidity((day_element.value == 25 && part_element.value == 2) ? 'Day 25 has no second part.' : '');
 
   if (document.querySelector("form").reportValidity()) {
@@ -53,6 +54,7 @@ function execute(wasm) {
     run_button.classList.add('in-progress');
     output_element.classList.remove('blink');
     const [year, day, part, input] = [year_element.value, day_element.value, part_element.value, input_element.value];
+    console.log('sending message to worker');
     worker.postMessage({ year, day, part, input, wasm });
   }
 }
