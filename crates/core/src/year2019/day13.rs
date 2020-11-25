@@ -99,20 +99,18 @@ pub fn part2(input_string: &str) -> Result<Word, String> {
     loop {
         let output = program.run_for_output()?;
         output.chunks_exact(3).for_each(|chunk| {
-            let x = chunk[0];
-            let y = chunk[1];
-            let third = chunk[2];
+            let (x, y, third) = (chunk[0], chunk[1], chunk[2]);
             if x == -1 && y == 0 {
                 current_score = third;
             } else {
                 #[cfg(feature = "visualization")]
                 tiles.insert((x, y), third);
 
-                if third == 3 {
-                    paddle_x = x;
-                } else if third == 4 {
-                    ball_x = x;
-                };
+                match third {
+                    3 => paddle_x = x,
+                    4 => ball_x = x,
+                    _ => {}
+                }
             }
         });
 
@@ -123,11 +121,7 @@ pub fn part2(input_string: &str) -> Result<Word, String> {
             break;
         }
 
-        program.input(match ball_x {
-            _ if ball_x > paddle_x => 1,
-            _ if ball_x < paddle_x => -1,
-            _ => 0,
-        });
+        program.input(ball_x.cmp(&paddle_x) as Word);
     }
 
     Ok(current_score)
