@@ -19,6 +19,7 @@ enum Command {
     SwitchLayer,
     FillStyleRGBA,
     SetAspectRatio,
+    Arc,
 }
 
 pub struct ToBufferDrawer {
@@ -111,6 +112,16 @@ impl ToBufferDrawer {
     pub fn shadow_blur(&mut self, level: i32) {
         self.output_buffer.write(Command::ShadowBlur as i32);
         self.output_buffer.write(level);
+    }
+
+    /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arc
+    pub fn arc(&mut self, x: f64, y: f64, radius: f64, start_angle: f64, end_angle: f64) {
+        self.output_buffer.write(Command::Arc as i32);
+        self.output_buffer.write_float(x);
+        self.output_buffer.write_float(y);
+        self.output_buffer.write_float(radius);
+        self.output_buffer.write_float(start_angle);
+        self.output_buffer.write_float(end_angle);
     }
 
     pub fn end_frame(&mut self) {
