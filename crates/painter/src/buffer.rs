@@ -37,7 +37,7 @@ impl CircularOutputBuffer {
 
     pub fn new() -> Self {
         let mut result = Self {
-            shared_buffer: vec![0; 64 * 65536],
+            shared_buffer: vec![0; 16 * 65536],
             non_flushed_writes: 0,
         };
 
