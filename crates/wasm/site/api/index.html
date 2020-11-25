@@ -2,24 +2,34 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8"/>
-	<title>Advent of Code API</title>
-	<meta name="description" content="API to solve Advent of Code problems"/>
-	<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js" charset="UTF-8"></script>
-	<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
-	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css"/>
-<style>
-.info { margin-bottom: 0 !important; }
-</style>
+  <meta charset="utf-8" />
+  <title>Advent of Code API</title>
+  <meta name="description" content="API to solve Advent of Code problems" />
+  <!-- https://cdnjs.com/libraries/swagger-ui -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.36.2/swagger-ui-bundle.js"
+    integrity="sha512-jagGsunuxhVlmwu5k4Ilqq3vP/jNswEVvtY4X73k5cT7QHUtKhwXqa1i9tSUF50r+b7cnchPur8OkFMCMpC+1w=="
+    crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.36.2/swagger-ui-standalone-preset.js"
+    integrity="sha512-cmCLlusXBOHOWrvbMqERJ6+dGrVxuIWtf33LAapATba3LYQDZhW9S4pKlfhADbaKgC2MwoL7AqsRdjxMhuEEJA=="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.36.2/swagger-ui.css"
+    integrity="sha512-tKlTmmIcJ/LXt94SNEbo3ZXMHhaa9quOeqk+sfMKYvTadSD2xSzmN95EOeITw7rmAQOuHStvbqA1W7fCU6RQZQ=="
+    crossorigin="anonymous" />
+  <style>
+    .info {
+      margin-bottom: 0 !important;
+    }
+  </style>
 </head>
 
 <body>
 
-    <div id="swagger-ui"></div>
+  <div id="swagger-ui"></div>
 
 </body>
 <script>
-const ui = SwaggerUIBundle({
+  const ui = SwaggerUIBundle({
     url: "/openapi.json",
     dom_id: '#swagger-ui',
     presets: [
@@ -30,7 +40,7 @@ const ui = SwaggerUIBundle({
     displayRequestDuration: true,
     docExpansion: "full",
     deepLinking: true,
-});
+  });
 </script>
 
 </html>
