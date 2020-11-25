@@ -104,14 +104,8 @@ impl Program {
         }
     }
 
-    fn output_location(
-        &self,
-        opcode_and_parameter_modes: Word,
-        parameter_position: u32,
-    ) -> Result<usize, String> {
-        if let Parameter::Address(location) =
-            self.parameter_mode(opcode_and_parameter_modes, parameter_position)
-        {
+    fn output_location(&self, instruction: Word, parameter_position: u32) -> Result<usize, String> {
+        if let Parameter::Address(location) = self.parameter_mode(instruction, parameter_position) {
             return Ok(location);
         }
         Err("Invalid parameter mode for where to write".to_string())
