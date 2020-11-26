@@ -1,24 +1,102 @@
 use crate::Input;
 use std::cmp;
-use std::collections::HashMap;
 use std::ops;
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone)]
-struct Point {
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+struct Vector {
     x: i32,
     y: i32,
 }
 
-impl Point {
+#[derive(Copy, Clone)]
+struct LineSegment {
+    top_left: Vector,
+    length: i32,
+    horizontal: bool,
+    start_step: u32,
+    /// If stepping into this top left point (otherwise stepping away).
+    incoming_direction: bool,
+}
+
+struct Intersection {
+    point: Vector,
+    combined_steps: u32,
+}
+
+impl LineSegment {
+    const fn end_point(self) -> Vector {
+        if self.horizontal {
+            Vector {
+                x: self.top_left.x + self.length,
+                y: self.top_left.y,
+            }
+        } else {
+            Vector {
+                x: self.top_left.x,
+                y: self.top_left.y + self.length,
+            }
+        }
+    }
+
+    fn intersection_with(self, other: Self) -> Option<Intersection> {
+        if self.horizontal == other.horizontal {
+            None
+        } else {
+            let (horizontal, vertical) = if self.horizontal {
+                (self, other)
+            } else {
+                (other, self)
+            };
+
+            // To check if two line segments intersects:
+            //
+            // [a..b]
+            //
+            // [c
+            //  .
+            //  .
+            //  d]
+
+            if (vertical.top_left.y..=vertical.end_point().y).contains(&horizontal.top_left.y)
+                && (horizontal.top_left.x..=horizontal.end_point().x).contains(&vertical.top_left.x)
+            {
+                let intersection_point = Vector {
+                    x: vertical.top_left.x,
+                    y: horizontal.top_left.y,
+                };
+
+                Some(Intersection {
+                    point: intersection_point,
+                    combined_steps: self.steps_at(intersection_point)
+                        + other.steps_at(intersection_point),
+                })
+            } else {
+                None
+            }
+        }
+    }
+
+    /// Assumes that point is one line.
+    const fn steps_at(self, point: Vector) -> u32 {
+        let self_steps_away = self.top_left.distance_from(point);
+        if self.incoming_direction {
+            self.start_step - self_steps_away
+        } else {
+            self.start_step + self_steps_away
+        }
+    }
+}
+
+impl Vector {
     const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
 
     fn direction(specifier: char) -> Result<Self, String> {
         Ok(match specifier {
-            'U' => Self::new(0, 1),
+            'U' => Self::new(0, -1),
             'R' => Self::new(1, 0),
-            'D' => Self::new(0, -1),
+            'D' => Self::new(0, 1),
             'L' => Self::new(-1, 0),
             _ => {
                 return Err(format!("Invalid direction: {}", specifier));
@@ -26,12 +104,19 @@ impl Point {
         })
     }
 
-    const fn distance_from_origin(self) -> u32 {
-        self.x.abs() as u32 + self.y.abs() as u32
+    const fn distance_from(self, other: Self) -> u32 {
+        (self.x - other.x).abs() as u32 + (self.y - other.y).abs() as u32
+    }
+
+    const fn multiply(self, factor: u32) -> Self {
+        Self {
+            x: self.x * (factor as i32),
+            y: self.y * (factor as i32),
+        }
     }
 }
 
-impl ops::AddAssign<Point> for Point {
+impl ops::AddAssign<Vector> for Vector {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
@@ -40,28 +125,45 @@ impl ops::AddAssign<Point> for Point {
 
 fn parse_wire_points<F>(string: &str, mut on_visit: F) -> Result<(), String>
 where
-    F: FnMut(Point, u32),
+    F: FnMut(LineSegment),
 {
-    let mut current_position = Point::new(0, 0);
-    let mut current_step: u32 = 0;
+    let mut current_position = Vector::new(0, 0);
+    let mut current_step = 0_u32;
 
     for word in string.split(',') {
-        let first_char = word
-            .chars()
-            .next()
-            .ok_or("Invalid input - too small word")?;
-        let direction = Point::direction(first_char)?;
-        let steps = word[1..].parse::<i32>().map_err(|error| {
-            format!(
-                "Invalid input - could not parse steps: {}",
-                error.to_string()
-            )
-        })?;
+        if let (Some(first_char), Some(Ok(steps))) =
+            (word.chars().next(), word.get(1..).map(|n| n.parse::<u32>()))
+        {
+            let start_position = current_position;
+            let direction = Vector::direction(first_char as char)?;
+            current_position += direction.multiply(steps);
 
-        for _ in 0..steps {
-            current_step += 1;
-            current_position += direction;
-            on_visit(current_position, current_step);
+            let top_left = Vector {
+                x: std::cmp::min(start_position.x, current_position.x),
+                y: std::cmp::min(start_position.y, current_position.y),
+            };
+
+            let incoming_direction = top_left != start_position;
+
+            let line_segment = LineSegment {
+                top_left,
+                length: (start_position.x - current_position.x).abs()
+                    + (start_position.y - current_position.y).abs(),
+                horizontal: direction.x.abs() != 0,
+                start_step: if incoming_direction {
+                    current_step + steps
+                } else {
+                    current_step
+                },
+                incoming_direction,
+            };
+
+            current_step += steps;
+            on_visit(line_segment);
+        } else {
+            return Err(
+                "Invalid word - not 'U', 'R', 'D' or 'L' followed by an integer".to_string(),
+            );
         }
     }
     Ok(())
@@ -80,25 +182,57 @@ fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let (first_line, second_line) = input_lines(&input.text)?;
-    let mut first_wire_points = HashMap::with_capacity(first_line.len() / 5);
+    let mut first_wire_segments = Vec::new();
 
-    parse_wire_points(first_line, |point, step| {
-        first_wire_points.entry(point).or_insert(step);
+    parse_wire_points(first_line, |line_segment| {
+        first_wire_segments.push(line_segment);
     })?;
 
     let mut best = std::u32::MAX;
-    parse_wire_points(second_line, |point, step| {
-        if let Some(&value) = first_wire_points.get(&point) {
-            let intersection_value = if input.is_part_one() {
-                point.distance_from_origin()
-            } else {
-                step + value
-            };
-            best = cmp::min(best, intersection_value);
+    let origin = Vector { x: 0, y: 0 };
+
+    parse_wire_points(second_line, |line_segment| {
+        for first_line_segment in &first_wire_segments {
+            if let Some(intersection) = first_line_segment.intersection_with(line_segment) {
+                // "While the wires do technically cross right at the central port
+                // where they both start, this point does not count":
+                if intersection.point != origin {
+                    let intersection_value = if input.is_part_one() {
+                        intersection.point.distance_from(origin)
+                    } else {
+                        intersection.combined_steps
+                    };
+                    best = cmp::min(best, intersection_value);
+                }
+            }
         }
     })?;
 
     Ok(best)
+}
+
+#[test]
+pub fn tests_line_segment() {
+    let l1 = LineSegment {
+        top_left: Vector { x: 0, y: 0 },
+        length: 10,
+        horizontal: true,
+        start_step: 99,
+        incoming_direction: false,
+    };
+    let l2 = LineSegment {
+        top_left: Vector { x: 3, y: -4 },
+        length: 5,
+        horizontal: false,
+        start_step: 10,
+        incoming_direction: false,
+    };
+    if let Some(intersection) = l1.intersection_with(l2) {
+        assert_eq!(Vector { x: 3, y: 0 }, intersection.point);
+        assert_eq!(99 + 3 + 10 + 4, intersection.combined_steps);
+    } else {
+        panic!("Incorrect");
+    }
 }
 
 #[test]
