@@ -198,7 +198,7 @@ setTimeout(async () => {
     let ctx = canvas.getContext('2d');
     ctx.setTransform(canvas.width/tmpCanvas.width, 0, 0, canvas.height/tmpCanvas.height, 0, 0);
     ctx.drawImage(tmpCanvas, 0, 0);
-    ctx.setTransform(canvas.width, 0, 0, canvas.height, 0, 0);
+    ctx.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
 
     layer1Canvas.width = canvas.width;
     layer1Canvas.height = canvas.height;

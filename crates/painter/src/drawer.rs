@@ -27,12 +27,14 @@ enum Command {
 
 pub struct ToBufferDrawer {
     pub output_buffer: CircularOutputBuffer,
+    aspect_ratio: f64,
 }
 
 impl ToBufferDrawer {
     pub fn new() -> ToBufferDrawer {
         Self {
             output_buffer: CircularOutputBuffer::new(),
+            aspect_ratio: 1.0,
         }
     }
 }
@@ -150,9 +152,13 @@ impl Painter for ToBufferDrawer {
 
     fn set_aspect_ratio(&mut self, width: i32, height: i32) {
         self.output_buffer.write(Command::SetAspectRatio as i32);
-        let aspect_ratio = width as f64 / height as f64;
-        self.output_buffer.write_float(aspect_ratio);
+        self.aspect_ratio = width as f64 / height as f64;
+        self.output_buffer.write_float(self.aspect_ratio);
         self.output_buffer.flush();
+    }
+
+    fn aspect_ratio(&self) -> f64 {
+        self.aspect_ratio
     }
 
     fn await_forever(&mut self) {

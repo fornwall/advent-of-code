@@ -88,6 +88,8 @@ pub fn solve(
     input_string: &str,
     #[cfg(feature = "visualization")] painter: Box<dyn Painter>,
 ) -> Result<String, String> {
+    #![allow(clippy::let_and_return)]
+
     if input_string.is_empty() {
         return Err("Empty input".to_string());
     }
@@ -100,7 +102,7 @@ pub fn solve(
         painter,
     };
 
-    match (year, day, part) {
+    let result = match (year, day, part) {
         (2017, 1, 1) => to_stringer(year2017::day01::part1, input_string),
         (2017, 1, 2) => to_stringer(year2017::day01::part2, input_string),
         (2017, 2, 1) => to_stringer(year2017::day02::part1, input_string),
@@ -182,8 +184,7 @@ pub fn solve(
         (2019, 1, 2) => to_stringer(year2019::day01::part2, input_string),
         (2019, 2, 1) => to_stringer(year2019::day02::part1, input_string),
         (2019, 2, 2) => to_stringer(year2019::day02::part2, input_string),
-        (2019, 3, 1) => to_stringer(year2019::day03::part1, input_string),
-        (2019, 3, 2) => to_stringer(year2019::day03::part2, input_string),
+        (2019, 3, _) => to_stringer_input(year2019::day03::solve, &mut input),
         (2019, 4, 1) => to_stringer(year2019::day04::part1, input_string),
         (2019, 4, 2) => to_stringer(year2019::day04::part2, input_string),
         (2019, 5, 1) => to_stringer(year2019::day05::part1, input_string),
@@ -230,7 +231,15 @@ pub fn solve(
             "Unsupported year={}, day={}, part={}",
             year, day, part
         )),
+    };
+
+    #[cfg(feature = "visualization")]
+    if result.is_err() {
+        // TODO: Report error. But perhaps not, return normally, and await ack in wait_forever.
+        input.painter.shadow_blur(10);
     }
+
+    result
 }
 
 /// A version of [solve](fn.solve.html) that takes strings as arguments and parses them to the required types.

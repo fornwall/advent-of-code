@@ -56,6 +56,8 @@ pub trait Painter {
 
     fn set_aspect_ratio(&mut self, width: i32, height: i32);
 
+    fn aspect_ratio(&self) -> f64;
+
     fn await_forever(&mut self);
 }
 
@@ -101,6 +103,10 @@ impl Painter for MockPainter {
     fn meta_switch_layer(&mut self, _to_layer: u16) {}
 
     fn set_aspect_ratio(&mut self, _width: i32, _height: i32) {}
+
+    fn aspect_ratio(&self) -> f64 {
+        1.
+    }
 
     fn await_forever(&mut self) {}
 }
