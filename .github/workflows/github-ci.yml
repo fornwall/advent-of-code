@@ -7,13 +7,6 @@ env:
   SERVER_DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-server
 
 jobs:
-  check-git-ignore:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: check-git-ignore
-      uses: fornwall/check-ignore@0.3
-
   test-rust:
     runs-on: ubuntu-latest
     strategy:
