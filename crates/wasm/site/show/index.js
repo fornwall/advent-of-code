@@ -4,6 +4,7 @@ import CanvasRecorder from './CanvasRecorder.js';
 let visualizerWorker = null;
 
 function terminateWorker() {
+  console.log('Terminating earlier worker');
   visualizerWorker.terminated = true;
   visualizerWorker.terminate();
   visualizerWorker = null;
@@ -17,7 +18,7 @@ for (let part of hash.split('&')) {
   params[key] = decodeURIComponent(value);
 }
 
-window.reloadWithParameters = (parameters) => {
+function reloadWithParameters(parameters) {
   updateHash(parameters);
   window.location.reload();
 }
@@ -33,16 +34,20 @@ function updateHash(parameters) {
   window.location.hash = hashString;
 }
 
-const canvas = document.getElementById("mainCanvas");
+const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 
-const layer1Canvas = document.getElementById("layer1");
+const layer1Canvas = document.getElementById('layer1');
 const layer1Ctx = layer1Canvas.getContext('2d');
-const composedCanvas = document.getElementById("composed");
-const composedCtx = composedCanvas.getContext('2d');
+const composedCanvas = document.getElementById('composed');
+// const composedCtx = composedCanvas.getContext('2d');
 
 if (params.aspectRatio) {
-  window.aspectRatio = parseFloat(params.aspectRatio);
+  onNewAspectRatio(parseFloat(params.aspectRatio));
+}
+
+function onNewAspectRatio(ratio) {
+  window.aspectRatio = ratio;
   for (let canvas of document.querySelectorAll('canvas')) {
     canvas.style.height = (100 / window.aspectRatio) + 'vw';
     canvas.style.maxWidth = (100 * window.aspectRatio) + 'vh';
@@ -50,15 +55,23 @@ if (params.aspectRatio) {
 }
 
 function visualize() {
-  if (visualizerWorker) terminateWorker();
-  visualizerWorker = new Worker("./worker-visualizer.js", { name: "visualizer" });
+  if (visualizerWorker) {
+    terminateWorker();
+  }
+  visualizerWorker = new Worker('./worker-visualizer.js', {name: 'visualizer'});
 
-  const { year, day, part, input } = params;
-  visualizerWorker.postMessage({ year, day, part, input });
+  const {year, day, part, input} = params;
+  visualizerWorker.postMessage({year, day, part, input});
   let myWorker = visualizerWorker;
 
   myWorker.onmessage = (message) => {
-    const renderer = new Renderer(message, [ctx, layer1Ctx]);
+    if ('errorMessage' in message.data) {
+        window.alert('Error from worker:\n' + message.data.errorMessage);
+        window.location = '..';
+        return;
+    }
+
+    const renderer = new Renderer(message, [ctx, layer1Ctx], onNewAspectRatio);
     window.renderer = renderer;
 
     const recorder = params.download ? new CanvasRecorder(canvas) : null;
@@ -76,9 +89,12 @@ function visualize() {
         console.log('[main] Rendering done');
         if (recorder) {
           recorder.stopAndSave(`Advent-of-Code-${year}-Day-${day}-Part-${part}.webm`);
-          updateHash({ download: '' });
+          updateHash({download: ''});
         }
-        document.getElementById('spinner').style.visibility = 'hidden';
+        // document.getElementById('spinner').style.visibility = 'visible';
+        // document.getElementById('spinnerImage').src = 'replay.svg';
+        canvas.classList.remove('slide-in');
+        canvas.classList.add('slide-out');
         terminateWorker();
       } else {
         try {
@@ -112,11 +128,11 @@ async function toggleFullScreen() {
     document.exitFullscreen();
   } else {
     document.documentElement.requestFullscreen();
-    //if ('orientation' in window.screen) 
+    // if ('orientation' in window.screen)
     // TODO: Only lock orientation if non-square aspect ratio?
 
     if (window.aspectRatio && window.aspectRatio > 1.0) {
-      await window.screen.orientation.lock("landscape-primary");
+      await window.screen.orientation.lock('landscape-primary');
     }
   }
 }
@@ -141,27 +157,58 @@ document.body.addEventListener('keyup', (e) => {
       visualize();
       break;
     case 's':
-      window.reloadWithParameters({ download: true });
+      reloadWithParameters({download: true});
       break;
   }
 });
 
 document.body.addEventListener('dblclick', toggleFullScreen);
 
-setTimeout(() => {
-  new ResizeObserver(() => {
-    //const scaleFactor = params.download ? 1 : window.devicePixelRatio;
-    const scaleFactor = window.devicePixelRatio;
-    canvas.width = canvas.clientWidth * scaleFactor;
-    canvas.height = canvas.clientHeight * scaleFactor;
+let resizeCount = 0;
+
+// https://web.dev/device-pixel-content-box/
+function isDevicePixelContentBoxSupported() {
+  return new Promise((resolve) => {
+    const ro = new ResizeObserver((entries) => {
+      resolve(entries.every((entry) => 'devicePixelContentBoxSize' in entry));
+      ro.disconnect();
+    });
+    ro.observe(document.body, {box: ['device-pixel-content-box']});
+  }).catch(() => false);
+}
+
+setTimeout(async () => {
+  const devicePixelContentBoxSupported = await isDevicePixelContentBoxSupported();
+  console.log('devicePixelContentBoxSupported', devicePixelContentBoxSupported);
+  const observerOptions = devicePixelContentBoxSupported ? {box: ['device-pixel-content-box']} : {};
+
+  new ResizeObserver((entries) => {
+    resizeCount++;
+
+    // TODO: For other layer and composed canvas?
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = canvas.width;
+    tmpCanvas.height = canvas.height;
+    tmpCanvas.getContext('2d').drawImage(canvas, 0, 0);
+
+    canvas.width = devicePixelContentBoxSupported ? entries[0].devicePixelContentBoxSize[0].inlineSize : (canvas.clientWidth * window.devicePixelRatio);
+    canvas.height = devicePixelContentBoxSupported ? entries[0].devicePixelContentBoxSize[0].blockSize : (canvas.clientHeight * window.devicePixelRatio);
+
+    // TODO: For other layer and composed canvas?
+    let ctx = canvas.getContext('2d');
+    ctx.setTransform(canvas.width/tmpCanvas.width, 0, 0, canvas.height/tmpCanvas.height, 0, 0);
+    ctx.drawImage(tmpCanvas, 0, 0);
+    ctx.setTransform(canvas.width, 0, 0, canvas.height, 0, 0);
 
     layer1Canvas.width = canvas.width;
     layer1Canvas.height = canvas.height;
+
     // TODO: Only have a compose canvas if recording.
     composedCanvas.width = canvas.width;
     composedCanvas.height = canvas.height;
 
-    visualize();
-  }).observe(canvas);
+    if (resizeCount == 1) visualize();
+  }).observe(canvas, observerOptions);
 }, 0);
+
 

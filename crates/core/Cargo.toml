@@ -17,10 +17,9 @@ name = "advent_of_code"
 
 [features]
 debug-output = []
-visualization = ["advent-of-code-painter"]
+visualization = []
 
 [dependencies]
-advent-of-code-painter = { path = "../painter", optional = true }
 
 [dev-dependencies]
 paste = "1.0"

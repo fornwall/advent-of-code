@@ -15,7 +15,7 @@
   },
   "servers": [
     {
-      "url": "https://aoc.fly.dev",
+      "url": "https://advent.fly.dev",
       "description": "Fly deployment"
     },
     {

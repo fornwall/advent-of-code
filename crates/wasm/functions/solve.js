@@ -2,7 +2,7 @@ const solve = require('advent-of-code-rs-wasm').solve;
 
 exports.handler = function(event, context, callback) {
   const headers = {
-    "Access-Control-Allow-Origin": "*"
+    'Access-Control-Allow-Origin': '*',
   };
 
   if (event.httpMethod !== 'POST') {
@@ -10,8 +10,8 @@ exports.handler = function(event, context, callback) {
       statusCode: 400,
       body: 'This endpoint only supports HTTP POST.',
       headers: {
-        'Allow': 'POST'
-      }
+        Allow: 'POST',
+      },
     });
   }
 
@@ -20,10 +20,10 @@ exports.handler = function(event, context, callback) {
     return callback(null, {
       statusCode: 400,
       headers,
-      body: "Invalid path - expected /solve/{YEAR}/{DAY}/{PART}, was: " + path
+      body: 'Invalid path - expected /solve/{YEAR}/{DAY}/{PART}, was: ' + path,
     });
   }
-  const [_api, year, day, part] = pathParts;
+  const [, year, day, part] = pathParts;
 
   try {
     const input = event.body;
@@ -31,13 +31,13 @@ exports.handler = function(event, context, callback) {
     return callback(null, {
       statusCode: 200,
       headers,
-      body: solution
+      body: solution,
     });
   } catch (e) {
     return callback(null, {
       statusCode: 400,
       headers,
-      body: e.message
+      body: e.message,
     });
   }
-}
+};

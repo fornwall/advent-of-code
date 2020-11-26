@@ -1,0 +1,15 @@
+{
+  "name": "advent-of-code-eslint-checker",
+  "version": "1.0.0",
+  "description": "Project to run eslint",
+  "scripts": {
+    "lint": "eslint **/*.js",
+    "fix": "eslint --fix **/*.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-google": "^0.7.0"
+  }
+}

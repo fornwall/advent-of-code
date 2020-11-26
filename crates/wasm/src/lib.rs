@@ -1,6 +1,8 @@
 extern crate js_sys;
 extern crate wasm_bindgen;
 use advent_of_code::solve_raw;
+#[cfg(feature = "visualization")]
+use advent_of_code_painter::drawer::ToBufferDrawer;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
@@ -21,8 +23,21 @@ pub fn solve(
     part: &JsValue,
     input: String,
 ) -> Result<String, JsValue> {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+
+    #[cfg(feature = "visualization")]
+    let painter = Box::new(ToBufferDrawer::new());
+
     let year = as_string(year);
     let day = as_string(day);
     let part = as_string(part);
-    solve_raw(&year, &day, &part, &input).map_err(|error| JsValue::from(js_sys::Error::new(&error)))
+    solve_raw(
+        &year,
+        &day,
+        &part,
+        &input,
+        #[cfg(feature = "visualization")]
+        painter,
+    )
+    .map_err(|error| JsValue::from(js_sys::Error::new(&error)))
 }

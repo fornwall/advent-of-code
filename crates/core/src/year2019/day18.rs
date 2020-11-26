@@ -1,5 +1,6 @@
 #[cfg(feature = "visualization")]
-use advent_of_code_painter::drawer::ToBufferDrawer;
+use crate::painter::Painter;
+use crate::Input;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
@@ -37,13 +38,12 @@ struct Edge {
     y: i32,
 }
 
-pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
+pub fn steps_to_gather_all_keys(
+    input_string: &str,
+    #[cfg(feature = "visualization")] mut painter: &mut Box<dyn Painter>,
+) -> Result<usize, String> {
     #[cfg(feature = "visualization")]
-    let mut drawer = {
-        let mut drawer = ToBufferDrawer::new();
-        drawer.fill_style_rgb(255, 0, 0);
-        drawer
-    };
+    painter.fill_style_rgb(255, 0, 0);
 
     let rows = input_string.lines().count();
     let cols = input_string.lines().next().ok_or("Empty input")?.len();
@@ -70,7 +70,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
             #[cfg(feature = "visualization")]
             let draw_height = 0.95 / rows as f64;
             #[cfg(feature = "visualization")]
-            let draw = |drawer: &mut ToBufferDrawer| {
+            let draw = |drawer: &mut Box<dyn Painter>| {
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
             };
 
@@ -80,9 +80,9 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     found_keys.insert(Key::new(b'@'), current_position);
                     #[cfg(feature = "visualization")]
                     {
-                        drawer.fill_style_rgb(0, 0, 255);
-                        draw(&mut drawer);
-                        drawer.fill_style_rgb(255, 0, 0);
+                        painter.fill_style_rgb(0, 0, 255);
+                        draw(&mut painter);
+                        painter.fill_style_rgb(255, 0, 0);
                     }
                     b'.'
                 }
@@ -93,17 +93,17 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     found_keys.insert(found_key, current_position);
                     #[cfg(feature = "visualization")]
                     {
-                        drawer.fill_style_rgb(0, 255, 0);
-                        draw(&mut drawer);
-                        drawer.fill_style_rgb(255, 0, 0);
+                        painter.fill_style_rgb(0, 255, 0);
+                        draw(&mut painter);
+                        painter.fill_style_rgb(255, 0, 0);
                     }
                     byte
                 }
                 '#' => {
                     #[cfg(feature = "visualization")]
                     {
-                        drawer.fill_text("12ab1234", 0.1, 0.1);
-                        draw(&mut drawer);
+                        //painter.fill_text("12ab1234", 0.1, 0.1);
+                        draw(&mut painter);
                     }
                     // Stone wall.
                     return;
@@ -112,9 +112,9 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     #[cfg(feature = "visualization")]
                     {
                         if ('A'..='Z').contains(&c) {
-                            drawer.fill_style_rgb(0, 255, 255);
-                            draw(&mut drawer);
-                            drawer.fill_style_rgb(255, 0, 0);
+                            painter.fill_style_rgb(0, 255, 255);
+                            draw(&mut painter);
+                            painter.fill_style_rgb(255, 0, 0);
                         }
                     }
                     byte
@@ -125,9 +125,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
     }
 
     #[cfg(feature = "visualization")]
-    {
-        drawer.end_frame();
-    }
+    painter.end_frame();
 
     if !found_keys.contains_key(&Key::new(b'@')) {
         return Err("No entrance ('@') found".to_string());
@@ -202,7 +200,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
         &adjacency_list,
         all_keys_bitset,
         #[cfg(feature = "visualization")]
-        &mut drawer,
+        &mut painter,
         #[cfg(feature = "visualization")]
         cols,
         #[cfg(feature = "visualization")]
@@ -214,7 +212,7 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
 fn shortest_path(
     adjacency_list: &HashMap<Key, Vec<Edge>>,
     all_keys: KeyBitset,
-    #[cfg(feature = "visualization")] drawer: &mut ToBufferDrawer,
+    #[cfg(feature = "visualization")] drawer: &mut Box<dyn Painter>,
     #[cfg(feature = "visualization")] cols: usize,
     #[cfg(feature = "visualization")] rows: usize,
 ) -> Option<usize> {
@@ -276,7 +274,7 @@ fn shortest_path(
                 let draw_height = 0.95 / rows as f64;
                 drawer.fill_style_rgb(80, 0, 80);
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
-                drawer.meta_delay(200);
+                drawer.meta_delay(50);
                 drawer.end_frame();
 
                 /*
@@ -324,18 +322,23 @@ fn shortest_path(
     None
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    steps_to_gather_all_keys(input_string)
-}
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    if input.is_part_one() {
+        return steps_to_gather_all_keys(
+            &input.text,
+            #[cfg(feature = "visualization")]
+            &mut input.painter,
+        );
+    }
 
-pub fn part2(input_string: &str) -> Result<usize, String> {
     let mut map_top_left = String::new();
     let mut map_top_right = String::new();
     let mut map_bottom_left = String::new();
     let mut map_bottom_right = String::new();
 
-    let num_rows = input_string.lines().count();
-    let num_columns = input_string
+    let num_rows = input.text.lines().count();
+    let num_columns = input
+        .text
         .lines()
         .next()
         .ok_or("Invalid input - empty first line")?
@@ -343,7 +346,7 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
     let center_y = num_rows / 2;
     let center_x = num_columns / 2;
 
-    input_string.lines().enumerate().for_each(|(y, line)| {
+    input.text.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
             let replaced_char = match (center_x as i32 - x as i32, center_y as i32 - y as i32) {
                 (0, 0) | (1, 0) | (-1, 0) | (0, 1) | (0, -1) => '#',
@@ -377,39 +380,61 @@ pub fn part2(input_string: &str) -> Result<usize, String> {
         return Err("Invalid input (not surrounded by '#')".to_string());
     }
 
-    let s1 = steps_to_gather_all_keys(&map_top_left)?;
-    let s2 = steps_to_gather_all_keys(&map_top_right)?;
-    let s3 = steps_to_gather_all_keys(&map_bottom_left)?;
-    let s4 = steps_to_gather_all_keys(&map_bottom_right)?;
+    let s1 = steps_to_gather_all_keys(
+        &map_top_left,
+        #[cfg(feature = "visualization")]
+        &mut input.painter,
+    )?;
+    let s2 = steps_to_gather_all_keys(
+        &map_top_right,
+        #[cfg(feature = "visualization")]
+        &mut input.painter,
+    )?;
+    let s3 = steps_to_gather_all_keys(
+        &map_bottom_left,
+        #[cfg(feature = "visualization")]
+        &mut input.painter,
+    )?;
+    let s4 = steps_to_gather_all_keys(
+        &map_bottom_right,
+        #[cfg(feature = "visualization")]
+        &mut input.painter,
+    )?;
     Ok(s1 + s2 + s3 + s4)
 }
 
 #[test]
 pub fn tests_part1() {
     assert_eq!(
-        part1(
+        solve(&mut Input::part_one(
             "#########
 #b.A.@.a#
 #########"
-        ),
+        )),
         Ok(8)
     );
 
     assert_eq!(
-        part1(
+        solve(&mut Input::part_one(
             "########################
 #f.D.E.e.C.b.A.@.a.B.c.#
 ######################.#
 #d.....................#
 ########################"
-        ),
+        )),
         Ok(86)
     );
 
-    assert_eq!(part1(include_str!("day18_input.txt")), Ok(4248));
+    assert_eq!(
+        solve(&mut Input::part_one(include_str!("day18_input.txt"))),
+        Ok(4248)
+    );
 }
 
 #[test]
 fn tests_part2() {
-    assert_eq!(part2(include_str!("day18_input.txt")), Ok(1878));
+    assert_eq!(
+        solve(&mut Input::part_two(include_str!("day18_input.txt"))),
+        Ok(1878)
+    );
 }

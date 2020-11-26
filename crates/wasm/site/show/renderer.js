@@ -19,8 +19,10 @@ const COMMAND_SWITCH_LAYER = 16;
 const COMMAND_FILL_STYLE_RGBA = 17;
 const COMMAND_SET_ASPECT_RATIO = 18;
 const COMMAND_ARC = 19;
+const COMMAND_FILL = 20;
+const COMMAND_STROKE = 21;
 
-export default function Renderer(message, layers) {
+export default function Renderer(message, layers, onNewAspectRatio) {
     const { buffer, offset, length } = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
@@ -29,8 +31,7 @@ export default function Renderer(message, layers) {
     ctx.imageSmoothingEnabled = false;
 
     for (let layer of layers) {
-        const scale = layer.canvas.width;
-        layer.setTransform(scale, 0, 0, scale, 0, 0);
+        layer.setTransform(layer.canvas.width, 0, 0, layer.canvas.height, 0, 0);
     }
 
     this.done = false;
@@ -129,11 +130,15 @@ export default function Renderer(message, layers) {
                 }
                 case COMMAND_SET_ASPECT_RATIO: {
                     const newAspectRatio = reader.nextFloat();
-                    if (!window.aspectRatio) {
-                        window.reloadWithParameters({aspectRatio: newAspectRatio});
-                        this.done = true;
-                        return;
-                    }
+                    onNewAspectRatio(newAspectRatio);
+                    break;
+                }
+                case COMMAND_FILL: {
+                    ctx.fill();
+                    break;
+                }
+                case COMMAND_STROKE: {
+                    ctx.stroke();
                     break;
                 }
                 default:

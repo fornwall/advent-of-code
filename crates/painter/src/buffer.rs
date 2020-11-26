@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
 const HEADER_ELEMENT_LENGTH: usize = 3;
-const HEADER_BYTE_LENGTH: usize = HEADER_ELEMENT_LENGTH * 4;
+// const HEADER_BYTE_LENGTH: usize = HEADER_ELEMENT_LENGTH * 4;
 const HEADER_READER_WANT_MORE_OFFSET: usize = 0;
 const HEADER_READ_OFFSET: usize = 1;
 const HEADER_WRITE_OFFSET: usize = 2;
@@ -31,10 +31,6 @@ pub struct CircularOutputBuffer {
 }
 
 impl CircularOutputBuffer {
-    pub fn data_len(&self) -> usize {
-        self.shared_buffer.len() - HEADER_ELEMENT_LENGTH
-    }
-
     pub fn new() -> Self {
         let mut result = Self {
             shared_buffer: vec![0; 16 * 65536],
@@ -62,6 +58,10 @@ impl CircularOutputBuffer {
         }
 
         result
+    }
+
+    pub fn data_len(&self) -> usize {
+        self.shared_buffer.len() - HEADER_ELEMENT_LENGTH
     }
 
     fn writer_offset(&self) -> usize {
@@ -122,7 +122,7 @@ impl CircularOutputBuffer {
         self.write(text.len() as i32);
 
         unsafe {
-            let mut as_bytes =
+            let as_bytes =
                 std::mem::transmute::<&mut Vec<i32>, &mut Vec<u8>>(&mut self.shared_buffer);
             // TODO:
             let buffer_start = self.writer_offset() * 4;
@@ -162,7 +162,9 @@ impl CircularOutputBuffer {
 
             // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
             // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
+            console_log!("BEFORE WAIT FOREVER DUE TO LARGE SIZE");
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+            console_log!("AFTER WAIT FOREVER");
 
             // A variant calling out to javascript, requires lines to be uncommented in
             // worker-visualiser.js. Still needs nightly build with atomics feature to
@@ -179,10 +181,9 @@ impl CircularOutputBuffer {
             let timeout_ns = 100_000_000_000_000_000;
             let mut zero = [0; 1];
             let raw_pointer: *mut i32 = zero.as_mut_ptr();
-
-            // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
-            // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
-            core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+            console_log!("BEFORE WAIT FOREVER");
+            let result = core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+            console_log!("AFTER WAIT FOREVER: {}", result);
         }
     }
 }

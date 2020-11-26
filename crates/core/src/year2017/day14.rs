@@ -1,10 +1,9 @@
 use super::day10::part2 as knot_hash;
 use super::disjoint_set::DisjointSet;
-#[cfg(feature = "visualization")]
-use advent_of_code_painter::drawer::ToBufferDrawer;
+use crate::Input;
 use std::collections::BTreeMap;
 
-fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     // Mapping from (x,y) coordinate of a used square to an identifier
     // constructed from a zero-based sequence to be used as set identifiers
     // in a disjoint set for part 2.
@@ -12,14 +11,10 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     let mut used_counter = 0;
 
     #[cfg(feature = "visualization")]
-    let mut drawer = {
-        let mut drawer = ToBufferDrawer::new();
-        drawer.fill_style_rgb(255, 0, 0);
-        drawer
-    };
+    input.painter.fill_style_rgb(255, 0, 0);
 
     for row in 0..=127 {
-        let hash_input = format!("{}-{}", input_string, row);
+        let hash_input = format!("{}-{}", input.text, row);
         let hash = knot_hash(&hash_input)?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
@@ -34,7 +29,7 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
                     {
                         let canvas_x = index * 4 + bit;
                         let canvas_y = row;
-                        drawer.fill_square(
+                        input.painter.fill_square(
                             canvas_x as f64 / 128.,
                             canvas_y as f64 / 128.,
                             1.0 / 128.,
@@ -44,12 +39,10 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
             }
         }
         #[cfg(feature = "visualization")]
-        {
-            drawer.end_frame();
-        }
+        input.painter.end_frame();
     }
 
-    Ok(if part1 {
+    Ok(if input.is_part_one() {
         used_counter as u32
     } else {
         let mut disjoint_set = DisjointSet::new(used_counter);
@@ -67,22 +60,20 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     })
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    solution(input_string, false)
-}
-
 #[test]
 fn test_part1() {
-    assert_eq!(Ok(8108), part1("flqrgnkx"));
-    assert_eq!(Ok(8222), part1(include_str!("day14_input.txt")));
+    assert_eq!(Ok(8108), solve(&mut Input::part_one("flqrgnkx")));
+    assert_eq!(
+        Ok(8222),
+        solve(&mut Input::part_one(include_str!("day14_input.txt")))
+    );
 }
 
 #[test]
 fn test_part2() {
-    assert_eq!(Ok(1242), part2("flqrgnkx"));
-    assert_eq!(Ok(1086), part2(include_str!("day14_input.txt")));
+    assert_eq!(Ok(1242), solve(&mut Input::part_two("flqrgnkx")));
+    assert_eq!(
+        Ok(1086),
+        solve(&mut Input::part_two(include_str!("day14_input.txt")))
+    );
 }

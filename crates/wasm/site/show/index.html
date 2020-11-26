@@ -31,10 +31,39 @@
 			left: 0;
 			right: 0;
 		}
+
+
+    .slide-out{animation:wobble-hor-bottom .8s both}
+    @keyframes wobble-hor-bottom{0%,100%{transform:translateX(0);transform-origin:50% 50%}15%{transform:translateX(-30px) rotate(-6deg)}30%{transform:translateX(15px) rotate(6deg)}45%{transform:translateX(-15px) rotate(-3.6deg)}60%{transform:translateX(9px) rotate(2.4deg)}75%{transform:translateX(-6px) rotate(-1.2deg)}}
+
+    .rotate { animation: rotation 0.5s 1 linear; }
+    @keyframes rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(359deg); }
+    }
+
+
+    .slide-in {
+	animation: slide-in-elliptic-top-fwd 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+    @keyframes slide-in-elliptic-top-fwd {
+  0% {
+    transform: translateY(-600px) rotateX(-30deg) scale(0);
+    transform-origin: 50% 100%;
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) rotateX(0) scale(1);
+    transform-origin: 50% 1400px;
+    opacity: 1;
+  }
+}
+
+
 	</style>
 
 <body>
-	<canvas id="mainCanvas"></canvas>
+	<canvas id="mainCanvas" class="slide-in"></canvas>
 	<canvas id="layer1" style="z-index: 1"></canvas>
 	<canvas id="composed" style="z-index: -1"></canvas>
 	<div style="display: flex; justify-content: center; align-items: center; width: 100vw; height: 100%; position: fixed" id="spinner">

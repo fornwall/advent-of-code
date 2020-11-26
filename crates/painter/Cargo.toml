@@ -9,6 +9,10 @@ js-sys = "0.3"
 wasm-bindgen = "0.2"
 web-sys = { version = "0.3", features = ['console', 'DedicatedWorkerGlobalScope'] }
 
+[dependencies."advent-of-code"]
+path = "../core"
+features = ["visualization"]
+
 [lib]
 name = "advent_of_code_painter"
 crate-type = ["cdylib", "rlib"]

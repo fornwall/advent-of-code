@@ -13,10 +13,12 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-visualization = [ "advent-of-code/visualization" ]
+visualization = [ "advent-of-code/visualization", "advent-of-code-painter" ]
 
 [dependencies]
+console_error_panic_hook = "0.1.6"
 advent-of-code = { path = "../core" }
+advent-of-code-painter = { path = "../painter", optional = true }
 wasm-bindgen = "*"
 wasm-bindgen-test = "*"
 js-sys = "*"
@@ -26,4 +28,4 @@ js-sys = "*"
 # is fixed with ""--enable-mutable-globals".
 # But without "--no-validation" the build using nightly for the
 # visualisation fails with "Fatal: module features do not match specified features"
-wasm-opt = ["-O4", "--no-validation"]
+wasm-opt = ["-O", "--no-validation"]

@@ -1,10 +1,7 @@
-# fly.toml file generated for aoc on 2020-10-14T01:08:45+02:00
-
-app = "aoc"
+app = "advent"
 
 [build]
   image = "fredrikfornwall/advent-of-code-server:2019.12.154"
-
 
 [[services]]
   internal_port = 8080
