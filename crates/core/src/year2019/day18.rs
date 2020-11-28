@@ -1,6 +1,6 @@
+use crate::input::Input;
 #[cfg(feature = "visualization")]
-use crate::painter::Painter;
-use crate::Input;
+use crate::painter::PainterRef;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
@@ -40,7 +40,7 @@ struct Edge {
 
 pub fn steps_to_gather_all_keys(
     input_string: &str,
-    #[cfg(feature = "visualization")] mut painter: &mut Box<dyn Painter>,
+    #[cfg(feature = "visualization")] mut painter: &mut PainterRef,
 ) -> Result<usize, String> {
     #[cfg(feature = "visualization")]
     painter.fill_style_rgb(255, 0, 0);
@@ -70,7 +70,7 @@ pub fn steps_to_gather_all_keys(
             #[cfg(feature = "visualization")]
             let draw_height = 0.95 / rows as f64;
             #[cfg(feature = "visualization")]
-            let draw = |drawer: &mut Box<dyn Painter>| {
+            let draw = |drawer: &mut PainterRef| {
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
             };
 
@@ -212,7 +212,7 @@ pub fn steps_to_gather_all_keys(
 fn shortest_path(
     adjacency_list: &HashMap<Key, Vec<Edge>>,
     all_keys: KeyBitset,
-    #[cfg(feature = "visualization")] drawer: &mut Box<dyn Painter>,
+    #[cfg(feature = "visualization")] drawer: &mut PainterRef,
     #[cfg(feature = "visualization")] cols: usize,
     #[cfg(feature = "visualization")] rows: usize,
 ) -> Option<usize> {

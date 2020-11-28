@@ -340,7 +340,7 @@ fn find_covering_subsequences(
 }
 
 #[test]
-pub fn tests_part1() {
+pub fn tests() {
     assert_eq!(
         part1_map(
             "..#..........
@@ -358,10 +358,7 @@ pub fn tests_part1() {
         part1(include_str!("day17_input.txt")),
         Ok("11140".to_string())
     );
-}
 
-#[test]
-fn tests_part2() {
     assert_eq!(
         part2(include_str!("day17_input.txt")),
         Ok("1113108".to_string())

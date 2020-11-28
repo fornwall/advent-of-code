@@ -12,7 +12,7 @@ enum Command {
     LineWidth,
     StrokeSquare,
     StrokeStyleRGB,
-    FillText,
+    StatusText,
     ShadowBlur,
     ShadowColor,
     Done,
@@ -64,11 +64,9 @@ impl Painter for ToBufferDrawer {
         self.output_buffer.write_float3(x, y, size);
     }
 
-    fn fill_text(&mut self, text: &str, x: f64, y: f64) {
-        self.output_buffer.write(Command::FillText as i32);
+    fn status_text(&mut self, text: &str) {
+        self.output_buffer.write(Command::StatusText as i32);
         self.output_buffer.write_text(text);
-        self.output_buffer.write_float(x);
-        self.output_buffer.write_float(y);
     }
 
     fn fill(&mut self) {

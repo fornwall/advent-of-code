@@ -1,8 +1,6 @@
 use super::int_code::Word;
-use crate::Painter;
+use crate::painter::PainterRef;
 use std::collections::HashMap;
-
-type PainterRef = Box<dyn Painter>;
 
 pub struct Renderer<'a> {
     tiles: HashMap<(Word, Word), Word>,
@@ -23,7 +21,7 @@ impl<'a> Renderer<'a> {
         self.tiles.insert(location, value);
     }
 
-    pub fn render(&mut self, current_score: Word) {
+    pub fn render(&mut self, _current_score: Word) {
         self.painter.clear();
 
         let mut min_x = Word::MAX;
@@ -55,15 +53,11 @@ impl<'a> Renderer<'a> {
                     let draw_y = (y - min_y) as f64 * grid_display_height;
                     painter.fill_style_rgb(r, g, b);
                     if r == 255 && g == 255 {
-                        painter.begin_path();
-                        painter.arc(
+                        painter.fill_circle(
                             draw_x + grid_display_width / 2.,
                             draw_y + grid_display_width / 2.,
                             grid_display_width / 3.,
-                            0.,
-                            std::f64::consts::PI * 2.,
                         );
-                        painter.fill();
                     } else {
                         painter.fill_rect(
                             draw_x,

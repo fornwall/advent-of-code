@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 use std::cmp;
 use std::ops;
 
@@ -56,7 +56,6 @@ impl LineSegment {
             //  .
             //  .
             //  d]
-
             if (vertical.top_left.y..=vertical.end_point().y).contains(&horizontal.top_left.y)
                 && (horizontal.top_left.x..=horizontal.end_point().x).contains(&vertical.top_left.x)
             {
@@ -76,7 +75,7 @@ impl LineSegment {
         }
     }
 
-    /// Assumes that point is one line.
+    /// Assumes that point is on line.
     const fn steps_at(self, point: Vector) -> u32 {
         let self_steps_away = self.top_left.distance_from(point);
         if self.incoming_direction {
@@ -194,6 +193,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
     #[cfg(feature = "visualization")]
     {
+        use crate::painter::PainterRef;
         let mut min_x = std::i32::MAX;
         let mut max_x = std::i32::MIN;
         let mut min_y = std::i32::MAX;
@@ -201,6 +201,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
         let second_wire_segments: Vec<LineSegment> =
             parse_wire_points(second_line).collect::<Result<_, _>>()?;
+
         for line_segment in first_wire_segments
             .iter()
             .chain(second_wire_segments.iter())
@@ -213,49 +214,69 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
         let grid_width = (max_x - min_x) as i32;
         let grid_height = (max_y - min_y) as i32;
-
         input.painter.set_aspect_ratio(grid_width, grid_height);
 
         let grid_display_width = 1.0 / grid_width as f64;
         let grid_display_height = (1.0 / grid_height as f64) / input.painter.aspect_ratio();
 
-        input.painter.clear();
-        for (&line_segment, &o) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
-            input.painter.fill_style_rgb(255, 0, 0);
-            input.painter.fill_rect(
-                (line_segment.top_left.x - min_x) as f64 * grid_display_width,
-                (line_segment.top_left.y - min_y) as f64 * grid_display_height,
-                if line_segment.horizontal {
-                    line_segment.length as f64 * grid_display_width
-                } else {
-                    grid_display_width * 40.
-                },
-                if line_segment.horizontal {
-                    grid_display_width * 40.
-                } else {
-                    line_segment.length as f64 * grid_display_height
-                },
-            );
+        let mut drawn_lines1: Vec<LineSegment> = Vec::new();
+        let mut drawn_lines2: Vec<LineSegment> = Vec::new();
 
-            input.painter.fill_style_rgb(0, 255, 0);
-            let line_segment = o;
-            input.painter.fill_rect(
-                (line_segment.top_left.x - min_x) as f64 * grid_display_width,
-                (line_segment.top_left.y - min_y) as f64 * grid_display_height,
-                if line_segment.horizontal {
-                    line_segment.length as f64 * grid_display_width
-                } else {
-                    grid_display_width * 40.
-                },
-                if line_segment.horizontal {
-                    grid_display_width * 40.
-                } else {
-                    line_segment.length as f64 * grid_display_height
-                },
-            );
+        let draw_line = |painter: &mut PainterRef, line_segment: &LineSegment, r, g, b| {
+            let start_x = (line_segment.top_left.x - min_x) as f64 * grid_display_width;
+            let start_y = (line_segment.top_left.y - min_y) as f64 * grid_display_height;
+            let mut end_x = start_x;
+            let mut end_y = start_y;
+            if line_segment.horizontal {
+                end_x += line_segment.length as f64 * grid_display_width
+            } else {
+                end_y += line_segment.length as f64 * grid_display_height
+            }
 
-            input.painter.fill_text("Hello, !", 0.5, 0.5);
-            input.painter.end_frame();
+            painter.line_width(grid_display_width * 30.);
+            painter.stroke_style_rgb(r, g, b);
+            painter.begin_path();
+            painter.move_to(start_x, start_y);
+            painter.line_to(end_x, end_y);
+            painter.stroke();
+        };
+
+        let mut first = true;
+        for (l1, l2) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
+            draw_line(&mut input.painter, &l1, 255, 0, 0);
+            draw_line(&mut input.painter, &l2, 0, 255, 0);
+
+            drawn_lines1.push(*l1);
+            drawn_lines2.push(*l2);
+
+            let mut intersection_count = 0;
+            for d1 in &drawn_lines1 {
+                for d2 in &drawn_lines2 {
+                    if let Some(intersection) = d1.intersection_with(*d2) {
+                        intersection_count += 1;
+                        input.painter.line_width(grid_display_width * 10.);
+                        input.painter.stroke_style_rgb(255, 255, 255);
+                        input.painter.stroke_circle(
+                            (intersection.point.x - min_x) as f64 * grid_display_width,
+                            (intersection.point.y - min_y) as f64 * grid_display_height,
+                            grid_display_width * 100.,
+                        );
+                    }
+                }
+            }
+
+            input.painter.status_text(&format!(
+                "Line segments: {} Intersections: {}",
+                drawn_lines1.len(),
+                intersection_count
+            ));
+
+            if first {
+                first = false;
+                input.painter.end_frame();
+            } else {
+                input.painter.meta_delay(100);
+            }
         }
     }
 
@@ -308,51 +329,20 @@ pub fn tests_line_segment() {
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(
-        solve(&mut Input::part_one("R8,U5,L5,D3\nU7,R6,D4,L4")),
-        Ok(6)
-    );
-    assert_eq!(
-        solve(&mut Input::part_one(
-            "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83"
-        )),
-        Ok(159)
-    );
-    assert_eq!(
-        solve(&mut Input::part_one(
-            "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
-        )),
-        Ok(135)
-    );
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-    assert_eq!(
-        solve(&mut Input::part_one(include_str!("day03_input.txt"))),
-        Ok(375)
-    );
-}
+    test_part_one!("R8,U5,L5,D3\nU7,R6,D4,L4" => 6);
+    test_part_one!("R8,U5,L5,D3\nU7,R6,D4,L4" => 6);
+    test_part_one!("R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83" => 159);
+    test_part_one!(
+            "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7" => 135);
 
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        solve(&mut Input::part_two("R8,U5,L5,D3\nU7,R6,D4,L4")),
-        Ok(30)
-    );
-    assert_eq!(
-        solve(&mut Input::part_two(
-            "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83"
-        )),
-        Ok(610)
-    );
-    assert_eq!(
-        solve(&mut Input::part_two(
-            "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
-        )),
-        Ok(410)
-    );
+    test_part_two!("R8,U5,L5,D3\nU7,R6,D4,L4" => 30);
+    test_part_two!("R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83" => 610);
+    test_part_two!("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7" => 410);
 
-    assert_eq!(
-        solve(&mut Input::part_two(include_str!("day03_input.txt"))),
-        Ok(14746)
-    );
+    let real_input = include_str!("day03_input.txt");
+    test_part_one!(real_input => 375);
+    test_part_two!(real_input => 14746);
 }

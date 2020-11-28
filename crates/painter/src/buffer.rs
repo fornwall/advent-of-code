@@ -123,24 +123,14 @@ impl CircularOutputBuffer {
 
         unsafe {
             let byte_pointer = self.shared_buffer.as_mut_ptr() as *mut u8;
-            //let as_bytes =
-            //std::mem::transmute::<&mut Vec<i32>, &mut Vec<u8>>(&mut self.shared_buffer);
             let buffer_start = self.writer_offset() * 4;
-            let buffer_end = buffer_start + text.len();
-            //as_bytes[buffer_start..buffer_end].copy_from_slice(text.as_bytes());
             for i in 0..text.len() {
                 byte_pointer
                     .offset((buffer_start + i) as isize)
                     .write(text.as_bytes()[i]);
             }
-            self.log(&format!(
-                "Wrote text (length={}), first byte={}, second_byte={}, int={}",
-                text.len(),
-                *byte_pointer.offset(buffer_start as isize),
-                *byte_pointer.offset((buffer_start + 1) as isize),
-                self.shared_buffer[self.writer_offset()]
-            ));
-            self.non_flushed_writes += (text.len() / 4) as i32;
+            self.non_flushed_writes +=
+                (text.len() / 4 + if text.len() % 4 == 0 { 0 } else { 1 }) as i32;
         }
     }
 
@@ -174,9 +164,9 @@ impl CircularOutputBuffer {
 
             // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
             // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
-            console_log!("BEFORE WAIT FOREVER DUE TO LARGE SIZE");
+            self.log("Awaiting request for more render data...");
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
-            console_log!("AFTER WAIT FOREVER");
+            self.log("Render data requested - continuing!");
 
             // A variant calling out to javascript, requires lines to be uncommented in
             // worker-visualiser.js. Still needs nightly build with atomics feature to
@@ -193,9 +183,12 @@ impl CircularOutputBuffer {
             let timeout_ns = 100_000_000_000_000_000;
             let mut zero = [0; 1];
             let raw_pointer: *mut i32 = zero.as_mut_ptr();
-            console_log!("BEFORE WAIT FOREVER");
+            self.log("Done - waiting forever to keep buffer alive");
             let result = core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
-            console_log!("AFTER WAIT FOREVER: {}", result);
+            self.log(&format!(
+                "This is strange - returning after eternal wait? result={}",
+                result
+            ));
         }
     }
 

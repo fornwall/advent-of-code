@@ -40,7 +40,7 @@ const ctx = canvas.getContext('2d');
 const layer1Canvas = document.getElementById('layer1');
 const layer1Ctx = layer1Canvas.getContext('2d');
 const composedCanvas = document.getElementById('composed');
-// const composedCtx = composedCanvas.getContext('2d');
+const composedCtx = composedCanvas.getContext('2d');
 
 if (params.aspectRatio) {
   onNewAspectRatio(parseFloat(params.aspectRatio));
@@ -74,7 +74,7 @@ function visualize() {
     const renderer = new Renderer(message, [ctx, layer1Ctx], onNewAspectRatio);
     window.renderer = renderer;
 
-    const recorder = params.download ? new CanvasRecorder(canvas) : null;
+    const recorder = params.download ? new CanvasRecorder(composedCtx.canvas) : null;
     if (recorder) {
       recorder.start();
       document.getElementById('spinnerImage').src = 'recording.svg';
@@ -99,13 +99,11 @@ function visualize() {
       } else {
         try {
           renderer.render();
-          /*
           if (recorder) {
               composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
               composedCtx.drawImage(canvas, 0, 0);
               composedCtx.drawImage(layer1Canvas, 0, 0);
           }
-          */
           if (renderer.delay) {
             setTimeout(render, renderer.delay);
             renderer.delay = false;

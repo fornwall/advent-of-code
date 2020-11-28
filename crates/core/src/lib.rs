@@ -4,53 +4,16 @@ This crates provides solutions for Advent of Code problems.
 */
 #![crate_name = "advent_of_code"]
 
+mod input;
 #[cfg(feature = "visualization")]
 pub mod painter;
 mod year2017;
 mod year2018;
 mod year2019;
 
+use input::{Input, Part};
 #[cfg(feature = "visualization")]
-use painter::MockPainter;
-#[cfg(feature = "visualization")]
-use painter::Painter;
-
-#[derive(Copy, Clone)]
-enum Part {
-    One,
-    Two,
-}
-
-pub struct Input {
-    part: Part,
-    text: String,
-    #[cfg(feature = "visualization")]
-    painter: Box<dyn Painter>,
-}
-
-impl Input {
-    const fn is_part_one(&self) -> bool {
-        matches!(self.part, Part::One)
-    }
-
-    pub fn part_one(text: &str) -> Self {
-        Self {
-            part: Part::One,
-            text: text.to_string(),
-            #[cfg(feature = "visualization")]
-            painter: Box::new(MockPainter {}),
-        }
-    }
-
-    pub fn part_two(text: &str) -> Self {
-        Self {
-            part: Part::Two,
-            text: text.to_string(),
-            #[cfg(feature = "visualization")]
-            painter: Box::new(MockPainter {}),
-        }
-    }
-}
+use painter::PainterRef;
 
 fn to_stringer<T: ToString>(
     function: fn(&str) -> Result<T, String>,
@@ -86,7 +49,7 @@ pub fn solve(
     day: u8,
     part: u8,
     input_string: &str,
-    #[cfg(feature = "visualization")] painter: Box<dyn Painter>,
+    #[cfg(feature = "visualization")] painter: PainterRef,
 ) -> Result<String, String> {
     #![allow(clippy::let_and_return)]
 
@@ -191,8 +154,7 @@ pub fn solve(
         (2019, 5, 2) => to_stringer(year2019::day05::part2, input_string),
         (2019, 6, 1) => to_stringer(year2019::day06::part1, input_string),
         (2019, 6, 2) => to_stringer(year2019::day06::part2, input_string),
-        (2019, 7, 1) => to_stringer(year2019::day07::part1, input_string),
-        (2019, 7, 2) => to_stringer(year2019::day07::part2, input_string),
+        (2019, 7, _) => to_stringer_input(year2019::day07::solve, &mut input),
         (2019, 8, 1) => to_stringer(year2019::day08::part1, input_string),
         (2019, 8, 2) => to_stringer(year2019::day08::part2, input_string),
         (2019, 9, 1) => to_stringer(year2019::day09::part1, input_string),
@@ -248,7 +210,7 @@ pub fn solve_raw(
     day_string: &str,
     part_string: &str,
     input: &str,
-    #[cfg(feature = "visualization")] painter: Box<dyn Painter>,
+    #[cfg(feature = "visualization")] painter: PainterRef,
 ) -> Result<String, String> {
     let year = year_string.parse::<u16>().map_err(|_| "Invalid year")?;
     let day = day_string.parse::<u8>().map_err(|_| "Invalid day")?;

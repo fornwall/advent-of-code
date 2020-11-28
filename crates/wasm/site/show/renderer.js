@@ -10,7 +10,7 @@ const COMMAND_FILL_STYLE_RGB = 7;
 const COMMAND_LINE_WIDTH = 8;
 const COMMAND_STROKE_SQUARE = 9;
 const COMMAND_STROKE_STYLE_RGB = 10;
-const COMMAND_FILL_TEXT = 11;
+const COMMAND_STATUS_TEXT = 11;
 const COMMAND_SHADOW_BLUR = 12;
 const COMMAND_SHADOW_COLOR = 13;
 const COMMAND_DONE = 14;
@@ -87,22 +87,18 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     ctx.strokeStyle = 'rgb(' + r + ', ' + g + ',' + b + ')';
                     break;
                 }
-                case COMMAND_FILL_TEXT: {
-                    let textLayer = layers[1];
-                    textLayer.font = '40px Monospace';
+                case COMMAND_STATUS_TEXT: {
                     const text = reader.nextString();
-                    let x = reader.nextFloat();
-                    let y = reader.nextFloat();
-                    x = textLayer.canvas.width;
-                    y = textLayer.canvas.height;
+                    let textLayer = layers[1];
                     textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);
+
+                    textLayer.font = '40px Monospace';
                     textLayer.fillStyle = 'white';
                     textLayer.strokeStyle = 'black';
-                    textLayer.textAlign = 'right';
-                    textLayer.textBaseline = 'bottom';
-                    textLayer.fillText(text, x, y);
-                    textLayer.strokeStyle = '2'
-                    //textLayer.strokeText(text, x, y);
+                    textLayer.textBaseline = 'top';
+                    const x = 4;
+                    const maxWidth = textLayer.canvas.width - x;
+                    textLayer.fillText(text, 4, 4, maxWidth);
                     break;
                 }
                 case COMMAND_SHADOW_BLUR: {

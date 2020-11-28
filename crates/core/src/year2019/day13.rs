@@ -1,5 +1,5 @@
 use super::int_code::{Program, Word};
-use crate::Input;
+use crate::input::Input;
 
 #[cfg(feature = "visualization")]
 use super::day13_renderer::Renderer;

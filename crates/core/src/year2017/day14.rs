@@ -1,6 +1,6 @@
 use super::day10::part2 as knot_hash;
 use super::disjoint_set::DisjointSet;
-use crate::Input;
+use crate::input::Input;
 use std::collections::BTreeMap;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {

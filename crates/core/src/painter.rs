@@ -13,8 +13,8 @@ pub trait Painter {
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillRect
     fn fill_square(&mut self, x: f64, y: f64, size: f64);
 
-    /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillText
-    fn fill_text(&mut self, text: &str, x: f64, y: f64);
+    /// Show a status of the current situation.
+    fn status_text(&mut self, text: &str);
 
     /// Fills the current path with the current fillStyle.
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fill
@@ -54,6 +54,18 @@ pub trait Painter {
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arc
     fn arc(&mut self, x: f64, y: f64, radius: f64, start_angle: f64, end_angle: f64);
 
+    fn stroke_circle(&mut self, x: f64, y: f64, radius: f64) {
+        self.begin_path();
+        self.arc(x, y, radius, 0., 2. * std::f64::consts::PI);
+        self.stroke();
+    }
+
+    fn fill_circle(&mut self, x: f64, y: f64, radius: f64) {
+        self.begin_path();
+        self.arc(x, y, radius, 0., 2. * std::f64::consts::PI);
+        self.fill();
+    }
+
     fn end_frame(&mut self);
 
     fn meta_delay(&mut self, delay_ms: u16);
@@ -69,6 +81,8 @@ pub trait Painter {
     fn log(&mut self, text: &str);
 }
 
+pub type PainterRef = Box<dyn Painter>;
+
 pub struct MockPainter;
 
 impl Painter for MockPainter {
@@ -82,7 +96,7 @@ impl Painter for MockPainter {
 
     fn fill_square(&mut self, _x: f64, _y: f64, _size: f64) {}
 
-    fn fill_text(&mut self, _text: &str, _x: f64, _y: f64) {}
+    fn status_text(&mut self, _text: &str) {}
 
     fn fill(&mut self) {}
 
