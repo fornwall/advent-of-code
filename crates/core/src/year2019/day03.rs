@@ -123,50 +123,57 @@ impl ops::AddAssign<Vector> for Vector {
     }
 }
 
-fn parse_wire_points<F>(string: &str, mut on_visit: F) -> Result<(), String>
-where
-    F: FnMut(LineSegment),
-{
-    let mut current_position = Vector::new(0, 0);
-    let mut current_step = 0_u32;
+fn parse_wire_points<'a>(
+    string: &'a str,
+) -> impl Iterator<Item = Result<LineSegment, String>> + Clone + 'a {
+    let initial_position = Vector::new(0, 0);
+    let initial_step = 0_u32;
 
-    for word in string.split(',') {
-        if let (Some(first_char), Some(Ok(steps))) =
-            (word.chars().next(), word.get(1..).map(|n| n.parse::<u32>()))
-        {
-            let start_position = current_position;
-            let direction = Vector::direction(first_char as char)?;
-            current_position += direction.multiply(steps);
+    string.split(',').scan(
+        (initial_position, initial_step),
+        |(current_position, current_step), word| {
+            if let (Some(first_char), Some(Ok(steps))) =
+                (word.chars().next(), word.get(1..).map(|n| n.parse::<u32>()))
+            {
+                let start_position = *current_position;
 
-            let top_left = Vector {
-                x: std::cmp::min(start_position.x, current_position.x),
-                y: std::cmp::min(start_position.y, current_position.y),
-            };
+                let direction = match Vector::direction(first_char as char) {
+                    Ok(direction) => direction,
+                    Err(description) => {
+                        return Some(Err(description));
+                    }
+                };
+                *current_position += direction.multiply(steps);
 
-            let incoming_direction = top_left != start_position;
+                let top_left = Vector {
+                    x: std::cmp::min(start_position.x, current_position.x),
+                    y: std::cmp::min(start_position.y, current_position.y),
+                };
 
-            let line_segment = LineSegment {
-                top_left,
-                length: (start_position.x - current_position.x).abs()
-                    + (start_position.y - current_position.y).abs(),
-                horizontal: direction.x.abs() != 0,
-                start_step: if incoming_direction {
-                    current_step + steps
-                } else {
-                    current_step
-                },
-                incoming_direction,
-            };
+                let incoming_direction = top_left != start_position;
 
-            current_step += steps;
-            on_visit(line_segment);
-        } else {
-            return Err(
-                "Invalid word - not 'U', 'R', 'D' or 'L' followed by an integer".to_string(),
-            );
-        }
-    }
-    Ok(())
+                let line_segment = LineSegment {
+                    top_left,
+                    length: steps as i32,
+                    horizontal: direction.x.abs() != 0,
+                    start_step: if incoming_direction {
+                        *current_step + steps
+                    } else {
+                        *current_step
+                    },
+                    incoming_direction,
+                };
+
+                *current_step += steps;
+
+                Some(Ok(line_segment))
+            } else {
+                Some(Err(
+                    "Invalid word - not 'U', 'R', 'D' or 'L' followed by an integer".to_string(),
+                ))
+            }
+        },
+    )
 }
 
 fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
@@ -182,16 +189,81 @@ fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let (first_line, second_line) = input_lines(&input.text)?;
-    let mut first_wire_segments = Vec::new();
+    let first_wire_segments: Vec<LineSegment> =
+        parse_wire_points(first_line).collect::<Result<_, _>>()?;
 
-    parse_wire_points(first_line, |line_segment| {
-        first_wire_segments.push(line_segment);
-    })?;
+    #[cfg(feature = "visualization")]
+    {
+        let mut min_x = std::i32::MAX;
+        let mut max_x = std::i32::MIN;
+        let mut min_y = std::i32::MAX;
+        let mut max_y = std::i32::MIN;
+
+        let second_wire_segments: Vec<LineSegment> =
+            parse_wire_points(second_line).collect::<Result<_, _>>()?;
+        for line_segment in first_wire_segments
+            .iter()
+            .chain(second_wire_segments.iter())
+        {
+            min_x = std::cmp::min(min_x, line_segment.top_left.x);
+            max_x = std::cmp::max(max_x, line_segment.end_point().x);
+            min_y = std::cmp::min(min_y, line_segment.top_left.y);
+            max_y = std::cmp::max(max_y, line_segment.end_point().y);
+        }
+
+        let grid_width = (max_x - min_x) as i32;
+        let grid_height = (max_y - min_y) as i32;
+
+        input.painter.set_aspect_ratio(grid_width, grid_height);
+
+        let grid_display_width = 1.0 / grid_width as f64;
+        let grid_display_height = (1.0 / grid_height as f64) / input.painter.aspect_ratio();
+
+        input.painter.clear();
+        for (&line_segment, &o) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
+            input.painter.fill_style_rgb(255, 0, 0);
+            input.painter.fill_rect(
+                (line_segment.top_left.x - min_x) as f64 * grid_display_width,
+                (line_segment.top_left.y - min_y) as f64 * grid_display_height,
+                if line_segment.horizontal {
+                    line_segment.length as f64 * grid_display_width
+                } else {
+                    grid_display_width * 40.
+                },
+                if line_segment.horizontal {
+                    grid_display_width * 40.
+                } else {
+                    line_segment.length as f64 * grid_display_height
+                },
+            );
+
+            input.painter.fill_style_rgb(0, 255, 0);
+            let line_segment = o;
+            input.painter.fill_rect(
+                (line_segment.top_left.x - min_x) as f64 * grid_display_width,
+                (line_segment.top_left.y - min_y) as f64 * grid_display_height,
+                if line_segment.horizontal {
+                    line_segment.length as f64 * grid_display_width
+                } else {
+                    grid_display_width * 40.
+                },
+                if line_segment.horizontal {
+                    grid_display_width * 40.
+                } else {
+                    line_segment.length as f64 * grid_display_height
+                },
+            );
+
+            input.painter.fill_text("Hello, !", 0.5, 0.5);
+            input.painter.end_frame();
+        }
+    }
 
     let mut best = std::u32::MAX;
     let origin = Vector { x: 0, y: 0 };
 
-    parse_wire_points(second_line, |line_segment| {
+    for line_segment in parse_wire_points(second_line) {
+        let line_segment = line_segment?;
         for first_line_segment in &first_wire_segments {
             if let Some(intersection) = first_line_segment.intersection_with(line_segment) {
                 // "While the wires do technically cross right at the central port
@@ -206,7 +278,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 }
             }
         }
-    })?;
+    }
 
     Ok(best)
 }

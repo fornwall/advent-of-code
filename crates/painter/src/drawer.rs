@@ -23,6 +23,8 @@ enum Command {
     Arc,
     Fill,
     Stroke,
+    LineTo,
+    MoveTo,
 }
 
 pub struct ToBufferDrawer {
@@ -91,9 +93,21 @@ impl Painter for ToBufferDrawer {
         self.output_buffer.write(Command::Stroke as i32);
     }
 
-    fn line_width(&mut self, width: i32) {
+    fn line_width(&mut self, width: f64) {
         self.output_buffer.write(Command::LineWidth as i32);
-        self.output_buffer.write(width);
+        self.output_buffer.write_float(width);
+    }
+
+    fn line_to(&mut self, x: f64, y: f64) {
+        self.output_buffer.write(Command::LineTo as i32);
+        self.output_buffer.write_float(x);
+        self.output_buffer.write_float(y);
+    }
+
+    fn move_to(&mut self, x: f64, y: f64) {
+        self.output_buffer.write(Command::MoveTo as i32);
+        self.output_buffer.write_float(x);
+        self.output_buffer.write_float(y);
     }
 
     fn fill_style_rgb(&mut self, r: i32, g: i32, b: i32) {
@@ -164,8 +178,11 @@ impl Painter for ToBufferDrawer {
     fn await_forever(&mut self) {
         self.output_buffer.write(Command::Done as i32);
         self.output_buffer.flush();
-        self.output_buffer.report_stats();
         self.output_buffer.wait_forever();
+    }
+
+    fn log(&mut self, text: &str) {
+        self.output_buffer.log(text);
     }
 }
 

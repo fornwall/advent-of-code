@@ -122,12 +122,24 @@ impl CircularOutputBuffer {
         self.write(text.len() as i32);
 
         unsafe {
-            let as_bytes =
-                std::mem::transmute::<&mut Vec<i32>, &mut Vec<u8>>(&mut self.shared_buffer);
-            // TODO:
+            let byte_pointer = self.shared_buffer.as_mut_ptr() as *mut u8;
+            //let as_bytes =
+            //std::mem::transmute::<&mut Vec<i32>, &mut Vec<u8>>(&mut self.shared_buffer);
             let buffer_start = self.writer_offset() * 4;
             let buffer_end = buffer_start + text.len();
-            as_bytes[buffer_start..buffer_end].copy_from_slice(text.as_bytes());
+            //as_bytes[buffer_start..buffer_end].copy_from_slice(text.as_bytes());
+            for i in 0..text.len() {
+                byte_pointer
+                    .offset((buffer_start + i) as isize)
+                    .write(text.as_bytes()[i]);
+            }
+            self.log(&format!(
+                "Wrote text (length={}), first byte={}, second_byte={}, int={}",
+                text.len(),
+                *byte_pointer.offset(buffer_start as isize),
+                *byte_pointer.offset((buffer_start + 1) as isize),
+                self.shared_buffer[self.writer_offset()]
+            ));
             self.non_flushed_writes += (text.len() / 4) as i32;
         }
     }
@@ -185,6 +197,10 @@ impl CircularOutputBuffer {
             let result = core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
             console_log!("AFTER WAIT FOREVER: {}", result);
         }
+    }
+
+    pub fn log(&mut self, text: &str) {
+        console_log!("[rust]: {}", text);
     }
 }
 

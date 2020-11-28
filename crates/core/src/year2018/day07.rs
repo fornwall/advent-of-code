@@ -182,7 +182,6 @@ pub fn part2_param(
 
     let mut latest_work_done_at = 0;
     while let Some(work_done) = work_queue.pop() {
-        // println!("Step {} done at time {}", work_done.name, work_done.done_at_second);
         latest_work_done_at = work_done.done_at_second;
 
         result.push(work_done.name);

@@ -31,7 +31,13 @@ pub trait Painter {
     fn stroke(&mut self);
 
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineWidth
-    fn line_width(&mut self, width: i32);
+    fn line_width(&mut self, width: f64);
+
+    /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo
+    fn line_to(&mut self, x: f64, y: f64);
+
+    ///https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/moveTo
+    fn move_to(&mut self, x: f64, y: f64);
 
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle
     fn fill_style_rgb(&mut self, r: i32, g: i32, b: i32);
@@ -59,6 +65,8 @@ pub trait Painter {
     fn aspect_ratio(&self) -> f64;
 
     fn await_forever(&mut self);
+
+    fn log(&mut self, text: &str);
 }
 
 pub struct MockPainter;
@@ -84,7 +92,11 @@ impl Painter for MockPainter {
 
     fn stroke(&mut self) {}
 
-    fn line_width(&mut self, _width: i32) {}
+    fn line_width(&mut self, _width: f64) {}
+
+    fn line_to(&mut self, _x: f64, _y: f64) {}
+
+    fn move_to(&mut self, _x: f64, _y: f64) {}
 
     fn fill_style_rgb(&mut self, _r: i32, _g: i32, _b: i32) {}
 
@@ -109,4 +121,6 @@ impl Painter for MockPainter {
     }
 
     fn await_forever(&mut self) {}
+
+    fn log(&mut self, _text: &str) {}
 }
