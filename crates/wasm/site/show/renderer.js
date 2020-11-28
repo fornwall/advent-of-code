@@ -29,13 +29,7 @@ export default function Renderer(message, layers, onNewAspectRatio) {
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
     let ctx = layers[0];
-
     ctx.imageSmoothingEnabled = false;
-
-    for (let layer of layers) {
-        layer.setTransform(layer.canvas.width, 0, 0, layer.canvas.height, 0, 0);
-    }
-
     this.done = false;
 
     this.render = () => {
@@ -94,12 +88,21 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     break;
                 }
                 case COMMAND_FILL_TEXT: {
-                    ctx.font = '0.04vw Arial';
+                    let textLayer = layers[1];
+                    textLayer.font = '40px Monospace';
                     const text = reader.nextString();
                     let x = reader.nextFloat();
                     let y = reader.nextFloat();
-                    console.log(`filling text '${text}' at ${x}, ${y}`);
-                    ctx.fillText(text, x, y);
+                    x = textLayer.canvas.width;
+                    y = textLayer.canvas.height;
+                    textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);
+                    textLayer.fillStyle = 'white';
+                    textLayer.strokeStyle = 'black';
+                    textLayer.textAlign = 'right';
+                    textLayer.textBaseline = 'bottom';
+                    textLayer.fillText(text, x, y);
+                    textLayer.strokeStyle = '2'
+                    //textLayer.strokeText(text, x, y);
                     break;
                 }
                 case COMMAND_SHADOW_BLUR: {

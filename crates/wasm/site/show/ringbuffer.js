@@ -49,11 +49,8 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
 
   this.nextString = () => {
       const stringLengthInBytes = this.next();
-      const stringLengthInI32 = stringLengthInBytes / 4;
-      console.log('About to read text with length', stringLengthInBytes);
+      const stringLengthInI32 = Math.floor(stringLengthInBytes / 4) + (stringLengthInBytes % 4 == 0 ? 0 : 1);
       const stringArray = dataBuffer.slice(this._readerPosition(), this._readerPosition() + stringLengthInI32);
-      console.log('The string array', stringArray);
-
       unflushedReads += stringLengthInI32;
       return utf8decoder.decode(stringArray);
   };

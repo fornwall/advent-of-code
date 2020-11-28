@@ -177,33 +177,53 @@ function isDevicePixelContentBoxSupported() {
   }).catch(() => false);
 }
 
+function saveContextState(ctx){
+    const props = ['strokeStyle', 'fillStyle', 'globalAlpha', 'lineWidth',
+    'lineCap', 'lineJoin', 'miterLimit', 'lineDashOffset', 'shadowOffsetX',
+    'shadowOffsetY', 'shadowBlur', 'shadowColor', 'globalCompositeOperation',
+    'font', 'textAlign', 'textBaseline', 'direction', 'imageSmoothingEnabled'];
+    const state = {}
+    for (let prop of props) state[prop] = ctx[prop];
+    return state;
+}
+
+function restoreContextState(ctx, state){
+    for (let prop in state) ctx[prop] = state[prop];
+}
+
 setTimeout(async () => {
   const devicePixelContentBoxSupported = await isDevicePixelContentBoxSupported();
-  console.log('devicePixelContentBoxSupported', devicePixelContentBoxSupported);
   const observerOptions = devicePixelContentBoxSupported ? {box: ['device-pixel-content-box']} : {};
 
   new ResizeObserver((entries) => {
     resizeCount++;
 
-    // TODO: For other layer and composed canvas?
+    // TODO: For all layers, and reconstruct composed canvas?
+
+    // Save a copy of the canvas:
     const tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = canvas.width;
     tmpCanvas.height = canvas.height;
     tmpCanvas.getContext('2d').drawImage(canvas, 0, 0);
 
+    let ctx = canvas.getContext('2d');
+
+    // Resize canvas and restore context:
+    const savedState = saveContextState(ctx);
     canvas.width = devicePixelContentBoxSupported ? entries[0].devicePixelContentBoxSize[0].inlineSize : (canvas.clientWidth * window.devicePixelRatio);
     canvas.height = devicePixelContentBoxSupported ? entries[0].devicePixelContentBoxSize[0].blockSize : (canvas.clientHeight * window.devicePixelRatio);
+    restoreContextState(ctx, savedState);
 
-    // TODO: For other layer and composed canvas?
-    let ctx = canvas.getContext('2d');
+    // Paint the old copy (scaled):
     ctx.setTransform(canvas.width/tmpCanvas.width, 0, 0, canvas.height/tmpCanvas.height, 0, 0);
     ctx.drawImage(tmpCanvas, 0, 0);
+
+    // Setup the correct transform for future painting:
     ctx.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
 
+    // TODO: Only have layer canvas if used, compose canvas if recording.
     layer1Canvas.width = canvas.width;
     layer1Canvas.height = canvas.height;
-
-    // TODO: Only have a compose canvas if recording.
     composedCanvas.width = canvas.width;
     composedCanvas.height = canvas.height;
 
