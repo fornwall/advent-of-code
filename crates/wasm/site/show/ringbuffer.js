@@ -7,15 +7,17 @@ const HEADER_WRITE_OFFSET = 2;
 
 export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, length) {
   const headerBuffer = new Int32Array(sharedArrayBuffer, sharedArrayBufferOffset, HEADER_ELEMENTS_LENGTH); // FIXME: offset in bytes?
-  const dataBuffer = new Int32Array(sharedArrayBuffer, sharedArrayBufferOffset + HEADER_BYTE_LENGTH, (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT);
-  const dataFloatBuffer = new Float32Array(sharedArrayBuffer, sharedArrayBufferOffset + HEADER_BYTE_LENGTH, (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT);
+  const dataBuffer = new Int32Array(sharedArrayBuffer,
+      sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
+      (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT,
+  );
+  const dataFloatBuffer = new Float32Array(sharedArrayBuffer,
+      sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
+      (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT,
+  );
   let unflushedReads = 0;
 
   const utf8decoder = new TextDecoder();
-
-  this.report = () => {
-      console.info("readerOffset=" + headerBuffer[HEADER_READ_OFFSET] + ', unflushedReads=' + unflushedReads + ', writerOffset=' +headerBuffer[HEADER_WRITE_OFFSET] + ', length=' + dataBuffer.length);
-  }
 
   this.hasNext = () => {
       const writerOffset = Atomics.load(headerBuffer, HEADER_WRITE_OFFSET);
@@ -29,7 +31,7 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
 
   this.next = () => {
       if (!this.hasNext()) {
-          throw new Error("next() called with !hasNext(). readerOffset=" + headerBuffer[HEADER_READ_OFFSET] + ', unflushedReads=' + unflushedReads + ', writerOffset=' +headerBuffer[HEADER_WRITE_OFFSET]);
+          throw new Error('next() called despite !hasNext()');
       }
       const readerOffset = this._readerPosition() % dataBuffer.length;
       unflushedReads += 1;
@@ -38,7 +40,7 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
 
   this.nextFloat = () => {
       if (!this.hasNext()) {
-          throw new Error("nextFloat() called with !hasNext(). readerOffset=" + headerBuffer[HEADER_READ_OFFSET] + ', unflushedReads=' + unflushedReads + ', writerOffset=' +headerBuffer[HEADER_WRITE_OFFSET]);
+          throw new Error('nextFloat() called despite !hasNext()');
       }
       const readerOffset = this._readerPosition() % dataBuffer.length;
       unflushedReads += 1;
@@ -48,8 +50,11 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
   this.nextString = () => {
       const stringLengthInBytes = this.next();
       const stringLengthInI32 = stringLengthInBytes / 4;
-      unflushedReads += stringLengthInI32;
+      console.log('About to read text with length', stringLengthInBytes);
       const stringArray = dataBuffer.slice(this._readerPosition(), this._readerPosition() + stringLengthInI32);
+      console.log('The string array', stringArray);
+
+      unflushedReads += stringLengthInI32;
       return utf8decoder.decode(stringArray);
   };
 

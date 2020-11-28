@@ -21,9 +21,11 @@ const COMMAND_SET_ASPECT_RATIO = 18;
 const COMMAND_ARC = 19;
 const COMMAND_FILL = 20;
 const COMMAND_STROKE = 21;
+const COMMAND_LINE_TO = 22;
+const COMMAND_MOVE_TO = 23;
 
 export default function Renderer(message, layers, onNewAspectRatio) {
-    const { buffer, offset, length } = message.data;
+    const {buffer, offset, length} = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
     let ctx = layers[0];
@@ -38,7 +40,6 @@ export default function Renderer(message, layers, onNewAspectRatio) {
 
     this.render = () => {
         if (this.paused) return;
-        let end_of_frame = false;
         outer:
         while (reader.hasNext()) {
             const command = reader.next();
@@ -48,7 +49,6 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     break;
                 }
                 case COMMAND_END_FRAME: {
-                    end_of_frame = true;
                     break outer;
                 }
                 case COMMAND_BEGIN_PATH: {
@@ -80,7 +80,7 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     break;
                 }
                 case COMMAND_LINE_WIDTH: {
-                    ctx.lineWidth = reader.next();
+                    ctx.lineWidth = reader.nextFloat();
                     break;
                 }
                 case COMMAND_STROKE_SQUARE: {
@@ -94,10 +94,11 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     break;
                 }
                 case COMMAND_FILL_TEXT: {
+                    ctx.font = '0.04vw Arial';
                     const text = reader.nextString();
-                    console.log('Got text', text);
-                    const x = reader.nextFloat();
-                    const y = reader.nextFloat();
+                    let x = reader.nextFloat();
+                    let y = reader.nextFloat();
+                    console.log(`filling text '${text}' at ${x}, ${y}`);
                     ctx.fillText(text, x, y);
                     break;
                 }
@@ -131,7 +132,7 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                 case COMMAND_SET_ASPECT_RATIO: {
                     const newAspectRatio = reader.nextFloat();
                     onNewAspectRatio(newAspectRatio);
-                    break;
+                    return;
                 }
                 case COMMAND_FILL: {
                     ctx.fill();
@@ -141,11 +142,19 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     ctx.stroke();
                     break;
                 }
+                case COMMAND_LINE_TO: {
+                    ctx.lineTo(reader.nextFloat(), reader.nextFloat());
+                    break;
+                }
+                case COMMAND_MOVE_TO: {
+                    ctx.moveTo(reader.nextFloat(), reader.nextFloat());
+                    break;
+                }
                 default:
                     throw new Error('Unhandled command: ' + command + ', done=' + this.done);
             }
         }
 
         reader.wantMore();
-    }
+    };
 }
