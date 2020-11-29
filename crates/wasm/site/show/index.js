@@ -118,7 +118,9 @@ function startVisualization() {
             count++;
             const fontHeight = 80;
             const startScreenCanvases = recorder ? [ctx, composedCtx] : [ctx];
-            const startRenderingNow = (recorder && count == 10) || state.phase === 'startScreenClicked';
+            const startRenderingNow = (recorder && count == 10) ||
+              state.phase === 'startScreenClicked' ||
+              localStorage.getItem('debug_autostart');
 
             for (const c of startScreenCanvases) {
                 c.resetTransform();
