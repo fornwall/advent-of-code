@@ -25,7 +25,7 @@ const COMMAND_LINE_TO = 22;
 const COMMAND_MOVE_TO = 23;
 const COMMAND_PLAY_SOUND = 24;
 
-export default function Renderer(message, layers, onNewAspectRatio) {
+export default function Renderer(message, layers, onNewAspectRatio, audioPlayer) {
     const {buffer, offset, length} = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
@@ -163,7 +163,7 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                 }
                 case COMMAND_PLAY_SOUND: {
                     const soundId = reader.next();
-                    if (this.audioPlayer) this.audioPlayer.play(soundId);
+                    if (audioPlayer) audioPlayer.play(soundId);
                     break;
                 }
                 default:
@@ -173,8 +173,4 @@ export default function Renderer(message, layers, onNewAspectRatio) {
 
         reader.wantMore();
     };
-
-    // Needed for web audio interactions.
-    // this.paused = true;
-
 }

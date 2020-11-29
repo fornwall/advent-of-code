@@ -2,20 +2,17 @@ import Renderer from './renderer.js';
 import CanvasRecorder from './CanvasRecorder.js';
 import {createAudioPlayer} from './audio-player.js';
 
-let visualizerWorker = null;
+const visualizerWorker = new Worker('./worker-visualizer.js', {name: 'visualizer'});
 
-function terminateWorker() {
-  console.log('Terminating earlier worker');
-  visualizerWorker.terminated = true;
-  visualizerWorker.terminate();
-  visualizerWorker = null;
-}
+const state = {
+   phase: 'pageload',
+   params: {},
+};
 
 let hash = location.hash.substring(1);
-let params = {};
 for (let part of hash.split('&')) {
   let [key, value] = part.split('=');
-  params[key] = decodeURIComponent(value);
+  state.params[key] = decodeURIComponent(value);
 }
 
 function reloadWithParameters(parameters) {
@@ -24,9 +21,9 @@ function reloadWithParameters(parameters) {
 }
 
 function updateHash(parameters) {
-  Object.assign(params, parameters);
+  Object.assign(state.params, parameters);
   let hashString = '';
-  for (const [key, value] of Object.entries(params)) {
+  for (const [key, value] of Object.entries(state.params)) {
     if (hashString) hashString += '&';
     hashString += key + '=' + encodeURIComponent(value);
   }
@@ -38,11 +35,12 @@ const ctx = canvas.getContext('2d');
 
 const overlayCanvas = document.getElementById('layer1');
 const overlayCtx = overlayCanvas.getContext('2d');
+
 const composedCanvas = document.getElementById('composed');
 const composedCtx = composedCanvas.getContext('2d');
 
-if (params.aspectRatio) {
-  onNewAspectRatio(parseFloat(params.aspectRatio));
+if (state.params.aspectRatio) {
+  onNewAspectRatio(parseFloat(state.params.aspectRatio));
 }
 
 function onNewAspectRatio(ratio) {
@@ -57,27 +55,17 @@ function onNewAspectRatio(ratio) {
   }
 }
 
-function visualize() {
-  if (visualizerWorker) {
-    terminateWorker();
-  }
-  visualizerWorker = new Worker('./worker-visualizer.js', {name: 'visualizer'});
+function startVisualization() {
+  const {year, day, part, input} = state.params;
 
-  const {year, day, part, input} = params;
-  visualizerWorker.postMessage({year, day, part, input});
-  let myWorker = visualizerWorker;
-
-  myWorker.onmessage = (message) => {
+  visualizerWorker.onmessage = (message) => {
     if ('errorMessage' in message.data) {
-        window.alert('Error from worker:\n' + message.data.errorMessage);
+        window.alert('Error:\n\n' + message.data.errorMessage);
         window.location = '..';
         return;
     }
 
-    const renderer = new Renderer(message, [ctx, overlayCtx], onNewAspectRatio);
-    window.renderer = renderer;
-
-    const recorder = params.download ? new CanvasRecorder(composedCtx.canvas) : null;
+    const recorder = state.params.download ? new CanvasRecorder(composedCtx.canvas) : null;
     if (recorder) {
       recorder.start();
       document.getElementById('spinnerImage').src = 'recording.svg';
@@ -85,66 +73,82 @@ function visualize() {
       document.getElementById('spinner').style.visibility = 'hidden';
     }
 
-    function render(time) {
-      if (myWorker.terminated) {
-        console.log('[main] Aborting rendering from terminated');
-      } else if (renderer.done) {
-        console.log('[main] Rendering done');
-        if (recorder) {
-          recorder.stopAndSave(generateFileName('webm'));
-          updateHash({download: ''});
-        }
-        document.getElementById('spinner').style.visibility = 'visible';
-        document.getElementById('spinnerImage').src = 'replay.svg';
-        terminateWorker();
-      } else {
-        try {
-          renderer.render();
-          if (recorder) {
-              composedCtx.fillStyle = 'rgb(13, 12, 26)';
-              composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
-              // composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
-              composedCtx.drawImage(canvas, 0, 0);
-              composedCtx.drawImage(overlayCanvas, 0, 0);
-          }
-          if (renderer.delay) {
-            setTimeout(render, renderer.delay);
-            renderer.delay = false;
+    function startRendering() {
+        const renderer = new Renderer(message, [ctx, overlayCtx], onNewAspectRatio, state.audioPlayer);
+        window.renderer = renderer;
+
+        function render(time) {
+          if (renderer.done) {
+            console.log('[main] Rendering done');
+            if (recorder) {
+              recorder.stopAndSave(generateFileName('webm'));
+              updateHash({download: ''});
+            }
+            document.getElementById('spinner').style.visibility = 'visible';
+            document.getElementById('spinnerImage').src = 'replay.svg';
           } else {
-            requestAnimationFrame(render);
+            try {
+              renderer.render();
+              if (recorder) {
+                  composedCtx.fillStyle = 'rgb(13, 12, 26)';
+                  composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+                  // composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+                  composedCtx.drawImage(canvas, 0, 0);
+                  composedCtx.drawImage(overlayCanvas, 0, 0);
+              }
+              if (renderer.delay) {
+                setTimeout(render, renderer.delay);
+                renderer.delay = false;
+              } else {
+                requestAnimationFrame(render);
+              }
+            } catch (e) {
+              console.error('Error when rendering', e);
+              alert('Error when rendering: ' + e.message);
+            }
           }
-        } catch (e) {
-          console.error('Error when rendering', e);
-          alert('Error when rendering: ' + e.message);
         }
-      }
+
+        requestAnimationFrame(render);
     }
 
-    if (recorder) {
-        let count = 0;
-        function renderStartScreen() {
+    let count = 0;
+    state.phase = 'onStartScreen';
+    function renderStartScreen() {
             count++;
-            console.log('count', count);
-            composedCtx.fillStyle = 'rgb(13, 12, 26)';
-            composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
-            composedCtx.textAlign = 'center';
-            composedCtx.textBaseline = 'middle';
-            composedCtx.fillStyle = 'white';
             const fontHeight = 80;
-            composedCtx.font = fontHeight + 'px Monospace';
-            composedCtx.fillText(`Advent of Code ${year}`, composedCtx.canvas.width/2, composedCtx.canvas.height/2 - fontHeight);
-            composedCtx.fillText(`Day ${day} Part ${part}`, composedCtx.canvas.width/2, composedCtx.canvas.height/2 + fontHeight);
-            if (count == 10) {
-                requestAnimationFrame(render);
+            const startScreenCanvases = recorder ? [ctx, composedCtx] : [ctx];
+            const startRenderingNow = (recorder && count == 10) || state.phase === 'startScreenClicked';
+
+            for (const c of startScreenCanvases) {
+                c.resetTransform();
+                if (startRenderingNow) {
+                    c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+                } else {
+                    c.fillStyle = 'rgb(13, 12, 26)';
+                    c.fillRect(0, 0, c.canvas.width, c.canvas.height);
+                    c.textAlign = 'center';
+                    c.textBaseline = 'middle';
+                    c.fillStyle = 'white';
+                    c.font = fontHeight + 'px Monospace';
+                    c.fillText(`Advent of Code ${year}`, c.canvas.width/2, c.canvas.height/2 - fontHeight, c.canvas.width);
+                    c.fillText(`Day ${day} Part ${part}`, c.canvas.width/2, c.canvas.height/2 + fontHeight, c.canvas.width);
+                }
+                if (c == ctx) c.setTransform(c.canvas.width, 0, 0, c.canvas.width, 0, 0);
+            }
+
+            if (startRenderingNow) {
+                console.log('[main] Starting rendering...');
+                state.phase = 'rendering';
+                startRendering();
             } else {
                 requestAnimationFrame(renderStartScreen);
             }
-        }
-        requestAnimationFrame(renderStartScreen);
-    } else {
-        requestAnimationFrame(render);
     }
+    requestAnimationFrame(renderStartScreen);
   };
+
+  visualizerWorker.postMessage({year, day, part, input});
 }
 
 async function toggleFullScreen() {
@@ -153,20 +157,29 @@ async function toggleFullScreen() {
   } else {
     document.documentElement.requestFullscreen();
     if (window.aspectRatio && window.aspectRatio > 1.0) {
-      await window.screen.orientation.lock('landscape-primary');
+      try {
+        await window.screen.orientation.lock('landscape-primary');
+      } catch (e) {}
     }
   }
 }
 
 async function togglePause() {
-  if (window.renderer.paused && !window.renderer.audioPlayer) {
-    window.renderer.audioPlayer = await createAudioPlayer('./bounce.mp4');
+  if (state.phase === 'onStartScreen') {
+      state.audioPlayer = await createAudioPlayer('./bounce.mp4');
+      state.phase = 'startScreenClicked';
+      return;
   }
+
+  if (window.renderer.done) {
+     reloadWithParameters({download: ''});
+  }
+
   window.renderer.paused = !window.renderer.paused;
 }
 
 function generateFileName(extension) {
-  const {year, day, part} = params;
+  const {year, day, part} = state.params;
   return `Advent-of-Code-${year}-Day-${day}-Part-${part}.${extension}`;
 }
 
@@ -199,7 +212,7 @@ document.body.addEventListener('keyup', async(e) => {
       await togglePause();
       break;
     case 'r': // Restart.
-      visualize();
+      reloadWithParameters({download: ''});
       break;
     case 'v': // Video.
       reloadWithParameters({download: true});
@@ -247,38 +260,51 @@ setTimeout(async() => {
     resizeCount++;
 
     // Save a copy of the canvas:
-    const tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width = canvas.width;
-    tmpCanvas.height = canvas.height;
-    tmpCanvas.getContext('2d').drawImage(canvas, 0, 0);
+    // TODO: We should store the status text and re-render to avoid alpha problem and blurry text:
+    for (const c of [overlayCtx, ctx]) {
+      composedCanvas.width = canvas.width;
+      composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+      composedCtx.drawImage(c.canvas, 0, 0);
 
-    let ctx = canvas.getContext('2d');
+      // Resize canvas and restore context:
+      const savedState = saveContextState(c);
+      const newWidth = devicePixelContentBoxSupported ?
+            entries[0].devicePixelContentBoxSize[0].inlineSize :
+            (canvas.clientWidth * window.devicePixelRatio);
+      const newHeight = devicePixelContentBoxSupported ?
+            entries[0].devicePixelContentBoxSize[0].blockSize :
+            (canvas.clientHeight * window.devicePixelRatio);
 
-    // Resize canvas and restore context:
-    const savedState = saveContextState(ctx);
-    canvas.width = devicePixelContentBoxSupported ?
-          entries[0].devicePixelContentBoxSize[0].inlineSize :
-          (canvas.clientWidth * window.devicePixelRatio);
-    canvas.height = devicePixelContentBoxSupported ?
-          entries[0].devicePixelContentBoxSize[0].blockSize :
-          (canvas.clientHeight * window.devicePixelRatio);
-    restoreContextState(ctx, savedState);
+      if (c.canvas.width == newWidth && c.canvas.height == newHeight) {
+          console.log('Ignoring resize with same size');
+          return;
+      }
 
-    // Paint the old copy (scaled):
-    ctx.setTransform(canvas.width/tmpCanvas.width, 0, 0, canvas.height/tmpCanvas.height, 0, 0);
-    ctx.drawImage(tmpCanvas, 0, 0);
+      c.canvas.width = newWidth;
+      c.canvas.height = newHeight;
+      restoreContextState(c, savedState);
 
-    // Setup the correct transform for future painting:
-    ctx.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
+      // Clear the old content, if any:
+      c.resetTransform();
+      c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+      // Paint the old copy (scaled):
+      c.setTransform(c.canvas.width/composedCanvas.width, 0, 0, c.canvas.height/composedCanvas.height, 0, 0);
+      c.drawImage(composedCanvas, 0, 0);
+
+      // Setup the correct transform for future painting:
+      if (c == ctx) {
+          c.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
+      } else {
+          c.resetTransform();
+      }
+    }
 
     // TODO: Only have layer canvas if used, compose canvas if recording.
-    overlayCanvas.width = canvas.width;
-    overlayCanvas.height = canvas.height;
     composedCanvas.width = canvas.width;
     composedCanvas.height = canvas.height;
 
     if (resizeCount == 1) {
-        setTimeout(visualize, 500);
+        startVisualization();
     }
   }).observe(canvas, observerOptions);
 }, 0);
