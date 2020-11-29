@@ -1,20 +1,25 @@
 const worker = new Worker('./worker.js', {name: 'solver'});
 
-const runWasmElement = document.getElementById('run-wasm');
-const runApiElement = document.getElementById('run-api');
 const yearElement = document.getElementById('year');
 const dayElement = document.getElementById('day');
 const partElement = document.getElementById('part');
 const inputElement = document.getElementById('input');
+
 const outputElement = document.getElementById('output');
+
 const apiExecutionTimeElement = document.getElementById('api-execution-time');
 const wasmExecutionTimeElement = document.getElementById('wasm-execution-time');
+
+const runWasmElement = document.getElementById('run-wasm');
+const runApiElement = document.getElementById('run-api');
+const showElement = document.getElementById('run-visualizer');
 
 worker.onmessage = (e) => {
   if ('wasmWorking' in e.data) {
     if (!e.data.wasmWorking) {
       runWasmElement.disabled = true;
       runWasmElement.title = 'Wasm is not working - check console logs';
+      showElement.disabled = true;
     }
   } else {
     const {isError, output, wasm, executionTime} = e.data;
@@ -110,9 +115,7 @@ async function clipboardReadMayWork() {
 function run() {
   runApiElement.addEventListener('click', () => execute(false));
   runWasmElement.addEventListener('click', () => execute(true));
-  document.getElementById('run-visualizer').addEventListener('click', visualize);
-
-  [yearElement, dayElement, partElement, inputElement].forEach((element) => element.addEventListener('change', storeForm));
+  showElement.addEventListener('click', visualize);
 
   document.getElementById('open-input').addEventListener('click', () => {
     const link = `https://adventofcode.com/${yearElement.value}/day/${dayElement.value}/input`;
@@ -144,8 +147,16 @@ function run() {
   fetch('gist-mapping.json')
       .then((response) => response.json())
       .then((mapping) => {
+        function isVisualisationEnabled() {
+            return !runWasmElement.disabled && !!mapping?.[yearElement.value]?.[dayElement.value]?.['visualization'];
+        }
+        showElement.disabled = !isVisualisationEnabled();
+        [yearElement, dayElement].forEach((element) => element.addEventListener('change', () => {
+           showElement.disabled = !isVisualisationEnabled();
+        }));
+
         document.getElementById('open-playground').addEventListener('click', () => {
-          const gistId = mapping?.[yearElement.value]?.[dayElement.value];
+          const gistId = mapping?.[yearElement.value]?.[dayElement.value]?.['gist'];
           if (gistId) {
             const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=${gistId}`;
             window.open(link);
@@ -154,6 +165,8 @@ function run() {
           }
         });
       });
+
+  [yearElement, dayElement, partElement, inputElement].forEach((element) => element.addEventListener('change', storeForm));
 }
 
 run();
