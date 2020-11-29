@@ -78,6 +78,8 @@ pub trait Painter {
 
     fn await_forever(&mut self);
 
+    fn play_sound(&mut self, sound_id: i32);
+
     fn log(&mut self, text: &str);
 }
 
@@ -137,4 +139,6 @@ impl Painter for MockPainter {
     fn await_forever(&mut self) {}
 
     fn log(&mut self, _text: &str) {}
+
+    fn play_sound(&mut self, _sound_id: i32) {}
 }

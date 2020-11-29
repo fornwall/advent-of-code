@@ -25,6 +25,7 @@ enum Command {
     Stroke,
     LineTo,
     MoveTo,
+    PlaySound,
 }
 
 pub struct ToBufferDrawer {
@@ -177,6 +178,11 @@ impl Painter for ToBufferDrawer {
         self.output_buffer.write(Command::Done as i32);
         self.output_buffer.flush();
         self.output_buffer.wait_forever();
+    }
+
+    fn play_sound(&mut self, sound_id: i32) {
+        self.output_buffer.write(Command::PlaySound as i32);
+        self.output_buffer.write(sound_id);
     }
 
     fn log(&mut self, text: &str) {
