@@ -43,11 +43,17 @@ const composedCanvas = document.getElementById('composed');
 const composedCtx = composedCanvas.getContext('2d');
 
 if (params.aspectRatio) {
+  console.log('using initial aspect ratio');
   onNewAspectRatio(parseFloat(params.aspectRatio));
 }
 
 function onNewAspectRatio(ratio) {
+  if (window.aspectRatio == ratio) {
+    return;
+  }
+  console.log(`changing aspect ratio - from ${window.aspectRatio} to ${ratio}`);
   window.aspectRatio = ratio;
+  updateHash({aspectRatio});
   for (let canvas of document.querySelectorAll('canvas')) {
     canvas.style.height = (100 / window.aspectRatio) + 'vw';
     canvas.style.maxWidth = (100 * window.aspectRatio) + 'vh';
@@ -88,19 +94,19 @@ function visualize() {
       } else if (renderer.done) {
         console.log('[main] Rendering done');
         if (recorder) {
-          recorder.stopAndSave(`Advent-of-Code-${year}-Day-${day}-Part-${part}.webm`);
+          recorder.stopAndSave(generateFileName('webm'));
           updateHash({download: ''});
         }
-        // document.getElementById('spinner').style.visibility = 'visible';
-        // document.getElementById('spinnerImage').src = 'replay.svg';
-        canvas.classList.remove('slide-in');
-        canvas.classList.add('slide-out');
+        document.getElementById('spinner').style.visibility = 'visible';
+        document.getElementById('spinnerImage').src = 'replay.svg';
         terminateWorker();
       } else {
         try {
           renderer.render();
           if (recorder) {
-              composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+              composedCtx.fillStyle = 'rgb(13, 12, 26)';
+              composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+              // composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
               composedCtx.drawImage(canvas, 0, 0);
               composedCtx.drawImage(layer1Canvas, 0, 0);
           }
@@ -117,7 +123,30 @@ function visualize() {
       }
     }
 
-    requestAnimationFrame(render);
+    if (recorder) {
+        let count = 0;
+        function renderStartScreen() {
+            count++;
+            console.log('count', count);
+            composedCtx.fillStyle = 'rgb(13, 12, 26)';
+            composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+            composedCtx.textAlign = 'center';
+            composedCtx.textBaseline = 'middle';
+            composedCtx.fillStyle = 'white';
+            const fontHeight = 80;
+            composedCtx.font = fontHeight + 'px Monospace';
+            composedCtx.fillText(`Advent of Code ${year}`, composedCtx.canvas.width/2, composedCtx.canvas.height/2 - fontHeight);
+            composedCtx.fillText(`Day ${day} Part ${part}`, composedCtx.canvas.width/2, composedCtx.canvas.height/2 + fontHeight);
+            if (count == 10) {
+                requestAnimationFrame(render);
+            } else {
+                requestAnimationFrame(renderStartScreen);
+            }
+        }
+        requestAnimationFrame(renderStartScreen);
+    } else {
+        requestAnimationFrame(render);
+    }
   };
 }
 
@@ -126,9 +155,6 @@ async function toggleFullScreen() {
     document.exitFullscreen();
   } else {
     document.documentElement.requestFullscreen();
-    // if ('orientation' in window.screen)
-    // TODO: Only lock orientation if non-square aspect ratio?
-
     if (window.aspectRatio && window.aspectRatio > 1.0) {
       await window.screen.orientation.lock('landscape-primary');
     }
@@ -139,6 +165,24 @@ function togglePause() {
   window.renderer.paused = !window.renderer.paused;
 }
 
+function generateFileName(extension) {
+  const {year, day, part, input} = params;
+  return `Advent-of-Code-${year}-Day-${day}-Part-${part}.${extension}`;
+}
+
+function downloadImage() {
+    composedCtx.fillStyle = 'rgb(13, 12, 26)';
+    composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
+    composedCtx.drawImage(canvas, 0, 0);
+    composedCtx.drawImage(layer1Canvas, 0, 0);
+
+    var url = composedCtx.canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = generateFileName('png');
+    a.click();
+}
+
 document.body.addEventListener('keyup', (e) => {
   switch (e.key) {
     case 'Escape':
@@ -147,22 +191,24 @@ document.body.addEventListener('keyup', (e) => {
     case 'Enter':
       toggleFullScreen();
       break;
-    case 'p':
+    case 'i': // Image.
+      downloadImage();
+      break;
+    case 'p': // Pause.
     case ' ':
       togglePause();
       break;
-    case 'r':
+    case 'r': // Restart.
       visualize();
       break;
-    case 's':
+    case 'v': // Video.
       reloadWithParameters({download: true});
       break;
   }
 });
 
-document.body.addEventListener('dblclick', toggleFullScreen);
-
-let resizeCount = 0;
+document.documentElement.addEventListener('click', togglePause);
+document.documentElement.addEventListener('dblclick', toggleFullScreen);
 
 // https://web.dev/device-pixel-content-box/
 function isDevicePixelContentBoxSupported() {
@@ -192,6 +238,8 @@ function restoreContextState(ctx, state){
 setTimeout(async () => {
   const devicePixelContentBoxSupported = await isDevicePixelContentBoxSupported();
   const observerOptions = devicePixelContentBoxSupported ? {box: ['device-pixel-content-box']} : {};
+
+  let resizeCount = 0;
 
   new ResizeObserver((entries) => {
     resizeCount++;
@@ -225,7 +273,9 @@ setTimeout(async () => {
     composedCanvas.width = canvas.width;
     composedCanvas.height = canvas.height;
 
-    if (resizeCount == 1) visualize();
+    if (resizeCount == 1) {
+        setTimeout(visualize, 500);
+    }
   }).observe(canvas, observerOptions);
 }, 0);
 

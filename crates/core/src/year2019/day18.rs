@@ -275,7 +275,6 @@ fn shortest_path(
                 drawer.fill_style_rgb(80, 0, 80);
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
                 drawer.meta_delay(50);
-                drawer.end_frame();
 
                 /*
                 drawer.meta_switch_layer(1);

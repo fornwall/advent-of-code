@@ -191,6 +191,27 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let first_wire_segments: Vec<LineSegment> =
         parse_wire_points(first_line).collect::<Result<_, _>>()?;
 
+    let mut best = std::u32::MAX;
+    let origin = Vector { x: 0, y: 0 };
+
+    for line_segment in parse_wire_points(second_line) {
+        let line_segment = line_segment?;
+        for first_line_segment in &first_wire_segments {
+            if let Some(intersection) = first_line_segment.intersection_with(line_segment) {
+                // "While the wires do technically cross right at the central port
+                // where they both start, this point does not count":
+                if intersection.point != origin {
+                    let intersection_value = if input.is_part_one() {
+                        intersection.point.distance_from(origin)
+                    } else {
+                        intersection.combined_steps
+                    };
+                    best = cmp::min(best, intersection_value);
+                }
+            }
+        }
+    }
+
     #[cfg(feature = "visualization")]
     {
         use crate::painter::PainterRef;
@@ -219,6 +240,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let grid_display_width = 1.0 / grid_width as f64;
         let grid_display_height = (1.0 / grid_height as f64) / input.painter.aspect_ratio();
 
+        // Mark origin:
+        input.painter.fill_style_rgb(255, 255, 0);
+        input.painter.fill_circle(
+            -min_x as f64 * grid_display_width,
+            -min_y as f64 * grid_display_height,
+            grid_display_width * 200.,
+        );
+
         let mut drawn_lines1: Vec<LineSegment> = Vec::new();
         let mut drawn_lines2: Vec<LineSegment> = Vec::new();
 
@@ -244,18 +273,37 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let mut first = true;
         for (l1, l2) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
             draw_line(&mut input.painter, &l1, 255, 0, 0);
-            draw_line(&mut input.painter, &l2, 0, 255, 0);
+            draw_line(&mut input.painter, &l2, 0x5b, 0xce, 0xf3);
 
             drawn_lines1.push(*l1);
             drawn_lines2.push(*l2);
 
             let mut intersection_count = 0;
+            let mut current_best = std::u32::MAX;
             for d1 in &drawn_lines1 {
                 for d2 in &drawn_lines2 {
                     if let Some(intersection) = d1.intersection_with(*d2) {
+                        let is_best = if intersection.point != origin {
+                            let intersection_value = if input.is_part_one() {
+                                intersection.point.distance_from(origin)
+                            } else {
+                                intersection.combined_steps
+                            };
+                            current_best = std::cmp::min(current_best, intersection_value);
+                            intersection_value == best
+                        } else {
+                            false
+                        };
+
                         intersection_count += 1;
-                        input.painter.line_width(grid_display_width * 10.);
-                        input.painter.stroke_style_rgb(255, 255, 255);
+                        input
+                            .painter
+                            .line_width(grid_display_width * if is_best { 30. } else { 10. });
+                        if is_best {
+                            input.painter.stroke_style_rgb(255, 255, 255);
+                        } else {
+                            input.painter.stroke_style_rgb(0x94, 0x84, 0x84);
+                        }
                         input.painter.stroke_circle(
                             (intersection.point.x - min_x) as f64 * grid_display_width,
                             (intersection.point.y - min_y) as f64 * grid_display_height,
@@ -266,9 +314,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             }
 
             input.painter.status_text(&format!(
-                "Line segments: {} Intersections: {}",
+                "Line segments: {: >3}   Intersections: {: >2}   Best: {: >4}",
                 drawn_lines1.len(),
-                intersection_count
+                intersection_count,
+                if current_best == std::u32::MAX {
+                    "".to_string()
+                } else {
+                    current_best.to_string()
+                },
             ));
 
             if first {
@@ -276,27 +329,6 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 input.painter.end_frame();
             } else {
                 input.painter.meta_delay(100);
-            }
-        }
-    }
-
-    let mut best = std::u32::MAX;
-    let origin = Vector { x: 0, y: 0 };
-
-    for line_segment in parse_wire_points(second_line) {
-        let line_segment = line_segment?;
-        for first_line_segment in &first_wire_segments {
-            if let Some(intersection) = first_line_segment.intersection_with(line_segment) {
-                // "While the wires do technically cross right at the central port
-                // where they both start, this point does not count":
-                if intersection.point != origin {
-                    let intersection_value = if input.is_part_one() {
-                        intersection.point.distance_from(origin)
-                    } else {
-                        intersection.combined_steps
-                    };
-                    best = cmp::min(best, intersection_value);
-                }
             }
         }
     }

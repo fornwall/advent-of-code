@@ -52,7 +52,7 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
       const stringLengthInI32 = Math.floor(stringLengthInBytes / 4) + (stringLengthInBytes % 4 == 0 ? 0 : 1);
       const stringArray = dataBuffer.slice(this._readerPosition(), this._readerPosition() + stringLengthInI32);
       unflushedReads += stringLengthInI32;
-      return utf8decoder.decode(stringArray);
+      return utf8decoder.decode(stringArray).substring(0, stringLengthInBytes);
   };
 
   this.wantMore = () => {

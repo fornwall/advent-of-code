@@ -92,13 +92,24 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     let textLayer = layers[1];
                     textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);
 
-                    textLayer.font = '40px Monospace';
+                    const textHeight = 60;
+                    const textWidth = textLayer.measureText(text).width;
+
+                    const xOffset = 4;
+                    const yOffset = 4;
+
+                    const boxMargin = 4;
+                    textLayer.shadowColor = 'black';
+                    textLayer.shadowBlur = 15;
+                    textLayer.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    textLayer.fillRect(xOffset-boxMargin, yOffset-boxMargin, textWidth+boxMargin*2, textHeight+boxMargin*2);
+
+                    textLayer.font = textHeight + 'px Monospace';
                     textLayer.fillStyle = 'white';
                     textLayer.strokeStyle = 'black';
                     textLayer.textBaseline = 'top';
-                    const x = 4;
-                    const maxWidth = textLayer.canvas.width - x;
-                    textLayer.fillText(text, 4, 4, maxWidth);
+                    const maxWidth = textLayer.canvas.width - xOffset;
+                    textLayer.fillText(text, xOffset, yOffset, maxWidth);
                     break;
                 }
                 case COMMAND_SHADOW_BLUR: {

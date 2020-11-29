@@ -21,8 +21,13 @@ impl<'a> Renderer<'a> {
         self.tiles.insert(location, value);
     }
 
-    pub fn render(&mut self, _current_score: Word) {
+    pub fn render(&mut self, current_score: Word, iteration: i32) {
         self.painter.clear();
+
+        self.painter.status_text(&format!(
+            "Score: {: >4}   Iteration: {: >4}",
+            current_score, iteration
+        ));
 
         let mut min_x = Word::MAX;
         let mut max_x = Word::MIN;

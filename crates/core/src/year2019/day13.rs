@@ -27,8 +27,15 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
 
     #[cfg(feature = "visualization")]
     let mut renderer = Renderer::new(&mut input.painter);
+    #[cfg(feature = "visualization")]
+    let mut iteration = 0;
 
     loop {
+        #[cfg(feature = "visualization")]
+        {
+            iteration += 1;
+        }
+
         let output = program.run_for_output()?;
         output.chunks_exact(3).for_each(|chunk| {
             let (x, y, third) = (chunk[0], chunk[1], chunk[2]);
@@ -47,7 +54,7 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
         });
 
         #[cfg(feature = "visualization")]
-        renderer.render(current_score);
+        renderer.render(current_score, iteration);
 
         if program.is_halted() {
             break;
