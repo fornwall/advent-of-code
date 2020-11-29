@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-python"
-version = "2019.12.158"
+version = "2019.12.159"
 keywords = ["advent-of-code", "python", "pyo3"]
 categories = ["algorithms", "rust-patterns"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
