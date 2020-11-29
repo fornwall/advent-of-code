@@ -23,6 +23,7 @@ const COMMAND_FILL = 20;
 const COMMAND_STROKE = 21;
 const COMMAND_LINE_TO = 22;
 const COMMAND_MOVE_TO = 23;
+const COMMAND_PLAY_SOUND = 24;
 
 export default function Renderer(message, layers, onNewAspectRatio) {
     const {buffer, offset, length} = message.data;
@@ -160,6 +161,12 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                     ctx.moveTo(reader.nextFloat(), reader.nextFloat());
                     break;
                 }
+                case COMMAND_PLAY_SOUND: {
+                    const soundId = reader.next();
+                    console.log('playing sound', soundId, ' with audio player', this.audioPlayer);
+                    if (this.audioPlayer) this.audioPlayer.play(soundId);
+                    break;
+                }
                 default:
                     throw new Error('Unhandled command: ' + command + ', done=' + this.done);
             }
@@ -167,4 +174,8 @@ export default function Renderer(message, layers, onNewAspectRatio) {
 
         reader.wantMore();
     };
+
+    // Needed for web audio interactions.
+    // this.paused = true;
+
 }
