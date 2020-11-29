@@ -6,6 +6,7 @@ pub struct Renderer<'a> {
     tiles: HashMap<(Word, Word), Word>,
     painter: &'a mut PainterRef,
     aspect_ratio_sent: bool,
+    explosion: bool,
 }
 
 impl<'a> Renderer<'a> {
@@ -14,15 +15,22 @@ impl<'a> Renderer<'a> {
             tiles: HashMap::new(),
             painter,
             aspect_ratio_sent: false,
+            explosion: false,
         }
     }
 
     pub fn add_tile(&mut self, location: (Word, Word), value: Word) {
-        self.tiles.insert(location, value);
+        let exploded_now = self.tiles.insert(location, value) == Some(2);
+        self.explosion = self.explosion || exploded_now;
     }
 
     pub fn render(&mut self, current_score: Word, iteration: i32) {
         self.painter.clear();
+
+        if self.explosion {
+            self.explosion = false;
+            self.painter.play_sound(0);
+        }
 
         self.painter.status_text(&format!(
             "Score: {: >4}   Iteration: {: >4}",
@@ -78,10 +86,10 @@ impl<'a> Renderer<'a> {
                         draw_rect(255, 0, 0, &mut self.painter);
                     }
                     Some(2) => {
+                        // Thing to blow up.
                         let r = (y * 11) % 256;
                         let g = 255 - (y * 3) % 256;
                         let b = 255 - (y * 9) % 256;
-                        // Thing to blow up.
                         draw_rect(r as i32, g as i32, b as i32, &mut self.painter);
                     }
                     Some(3) => {

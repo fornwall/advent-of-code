@@ -93,6 +93,7 @@ pub fn solve(
         (2017, 13, 1) => to_stringer(year2017::day13::part1, input_string),
         (2017, 13, 2) => to_stringer(year2017::day13::part2, input_string),
         (2017, 14, _) => to_stringer_input(year2017::day14::solve, &mut input),
+        (2017, 15, _) => to_stringer_input(year2017::day15::solve, &mut input),
         (2018, 1, 1) => to_stringer(year2018::day01::part1, input_string),
         (2018, 1, 2) => to_stringer(year2018::day01::part2, input_string),
         (2018, 2, 1) => to_stringer(year2018::day02::part1, input_string),

@@ -1,5 +1,6 @@
 import Renderer from './renderer.js';
 import CanvasRecorder from './CanvasRecorder.js';
+import {createAudioPlayer} from './audio-player.js';
 
 let visualizerWorker = null;
 
@@ -30,7 +31,6 @@ function updateHash(parameters) {
     if (hashString) hashString += '&';
     hashString += key + '=' + encodeURIComponent(value);
   }
-  console.log('updated params: ', params.download);
   window.location.hash = hashString;
 }
 
@@ -43,7 +43,6 @@ const composedCanvas = document.getElementById('composed');
 const composedCtx = composedCanvas.getContext('2d');
 
 if (params.aspectRatio) {
-  console.log('using initial aspect ratio');
   onNewAspectRatio(parseFloat(params.aspectRatio));
 }
 
@@ -51,7 +50,6 @@ function onNewAspectRatio(ratio) {
   if (window.aspectRatio == ratio) {
     return;
   }
-  console.log(`changing aspect ratio - from ${window.aspectRatio} to ${ratio}`);
   window.aspectRatio = ratio;
   updateHash({aspectRatio});
   for (let canvas of document.querySelectorAll('canvas')) {
@@ -161,7 +159,10 @@ async function toggleFullScreen() {
   }
 }
 
-function togglePause() {
+async function togglePause() {
+  if (window.renderer.paused && !window.renderer.audioPlayer) {
+    window.renderer.audioPlayer = await createAudioPlayer('./bounce.mp4');
+  }
   window.renderer.paused = !window.renderer.paused;
 }
 
@@ -183,7 +184,7 @@ function downloadImage() {
     a.click();
 }
 
-document.body.addEventListener('keyup', (e) => {
+document.body.addEventListener('keyup', async (e) => {
   switch (e.key) {
     case 'Escape':
       window.location = '..';
@@ -196,7 +197,7 @@ document.body.addEventListener('keyup', (e) => {
       break;
     case 'p': // Pause.
     case ' ':
-      togglePause();
+      await togglePause();
       break;
     case 'r': // Restart.
       visualize();

@@ -15,6 +15,9 @@ sessions_file = f"{Path.home()}/.advent-of-code.json"
 with open(sessions_file) as f:
     SESSIONS = json.load(f)
 
+# Prevent webbrowser.open, which aocd calls, from opening a browser:
+os.environ["BROWSER"] = "true"
+
 if "AOC_YEAR" in os.environ:
     years_string = os.environ['AOC_YEAR']
     if "-" in years_string:

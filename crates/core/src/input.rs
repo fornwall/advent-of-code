@@ -21,6 +21,15 @@ impl Input {
         matches!(self.part, Part::One)
     }
 
+    pub fn part_values<T>(&self, if_part_one: T, if_part_two: T) -> T {
+        // See https://github.com/rust-lang/rust/issues/66753 for missing_const_for_fn.
+        #![allow(clippy::missing_const_for_fn)]
+        match self.part {
+            Part::One => if_part_one,
+            Part::Two => if_part_two,
+        }
+    }
+
     #[cfg(test)]
     pub fn part_one(text: &str) -> Self {
         Self {

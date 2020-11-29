@@ -163,7 +163,6 @@ export default function Renderer(message, layers, onNewAspectRatio) {
                 }
                 case COMMAND_PLAY_SOUND: {
                     const soundId = reader.next();
-                    console.log('playing sound', soundId, ' with audio player', this.audioPlayer);
                     if (this.audioPlayer) this.audioPlayer.play(soundId);
                     break;
                 }
