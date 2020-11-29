@@ -151,6 +151,6 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
 
         gist_mapping[year_str][day_str]['visualization'] = supports_visualization
 
-if True or not dry_run:
+if not dry_run:
     with open(MAPPING_FILE_NAME, "w") as outfile:
         json.dump(gist_mapping, outfile, indent=2)
