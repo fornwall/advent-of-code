@@ -13,7 +13,6 @@ function terminateWorker() {
 
 let hash = location.hash.substring(1);
 let params = {};
-
 for (let part of hash.split('&')) {
   let [key, value] = part.split('=');
   params[key] = decodeURIComponent(value);
@@ -37,8 +36,8 @@ function updateHash(parameters) {
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 
-const layer1Canvas = document.getElementById('layer1');
-const layer1Ctx = layer1Canvas.getContext('2d');
+const overlayCanvas = document.getElementById('layer1');
+const overlayCtx = overlayCanvas.getContext('2d');
 const composedCanvas = document.getElementById('composed');
 const composedCtx = composedCanvas.getContext('2d');
 
@@ -75,7 +74,7 @@ function visualize() {
         return;
     }
 
-    const renderer = new Renderer(message, [ctx, layer1Ctx], onNewAspectRatio);
+    const renderer = new Renderer(message, [ctx, overlayCtx], onNewAspectRatio);
     window.renderer = renderer;
 
     const recorder = params.download ? new CanvasRecorder(composedCtx.canvas) : null;
@@ -106,7 +105,7 @@ function visualize() {
               composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
               // composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
               composedCtx.drawImage(canvas, 0, 0);
-              composedCtx.drawImage(layer1Canvas, 0, 0);
+              composedCtx.drawImage(overlayCanvas, 0, 0);
           }
           if (renderer.delay) {
             setTimeout(render, renderer.delay);
@@ -167,7 +166,7 @@ async function togglePause() {
 }
 
 function generateFileName(extension) {
-  const {year, day, part, input} = params;
+  const {year, day, part} = params;
   return `Advent-of-Code-${year}-Day-${day}-Part-${part}.${extension}`;
 }
 
@@ -175,16 +174,16 @@ function downloadImage() {
     composedCtx.fillStyle = 'rgb(13, 12, 26)';
     composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
     composedCtx.drawImage(canvas, 0, 0);
-    composedCtx.drawImage(layer1Canvas, 0, 0);
+    composedCtx.drawImage(overlayCanvas, 0, 0);
 
-    var url = composedCtx.canvas.toDataURL('image/png');
+    const url = composedCtx.canvas.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = url;
     a.download = generateFileName('png');
     a.click();
 }
 
-document.body.addEventListener('keyup', async (e) => {
+document.body.addEventListener('keyup', async(e) => {
   switch (e.key) {
     case 'Escape':
       window.location = '..';
@@ -222,21 +221,23 @@ function isDevicePixelContentBoxSupported() {
   }).catch(() => false);
 }
 
-function saveContextState(ctx){
+function saveContextState(ctx) {
     const props = ['strokeStyle', 'fillStyle', 'globalAlpha', 'lineWidth',
     'lineCap', 'lineJoin', 'miterLimit', 'lineDashOffset', 'shadowOffsetX',
     'shadowOffsetY', 'shadowBlur', 'shadowColor', 'globalCompositeOperation',
     'font', 'textAlign', 'textBaseline', 'direction', 'imageSmoothingEnabled'];
-    const state = {}
+    const state = {};
     for (let prop of props) state[prop] = ctx[prop];
     return state;
 }
 
-function restoreContextState(ctx, state){
-    for (let prop in state) ctx[prop] = state[prop];
+function restoreContextState(ctx, state) {
+    for (const [key, value] of Object.entries(state)) {
+        ctx[key] = value;
+    }
 }
 
-setTimeout(async () => {
+setTimeout(async() => {
   const devicePixelContentBoxSupported = await isDevicePixelContentBoxSupported();
   const observerOptions = devicePixelContentBoxSupported ? {box: ['device-pixel-content-box']} : {};
 
@@ -244,8 +245,6 @@ setTimeout(async () => {
 
   new ResizeObserver((entries) => {
     resizeCount++;
-
-    // TODO: For all layers, and reconstruct composed canvas?
 
     // Save a copy of the canvas:
     const tmpCanvas = document.createElement('canvas');
@@ -257,8 +256,12 @@ setTimeout(async () => {
 
     // Resize canvas and restore context:
     const savedState = saveContextState(ctx);
-    canvas.width = devicePixelContentBoxSupported ? entries[0].devicePixelContentBoxSize[0].inlineSize : (canvas.clientWidth * window.devicePixelRatio);
-    canvas.height = devicePixelContentBoxSupported ? entries[0].devicePixelContentBoxSize[0].blockSize : (canvas.clientHeight * window.devicePixelRatio);
+    canvas.width = devicePixelContentBoxSupported ?
+          entries[0].devicePixelContentBoxSize[0].inlineSize :
+          (canvas.clientWidth * window.devicePixelRatio);
+    canvas.height = devicePixelContentBoxSupported ?
+          entries[0].devicePixelContentBoxSize[0].blockSize :
+          (canvas.clientHeight * window.devicePixelRatio);
     restoreContextState(ctx, savedState);
 
     // Paint the old copy (scaled):
@@ -269,8 +272,8 @@ setTimeout(async () => {
     ctx.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
 
     // TODO: Only have layer canvas if used, compose canvas if recording.
-    layer1Canvas.width = canvas.width;
-    layer1Canvas.height = canvas.height;
+    overlayCanvas.width = canvas.width;
+    overlayCanvas.height = canvas.height;
     composedCanvas.width = canvas.width;
     composedCanvas.height = canvas.height;
 
@@ -279,5 +282,3 @@ setTimeout(async () => {
     }
   }).observe(canvas, observerOptions);
 }, 0);
-
-
