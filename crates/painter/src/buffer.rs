@@ -164,9 +164,9 @@ impl CircularOutputBuffer {
 
             // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
             // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
-            self.log("Awaiting request for more render data...");
+            // self.log("Awaiting request for more render data...");
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
-            self.log("Render data requested - continuing!");
+            // self.log(&format!("Render data requested - continuing: {}", result));
 
             // A variant calling out to javascript, requires lines to be uncommented in
             // worker-visualiser.js. Still needs nightly build with atomics feature to
@@ -181,7 +181,7 @@ impl CircularOutputBuffer {
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
         unsafe {
             let timeout_ns = 100_000_000_000_000_000;
-            let mut zero = [0; 1];
+            let mut zero = vec![0; 1];
             let raw_pointer: *mut i32 = zero.as_mut_ptr();
             self.log("Done - waiting forever to keep buffer alive");
             let result = core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
