@@ -113,6 +113,7 @@ netlify:
 		. $(HOME)/.cargo/env && \
 		make install-nightly && \
 		make install-wasm-pack && \
+		wasm-pack --version && \
 		make WASM_RELEASE=1 site-wasmpack && \
 		make WASM_RELEASE=1 site-wasmpack-visualization && \
 		make site-downloads && \
