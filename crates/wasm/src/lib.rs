@@ -23,6 +23,7 @@ pub fn solve(
     part: &JsValue,
     input: String,
 ) -> Result<String, JsValue> {
+    #[cfg(feature = "console-panic-hook")]
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     #[cfg(feature = "visualization")]
