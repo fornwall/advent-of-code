@@ -121,14 +121,19 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         print(f"{year} - {day}")
 
         src = Path(path).read_text()
+
+        # Check if visualization before inlining (since inlined code
+        # may contain 'feature = "visualization"':
+        supports_visualization = '#[cfg(feature = "visualization")]' in src
+
         src = add_header(src, year, day)
         src = replace_include_str(dirpath, src)
 
         year_str = str(year)
         day_str = str(day)
 
-        if year_str in gist_mapping and day_str in gist_mapping[year_str]:
-            existing_id = gist_mapping[year_str][day_str]
+        if year_str in gist_mapping and day_str in gist_mapping[year_str] and 'gist' in gist_mapping[year_str][day_str]:
+            existing_id = gist_mapping[year_str][day_str]['gist']
             if dry_run:
                 print(f"Would reuse existing id {existing_id}")
             else:
@@ -140,8 +145,12 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
                 new_id = set_gist(year, day, src)
                 if year_str not in gist_mapping:
                     gist_mapping[year_str] = {}
-                gist_mapping[year_str][day_str] = new_id
+                if day_str not in gist_mapping[year_str]:
+                    gist_mapping[year_str][day_str] = {}
+                gist_mapping[year_str][day_str]['gist'] = new_id
 
-if not dry_run:
+        gist_mapping[year_str][day_str]['visualization'] = supports_visualization
+
+if True or not dry_run:
     with open(MAPPING_FILE_NAME, "w") as outfile:
         json.dump(gist_mapping, outfile, indent=2)

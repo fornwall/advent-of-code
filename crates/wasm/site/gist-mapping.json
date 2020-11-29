@@ -1,73 +1,268 @@
 {
   "2018": {
-    "1": "a5bcb85dd47dbe95ad26b7e8ecdcfde1",
-    "2": "0468cf7476f36491140a0fc713f63319",
-    "3": "958340032341b27b42a5c3ea27824e5d",
-    "4": "28365319f62bca9a057c40880be4df4e",
-    "5": "58486310fbf0ae582a45615bea4dd17e",
-    "6": "b5522d660d2ab0f653663ddf2f55432c",
-    "7": "ff5c565cf3b6fbb5457fb630b3cee585",
-    "8": "a59d51ed8551dad851997e212d0afbc1",
-    "9": "04980127ebc80f32226c64298138b4b6",
-    "10": "6ab526d32ac9ecff6a2f3fbfc9ac2571",
-    "11": "ed6ac272e13f183ec7779ee42a8cb06c",
-    "12": "c806c6863b60bdc7210599747a73e54a",
-    "13": "12658010e768cfe9f4816d84d1aa6d75",
-    "14": "f8d14813293d9ceb2d7d6e116f1f4721",
-    "15": "1dfc563f9fbed1c4d07f033c6174cf11",
-    "16": "8eacc0e981e20e3a8733e732a7d5fd7c",
-    "17": "728019456c09e537ea2692ba31745245",
-    "18": "c48331d5db17ef7d04c49e4d32a1cb3d",
-    "19": "6488a286af0ba741beb1272faf970813",
-    "20": "ab5d5bafbce0d9e69eac76b99b585732",
-    "21": "2ec17d6bff012235f18ccb54fc61ca45",
-    "22": "87d0db9f5af1e1a55707a793644242b2",
-    "23": "e28889f929ba0314c0ebb1f2a6576fe5",
-    "24": "17cbf0ad5a22e8dff8e29c82a376a8ed",
-    "25": "4f6690e5698833db5834bb5862d1ed37"
+    "1": {
+      "gist": "a5bcb85dd47dbe95ad26b7e8ecdcfde1",
+      "visualization": false
+    },
+    "2": {
+      "gist": "0468cf7476f36491140a0fc713f63319",
+      "visualization": false
+    },
+    "3": {
+      "gist": "958340032341b27b42a5c3ea27824e5d",
+      "visualization": false
+    },
+    "4": {
+      "gist": "28365319f62bca9a057c40880be4df4e",
+      "visualization": false
+    },
+    "5": {
+      "gist": "58486310fbf0ae582a45615bea4dd17e",
+      "visualization": false
+    },
+    "6": {
+      "gist": "b5522d660d2ab0f653663ddf2f55432c",
+      "visualization": false
+    },
+    "7": {
+      "gist": "ff5c565cf3b6fbb5457fb630b3cee585",
+      "visualization": false
+    },
+    "8": {
+      "gist": "a59d51ed8551dad851997e212d0afbc1",
+      "visualization": false
+    },
+    "9": {
+      "gist": "04980127ebc80f32226c64298138b4b6",
+      "visualization": false
+    },
+    "10": {
+      "gist": "6ab526d32ac9ecff6a2f3fbfc9ac2571",
+      "visualization": false
+    },
+    "11": {
+      "gist": "ed6ac272e13f183ec7779ee42a8cb06c",
+      "visualization": false
+    },
+    "12": {
+      "gist": "c806c6863b60bdc7210599747a73e54a",
+      "visualization": false
+    },
+    "13": {
+      "gist": "12658010e768cfe9f4816d84d1aa6d75",
+      "visualization": false
+    },
+    "14": {
+      "gist": "f8d14813293d9ceb2d7d6e116f1f4721",
+      "visualization": false
+    },
+    "15": {
+      "gist": "1dfc563f9fbed1c4d07f033c6174cf11",
+      "visualization": false
+    },
+    "16": {
+      "gist": "8eacc0e981e20e3a8733e732a7d5fd7c",
+      "visualization": false
+    },
+    "17": {
+      "gist": "728019456c09e537ea2692ba31745245",
+      "visualization": false
+    },
+    "18": {
+      "gist": "c48331d5db17ef7d04c49e4d32a1cb3d",
+      "visualization": false
+    },
+    "19": {
+      "gist": "6488a286af0ba741beb1272faf970813",
+      "visualization": false
+    },
+    "20": {
+      "gist": "ab5d5bafbce0d9e69eac76b99b585732",
+      "visualization": false
+    },
+    "21": {
+      "gist": "2ec17d6bff012235f18ccb54fc61ca45",
+      "visualization": false
+    },
+    "22": {
+      "gist": "87d0db9f5af1e1a55707a793644242b2",
+      "visualization": false
+    },
+    "23": {
+      "gist": "e28889f929ba0314c0ebb1f2a6576fe5",
+      "visualization": false
+    },
+    "24": {
+      "gist": "17cbf0ad5a22e8dff8e29c82a376a8ed",
+      "visualization": false
+    },
+    "25": {
+      "gist": "4f6690e5698833db5834bb5862d1ed37",
+      "visualization": false
+    }
   },
   "2019": {
-    "1": "59f4bb0819c4e0849574ebf253967681",
-    "2": "3c2c775007cca000b8ed8242bf03cbe4",
-    "3": "f8c7ec5eb13c40afa18aa798a87044ff",
-    "4": "f8d36a44dd53dab666f5dadc2d3c0cc8",
-    "5": "3bed907f9ce332c3d0b1684c7fc8f346",
-    "6": "b804ca2474094509013f71e24db968fe",
-    "7": "4ac3523c46695821a7e2fa4e14fe4014",
-    "8": "6c9dc4cde034f1e6958bebf61cff4d03",
-    "9": "9392e4bed56607cbf2a80af4b43af2b3",
-    "10": "304750a20cee4ad0aad53823148bacb9",
-    "11": "ea4a887ff6479ffa657c271d37583bb8",
-    "12": "cb96a3cda02a16729e2cda34fa7e0060",
-    "13": "8327b98893ece5b61528bcbf12f52d3c",
-    "14": "73c0810caae7eba41eea9fef74fe1b0c",
-    "15": "8a4882cf0ae24de9cf19e671b27aec1a",
-    "16": "f9778a460aed86ab009a24240b398bda",
-    "17": "92830172fa2ca87064e79a350f8ed1f1",
-    "18": "7fac441c0309e918dd6b5e5e09c559bd",
-    "19": "182ca0353bab91e212bdb34ea5f198d1",
-    "20": "fe455a635822a5324c1d5c77dfc705cb",
-    "21": "1394dc28b00ee71fe1cd7717d276c5d0",
-    "22": "c050736343622e053458e12a71f14e9f",
-    "23": "f7aa9df2e0e73c7db2be0dcd847474e3",
-    "24": "cb708b2df7ce1950691c76b1aac77b2d",
-    "25": "084d18109492ed366b68306e9e979797"
+    "1": {
+      "gist": "59f4bb0819c4e0849574ebf253967681",
+      "visualization": false
+    },
+    "2": {
+      "gist": "3c2c775007cca000b8ed8242bf03cbe4",
+      "visualization": false
+    },
+    "3": {
+      "gist": "f8c7ec5eb13c40afa18aa798a87044ff",
+      "visualization": true
+    },
+    "4": {
+      "gist": "f8d36a44dd53dab666f5dadc2d3c0cc8",
+      "visualization": false
+    },
+    "5": {
+      "gist": "3bed907f9ce332c3d0b1684c7fc8f346",
+      "visualization": false
+    },
+    "6": {
+      "gist": "b804ca2474094509013f71e24db968fe",
+      "visualization": false
+    },
+    "7": {
+      "gist": "4ac3523c46695821a7e2fa4e14fe4014",
+      "visualization": false
+    },
+    "8": {
+      "gist": "6c9dc4cde034f1e6958bebf61cff4d03",
+      "visualization": false
+    },
+    "9": {
+      "gist": "9392e4bed56607cbf2a80af4b43af2b3",
+      "visualization": false
+    },
+    "10": {
+      "gist": "304750a20cee4ad0aad53823148bacb9",
+      "visualization": false
+    },
+    "11": {
+      "gist": "ea4a887ff6479ffa657c271d37583bb8",
+      "visualization": false
+    },
+    "12": {
+      "gist": "cb96a3cda02a16729e2cda34fa7e0060",
+      "visualization": false
+    },
+    "13": {
+      "gist": "8327b98893ece5b61528bcbf12f52d3c",
+      "visualization": true
+    },
+    "14": {
+      "gist": "73c0810caae7eba41eea9fef74fe1b0c",
+      "visualization": false
+    },
+    "15": {
+      "gist": "8a4882cf0ae24de9cf19e671b27aec1a",
+      "visualization": false
+    },
+    "16": {
+      "gist": "f9778a460aed86ab009a24240b398bda",
+      "visualization": false
+    },
+    "17": {
+      "gist": "92830172fa2ca87064e79a350f8ed1f1",
+      "visualization": false
+    },
+    "18": {
+      "gist": "7fac441c0309e918dd6b5e5e09c559bd",
+      "visualization": true
+    },
+    "19": {
+      "gist": "182ca0353bab91e212bdb34ea5f198d1",
+      "visualization": false
+    },
+    "20": {
+      "gist": "fe455a635822a5324c1d5c77dfc705cb",
+      "visualization": false
+    },
+    "21": {
+      "gist": "1394dc28b00ee71fe1cd7717d276c5d0",
+      "visualization": false
+    },
+    "22": {
+      "gist": "c050736343622e053458e12a71f14e9f",
+      "visualization": false
+    },
+    "23": {
+      "gist": "f7aa9df2e0e73c7db2be0dcd847474e3",
+      "visualization": false
+    },
+    "24": {
+      "gist": "cb708b2df7ce1950691c76b1aac77b2d",
+      "visualization": false
+    },
+    "25": {
+      "gist": "084d18109492ed366b68306e9e979797",
+      "visualization": false
+    }
   },
   "2017": {
-    "4": "43360bfc26ff9f9f64b6f3e7cc61975c",
-    "10": "fdb20e78fdef140e6c71c6ef8c8682ec",
-    "11": "1368847d155c9101560f18e947737893",
-    "5": "e4d06c8d06be82b1c284c872651790be",
-    "8": "36838ef8c826aab7226cac434d3c4408",
-    "9": "3d42959914876c58da5802f7b63f9aef",
-    "2": "148cb254948c7842b03177049ae52c5e",
-    "6": "f70604a6fd6b19fa76f4d3cd84f1afc2",
-    "7": "eee52a284dbb535bf9bf358ec6ff55ed",
-    "3": "f8a4f391f82922d6991b23495fab4e8d",
-    "1": "e39dbd240c328fb95580e0ba30638039",
-    "12": "38dd9222543e293e64f012d52d3ec439",
-    "13": "a6a23ed4b5f011bf8bbccee3a927864f",
-    "14": "e667db6cf5ec7d01c1e54d26cbe5c5c5",
-    "15": "d0b350bf8a3f09c0e9bc69604703d03e"
+    "4": {
+      "gist": "43360bfc26ff9f9f64b6f3e7cc61975c",
+      "visualization": false
+    },
+    "10": {
+      "gist": "fdb20e78fdef140e6c71c6ef8c8682ec",
+      "visualization": false
+    },
+    "11": {
+      "gist": "1368847d155c9101560f18e947737893",
+      "visualization": false
+    },
+    "5": {
+      "gist": "e4d06c8d06be82b1c284c872651790be",
+      "visualization": false
+    },
+    "8": {
+      "gist": "36838ef8c826aab7226cac434d3c4408",
+      "visualization": false
+    },
+    "9": {
+      "gist": "3d42959914876c58da5802f7b63f9aef",
+      "visualization": false
+    },
+    "2": {
+      "gist": "148cb254948c7842b03177049ae52c5e",
+      "visualization": false
+    },
+    "6": {
+      "gist": "f70604a6fd6b19fa76f4d3cd84f1afc2",
+      "visualization": false
+    },
+    "7": {
+      "gist": "eee52a284dbb535bf9bf358ec6ff55ed",
+      "visualization": false
+    },
+    "3": {
+      "gist": "f8a4f391f82922d6991b23495fab4e8d",
+      "visualization": false
+    },
+    "1": {
+      "gist": "e39dbd240c328fb95580e0ba30638039",
+      "visualization": false
+    },
+    "12": {
+      "gist": "38dd9222543e293e64f012d52d3ec439",
+      "visualization": false
+    },
+    "13": {
+      "gist": "a6a23ed4b5f011bf8bbccee3a927864f",
+      "visualization": false
+    },
+    "14": {
+      "gist": "e667db6cf5ec7d01c1e54d26cbe5c5c5",
+      "visualization": true
+    },
+    "15": {
+      "gist": "d0b350bf8a3f09c0e9bc69604703d03e",
+      "visualization": false
+    }
   }
 }
