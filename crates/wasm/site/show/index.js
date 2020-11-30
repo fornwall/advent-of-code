@@ -167,17 +167,19 @@ async function toggleFullScreen() {
 }
 
 async function togglePause() {
-  if (state.phase === 'onStartScreen') {
+  switch (state.phase) {
+    case 'pageload':
+      break;
+    case 'onStartScreen':
       state.audioPlayer = await createAudioPlayer('./bounce.mp4');
       state.phase = 'startScreenClicked';
-      return;
+      break;
+    default:
+     if (window.renderer.done) {
+        reloadWithParameters({download: ''});
+     }
+     window.renderer.paused = !window.renderer.paused;
   }
-
-  if (window.renderer.done) {
-     reloadWithParameters({download: ''});
-  }
-
-  window.renderer.paused = !window.renderer.paused;
 }
 
 function generateFileName(extension) {
