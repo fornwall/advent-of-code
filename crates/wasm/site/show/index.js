@@ -1,6 +1,6 @@
 import Renderer from './renderer.js';
 import CanvasRecorder from './CanvasRecorder.js';
-import {createAudioPlayer} from './audio-player.js';
+import {AudioPlayer} from './audio-player.js';
 
 const visualizerWorker = new Worker('./worker-visualizer.js', {name: 'visualizer'});
 
@@ -11,6 +11,7 @@ const PHASE_START_SCREEN_CLICKED = 'startscreenclicked';
 const state = {
    phase: PHASE_PAGE_LOAD,
    params: {},
+   audioPlayer: new AudioPlayer('bounce.mp4'),
 };
 
 let hash = location.hash.substring(1);
@@ -81,6 +82,7 @@ visualizerWorker.onmessage = (message) => {
     document.getElementById('spinnerImage').src = 'recording.svg';
   } else {
     document.getElementById('spinner').style.visibility = 'hidden';
+    document.getElementById('spinnerImage').classList.remove('fade-out');
   }
 
   const rerun = !!window.renderer;
@@ -98,6 +100,7 @@ visualizerWorker.onmessage = (message) => {
           }
           document.getElementById('spinner').style.visibility = 'visible';
           document.getElementById('spinnerImage').src = 'replay.svg';
+          document.getElementById('spinnerImage').classList.add('fade-out');
         } else {
           try {
             renderer.render();
@@ -182,7 +185,7 @@ async function togglePause() {
     case PHASE_PAGE_LOAD:
       break;
     case PHASE_SHOWING_START_SCREEN:
-      state.audioPlayer = await createAudioPlayer('./bounce.mp4');
+      await state.audioPlayer.load();
       state.phase = PHASE_START_SCREEN_CLICKED;
       break;
     default:
