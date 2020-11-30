@@ -17,7 +17,9 @@ self.onmessage = async (message) => {
         const answer = wasm_bindgen.solve(year, day, part, input);
         console.log('Answer', answer);
     } catch (e) {
-        self.postMessage({errorMessage: e.message});
+        if (!e.errorAlreadyReported) {
+            self.postMessage({errorMessage: e.message});
+        }
     }
 }
 
@@ -28,7 +30,7 @@ self.wasmReadyPromise = (async() => {
     console.error('WebAssembly not working', e);
     const errorMessage = "WebAssembly not working - " + e.message;
     self.postMessage({errorMessage});
-    throw e;
+    throw { message: e.message, errorAlreadyReported: true };
   }
   return result;
 })();

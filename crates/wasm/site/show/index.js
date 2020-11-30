@@ -60,7 +60,7 @@ function startVisualization() {
 
   visualizerWorker.onmessage = (message) => {
     if ('errorMessage' in message.data) {
-        window.alert('Error:\n\n' + message.data.errorMessage);
+        window.alert(message.data.errorMessage);
         window.location = '..';
         return;
     }

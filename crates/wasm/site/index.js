@@ -64,15 +64,9 @@ function execute(wasm) {
 }
 
 function visualize() {
-  if (!window.SharedArrayBuffer) {
-    alert('Sorry - SharedArrayBuffer is not supported by your browser!');
-  } else if (!window.Atomics) {
-    alert('Sorry - Atomics is not supported by your browser!');
-  } else {
-    const [year, day, part, input] = [yearElement.value, dayElement.value, partElement.value, inputElement.value];
-    const visualizerUrl = `/show/#year=${year}&day=${day}&part=${part}&input=${encodeURIComponent(input)}`;
-    window.location = visualizerUrl;
-  }
+  const [year, day, part, input] = [yearElement.value, dayElement.value, partElement.value, inputElement.value];
+  const visualizerUrl = `/show/#year=${year}&day=${day}&part=${part}&input=${encodeURIComponent(input)}`;
+  window.location = visualizerUrl;
 }
 
 function storeForm() {
