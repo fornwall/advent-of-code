@@ -41,6 +41,10 @@ struct Edge {
 pub fn steps_to_gather_all_keys(
     input_string: &str,
     #[cfg(feature = "visualization")] mut painter: &mut PainterRef,
+    #[cfg(feature = "visualization")] map_x_offset: usize,
+    #[cfg(feature = "visualization")] map_y_offset: usize,
+    #[cfg(feature = "visualization")] mut global_cols: usize,
+    #[cfg(feature = "visualization")] mut global_rows: usize,
 ) -> Result<usize, String> {
     #[cfg(feature = "visualization")]
     painter.fill_style_rgb(255, 0, 0);
@@ -53,6 +57,14 @@ pub fn steps_to_gather_all_keys(
 
     let index_of = |x, y| x + y * cols;
 
+    #[cfg(feature = "visualization")]
+    {
+        if global_rows == 0 {
+            global_rows = rows;
+            global_cols = cols;
+        }
+    }
+
     for (y, line) in input_string.lines().enumerate() {
         if line.len() != cols {
             return Err("Not all rows have same width".to_string());
@@ -62,13 +74,13 @@ pub fn steps_to_gather_all_keys(
             let current_position = (x as i32, y as i32);
 
             #[cfg(feature = "visualization")]
-            let canvas_x = x as f64 / cols as f64;
+            let canvas_x = (x + map_x_offset) as f64 / global_cols as f64;
             #[cfg(feature = "visualization")]
-            let canvas_y = y as f64 / rows as f64;
+            let canvas_y = (y + map_y_offset) as f64 / global_rows as f64;
             #[cfg(feature = "visualization")]
-            let draw_width = 0.95 / cols as f64;
+            let draw_width = 0.95 / global_cols as f64;
             #[cfg(feature = "visualization")]
-            let draw_height = 0.95 / rows as f64;
+            let draw_height = 0.95 / global_rows as f64;
             #[cfg(feature = "visualization")]
             let draw = |drawer: &mut PainterRef| {
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
@@ -82,7 +94,6 @@ pub fn steps_to_gather_all_keys(
                     {
                         painter.fill_style_rgb(0, 0, 255);
                         draw(&mut painter);
-                        painter.fill_style_rgb(255, 0, 0);
                     }
                     b'.'
                 }
@@ -95,14 +106,13 @@ pub fn steps_to_gather_all_keys(
                     {
                         painter.fill_style_rgb(0, 255, 0);
                         draw(&mut painter);
-                        painter.fill_style_rgb(255, 0, 0);
                     }
                     byte
                 }
                 '#' => {
                     #[cfg(feature = "visualization")]
                     {
-                        //painter.fill_text("12ab1234", 0.1, 0.1);
+                        painter.fill_style_rgb(255, 0, 0);
                         draw(&mut painter);
                     }
                     // Stone wall.
@@ -114,7 +124,6 @@ pub fn steps_to_gather_all_keys(
                         if ('A'..='Z').contains(&c) {
                             painter.fill_style_rgb(0, 255, 255);
                             draw(&mut painter);
-                            painter.fill_style_rgb(255, 0, 0);
                         }
                     }
                     byte
@@ -205,6 +214,14 @@ pub fn steps_to_gather_all_keys(
         cols,
         #[cfg(feature = "visualization")]
         rows,
+        #[cfg(feature = "visualization")]
+        map_x_offset,
+        #[cfg(feature = "visualization")]
+        map_y_offset,
+        #[cfg(feature = "visualization")]
+        global_cols,
+        #[cfg(feature = "visualization")]
+        global_rows,
     )
     .ok_or_else(|| "Not possible to gather all keys".to_string())
 }
@@ -215,6 +232,10 @@ fn shortest_path(
     #[cfg(feature = "visualization")] drawer: &mut PainterRef,
     #[cfg(feature = "visualization")] cols: usize,
     #[cfg(feature = "visualization")] rows: usize,
+    #[cfg(feature = "visualization")] map_x_offset: usize,
+    #[cfg(feature = "visualization")] map_y_offset: usize,
+    #[cfg(feature = "visualization")] global_cols: usize,
+    #[cfg(feature = "visualization")] global_rows: usize,
 ) -> Option<usize> {
     #[derive(Copy, Clone, Eq, PartialEq)]
     struct Vertex {
@@ -268,25 +289,13 @@ fn shortest_path(
         #[cfg(feature = "visualization")]
         {
             if visited_locations.insert((current.x, current.y)) && current.at_key.value != b'@' {
-                let canvas_x = current.x as f64 / cols as f64;
-                let canvas_y = current.y as f64 / rows as f64;
-                let draw_width = 0.95 / cols as f64;
-                let draw_height = 0.95 / rows as f64;
+                let canvas_x = (current.x + map_x_offset as i32) as f64 / global_cols as f64;
+                let canvas_y = (current.y + map_y_offset as i32) as f64 / global_rows as f64;
+                let draw_width = 0.95 / global_cols as f64;
+                let draw_height = 0.95 / global_rows as f64;
                 drawer.fill_style_rgb(80, 0, 80);
                 drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
                 drawer.meta_delay(50);
-
-                /*
-                drawer.meta_switch_layer(1);
-                drawer.clear();
-                drawer.fill_style_rgba(80, 0, 0, 0.5);
-                if current.x < cols as i32 / 2 {
-                    drawer.fill_rect(0., 0., 50., 50.);
-                } else {
-                    drawer.fill_rect(50., 0., 50., 50.);
-                }
-                drawer.meta_switch_layer(0);
-                 */
             }
         }
 
@@ -327,6 +336,14 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             &input.text,
             #[cfg(feature = "visualization")]
             &mut input.painter,
+            #[cfg(feature = "visualization")]
+            0,
+            #[cfg(feature = "visualization")]
+            0,
+            #[cfg(feature = "visualization")]
+            0,
+            #[cfg(feature = "visualization")]
+            0,
         );
     }
 
@@ -383,21 +400,61 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         &map_top_left,
         #[cfg(feature = "visualization")]
         &mut input.painter,
+        #[cfg(feature = "visualization")]
+        0,
+        #[cfg(feature = "visualization")]
+        0,
+        #[cfg(feature = "visualization")]
+        num_columns,
+        #[cfg(feature = "visualization")]
+        num_rows,
     )?;
     let s2 = steps_to_gather_all_keys(
         &map_top_right,
         #[cfg(feature = "visualization")]
         &mut input.painter,
+        #[cfg(feature = "visualization")]
+        {
+            center_x + 1
+        },
+        #[cfg(feature = "visualization")]
+        0,
+        #[cfg(feature = "visualization")]
+        num_columns,
+        #[cfg(feature = "visualization")]
+        num_rows,
     )?;
     let s3 = steps_to_gather_all_keys(
         &map_bottom_left,
         #[cfg(feature = "visualization")]
         &mut input.painter,
+        #[cfg(feature = "visualization")]
+        0,
+        #[cfg(feature = "visualization")]
+        {
+            center_y + 1
+        },
+        #[cfg(feature = "visualization")]
+        num_columns,
+        #[cfg(feature = "visualization")]
+        num_rows,
     )?;
     let s4 = steps_to_gather_all_keys(
         &map_bottom_right,
         #[cfg(feature = "visualization")]
         &mut input.painter,
+        #[cfg(feature = "visualization")]
+        {
+            center_x + 1
+        },
+        #[cfg(feature = "visualization")]
+        {
+            center_y + 1
+        },
+        #[cfg(feature = "visualization")]
+        num_columns,
+        #[cfg(feature = "visualization")]
+        num_rows,
     )?;
     Ok(s1 + s2 + s3 + s4)
 }
