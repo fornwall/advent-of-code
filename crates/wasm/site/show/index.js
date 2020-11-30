@@ -133,7 +133,7 @@ visualizerWorker.onmessage = (message) => {
           }
           const fontHeight = 80;
           const startScreenCanvases = state.params.download ? [ctx, composedCtx] : [ctx];
-          const startRenderingNow = (state.params.download && count == 2) ||
+          const startRenderingNow = (state.params.download && count == 10) ||
             (!state.params.download && state.phase === PHASE_START_SCREEN_CLICKED) ||
             rerun ||
             localStorage.getItem('debug_autostart');
