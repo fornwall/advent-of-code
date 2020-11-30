@@ -4,6 +4,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 from pathlib import Path
 
 import requests
@@ -61,7 +62,7 @@ def replace_include_str(dirpath, src):
         included_file = match.group(1)
         replacement_file = os.path.join(dirpath, included_file)
         included_src = Path(replacement_file).read_text()
-        included_src = included_src.replace("\\", "\\\\").replace("\n", "\\n")
+        included_src = included_src.replace("\\", "\\\\").replace("\n", "\\n").replace('"', '\\"')
         return f'"{included_src}"'
 
     return re.sub(r'include_str!\("(.*?)"\)', replace, src)
@@ -115,6 +116,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
             continue
         if filename.endswith("renderer.rs"):
             continue
+
         day = int(filename[3:][:-3])
         path = os.path.join(dirpath, filename)
 
@@ -126,8 +128,15 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         # may contain 'feature = "visualization"':
         supports_visualization = '#[cfg(feature = "visualization")]' in src
 
+        # Strip away use of visualization packages - they just bloat up gist
+        # with unrelated code and may contain transitive imports:
+        src = re.sub('\n#\\[cfg\\(feature = "visualization"[^;]*;', '', src, re.DOTALL)
+
         src = add_header(src, year, day)
         src = replace_include_str(dirpath, src)
+
+        # Finally format source code:
+        src = subprocess.run(['rustfmt'], stdout=subprocess.PIPE, input=src, encoding='utf-8').stdout
 
         year_str = str(year)
         day_str = str(day)
