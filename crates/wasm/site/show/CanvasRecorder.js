@@ -10,26 +10,37 @@
 //
 // Or use the webm-cleaner scirpt:
 // $ webm-cleaner in.webm
-export default function CanvasRecorder(canvas, videoBitsPerSecond) {
+export default function CanvasRecorder(canvas, audioStream, videoBitsPerSecond) {
     this.start = () => {
         const mimeType = [
             'video/webm;codecs=vp9',
-            "video/webm",
+            'video/webm',
             'video/vp8',
-            "video/webm;codecs=vp8",
-            "video/webm;codecs=daala",
-            "video/webm;codecs=h264",
-            "video/mpeg"
+            'video/webm;codecs=vp8',
+            'video/webm;codecs=daala',
+            'video/webm;codecs=h264',
+            'video/mpeg',
         ].find(MediaRecorder.isTypeSupported);
 
         if (!mimeType) {
-            throw new Error("No supported mime type found for MediaRecorder");
+            throw new Error('No supported mime type found for MediaRecorder');
         }
 
-        const stream = canvas.captureStream();
-        this.mediaRecorder = new MediaRecorder(stream, {
+        const videoStream = canvas.captureStream();
+        let streamToRecord;
+        if (audioStream) {
+            // const videoTrack = videoStream.getVideoTracks()[0];
+            const audioTrack = audioStream.getAudioTracks()[0];
+            console.log('audio stream', audioStream, 'audio track', audioTrack);
+            // streamToRecord = new MediaStream([audioTrack, videoTrack]);
+            videoStream.addTrack(audioTrack);
+            streamToRecord = videoStream;
+        } else {
+            streamToRecord = videoStream;
+        }
+        this.mediaRecorder = new MediaRecorder(streamToRecord, {
             mimeType,
-            videoBitsPerSecond: videoBitsPerSecond || 5000000
+            videoBitsPerSecond: videoBitsPerSecond || 5000000,
         });
 
         this.mediaRecorder.ondataavailable = (event) => {
@@ -39,13 +50,13 @@ export default function CanvasRecorder(canvas, videoBitsPerSecond) {
             a.download = this.fileName;
             a.click();
             window.URL.revokeObjectURL(url);
-        }
+        };
 
         this.mediaRecorder.start();
-    }
+    };
 
     this.stopAndSave = (fileName) => {
         this.fileName = fileName || 'recording.webm';
         this.mediaRecorder.stop();
-    }
+    };
 }

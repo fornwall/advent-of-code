@@ -76,9 +76,7 @@ visualizerWorker.onmessage = (message) => {
       return;
   }
 
-  const recorder = state.params.download ? new CanvasRecorder(composedCtx.canvas) : null;
-  if (recorder) {
-    recorder.start();
+  if (state.params.download) {
     document.getElementById('spinnerImage').src = 'recording.svg';
   } else {
     document.getElementById('spinner').style.visibility = 'hidden';
@@ -94,8 +92,8 @@ visualizerWorker.onmessage = (message) => {
         // TODO: Do not ignore time parameter.
         if (renderer.done) {
           console.log('[main] Rendering done');
-          if (recorder) {
-            recorder.stopAndSave(generateFileName('webm'));
+          if (state.recorder) {
+            state.recorder.stopAndSave(generateFileName('webm'));
             updateHash({download: ''});
           }
           document.getElementById('spinner').style.visibility = 'visible';
@@ -104,7 +102,7 @@ visualizerWorker.onmessage = (message) => {
         } else {
           try {
             renderer.render();
-            if (recorder) {
+            if (state.recorder) {
                 composedCtx.fillStyle = 'rgb(13, 12, 26)';
                 composedCtx.fillRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
                 // composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
@@ -130,11 +128,13 @@ visualizerWorker.onmessage = (message) => {
   let count = 0;
   state.phase = PHASE_SHOWING_START_SCREEN;
   function renderStartScreen() {
-          count++;
+          if (state.phase == PHASE_START_SCREEN_CLICKED) {
+            count++;
+          }
           const fontHeight = 80;
-          const startScreenCanvases = recorder ? [ctx, composedCtx] : [ctx];
-          const startRenderingNow = (recorder && count == 10) ||
-            state.phase === PHASE_START_SCREEN_CLICKED ||
+          const startScreenCanvases = state.params.download ? [ctx, composedCtx] : [ctx];
+          const startRenderingNow = (state.params.download && count == 2) ||
+            (!state.params.download && state.phase === PHASE_START_SCREEN_CLICKED) ||
             rerun ||
             localStorage.getItem('debug_autostart');
 
@@ -185,7 +185,12 @@ async function togglePause() {
     case PHASE_PAGE_LOAD:
       break;
     case PHASE_SHOWING_START_SCREEN:
-      await state.audioPlayer.load();
+      const recordAudio = state.params.download && false;
+      await state.audioPlayer.load(recordAudio);
+      if (state.params.download) {
+        state.recorder = recordAudio ? new CanvasRecorder(ctx.canvas, state.audioPlayer.createStream()) : new CanvasRecorder(ctx.canvas);
+        state.recorder.start();
+      }
       state.phase = PHASE_START_SCREEN_CLICKED;
       break;
     default:
@@ -234,7 +239,7 @@ document.body.addEventListener('keyup', async(e) => {
       reloadWithParameters({download: ''});
       break;
     case 'v': // Video.
-      reloadWithParameters({download: true, aspectRatio: state.aspectRatio});
+      reloadWithParameters({download: true, aspectRatio: state.aspectRatio ? state.aspectRatio : ''});
       break;
   }
 });
