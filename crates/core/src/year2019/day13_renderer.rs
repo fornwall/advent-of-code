@@ -7,6 +7,7 @@ pub struct Renderer<'a> {
     painter: &'a mut PainterRef,
     aspect_ratio_sent: bool,
     explosion: bool,
+    iteration: u32,
 }
 
 impl<'a> Renderer<'a> {
@@ -16,6 +17,7 @@ impl<'a> Renderer<'a> {
             painter,
             aspect_ratio_sent: false,
             explosion: false,
+            iteration: 0,
         }
     }
 
@@ -24,8 +26,10 @@ impl<'a> Renderer<'a> {
         self.explosion = self.explosion || exploded_now;
     }
 
-    pub fn render(&mut self, current_score: Word, iteration: i32) {
+    pub fn render(&mut self, current_score: Word) {
         self.painter.clear();
+
+        self.iteration += 1;
 
         if self.explosion {
             self.explosion = false;
@@ -34,7 +38,7 @@ impl<'a> Renderer<'a> {
 
         self.painter.status_text(&format!(
             "Score: {: >4}   Iteration: {: >4}",
-            current_score, iteration
+            current_score, self.iteration
         ));
 
         let mut min_x = Word::MAX;

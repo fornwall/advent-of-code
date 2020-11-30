@@ -1,9 +1,10 @@
-const HEADER_ELEMENTS_LENGTH = 3;
+const HEADER_ELEMENTS_LENGTH = 4;
 const HEADER_BYTE_LENGTH = HEADER_ELEMENTS_LENGTH * Int32Array.BYTES_PER_ELEMENT;
 
 const HEADER_READER_WANT_MORE_OFFSET = 0;
 const HEADER_READ_OFFSET = 1;
 const HEADER_WRITE_OFFSET = 2;
+const HEADER_OK_TO_EXIT_OFFSET = 3;
 
 export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, length) {
   const headerBuffer = new Int32Array(sharedArrayBuffer, sharedArrayBufferOffset, HEADER_ELEMENTS_LENGTH); // FIXME: offset in bytes?
@@ -27,6 +28,10 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
 
   this._readerPosition = () => {
     return headerBuffer[HEADER_READ_OFFSET] + unflushedReads;
+  };
+
+  this.toDebug = () => {
+    return JSON.stringify({reader: this._readerPosition(), writer: Atomics.load(headerBuffer, HEADER_WRITE_OFFSET)});
   };
 
   this.next = () => {
@@ -71,5 +76,11 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
       } else {
         console.log('not requesting more as utilisation=' + (used*1.0/dataBuffer.length));
       }
+  };
+
+  this.pleaseExit = () => {
+     unflushedReads = 0; // Reset internal state for re-use.
+     Atomics.store(headerBuffer, HEADER_OK_TO_EXIT_OFFSET, 1);
+     Atomics.notify(headerBuffer, HEADER_OK_TO_EXIT_OFFSET);
   };
 }

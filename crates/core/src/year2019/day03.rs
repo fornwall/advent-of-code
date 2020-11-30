@@ -314,7 +314,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             }
 
             input.painter.status_text(&format!(
-                "Line segments: {: >3}   Intersections: {: >2}   Best: {: >4}",
+                "Line segments: {: >3}   Intersections: {: >2}   Best: {: >5}",
                 drawn_lines1.len(),
                 intersection_count,
                 if current_best == std::u32::MAX {

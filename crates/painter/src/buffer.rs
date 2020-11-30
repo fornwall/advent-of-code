@@ -3,11 +3,12 @@ use wasm_bindgen::prelude::*;
 #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 use wasm_bindgen::JsCast;
 
-const HEADER_ELEMENT_LENGTH: usize = 3;
+const HEADER_ELEMENT_LENGTH: usize = 4;
 // const HEADER_BYTE_LENGTH: usize = HEADER_ELEMENT_LENGTH * 4;
 const HEADER_READER_WANT_MORE_OFFSET: usize = 0;
 const HEADER_READ_OFFSET: usize = 1;
 const HEADER_WRITE_OFFSET: usize = 2;
+const HEADER_OK_TO_EXIT_OFFSET: usize = 3;
 
 #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 #[wasm_bindgen]
@@ -181,19 +182,15 @@ impl CircularOutputBuffer {
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
         unsafe {
             let timeout_ns = 100_000_000_000_000_000;
-            let mut zero = vec![0; 1];
-            let raw_pointer: *mut i32 = zero.as_mut_ptr();
-            self.log("Done - waiting forever to keep buffer alive");
-            let result = core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
-            self.log(&format!(
-                "This is strange - returning after eternal wait? result={}",
-                result
-            ));
+            let raw_pointer: *mut i32 = self.shared_buffer[HEADER_OK_TO_EXIT_OFFSET..].as_mut_ptr();
+            self.log("Done - waiting for ok to exit");
+            core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+            self.log("Got ok to exit!");
         }
     }
 
     pub fn log(&mut self, text: &str) {
-        console_log!("[rust]: {}", text);
+        console_log!("[rust] {}", text);
     }
 }
 

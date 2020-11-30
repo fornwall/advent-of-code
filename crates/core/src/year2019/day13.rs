@@ -7,19 +7,13 @@ use super::day13_renderer::Renderer;
 pub fn solve(input: &mut Input) -> Result<Word, String> {
     let mut program = Program::parse(&input.text)?;
 
-    if input.is_part_one() {
-        let output = program.run_for_output()?;
-        return Ok(output
-            .iter()
-            .skip(2)
-            .step_by(3)
-            .filter(|&&t| t == 2)
-            .count() as Word);
-    }
+    let is_part_one = input.is_part_one();
 
     // "Memory address 0 represents the number of quarters that have been
     // inserted; set it to 2 to play for free."
-    program.write_memory(0, 2);
+    if !is_part_one {
+        program.write_memory(0, 2);
+    }
 
     let mut current_score = 0;
     let mut ball_x = -1;
@@ -27,15 +21,8 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
 
     #[cfg(feature = "visualization")]
     let mut renderer = Renderer::new(&mut input.painter);
-    #[cfg(feature = "visualization")]
-    let mut iteration = 0;
 
     loop {
-        #[cfg(feature = "visualization")]
-        {
-            iteration += 1;
-        }
-
         let output = program.run_for_output()?;
         output.chunks_exact(3).for_each(|chunk| {
             let (x, y, third) = (chunk[0], chunk[1], chunk[2]);
@@ -54,7 +41,16 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
         });
 
         #[cfg(feature = "visualization")]
-        renderer.render(current_score, iteration);
+        renderer.render(current_score);
+
+        if is_part_one {
+            return Ok(output
+                .iter()
+                .skip(2)
+                .step_by(3)
+                .filter(|&&t| t == 2)
+                .count() as Word);
+        }
 
         if program.is_halted() {
             break;

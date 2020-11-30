@@ -30,7 +30,6 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
     let ctx = layers[0];
-    ctx.imageSmoothingEnabled = false;
     this.done = false;
 
     this.render = () => {
@@ -89,28 +88,8 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     break;
                 }
                 case COMMAND_STATUS_TEXT: {
-                    const text = reader.nextString();
-                    let textLayer = layers[1];
-                    textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);
-
-                    const textHeight = 60;
-                    const textWidth = textLayer.measureText(text).width;
-
-                    const xOffset = 4;
-                    const yOffset = 4;
-
-                    const boxMargin = 4;
-                    textLayer.shadowColor = 'black';
-                    textLayer.shadowBlur = 15;
-                    textLayer.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                    textLayer.fillRect(xOffset-boxMargin, yOffset-boxMargin, textWidth+boxMargin*2, textHeight+boxMargin*2);
-
-                    textLayer.font = textHeight + 'px Monospace';
-                    textLayer.fillStyle = 'white';
-                    textLayer.strokeStyle = 'black';
-                    textLayer.textBaseline = 'top';
-                    const maxWidth = textLayer.canvas.width - xOffset;
-                    textLayer.fillText(text, xOffset, yOffset, maxWidth);
+                    this.statusText = reader.nextString();
+                    this.renderStatusText();
                     break;
                 }
                 case COMMAND_SHADOW_BLUR: {
@@ -127,9 +106,10 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     break;
                 }
                 case COMMAND_DONE: {
-                    console.log('done rendering');
+                    console.log('[main] Please exit');
+                    reader.pleaseExit();
                     this.done = true;
-                    break;
+                    return;
                 }
                 case COMMAND_DELAY: {
                     this.delay = reader.next();
@@ -167,10 +147,38 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     break;
                 }
                 default:
-                    throw new Error('Unhandled command: ' + command + ', done=' + this.done);
+                    throw new Error('Unhandled command: ' + command + ', done=' + this.done + ', buffer=' + reader.toDebug());
             }
         }
 
         reader.wantMore();
+    };
+
+    this.renderStatusText = () => {
+        if (!this.statusText) return;
+        let textLayer = layers[1];
+
+        const yOffset = 0;
+        const boxMargin = 10;
+        const textHeight = 60;
+        textLayer.font = textHeight + 'px Monospace';
+
+        textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);
+
+        const textWidth = textLayer.measureText(this.statusText).width;
+
+        textLayer.fillStyle = 'rgba(13, 12, 26, 0.3)';
+        const rectX = textLayer.canvas.width/2 - textWidth/2 - boxMargin;
+        const rectY = yOffset;
+        const rectWidth = textWidth + boxMargin*2;
+        const rectHeight = textHeight;
+        textLayer.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+        textLayer.fillStyle = 'white';
+        textLayer.strokeStyle = 'black';
+        textLayer.textBaseline = 'top';
+        textLayer.textAlign = 'center';
+        const maxWidth = textLayer.canvas.width;
+        textLayer.fillText(this.statusText, textLayer.canvas.width/2, yOffset, maxWidth);
     };
 }

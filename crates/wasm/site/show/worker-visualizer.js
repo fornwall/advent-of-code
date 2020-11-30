@@ -1,9 +1,9 @@
 'use strict';
-self.importScripts("advent_of_code_wasm.js");
+self.importScripts('advent_of_code_wasm.js');
 
-self.onmessage = async (message) => {
+self.onmessage = async(message) => {
     try {
-        const { year, day, part, input } = message.data;
+        const {year, day, part, input} = message.data;
         const wasm = await self.wasmReadyPromise;
 
         // If building with atomics, "memory" gets mangled to "__wbindgen_export_0":
@@ -15,8 +15,9 @@ self.onmessage = async (message) => {
         // }
 
         const answer = wasm_bindgen.solve(year, day, part, input);
-        console.log('Answer', answer);
+        self.postMessage({done: true, answer});
     } catch (e) {
+        console.log(e);
         if (!e.errorAlreadyReported) {
             self.postMessage({errorMessage: e.message});
         }
@@ -28,9 +29,9 @@ self.wasmReadyPromise = (async() => {
     return await wasm_bindgen('advent_of_code_wasm_bg.wasm');
   } catch (e) {
     console.error('WebAssembly not working', e);
-    const errorMessage = "WebAssembly not working - " + e.message;
+    const errorMessage = 'WebAssembly not working - ' + e.message;
     self.postMessage({errorMessage});
-    throw { message: e.message, errorAlreadyReported: true };
+    throw {message: e.message, errorAlreadyReported: true};
   }
   return result;
 })();
