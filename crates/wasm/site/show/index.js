@@ -188,7 +188,7 @@ async function togglePause() {
       const recordAudio = state.params.download && false;
       await state.audioPlayer.load(recordAudio);
       if (state.params.download) {
-        state.recorder = recordAudio ? new CanvasRecorder(ctx.canvas, state.audioPlayer.createStream()) : new CanvasRecorder(ctx.canvas);
+        state.recorder = recordAudio ? new CanvasRecorder(composedCtx.canvas, state.audioPlayer.createStream()) : new CanvasRecorder(composedCtx.canvas);
         state.recorder.start();
       }
       state.phase = PHASE_START_SCREEN_CLICKED;
