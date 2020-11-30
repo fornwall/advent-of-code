@@ -159,15 +159,14 @@ impl CircularOutputBuffer {
 
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
         unsafe {
-            // Firefox issue? i64::MAX makes memory_atomic_wait32() return 2 directly:
-            let timeout_ns = 100_000_000_000_000_000;
+            let timeout_ns = -1;
             let raw_pointer: *mut i32 = self.shared_buffer.as_mut_ptr();
-
-            // Block while there is no more writes desired: while header[HEADER_READER_WANT_MORE_OFFSET] == 0.
-            // https://docs.rs/core_arch/0.1.5/core_arch/wasm32/fn.i32_atomic_wait.html
-            // self.log("Awaiting request for more render data...");
+            if raw_pointer as usize == 1 {
+                self.log(
+                    "This check of raw_pointer is necessary for (wasm-opt|compiler)? to keep it",
+                );
+            }
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
-            // self.log(&format!("Render data requested - continuing: {}", result));
 
             // A variant calling out to javascript, requires lines to be uncommented in
             // worker-visualiser.js. Still needs nightly build with atomics feature to
@@ -181,9 +180,17 @@ impl CircularOutputBuffer {
     pub fn wait_forever(&mut self) {
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
         unsafe {
-            let timeout_ns = 100_000_000_000_000_000;
-            let raw_pointer: *mut i32 = self.shared_buffer[HEADER_OK_TO_EXIT_OFFSET..].as_mut_ptr();
-            self.log("Done - waiting for ok to exit");
+            let timeout_ns = -1;
+            let raw_pointer: *mut i32 = self
+                .shared_buffer
+                .as_mut_ptr()
+                .offset(HEADER_OK_TO_EXIT_OFFSET as isize);
+            if raw_pointer as usize == 1 {
+                self.log(
+                    "This check of raw_pointer is necessary for (wasm-opt|compiler)? to keep it",
+                );
+            }
+            self.log("Done - asking for permission to exit...");
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
             self.log("Got ok to exit!");
         }
