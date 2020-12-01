@@ -1,17 +1,17 @@
 use crate::input::Input;
 use core::cmp::Ordering::{Equal, Greater, Less};
 
-fn subsequence_summing_to(sequence: &[u32], desired_sum: u32) -> Option<u32> {
-    if sequence.is_empty() {
+fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u32> {
+    if sorted_sequence.is_empty() {
         return None;
     }
 
     let mut left = 0;
-    let mut right = sequence.len() - 1;
+    let mut right = sorted_sequence.len() - 1;
 
     while left != right {
-        let left_value = sequence[left];
-        let right_value = sequence[right];
+        let left_value = sorted_sequence[left];
+        let right_value = sorted_sequence[right];
 
         let candidate_sum = left_value + right_value;
 
