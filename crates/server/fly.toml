@@ -1,7 +1,7 @@
 app = "advent"
 
 [build]
-  image = "fredrikfornwall/advent-of-code-server:2019.12.168"
+  image = "fredrikfornwall/advent-of-code-server:2019.12.169"
 
 [[services]]
   internal_port = 8080
