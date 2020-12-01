@@ -6,6 +6,7 @@ use advent::solver_server::{Solver, SolverServer};
 use advent::{ProblemInput, ProblemOutput};
 
 mod advent {
+    #![allow(clippy::unwrap_used, clippy::future_not_send)]
     tonic::include_proto!("advent");
 }
 
@@ -52,7 +53,7 @@ impl Solver for SolverImpl {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "0.0.0.0:50051".parse().unwrap();
+    let addr = "0.0.0.0:50051".parse()?;
     let solver = SolverImpl::default();
 
     // let cert = include_str!("../server.pem");
