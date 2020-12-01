@@ -84,6 +84,8 @@ pub fn tests() {
     test_part_one_error!("1\n2\n3" => "No 2 expenses sum to 2020");
 
     test_part_two!("1721\n979\n366\n299\n675\n1456" => 241861950);
+    test_part_two_error!("asdf" => "Line 1: Cannot parse expense (invalid digit found in string)");
+    test_part_two_error!("12\nasdf" => "Line 2: Cannot parse expense (invalid digit found in string)");
     test_part_two_error!("" => "No 3 expenses sum to 2020");
     test_part_two_error!("1" => "No 3 expenses sum to 2020");
     test_part_two_error!("1\n2" => "No 3 expenses sum to 2020");
