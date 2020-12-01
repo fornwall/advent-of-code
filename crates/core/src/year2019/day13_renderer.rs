@@ -33,7 +33,7 @@ impl<'a> Renderer<'a> {
 
         if self.explosion {
             self.explosion = false;
-            self.painter.play_sound(0);
+            self.painter.play_sound(1);
         }
 
         self.painter.status_text(&format!(

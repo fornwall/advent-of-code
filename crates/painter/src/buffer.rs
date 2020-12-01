@@ -103,22 +103,6 @@ impl CircularOutputBuffer {
         }
     }
 
-    pub fn report_stats(&self) {
-        #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
-        console_log!(
-            "[buffer.rs] write={}, read={}",
-            self.shared_buffer[HEADER_WRITE_OFFSET],
-            self.shared_buffer[HEADER_READ_OFFSET]
-        )
-    }
-
-    pub fn write4(&mut self, a: i32, b: i32, c: i32, d: i32) {
-        self.write(a);
-        self.write(b);
-        self.write(c);
-        self.write(d);
-    }
-
     pub fn write_text(&mut self, text: &str) {
         self.write(text.len() as i32);
 

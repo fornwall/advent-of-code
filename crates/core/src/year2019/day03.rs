@@ -233,6 +233,11 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             max_y = std::cmp::max(max_y, line_segment.end_point().y);
         }
 
+        min_x -= 500;
+        min_y -= 500;
+        max_x += 500;
+        max_y += 500;
+
         let grid_width = (max_x - min_x) as i32;
         let grid_height = (max_y - min_y) as i32;
         input.painter.set_aspect_ratio(grid_width, grid_height);
@@ -271,6 +276,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         };
 
         let mut first = true;
+        let mut last_notified_intersection_count = 0;
         for (l1, l2) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
             draw_line(&mut input.painter, &l1, 255, 0, 0);
             draw_line(&mut input.painter, &l2, 0x5b, 0xce, 0xf3);
@@ -296,21 +302,27 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         };
 
                         intersection_count += 1;
+
                         input
                             .painter
-                            .line_width(grid_display_width * if is_best { 30. } else { 10. });
+                            .line_width(grid_display_width * if is_best { 60. } else { 10. });
                         if is_best {
                             input.painter.stroke_style_rgb(255, 255, 255);
                         } else {
-                            input.painter.stroke_style_rgb(0x94, 0x84, 0x84);
+                            input.painter.stroke_style_rgb(255, 255, 255);
                         }
                         input.painter.stroke_circle(
                             (intersection.point.x - min_x) as f64 * grid_display_width,
                             (intersection.point.y - min_y) as f64 * grid_display_height,
-                            grid_display_width * 100.,
+                            grid_display_width * 100. * if is_best { 2. } else { 1. },
                         );
                     }
                 }
+            }
+
+            if intersection_count != last_notified_intersection_count {
+                input.painter.play_sound(0);
+                last_notified_intersection_count = intersection_count;
             }
 
             input.painter.status_text(&format!(

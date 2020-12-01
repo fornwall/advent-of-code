@@ -11,7 +11,7 @@ const PHASE_START_SCREEN_CLICKED = 'startscreenclicked';
 const state = {
    phase: PHASE_PAGE_LOAD,
    params: {},
-   audioPlayer: new AudioPlayer('bounce.mp4'),
+   audioPlayer: new AudioPlayer('bounce.mp4', 'pop.mp4'),
 };
 
 let hash = location.hash.substring(1);
@@ -93,8 +93,11 @@ visualizerWorker.onmessage = (message) => {
         if (renderer.done) {
           console.log('[main] Rendering done');
           if (state.recorder) {
-            state.recorder.stopAndSave(generateFileName('webm'));
-            updateHash({download: ''});
+            setTimeout(() => {
+              // Give time for last frames to be recorded:
+              state.recorder.stopAndSave(generateFileName('webm'));
+              updateHash({download: ''});
+            }, 1000);
           }
           document.getElementById('spinner').style.visibility = 'visible';
           document.getElementById('spinnerImage').src = 'replay.svg';
@@ -185,10 +188,12 @@ async function togglePause() {
     case PHASE_PAGE_LOAD:
       break;
     case PHASE_SHOWING_START_SCREEN:
-      const recordAudio = state.params.download && false;
+      const recordAudio = state.params.download && true;
       await state.audioPlayer.load(recordAudio);
       if (state.params.download) {
-        state.recorder = recordAudio ? new CanvasRecorder(composedCtx.canvas, state.audioPlayer.createStream()) : new CanvasRecorder(composedCtx.canvas);
+        state.recorder = recordAudio ?
+              new CanvasRecorder(composedCtx.canvas, state.audioPlayer.createStream()) :
+              new CanvasRecorder(composedCtx.canvas);
         state.recorder.start();
       }
       state.phase = PHASE_START_SCREEN_CLICKED;

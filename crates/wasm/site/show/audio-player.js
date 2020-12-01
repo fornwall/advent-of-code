@@ -27,6 +27,14 @@ export function AudioPlayer(...urlList) {
   },
 
   this.createStream = () => {
+    const silence = this.context.createGain();
+    silence.gain.value = 0;
+    silence.connect(this.mediaStreamDestination);
+
+    const osc = this.context.createOscillator();
+    osc.connect(silence);
+    osc.start(0);
+
     // https://stackoverflow.com/questions/52134781/webrtc-video-audio-streams-out-of-sync-mediastream-mediarecorder-mediasou
     // https://stackoverflow.com/questions/40687010/canvascapturemediastream-mediarecorder-frame-synchronization
     // const osc = this.context.createOscillator();

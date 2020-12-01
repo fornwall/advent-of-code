@@ -28,13 +28,13 @@ enum Command {
     PlaySound,
 }
 
-pub struct ToBufferDrawer {
-    pub output_buffer: CircularOutputBuffer,
+pub struct CommandBufferPainter {
+    output_buffer: CircularOutputBuffer,
     aspect_ratio: f64,
 }
 
-impl ToBufferDrawer {
-    pub fn new() -> ToBufferDrawer {
+impl CommandBufferPainter {
+    pub fn new() -> CommandBufferPainter {
         Self {
             output_buffer: CircularOutputBuffer::new(),
             aspect_ratio: 1.0,
@@ -42,7 +42,7 @@ impl ToBufferDrawer {
     }
 }
 
-impl Painter for ToBufferDrawer {
+impl Painter for CommandBufferPainter {
     fn clear(&mut self) {
         self.output_buffer.write(Command::Clear as i32);
     }
@@ -190,7 +190,7 @@ impl Painter for ToBufferDrawer {
     }
 }
 
-impl Drop for ToBufferDrawer {
+impl Drop for CommandBufferPainter {
     fn drop(&mut self) {
         self.await_forever();
     }

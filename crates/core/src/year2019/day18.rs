@@ -211,10 +211,6 @@ pub fn steps_to_gather_all_keys(
         #[cfg(feature = "visualization")]
         &mut painter,
         #[cfg(feature = "visualization")]
-        cols,
-        #[cfg(feature = "visualization")]
-        rows,
-        #[cfg(feature = "visualization")]
         map_x_offset,
         #[cfg(feature = "visualization")]
         map_y_offset,
@@ -230,8 +226,6 @@ fn shortest_path(
     adjacency_list: &HashMap<Key, Vec<Edge>>,
     all_keys: KeyBitset,
     #[cfg(feature = "visualization")] drawer: &mut PainterRef,
-    #[cfg(feature = "visualization")] cols: usize,
-    #[cfg(feature = "visualization")] rows: usize,
     #[cfg(feature = "visualization")] map_x_offset: usize,
     #[cfg(feature = "visualization")] map_y_offset: usize,
     #[cfg(feature = "visualization")] global_cols: usize,
