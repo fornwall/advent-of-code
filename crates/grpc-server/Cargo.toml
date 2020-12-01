@@ -1,0 +1,20 @@
+[package]
+name = "advent-of-code-grpc-server"
+version = "2019.12.172"
+keywords = ["advent-of-code", "rust", "warp"]
+categories = ["algorithms", "rust-patterns", "grpc"]
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+repository = "https://github.com/fornwall/advent-of-code"
+description = "Solutions to Advent of Code written in Rust"
+license = "MIT"
+readme = "../../README.md"
+edition = "2018"
+
+[dependencies]
+advent-of-code = { path = "../core" }
+prost = "0.6"
+tokio = {version = "0.2", features = ["stream", "macros"]}
+tonic = { git = "https://github.com/hyperium/tonic", rev = "2e964c78c666ecd6e6cfc37689d30300cad81f4c" }
+
+[build-dependencies]
+tonic-build = "0.3"

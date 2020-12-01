@@ -2,10 +2,6 @@ name: Github CI
 
 on: push
 
-env:
-  DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
-  SERVER_DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-server
-
 jobs:
   test-rust:
     runs-on: ubuntu-latest
@@ -150,6 +146,8 @@ jobs:
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Build and push docker image
+      env:
+        DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
       run: |
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
@@ -158,7 +156,7 @@ jobs:
         docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
         docker push ${DOCKER_IMAGE_NAME}
 
-  release-and-deploy-server:
+  publish-and-deploy-http-server:
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
@@ -171,22 +169,58 @@ jobs:
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Build and push docker image
+      env:
+        DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-http-server
       run: |
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         bump2version patch
-        IMAGE=${SERVER_DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
         cd crates/server
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
         docker build --tag ${IMAGE} .
-        docker tag ${IMAGE} ${SERVER_DOCKER_IMAGE_NAME}:latest
-        docker push ${SERVER_DOCKER_IMAGE_NAME}
+        docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
+        docker push ${DOCKER_IMAGE_NAME}
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         FLY_PROJECT_PATH: crates/server
+      with:
+        args: "deploy"
+
+  publish-and-deploy-grpc-server:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - name: Install bump2version
+      run: pip install bump2version
+    - name: Login to docker hub
+      run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
+      env:
+        DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+    - name: Build and push docker image
+      env:
+        DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-grpc-server
+      run: |
+        NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
+        bump2version patch
+        IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
+        cd crates/grpc-server
+        cp -Rf ../core core
+        perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
+        docker build --tag ${IMAGE} .
+        docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
+        docker push ${DOCKER_IMAGE_NAME}
+    - name: Deploy to Fly
+      uses: superfly/flyctl-actions@master
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        FLY_PROJECT_PATH: crates/grpc-server
       with:
         args: "deploy"
 

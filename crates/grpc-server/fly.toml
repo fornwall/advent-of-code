@@ -1,0 +1,12 @@
+app = "advent-grpc"
+
+[build]
+  image = "fredrikfornwall/advent-of-code-grpc-server:2019.12.172"
+
+[[services]]
+  internal_port = 50051
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["tls"]
+    port = "443"

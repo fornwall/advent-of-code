@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package advent;
+
+service Solver {
+  rpc Solve (ProblemInput) returns (ProblemOutput);
+}
+
+message ProblemInput {
+  uint32 year = 1;
+  uint32 day = 2;
+  uint32 part = 3;
+  string text = 4;
+}
+
+message ProblemOutput {
+  string text = 1;
+}
+
+message ErrorResponse {
+  string description = 1;
+}
+
+message Response {
+  oneof response {
+    ProblemOutput output = 1;
+    ErrorResponse error = 2;
+  }
+}
