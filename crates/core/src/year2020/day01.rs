@@ -92,6 +92,6 @@ pub fn tests() {
     test_part_two_error!("1\n2\n3" => "No 3 expenses sum to 2020");
 
     let real_input = include_str!("day01_input.txt");
-    test_part_one!(real_input => 121396);
-    test_part_two!(real_input => 73616634);
+    test_part_one!(real_input => 138379);
+    test_part_two!(real_input => 85491920);
 }
