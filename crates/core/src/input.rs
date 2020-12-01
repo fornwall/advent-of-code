@@ -64,3 +64,17 @@ macro_rules! test_part_two {
         assert_eq!(Ok($expected), solve(&mut Input::part_two($input)));
     };
 }
+
+#[macro_export]
+macro_rules! test_part_one_error {
+    ($input:tt => $expected:tt) => {
+        assert_eq!(Err($expected.into()), solve(&mut Input::part_one($input)));
+    };
+}
+
+#[macro_export]
+macro_rules! test_part_two_error {
+    ($input:tt => $expected:tt) => {
+        assert_eq!(Err($expected.into()), solve(&mut Input::part_two($input)));
+    };
+}
