@@ -5,8 +5,8 @@ pub fn solve(_input: &mut Input) -> Result<u32, String> {
 }
 
 #[test]
-pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+pub const fn tests() {
+    // use crate::{test_part_one, test_part_two};
 
     // test_part_one!("R8,U5,L5,D3\nU7,R6,D4,L4" => 6);
 

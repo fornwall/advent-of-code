@@ -39,7 +39,7 @@ pub fn tests_part1() {
     assert_eq!(Ok(4_570_637), part1(include_str!("day02_input.txt")));
 
     assert_eq!(
-        Err("Line 1: Unable to parse program word (invalid digit found in string)".to_string()),
+        Err("Unable to parse program word (invalid digit found in string)".to_string()),
         part1("hi")
     );
 }
