@@ -139,7 +139,7 @@ visualizerWorker.onmessage = (message) => {
           const startRenderingNow = (state.params.download && count == 10) ||
             (!state.params.download && state.phase === PHASE_START_SCREEN_CLICKED) ||
             rerun ||
-            localStorage.getItem('debug_autostart');
+            (localStorage.getItem('debug_autostart') && !state.params.download);
 
           for (const c of startScreenCanvases) {
               c.resetTransform();

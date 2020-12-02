@@ -14,3 +14,7 @@ Show a UI with:
 ```sh
 grpcui -proto proto/advent.proto -plaintext '[::]:50051'
 ```
+
+#![allow(clippy::unwrap_used, clippy::future_not_send)]
+
+tonic::include_proto!("advent");

@@ -1,4 +1,6 @@
 use crate::input::Input;
+#[cfg(feature = "visualization")]
+use crate::year2020::day01_renderer::{render_part_one, render_part_two};
 use core::cmp::Ordering::{Equal, Greater, Less};
 
 fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u32> {
@@ -6,13 +8,10 @@ fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u
         return None;
     }
 
-    let mut left = 0;
-    let mut right = sorted_sequence.len() - 1;
+    let (mut left, mut right) = (0, sorted_sequence.len() - 1);
 
     while left != right {
-        let left_value = sorted_sequence[left];
-        let right_value = sorted_sequence[right];
-
+        let (left_value, right_value) = (sorted_sequence[left], sorted_sequence[right]);
         let candidate_sum = left_value + right_value;
 
         match candidate_sum.cmp(&desired_sum) {
@@ -51,26 +50,30 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
     expenses.sort_unstable();
 
-    if input.is_part_one() {
-        if let Some(value) = subsequence_summing_to(&expenses, DESIRED_SUM) {
-            return Ok(value);
-        }
+    let result = if input.is_part_one() {
+        #[cfg(feature = "visualization")]
+        render_part_one(&mut expenses, &mut input.painter);
+        subsequence_summing_to(&expenses, DESIRED_SUM)
     } else {
-        for (left_index, left_value) in expenses.iter().enumerate() {
-            let desired_sub_sum = DESIRED_SUM - left_value;
-            if let Some(value) =
+        #[cfg(feature = "visualization")]
+        render_part_two(&mut expenses, &mut input.painter);
+        expenses
+            .iter()
+            .enumerate()
+            .find_map(|(left_index, left_value)| {
+                let desired_sub_sum = DESIRED_SUM - left_value;
                 subsequence_summing_to(&expenses[(left_index + 1)..], desired_sub_sum)
-            {
-                return Ok(left_value * value);
-            }
-        }
-    }
+                    .map(|value| value * left_value)
+            })
+    };
 
-    Err(format!(
-        "No {} expenses sum to {}",
-        input.part_values(2, 3),
-        DESIRED_SUM
-    ))
+    result.ok_or_else(|| {
+        format!(
+            "No {} expenses sum to {}",
+            input.part_values(2, 3),
+            DESIRED_SUM
+        )
+    })
 }
 
 #[test]

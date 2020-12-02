@@ -43,6 +43,14 @@ pub trait Painter {
     fn fill_style_rgb(&mut self, r: i32, g: i32, b: i32);
 
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle
+    fn fill_style_rgb_packed(&mut self, rgb: i32) {
+        let red = (rgb & 0xFF0000) >> 16;
+        let green = (rgb & 0x00FF00) >> 8;
+        let blue = (rgb & 0x0000FF) >> 0;
+        self.fill_style_rgb(red, green, blue);
+    }
+
+    /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle
     fn fill_style_rgba(&mut self, r: i32, g: i32, b: i32, a: f64);
 
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/shadowColor
@@ -138,7 +146,7 @@ impl Painter for MockPainter {
 
     fn await_forever(&mut self) {}
 
-    fn log(&mut self, _text: &str) {}
-
     fn play_sound(&mut self, _sound_id: i32) {}
+
+    fn log(&mut self, _text: &str) {}
 }
