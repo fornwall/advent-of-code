@@ -176,7 +176,7 @@ jobs:
         bump2version patch
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
-        cd crates/server
+        cd crates/http-server
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
         docker build --tag ${IMAGE} .
@@ -186,7 +186,7 @@ jobs:
       uses: superfly/flyctl-actions@master
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        FLY_PROJECT_PATH: crates/server
+        FLY_PROJECT_PATH: crates/http-server
       with:
         args: "deploy"
 
