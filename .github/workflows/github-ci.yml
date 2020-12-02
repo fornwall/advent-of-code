@@ -25,7 +25,7 @@ jobs:
       run: |
         rustup component add clippy rustfmt --toolchain nightly
         LLVM_CONFIG=llvm-config-11 make NIGHTLY=1 check
-      if: matrix.rust == 'nightly'
+      if: matrix.rust == 'nightly-2020-11-21'
       continue-on-error: true
 
   test-python:
