@@ -39,6 +39,10 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         })
         .collect::<Result<Vec<u64>, _>>()?;
 
+    if starting_values.len() != 2 {
+        return Err("Invalid input - should be 2 lines".to_string());
+    }
+
     let first_generator = Generator {
         value: starting_values[0],
         factor: 16807,

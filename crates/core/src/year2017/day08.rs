@@ -8,6 +8,9 @@ fn solution(input_string: &str, part1: bool) -> Result<i32, String> {
 
     for line in input_string.lines() {
         let parts: Vec<&str> = line.split(' ').collect();
+        if parts.len() != 7 {
+            return Err("Invalid input - every line should have 7 words".to_string());
+        }
 
         let condition_register = parts[4];
         let &condition_value = registers.get(condition_register).unwrap_or(&0);

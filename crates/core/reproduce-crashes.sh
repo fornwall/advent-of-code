@@ -3,7 +3,7 @@ set -u
 
 INPUT=$1
 
-for year in 2018 2019; do
+for year in 2017 2018 2019 2020; do
   for day in {1..25}; do
     for part in 1 2; do
       echo "cargo run -q $year $day $part < $INPUT"

@@ -10,6 +10,10 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut location_to_set_identifier = BTreeMap::new();
     let mut used_counter = 0;
 
+    if input.text.len() != 8 {
+        return Err("Invalid input - should contain 8 characters".to_string());
+    }
+
     #[cfg(feature = "visualization")]
     input.painter.fill_style_rgb(255, 0, 0);
 
