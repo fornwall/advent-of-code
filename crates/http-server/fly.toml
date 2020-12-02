@@ -1,4 +1,4 @@
-app = "aoc"
+app = "advent"
 
 [build]
   image = "fredrikfornwall/advent-of-code-http-server:2019.12.174"
