@@ -78,5 +78,5 @@ pub fn tests() {
 
     let real_input = include_str!("day03_input.txt");
     test_part_one!(real_input => 286);
-    test_part_two!(real_input => 3093068400);
+    test_part_two!(real_input => 3638606400);
 }
