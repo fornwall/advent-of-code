@@ -10,7 +10,7 @@
 Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust. Consists of the following parts:
 
 - [crates/core](crates/core): The solutions themselves and a command-line tool on top of them.
-- [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [tonic](https://docs.rs/tonic).
+- [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [Tonic](https://docs.rs/tonic).
 - [crates/http-server](crates/http-server): Server with a HTTP API using [warp](https://github.com/seanmonstar/warp).
 - [crates/fuzzing-afl](crates/fuzzing-afl): Fuzzing of the solutions using [afl](https://lcamtuf.coredump.cx/afl/).
 - [crates/fuzzing-hfuzz](crates/fuzzing-hfuzz): Fuzzing of the solutions using [hongfuzz](https://honggfuzz.dev/).
