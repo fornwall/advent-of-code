@@ -130,7 +130,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
 
         # Strip away use of visualization packages - they just bloat up gist
         # with unrelated code and may contain transitive imports:
-        src = re.sub('\n#\\[cfg\\(feature = "visualization"[^;]*;', '', src, re.DOTALL)
+        src = re.sub('^#\\[cfg\\(feature = "visualization"[^;]*;', '', src, re.DOTALL)
 
         src = add_header(src, year, day)
         src = replace_include_str(dirpath, src)
