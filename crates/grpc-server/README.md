@@ -23,7 +23,7 @@ Show a UI using [grpcui](https://github.com/fullstorydev/grpcui):
 grpcui -proto proto/advent.proto -plaintext advent-grpc.fly.dev:443
 ```
 
-A [fredrikfornwall/advent-of-code-grpc-server](https://hub.docker.com/r/fredrikfornwall/advent-of-code-grpc-server) Docker image which starts the server on port 8080 is also available on Docker Hub:
+A [fredrikfornwall/advent-of-code-grpc-server](https://hub.docker.com/r/fredrikfornwall/advent-of-code-grpc-server) Docker image which starts the server on port 50051 is also available on Docker Hub:
 
 ```sh
 docker run -p 50051:50051 fredrikfornwall/advent-of-code-grpc-server
