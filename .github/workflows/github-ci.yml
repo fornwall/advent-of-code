@@ -23,7 +23,7 @@ jobs:
       if: matrix.rust == 'stable'
     - name: Test and check (nightly)
       run: |
-        rustup component add clippy rustfmt --toolchain nightly
+        rustup component add clippy rustfmt --toolchain nightly-2020-11-21
         LLVM_CONFIG=llvm-config-11 make NIGHTLY=1 check
       if: matrix.rust == 'nightly-2020-11-21'
       continue-on-error: true
