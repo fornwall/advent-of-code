@@ -102,3 +102,4 @@ run_bench!(2019, 25);
 run_bench!(2020, 1);
 run_bench!(2020, 2);
 run_bench!(2020, 3);
+run_bench!(2020, 4);
