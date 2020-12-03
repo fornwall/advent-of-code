@@ -1,7 +1,10 @@
+NIGHTLY_DATE = 2020-11-21 # Update versions in .github/workflows as well.
+NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
+
 CARGO_COMMAND = cargo
 CLIPPY_PARAMS = -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
 ifeq ($(NIGHTLY),1)
-  CARGO_COMMAND += +nightly
+  CARGO_COMMAND += +$(NIGHTLY_TOOLCHAIN)
   CLIPPY_PARAMS := --all-features --all-targets $(CLIPPY_PARAMS)
 else
   CLIPPY_PARAMS += -D warnings
@@ -19,8 +22,6 @@ WASM_PACK_COMMAND = wasm-pack \
 	build $(wasm_pack_profile) \
 	--target no-modules \
 	--out-dir site
-NIGHTLY_DATE = 2020-11-21
-NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 WASM_PACK_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory" \
 	rustup run $(NIGHTLY_TOOLCHAIN) \
 	wasm-pack build \
@@ -39,7 +40,7 @@ install-cargo-deps:
 	cargo install cargo-benchcmp cargo-watch devserver
 
 bench:
-	cargo +nightly bench
+	cargo +$(NIGHTLY_TOOLCHAIN) bench
 
 site-downloads:
 	cd crates/wasm && \
@@ -101,7 +102,7 @@ fuzz-hfuzz:
 
 fuzz-libfuzzer:
 	cargo install cargo-fuzz
-	cd crates/fuzzing-libfuzzer/ && cargo +nightly fuzz run fuzz_target
+	cd crates/fuzzing-libfuzzer/ && cargo +$(NIGHTLY_TOOLCHAIN) fuzz run fuzz_target
 
 install-nightly:
 	rustup toolchain install $(NIGHTLY_TOOLCHAIN) && \
