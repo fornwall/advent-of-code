@@ -1,3 +1,5 @@
+[![npm](https://img.shields.io/npm/v/advent-of-code-wasm.svg)](https://www.npmjs.com/package/advent-of-code-wasm)
+
 # advent-of-code-wasm
 Solutions to [Advent of Code](https://adventofcode.com/) implemented in Rust and compiled to WebAssembly.
 
