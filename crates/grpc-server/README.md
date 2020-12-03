@@ -1,8 +1,9 @@
 [![Docker Hub](https://img.shields.io/docker/v/fredrikfornwall/advent-of-code-grpc-server.svg?label=docker)](https://hub.docker.com/r/fredrikfornwall/advent-of-code-grpc-server)
 
 # Advent of Code gRPC solver server
-
 A gRPC server exposing an API to solve [Advent of Code](https://adventofcode.com/) problems.
+
+Solutions are implemented in Rust in the [core crate](https://github.com/fornwall/advent-of-code/tree/master/crates/core) and this crate uses the [Tonic](https://docs.rs/tonic/0.3.1/tonic/) library to expose them over gRPC.
 
 - Deployment URL: `advent-grpc.fly.dev:443`
 - Schema: [proto/advent.proto](proto/advent.proto)
