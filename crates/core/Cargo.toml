@@ -9,7 +9,7 @@ license = "MIT"
 description = "Solutions to Advent of Code"
 documentation = "https://docs.rs/advent-of-code/2019.12.179/advent_of_code/"
 homepage = "https://github.com/fornwall/advent-of-code"
-readme = "../../README.md"
+readme = "README.md"
 edition = "2018"
 
 [lib]
