@@ -1,4 +1,4 @@
-# advent-of-code
+# Advent of Code solutions in Rust exposed as a Python package
 Solutions to [Advent of Code](https://adventofcode.com/).
 
 The solutions are implemented in Rust which is exposed to Python using [PyO3](https://pyo3.rs/).
