@@ -1,6 +1,6 @@
-use crate::input::Input;
 #[cfg(feature = "visualization")]
-use crate::year2020::day01_renderer::{render_part_one, render_part_two};
+use super::day01_renderer::{render_part_one, render_part_two};
+use crate::input::Input;
 use core::cmp::Ordering::{Equal, Greater, Less};
 
 fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u32> {

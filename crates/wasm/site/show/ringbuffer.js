@@ -71,16 +71,21 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
       const used = readerOffset > writerOffset ? (writerOffset - readerOffset + dataBuffer.length) : (writerOffset - readerOffset);
 
       if (used < dataBuffer.length/3) {
-        Atomics.store(headerBuffer, HEADER_READER_WANT_MORE_OFFSET, 1);
-        Atomics.notify(headerBuffer, HEADER_READER_WANT_MORE_OFFSET);
+        // console.log(`YES requesting more data ${used} while len=${dataBuffer.length}`);
+        if (headerBuffer[HEADER_OK_TO_EXIT_OFFSET] == 1) {
+            // console.log('but rust exited, so skipping');
+        } else {
+            Atomics.store(headerBuffer, HEADER_READER_WANT_MORE_OFFSET, 1);
+            Atomics.notify(headerBuffer, HEADER_READER_WANT_MORE_OFFSET);
+        }
       } else {
-        console.log('not requesting more as utilisation=' + (used*1.0/dataBuffer.length));
+        // console.log(`NOT requesting more data ${used} while len=${dataBuffer.length}`);
       }
   };
 
   this.pleaseExit = () => {
      unflushedReads = 0; // Reset internal state for re-use.
-     Atomics.store(headerBuffer, HEADER_OK_TO_EXIT_OFFSET, 1);
+     Atomics.store(headerBuffer, HEADER_OK_TO_EXIT_OFFSET, 2);
      Atomics.notify(headerBuffer, HEADER_OK_TO_EXIT_OFFSET);
   };
 }

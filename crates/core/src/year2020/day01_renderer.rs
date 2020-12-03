@@ -122,6 +122,15 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
                     grid_draw_width,
                     draw_height,
                 );
+
+                if i == left || i == right || i == leftmost_index {
+                    painter.draw_text(
+                        (i as i32 - start_x) as f64 * grid_draw_width,
+                        1. - draw_height,
+                        0.02,
+                        &format!("{}", value),
+                    );
+                }
             }
 
             {

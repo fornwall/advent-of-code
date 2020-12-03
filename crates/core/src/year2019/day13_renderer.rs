@@ -84,6 +84,7 @@ impl<'a> Renderer<'a> {
                         );
                     }
                 };
+
                 match self.tiles.get(&(x, y)) {
                     Some(1) => {
                         // Wall.
@@ -98,10 +99,10 @@ impl<'a> Renderer<'a> {
                     }
                     Some(3) => {
                         // Paddle.
-                        self.painter.shadow_color(255, 0, 255);
-                        self.painter.shadow_blur(85);
-                        draw_rect(0, 0, 255, &mut self.painter);
-                        self.painter.shadow_blur(0);
+                        //self.painter.shadow_color(0x8a, 0xec, 0xff);
+                        //self.painter.shadow_blur(85);
+                        draw_rect(0xb1, 0xf2, 0xff, &mut self.painter);
+                        //self.painter.shadow_blur(0);
                     }
                     Some(4) => {
                         // Ball.

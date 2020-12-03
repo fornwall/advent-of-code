@@ -24,12 +24,14 @@ const COMMAND_STROKE = 21;
 const COMMAND_LINE_TO = 22;
 const COMMAND_MOVE_TO = 23;
 const COMMAND_PLAY_SOUND = 24;
+const COMMAND_DRAW_TEXT = 25;
 
 export default function Renderer(message, layers, onNewAspectRatio, audioPlayer) {
     const {buffer, offset, length} = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
     let ctx = layers[0];
+    // ctx.filter = 'blur(4px)';
     this.done = false;
 
     this.render = () => {
@@ -113,12 +115,12 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                 }
                 case COMMAND_DELAY: {
                     this.delay = reader.next();
-                    return;
+                    break outer;
                 }
                 case COMMAND_SWITCH_LAYER: {
                     const activeLayer = reader.next();
                     ctx = layers[activeLayer];
-                    return;
+                    break;
                 }
                 case COMMAND_SET_ASPECT_RATIO: {
                     const newAspectRatio = reader.nextFloat();
@@ -146,6 +148,35 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     if (audioPlayer) audioPlayer.play(soundId);
                     break;
                 }
+                case COMMAND_DRAW_TEXT: {
+                    const x = reader.nextFloat();
+                    const y = reader.nextFloat();
+                    const fontSize = reader.nextFloat();
+                    const text = reader.nextString();
+
+                    let textLayer = layers[1];
+                    const actualFontSize = fontSize * textLayer.canvas.height;
+
+                    textLayer.font = 'normal ' + actualFontSize + 'px Arial';
+                    textLayer.textAlign = 'center';
+                    textLayer.textBaseline = 'middle';
+
+                    const boxMargin = 0;
+                    const textWidth = textLayer.measureText(text).width;
+                    textLayer.fillStyle = 'rgba(13, 12, 26, 0.3)';
+                    const rectX = textLayer.canvas.width*x - textWidth/2 - boxMargin;
+                    const rectY = textLayer.canvas.height*y - actualFontSize/2;
+                    const rectWidth = textWidth + boxMargin*2;
+                    const rectHeight = actualFontSize;
+                    textLayer.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+                    textLayer.fillStyle = 'white';
+                    // const savedTransform = textLayer.getTransform();
+                    // textLayer.resetTransform();
+                    textLayer.fillText(text, textLayer.canvas.width*x, textLayer.canvas.height*y);
+                    // textLayer.setTransform(savedTransform);
+                    break;
+                }
                 default:
                     throw new Error('Unhandled command: ' + command + ', done=' + this.done + ', buffer=' + reader.toDebug());
             }
@@ -160,7 +191,7 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
 
         const yOffset = 0;
         const boxMargin = 10;
-        const textHeight = 60;
+        const textHeight = 80;
         textLayer.font = textHeight + 'px Monospace';
 
         textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);

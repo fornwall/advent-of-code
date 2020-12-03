@@ -34,7 +34,7 @@ pub struct CircularOutputBuffer {
 impl CircularOutputBuffer {
     pub fn new() -> Self {
         let mut result = Self {
-            shared_buffer: vec![0; 16 * 65536],
+            shared_buffer: vec![0; 4 * 1024 * 1024],
             non_flushed_writes: 0,
         };
 
@@ -94,15 +94,6 @@ impl CircularOutputBuffer {
         self.write_float(d);
     }
 
-    pub fn flush(&mut self) {
-        if self.non_flushed_writes > 0 {
-            self.shared_buffer[HEADER_WRITE_OFFSET] =
-                (self.shared_buffer[HEADER_WRITE_OFFSET] + self.non_flushed_writes) as i32
-                    % (self.data_len() as i32);
-            self.non_flushed_writes = 0;
-        }
-    }
-
     pub fn write_text(&mut self, text: &str) {
         self.write(text.len() as i32);
 
@@ -119,26 +110,45 @@ impl CircularOutputBuffer {
         }
     }
 
-    pub fn perhaps_wait(&mut self) {
-        self.shared_buffer[HEADER_READER_WANT_MORE_OFFSET] = 0;
+    pub fn flush_if_necessary(&mut self) {
+        self.flush(false);
+    }
 
+    pub fn flush(&mut self, force: bool) {
+        if self.non_flushed_writes > 1000 || (self.non_flushed_writes > 0 && force) {
+            /*
+            self.log(&format!(
+                "Non flushed writes={}, writeOffset={}, readOffset={}, totalSize={}",
+                self.non_flushed_writes,
+                self.shared_buffer[HEADER_WRITE_OFFSET],
+                self.shared_buffer[HEADER_READ_OFFSET],
+                self.shared_buffer.len(),
+            ));
+             */
+            self.shared_buffer[HEADER_WRITE_OFFSET] =
+                (self.shared_buffer[HEADER_WRITE_OFFSET] + self.non_flushed_writes) as i32
+                    % (self.data_len() as i32);
+            self.non_flushed_writes = 0;
+        }
+        self.perhaps_wait();
+    }
+
+    fn used_space(&self) -> i32 {
         let read_offset = self.shared_buffer[HEADER_READ_OFFSET];
         let write_offset = self.shared_buffer[HEADER_WRITE_OFFSET];
-        let used = if read_offset > write_offset {
+        if read_offset > write_offset {
             write_offset - read_offset + self.data_len() as i32
         } else {
             write_offset - read_offset
-        };
-        if used < (self.data_len() as i32 / 3) {
+        }
+    }
+
+    pub fn perhaps_wait(&mut self) {
+        self.shared_buffer[HEADER_READER_WANT_MORE_OFFSET] = 0;
+
+        let used = self.used_space();
+        if used * 3 < (self.data_len() as i32) * 2 {
             return;
-        } else {
-            /*
-            #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
-            console_log!(
-                "[rust] Waiting, use ratio {}",
-                used as f32 / self.data_len() as f32
-            );
-             */
         }
 
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
@@ -150,7 +160,10 @@ impl CircularOutputBuffer {
                     "This check of raw_pointer is necessary for (wasm-opt|compiler)? to keep it",
                 );
             }
+
+            self.log("About do wait for more");
             core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+            self.log("Waiting done");
 
             // A variant calling out to javascript, requires lines to be uncommented in
             // worker-visualiser.js. Still needs nightly build with atomics feature to
@@ -162,6 +175,11 @@ impl CircularOutputBuffer {
 
     /// Avoid exiting program while the worker javascript has not finished reading the output buffer.
     pub fn wait_forever(&mut self) {
+        self.flush(true);
+
+        // Signal we want to exit
+        self.shared_buffer[HEADER_OK_TO_EXIT_OFFSET] = 1;
+
         #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
         unsafe {
             let timeout_ns = -1;
@@ -175,7 +193,7 @@ impl CircularOutputBuffer {
                 );
             }
             self.log("Done - asking for permission to exit...");
-            core::arch::wasm32::memory_atomic_wait32(raw_pointer, 0, timeout_ns);
+            core::arch::wasm32::memory_atomic_wait32(raw_pointer, 1, timeout_ns);
             self.log("Got ok to exit!");
         }
     }

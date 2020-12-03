@@ -11,7 +11,6 @@ pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut Painter
         );
     }
 
-    painter.log(&format!("Num repeats: {}", num_horizontal_repeats));
     let min_x = 0;
     let max_x = map.cols * num_horizontal_repeats;
     let min_y = 0;
@@ -20,7 +19,7 @@ pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut Painter
     let grid_width = (max_x - min_x + 1) as i32;
     let grid_height = (max_y - min_y + 1) as i32;
 
-    painter.set_aspect_ratio(grid_width, grid_height);
+    painter.set_aspect_ratio(16, 9);
     painter.end_frame();
     painter.meta_delay(100);
 
@@ -37,7 +36,7 @@ pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut Painter
             painter.fill_circle(
                 draw_x + draw_width / 2.,
                 draw_y + draw_height / 2.,
-                grid_display_width * 2.,
+                grid_display_width * 3.,
             );
         } else {
             painter.fill_rect(draw_x, draw_y, draw_width, draw_height);
@@ -47,12 +46,9 @@ pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut Painter
     for y in 0..map.rows {
         for x in 0..(map.cols * num_horizontal_repeats) {
             if map.tree_at(x, y) {
-                draw_rect(x, y, 0x1fd537, false, &mut painter);
+                draw_rect(x, y, 0x00FF00, false, &mut painter);
             }
         }
-        //if y % 10 == 0 {
-        //painter.end_frame();
-        //}
     }
 
     painter.end_frame();
@@ -65,10 +61,17 @@ pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut Painter
 
         let set_status =
             |slope: &(usize, usize), trees_seen_now, current_product, painter: &mut PainterRef| {
-                painter.status_text(&format!(
-                    "Slope: {},{} Trees: {: >3} Product: {: >8}",
-                    slope.0, slope.1, trees_seen_now, current_product
-                ));
+                if slopes.len() == 1 {
+                    painter.status_text(&format!(
+                        "Slope: {},{} Trees: {: >3}",
+                        slope.0, slope.1, trees_seen_now
+                    ));
+                } else {
+                    painter.status_text(&format!(
+                        "Slope: {},{} Trees: {: >3} Product: {: >8}",
+                        slope.0, slope.1, trees_seen_now, current_product
+                    ));
+                }
             };
 
         for position in std::iter::successors(Some(initial_position), |pos| {
@@ -80,6 +83,7 @@ pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut Painter
             }
         }) {
             if map.tree_at(position.0, position.1) {
+                painter.play_sound(1);
                 trees_seen_now += 1;
             }
             draw_rect(position.0, position.1, 0xFF0000, true, &mut painter);

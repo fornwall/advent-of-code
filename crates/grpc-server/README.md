@@ -1,20 +1,22 @@
-# Advent of Code solver gRPC server
-Start server with `cargo run`, invoke as with:
+# Advent of Code gRPC solver server
+
+A gRPC server exposing an API to solve [Advent of Code](https://adventofcode.com/) problems.
+
+- Deployment URL: `advent-grpc.fly.dev`
+- Schema: [proto/advent.proto](proto/advent.proto)
+
+It can be invoked using [grpcurl](https://github.com/fullstorydev/grpcurl) as shown below:
 
 ```sh
 grpcurl -plaintext \
   -proto ./proto/advent.proto \
   -d '{"year": 2019, "day": 1, "part": 1, "text": "12334"}' \
-  '[::]:50051' \
+  advent-grpc.fly.dev:443 \
   advent.Solver/Solve
 ```
 
-Show a UI with:
+Show a UI using [grpcui](https://github.com/fullstorydev/grpcui):
 
 ```sh
-grpcui -proto proto/advent.proto -plaintext '[::]:50051'
+grpcui -proto proto/advent.proto -plaintext advent-grpc.fly.dev:443
 ```
-
-#![allow(clippy::unwrap_used, clippy::future_not_send)]
-
-tonic::include_proto!("advent");

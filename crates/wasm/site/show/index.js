@@ -4,6 +4,8 @@ import {AudioPlayer} from './audio-player.js';
 
 const visualizerWorker = new Worker('./worker-visualizer.js', {name: 'visualizer'});
 
+const spinnerImage = document.getElementById('spinnerImage');
+
 const PHASE_PAGE_LOAD = 'pageload';
 const PHASE_SHOWING_START_SCREEN = 'showingstartscreen';
 const PHASE_START_SCREEN_CLICKED = 'startscreenclicked';
@@ -77,10 +79,11 @@ visualizerWorker.onmessage = (message) => {
   }
 
   if (state.params.download) {
-    document.getElementById('spinnerImage').src = 'recording.svg';
+    spinnerImage.src = 'recording.svg';
   } else {
     document.getElementById('spinner').style.visibility = 'hidden';
-    document.getElementById('spinnerImage').classList.remove('fade-out');
+    spinnerImage.src = 'replay.svg';
+    spinnerImage.classList.remove('fade-out');
   }
 
   const rerun = !!window.renderer;
@@ -100,8 +103,7 @@ visualizerWorker.onmessage = (message) => {
             }, 1000);
           }
           document.getElementById('spinner').style.visibility = 'visible';
-          document.getElementById('spinnerImage').src = 'replay.svg';
-          document.getElementById('spinnerImage').classList.add('fade-out');
+          spinnerImage.classList.add('fade-out');
         } else {
           try {
             renderer.render();
@@ -160,7 +162,6 @@ visualizerWorker.onmessage = (message) => {
           }
 
           if (startRenderingNow) {
-              console.log('[main] Starting rendering...');
               state.phase = 'rendering';
               startRendering(renderer);
           } else {
