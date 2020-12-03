@@ -1,3 +1,5 @@
+[![PyPi](https://img.shields.io/pypi/v/advent-of-code.svg)](https://pypi.org/project/advent-of-code/)
+
 # advent-of-code-python
 Solutions to [Advent of Code](https://adventofcode.com/) implemented in Rust and exposed to Python using [PyO3](https://pyo3.rs/).
 
