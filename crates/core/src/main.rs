@@ -29,7 +29,7 @@ fn main() -> Result<(), String> {
             part,
             input.as_ref(),
             #[cfg(feature = "visualization")]
-            MockPainter {},
+            Box::new(MockPainter {}),
         )?;
         println!("{}", solution);
     } else {
