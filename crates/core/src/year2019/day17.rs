@@ -250,6 +250,9 @@ fn subsequence_exists<T>(seq: &[T], subseq: &[T]) -> bool
 where
     T: PartialEq,
 {
+    if subseq.len() > seq.len() {
+        return false;
+    }
     (0..(seq.len() - subseq.len())).any(|i| seq[i..].starts_with(subseq))
 }
 
