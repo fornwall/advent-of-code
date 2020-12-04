@@ -1,47 +1,42 @@
 use crate::input::Input;
 
-fn is_valid(field_idx: usize, field_value: &str) -> bool {
+fn is_valid(field_idx: usize, value: &str) -> bool {
     fn in_range(string: &str, start: u32, end: u32) -> bool {
         (start..=end).contains(&string.parse::<u32>().unwrap_or_default())
     }
 
     match field_idx {
-        0 => field_value.len() == 4 && in_range(field_value, 1920, 2002),
-        1 => field_value.len() == 4 && in_range(field_value, 2010, 2020),
-        2 => field_value.len() == 4 && in_range(field_value, 2020, 2030),
+        0 => value.len() == 4 && in_range(value, 1920, 2002),
+        1 => value.len() == 4 && in_range(value, 2010, 2020),
+        2 => value.len() == 4 && in_range(value, 2020, 2030),
         3 => {
-            (field_value.ends_with("cm")
-                && in_range(&field_value[0..(field_value.len() - 2)], 150, 193))
-                || (field_value.ends_with("in")
-                    && in_range(&field_value[0..(field_value.len() - 2)], 59, 76))
+            (value.ends_with("cm") && in_range(&value[0..(value.len() - 2)], 150, 193))
+                || (value.ends_with("in") && in_range(&value[0..(value.len() - 2)], 59, 76))
         }
         4 => {
-            field_value.starts_with('#')
-                && field_value.len() == 7
-                && field_value[1..]
+            value.starts_with('#')
+                && value.len() == 7
+                && value[1..]
                     .chars()
                     .all(|c| c.is_ascii_digit() || c.is_ascii_lowercase())
         }
-        5 => matches!(
-            field_value,
-            "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"
-        ),
-        6 => field_value.len() == 9 && field_value.parse::<u32>().is_ok(),
+        5 => matches!(value, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"),
+        6 => value.len() == 9 && value.parse::<u32>().is_ok(),
         _ => false,
     }
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let all_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+    let field_names = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+    let mut valid_fields = [false; 7];
     let mut valid_count = 0;
-    let mut field_statuses = [false; 7];
 
     for line in input.text.lines().chain(std::iter::once("")) {
         if line.is_empty() {
-            if field_statuses.iter().all(|&ok| ok) {
+            if valid_fields.iter().all(|&ok| ok) {
                 valid_count += 1;
             }
-            field_statuses.iter_mut().for_each(|ok| *ok = false);
+            valid_fields.iter_mut().for_each(|ok| *ok = false);
         } else {
             for (line_idx, entry) in line.split(' ').enumerate() {
                 let parts: Vec<&str> = entry.split(':').collect();
@@ -54,8 +49,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
                 let key = parts[0];
                 let value = parts[1];
-                if let Some(field_idx) = all_fields.iter().position(|&field| field == key) {
-                    field_statuses[field_idx] = input.is_part_one() || is_valid(field_idx, value);
+                if let Some(field_idx) = field_names.iter().position(|&field| field == key) {
+                    valid_fields[field_idx] = input.is_part_one() || is_valid(field_idx, value);
                 }
             }
         }
