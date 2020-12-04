@@ -1,6 +1,6 @@
 [workspace]
 members = [ "crates/*" ]
-exclude = [ "crates/painter", "crates/fuzzing-libfuzzer" ]
+exclude = [ "crates/painter", "crates/fuzzing-afl" ]
 
 [profile.release]
 lto = true
