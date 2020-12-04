@@ -18,7 +18,7 @@ fn is_valid(field_idx: usize, value: &str) -> bool {
                 && value.len() == 7
                 && value[1..]
                     .bytes()
-                    .all(|c| c.is_ascii_digit() || c.is_ascii_lowercase())
+                    .all(|c| matches!(c, b'0'..=b'9' | b'a'..=b'f'))
         }
         5 => matches!(value, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"),
         6 => value.len() == 9 && value.parse::<u32>().is_ok(),
@@ -40,18 +40,17 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             fields_validity.iter_mut().for_each(|ok| *ok = false);
         } else {
             for (line_idx, entry) in line.split(' ').enumerate() {
-                let parts: Vec<&str> = entry.split(':').collect();
-                if parts.len() != 2 {
+                let mut parts = entry.split(':');
+                if let (Some(key), Some(value), None) = (parts.next(), parts.next(), parts.next()) {
+                    if let Some(field_idx) = FIELD_NAMES.iter().position(|&field| field == key) {
+                        fields_validity[field_idx] =
+                            input.is_part_one() || is_valid(field_idx, value);
+                    }
+                } else {
                     return Err(format!(
-                        "Line {} contains an entry not separated by a colon",
-                        line_idx
+                        "Line {}: Word not having the format $KEY:$VALUE",
+                        line_idx + 1
                     ));
-                }
-
-                let key = parts[0];
-                if let Some(field_idx) = FIELD_NAMES.iter().position(|&field| field == key) {
-                    let value = parts[1];
-                    fields_validity[field_idx] = input.is_part_one() || is_valid(field_idx, value);
                 }
             }
         }
