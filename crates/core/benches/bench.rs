@@ -1,18 +1,95 @@
-#![feature(test, concat_idents)]
+#![feature(test, const_fn)]
 #![allow(clippy::zero_prefixed_literal)]
 extern crate test;
 
 use advent_of_code::solve;
 use paste::paste;
+#[cfg(feature = "count-allocations")]
+use std::alloc::System;
 use std::fs::read_to_string;
 use test::Bencher;
+
+#[cfg(feature = "count-allocations")]
+mod counting_allocator {
+    use backtrace::Backtrace;
+    use std::alloc::{GlobalAlloc, Layout};
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    /// A memory allocator which wraps another and counts allocations.
+    ///
+    /// It can optionally fail with a backtrace after a specific number of allocations.
+    ///
+    /// https://www.reddit.com/r/rust/comments/8z83wc/is_there_any_way_to_benchmark_memory_usage_in_rust/
+    /// RUSTFLAGS="-Cdebuginfo=1" cargo +nightly-2020-11-21 bench problem_2020 --features count-allocations -- --nocapture
+    pub struct CountingAllocator<A: GlobalAlloc> {
+        pub wrapped_allocator: A,
+        allocator_count: AtomicU64,
+        start_failing_after: AtomicU64,
+    }
+
+    unsafe impl<A: GlobalAlloc> GlobalAlloc for CountingAllocator<A> {
+        unsafe fn alloc(&self, l: Layout) -> *mut u8 {
+            let previous_count = self.allocator_count.fetch_add(1u64, Ordering::SeqCst);
+            if previous_count >= self.start_failing_after.load(Ordering::SeqCst) {
+                self.start_failing_after.store(u64::MAX, Ordering::SeqCst);
+                println!("Allocation back trace: {:?}", Backtrace::new());
+                panic!("Aborting after found allocation");
+            }
+
+            self.wrapped_allocator.alloc(l)
+        }
+
+        unsafe fn dealloc(&self, ptr: *mut u8, l: Layout) {
+            self.wrapped_allocator.dealloc(ptr, l);
+        }
+    }
+
+    impl<A: GlobalAlloc> CountingAllocator<A> {
+        pub const fn new(a: A) -> Self {
+            Self {
+                wrapped_allocator: a,
+                allocator_count: AtomicU64::new(0),
+                start_failing_after: AtomicU64::new(u64::MAX),
+            }
+        }
+
+        pub fn reset(&self) {
+            self.allocator_count.store(0, Ordering::SeqCst);
+            self.start_failing_after.store(u64::MAX, Ordering::SeqCst);
+        }
+
+        pub fn reset_and_fail_after(&self, fail_after: u64) {
+            self.start_failing_after.store(fail_after, Ordering::SeqCst);
+            self.allocator_count.store(0, Ordering::SeqCst);
+        }
+
+        pub fn get(&self) -> u64 {
+            self.allocator_count.load(Ordering::SeqCst)
+        }
+    }
+}
+
+#[global_allocator]
+#[cfg(feature = "count-allocations")]
+static GLOBAL: counting_allocator::CountingAllocator<System> =
+    counting_allocator::CountingAllocator::new(System);
 
 fn solve_parts(b: &mut Bencher, year: u16, day: u8, part: u8) {
     #![allow(clippy::unwrap_used)]
     let input_path = format!("src/year{}/day{:02}_input.txt", year, day);
     let input = read_to_string(input_path).unwrap();
+
     b.iter(|| {
+        #[cfg(feature = "count-allocations")]
+        GLOBAL.reset_and_fail_after(2);
+
         solve(year, day, part, &input).unwrap();
+
+        #[cfg(feature = "count-allocations")]
+        {
+            println!("Number of allocations: {}", GLOBAL.get());
+            GLOBAL.reset();
+        }
     });
 }
 
