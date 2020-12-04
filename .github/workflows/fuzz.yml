@@ -15,6 +15,7 @@ jobs:
 
   fuzz-afl:
     runs-on: ubuntu-latest
+    # Allow failures as LLVM is not always available for installation:
     continue-on-error: true
     steps:
     - name: Check out source code
@@ -32,7 +33,6 @@ jobs:
 
   fuzz-libfuzzer:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
     - name: Check out source code
       uses: actions/checkout@v2
