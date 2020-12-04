@@ -27,7 +27,8 @@ fn is_valid(field_idx: usize, value: &str) -> bool {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let field_names = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+    const FIELD_NAMES: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+
     let mut fields_validity = [false; 7];
     let mut valid_passports_count = 0;
 
@@ -48,7 +49,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 }
 
                 let key = parts[0];
-                if let Some(field_idx) = field_names.iter().position(|&field| field == key) {
+                if let Some(field_idx) = FIELD_NAMES.iter().position(|&field| field == key) {
                     let value = parts[1];
                     fields_validity[field_idx] = input.is_part_one() || is_valid(field_idx, value);
                 }
