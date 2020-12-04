@@ -2,6 +2,8 @@
 use std::env;
 use std::io::Read;
 
+#[cfg(feature = "visualization")]
+use advent_of_code::painter::MockPainter;
 use advent_of_code::solve_raw;
 
 fn main() -> Result<(), String> {
@@ -21,7 +23,14 @@ fn main() -> Result<(), String> {
             .read_to_string(&mut input)
             .map_err(|error| format!("Error reading input: {}", error.to_string()))?;
 
-        let solution = solve_raw(year, day, part, input.as_ref())?;
+        let solution = solve_raw(
+            year,
+            day,
+            part,
+            input.as_ref(),
+            #[cfg(feature = "visualization")]
+            MockPainter {},
+        )?;
         println!("{}", solution);
     } else {
         usage();
