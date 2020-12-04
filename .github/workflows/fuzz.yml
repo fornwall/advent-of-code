@@ -15,6 +15,8 @@ jobs:
 
   fuzz-afl:
     runs-on: ubuntu-latest
+    # Allow failures as LLVM is not always available for installation:
+    continue-on-error: true
     steps:
     - name: Check out source code
       uses: actions/checkout@v2
@@ -37,8 +39,6 @@ jobs:
     - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: nightly-2020-11-21
-    - name: Install current LLVM
-      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - name: Fuzz with libfuzzer
       run: timeout 1800s make fuzz-libfuzzer
       continue-on-error: true
