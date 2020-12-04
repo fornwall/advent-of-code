@@ -46,7 +46,7 @@ impl Moons {
     }
 
     fn total_energy(&self) -> u64 {
-        let mut total_energy = 0 as u64;
+        let mut total_energy = 0_u64;
         for i in 0..4 {
             let potential_energy = self.positions[i].iter().map(|&x| x.abs()).sum::<i32>() as u64;
             let kinetic_energy = self.velocities[i].iter().map(|&x| x.abs()).sum::<i32>() as u64;

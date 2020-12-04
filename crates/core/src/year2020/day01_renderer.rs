@@ -63,6 +63,10 @@ pub fn render_part_one(input: &mut Vec<u32>, painter: &mut PainterRef) {
 }
 
 pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
+    const COLOR_LEFTMOST: i32 = 0xFFFFFF;
+    const COLOR_LEFT: i32 = 0x00FF00;
+    const COLOR_RIGHT: i32 = 0xFF0000;
+
     let desired_sum = 2020;
 
     let mut min_value = u32::MAX;
@@ -80,10 +84,6 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
 
     let grid_draw_width = 1. / (input.len() as i32 - start_x) as f64;
     let grid_draw_height = 1. / value_span as f64;
-
-    const COLOR_LEFTMOST: i32 = 0xFFFFFF;
-    const COLOR_LEFT: i32 = 0x00FF00;
-    const COLOR_RIGHT: i32 = 0xFF0000;
 
     let mut iteration = 0;
     for (leftmost_index, leftmost_value) in input.iter().enumerate() {

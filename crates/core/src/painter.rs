@@ -46,7 +46,7 @@ pub trait Painter {
     fn fill_style_rgb_packed(&mut self, rgb: i32) {
         let red = (rgb & 0xFF0000) >> 16;
         let green = (rgb & 0x00FF00) >> 8;
-        let blue = (rgb & 0x0000FF) >> 0;
+        let blue = rgb & 0x0000FF;
         self.fill_style_rgb(red, green, blue);
     }
 

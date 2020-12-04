@@ -1,7 +1,7 @@
 use super::day03::Map;
 use crate::painter::PainterRef;
 
-pub fn render(map: &Map, slopes: &Vec<(usize, usize)>, mut painter: &mut PainterRef) {
+pub fn render(map: &Map, slopes: &[(usize, usize)], mut painter: &mut PainterRef) {
     let mut num_horizontal_repeats = 1;
     for slope in slopes {
         let num_iterations = map.rows / slope.1;

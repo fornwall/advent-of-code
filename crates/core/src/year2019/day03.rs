@@ -278,8 +278,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let mut first = true;
         let mut last_notified_intersection_count = 0;
         for (l1, l2) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
-            draw_line(&mut input.painter, &l1, 255, 0, 0);
-            draw_line(&mut input.painter, &l2, 0x5b, 0xce, 0xf3);
+            draw_line(&mut input.painter, l1, 255, 0, 0);
+            draw_line(&mut input.painter, l2, 0x5b, 0xce, 0xf3);
 
             drawn_lines1.push(*l1);
             drawn_lines2.push(*l2);
@@ -289,7 +289,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             for d1 in &drawn_lines1 {
                 for d2 in &drawn_lines2 {
                     if let Some(intersection) = d1.intersection_with(*d2) {
-                        let is_best = if intersection.point != origin {
+                        let is_best = if intersection.point == origin {
+                            false
+                        } else {
                             let intersection_value = if input.is_part_one() {
                                 intersection.point.distance_from(origin)
                             } else {
@@ -297,8 +299,6 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                             };
                             current_best = std::cmp::min(current_best, intersection_value);
                             intersection_value == best
-                        } else {
-                            false
                         };
 
                         intersection_count += 1;
@@ -306,11 +306,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         input
                             .painter
                             .line_width(grid_display_width * if is_best { 60. } else { 10. });
-                        if is_best {
-                            input.painter.stroke_style_rgb(255, 255, 255);
-                        } else {
-                            input.painter.stroke_style_rgb(255, 255, 255);
-                        }
+                        input.painter.stroke_style_rgb(255, 255, 255);
                         input.painter.stroke_circle(
                             (intersection.point.x - min_x) as f64 * grid_display_width,
                             (intersection.point.y - min_y) as f64 * grid_display_height,
