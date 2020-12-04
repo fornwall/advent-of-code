@@ -1,79 +1,62 @@
 use crate::input::Input;
-use std::collections::HashMap;
 
-fn is_valid(field_name: &str, field_value: &str) -> bool {
-    match field_name {
-        "byr" => {
-            field_value.len() == 4
-                && (1920..=2002).contains(&field_value.parse::<u32>().unwrap_or_default())
-        }
-        "iyr" => {
-            field_value.len() == 4
-                && (2010..=2020).contains(&field_value.parse::<u32>().unwrap_or_default())
-        }
-        "eyr" => {
-            field_value.len() == 4
-                && (2020..=2030).contains(&field_value.parse::<u32>().unwrap_or_default())
-        }
-        "hgt" => {
+fn is_valid(field_idx: usize, field_value: &str) -> bool {
+    fn in_range(string: &str, start: u32, end: u32) -> bool {
+        (start..=end).contains(&string.parse::<u32>().unwrap_or_default())
+    }
+
+    match field_idx {
+        0 => field_value.len() == 4 && in_range(field_value, 1920, 2002),
+        1 => field_value.len() == 4 && in_range(field_value, 2010, 2020),
+        2 => field_value.len() == 4 && in_range(field_value, 2020, 2030),
+        3 => {
             (field_value.ends_with("cm")
-                && (150..=193).contains(
-                    &field_value[0..(field_value.len() - 2)]
-                        .parse::<u32>()
-                        .unwrap_or_default(),
-                ))
+                && in_range(&field_value[0..(field_value.len() - 2)], 150, 193))
                 || (field_value.ends_with("in")
-                    && (59..=76).contains(
-                        &field_value[0..(field_value.len() - 2)]
-                            .parse::<u32>()
-                            .unwrap_or_default(),
-                    ))
+                    && in_range(&field_value[0..(field_value.len() - 2)], 59, 76))
         }
-        "hcl" => {
+        4 => {
             field_value.starts_with('#')
                 && field_value.len() == 7
-                && (&field_value[1..])
+                && field_value[1..]
                     .chars()
                     .all(|c| c.is_ascii_digit() || c.is_ascii_lowercase())
         }
-        "ecl" => matches!(
+        5 => matches!(
             field_value,
             "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"
         ),
-        "pid" => field_value.len() == 9 && field_value.parse::<u32>().is_ok(),
+        6 => field_value.len() == 9 && field_value.parse::<u32>().is_ok(),
         _ => false,
     }
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let all_fields = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-
-    let mut current_password: HashMap<&str, String> = HashMap::new();
+    let all_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
     let mut valid_count = 0;
+    let mut field_statuses = [false; 7];
 
     for line in input.text.lines().chain(std::iter::once("")) {
         if line.is_empty() {
-            let mut this_passport_valid = true;
-            for &field in &all_fields {
-                if !current_password.contains_key(field) {
-                    this_passport_valid = false;
-                } else if input.is_part_two()
-                    && !is_valid(field, current_password.get(field).unwrap())
-                {
-                    this_passport_valid = false;
-                }
-            }
-
-            current_password.clear();
-
-            if this_passport_valid {
+            if field_statuses.iter().all(|&ok| ok) {
                 valid_count += 1;
             }
+            field_statuses.iter_mut().for_each(|ok| *ok = false);
         } else {
-            for entry in line.split(' ') {
-                let key = entry.split(':').next().unwrap();
-                let value = entry.split(':').nth(1).unwrap();
-                current_password.insert(key, value.to_string());
+            for (line_idx, entry) in line.split(' ').enumerate() {
+                let parts: Vec<&str> = entry.split(':').collect();
+                if parts.len() != 2 {
+                    return Err(format!(
+                        "Line {} contains a non-semicolon separated entry",
+                        line_idx
+                    ));
+                }
+
+                let key = parts[0];
+                let value = parts[1];
+                if let Some(field_idx) = all_fields.iter().position(|&field| field == key) {
+                    field_statuses[field_idx] = input.is_part_one() || is_valid(field_idx, value);
+                }
             }
         }
     }
@@ -83,7 +66,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two}; // , test_part_one_error, test_part_two, test_part_two_error};
+    use crate::{test_part_one, test_part_two};
 
     test_part_one!("ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
 byr:1937 iyr:2017 cid:147 hgt:183cm
