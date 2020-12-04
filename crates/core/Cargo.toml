@@ -18,8 +18,10 @@ name = "advent_of_code"
 [features]
 debug-output = []
 visualization = []
+count-allocations = ["backtrace"]
 
 [dependencies]
+backtrace = { version = "0.3", optional = true }
 
 [dev-dependencies]
 paste = "1.0"

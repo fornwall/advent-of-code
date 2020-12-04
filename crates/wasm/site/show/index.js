@@ -40,7 +40,7 @@ function updateHash(parameters) {
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 
-const overlayCanvas = document.getElementById('layer1');
+const overlayCanvas = document.getElementById('overlayCanvas');
 const overlayCtx = overlayCanvas.getContext('2d');
 
 const composedCanvas = document.getElementById('composed');
