@@ -46,6 +46,7 @@ run_bench!(2017, 12);
 run_bench!(2017, 13);
 run_bench!(2017, 14);
 run_bench!(2017, 15);
+run_bench!(2017, 16);
 
 run_bench!(2018, 01);
 run_bench!(2018, 02);
@@ -103,3 +104,4 @@ run_bench!(2020, 1);
 run_bench!(2020, 2);
 run_bench!(2020, 3);
 run_bench!(2020, 4);
+run_bench!(2020, 5);
