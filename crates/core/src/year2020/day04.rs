@@ -48,8 +48,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 }
 
                 let key = parts[0];
-                let value = parts[1];
                 if let Some(field_idx) = field_names.iter().position(|&field| field == key) {
+                    let value = parts[1];
                     valid_fields[field_idx] = input.is_part_one() || is_valid(field_idx, value);
                 }
             }
