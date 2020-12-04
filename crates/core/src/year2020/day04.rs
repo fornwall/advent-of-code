@@ -47,7 +47,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 let parts: Vec<&str> = entry.split(':').collect();
                 if parts.len() != 2 {
                     return Err(format!(
-                        "Line {} contains a non-semicolon separated entry",
+                        "Line {} contains an entry not separated by a colon",
                         line_idx
                     ));
                 }
