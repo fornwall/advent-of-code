@@ -1,5 +1,6 @@
 use crate::input::Input;
 
+#[derive(Copy, Clone)]
 struct Generator {
     value: u64,
     factor: u64,
@@ -11,7 +12,12 @@ impl Iterator for Generator {
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            self.value = (self.value * self.factor) % 2147483647;
+            // https://www.reddit.com/r/adventofcode/comments/7jyz5x/2017_day_15_opportunities_for_optimization/drasfzr?utm_source=share&utm_medium=web2x&context=3
+            // self.value = (self.value * self.factor) % 2147483647;
+            let prod = self.value * self.factor;
+            let g = (prod & 0x7fffffff) + (prod >> 31);
+            self.value = if g >> 31 == 0 { g } else { g - 0x7fffffff };
+
             if self.value % self.only_multiples_of == 0 {
                 return Some(self.value);
             }
