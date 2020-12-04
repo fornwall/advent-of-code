@@ -17,7 +17,7 @@ fn is_valid(field_idx: usize, value: &str) -> bool {
             value.starts_with('#')
                 && value.len() == 7
                 && value[1..]
-                    .chars()
+                    .bytes()
                     .all(|c| c.is_ascii_digit() || c.is_ascii_lowercase())
         }
         5 => matches!(value, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth"),
@@ -28,15 +28,15 @@ fn is_valid(field_idx: usize, value: &str) -> bool {
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let field_names = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-    let mut valid_fields = [false; 7];
-    let mut valid_count = 0;
+    let mut fields_validity = [false; 7];
+    let mut valid_passports_count = 0;
 
     for line in input.text.lines().chain(std::iter::once("")) {
         if line.is_empty() {
-            if valid_fields.iter().all(|&ok| ok) {
-                valid_count += 1;
+            if fields_validity.iter().all(|&ok| ok) {
+                valid_passports_count += 1;
             }
-            valid_fields.iter_mut().for_each(|ok| *ok = false);
+            fields_validity.iter_mut().for_each(|ok| *ok = false);
         } else {
             for (line_idx, entry) in line.split(' ').enumerate() {
                 let parts: Vec<&str> = entry.split(':').collect();
@@ -50,13 +50,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 let key = parts[0];
                 if let Some(field_idx) = field_names.iter().position(|&field| field == key) {
                     let value = parts[1];
-                    valid_fields[field_idx] = input.is_part_one() || is_valid(field_idx, value);
+                    fields_validity[field_idx] = input.is_part_one() || is_valid(field_idx, value);
                 }
             }
         }
     }
 
-    Ok(valid_count)
+    Ok(valid_passports_count)
 }
 
 #[test]
