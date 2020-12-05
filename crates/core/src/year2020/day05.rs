@@ -45,7 +45,7 @@ pub fn solve(input: &mut Input) -> Result<u16, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two}; // , test_part_one_error, test_part_two, test_part_two_error};
+    use crate::{test_part_one, test_part_two};
 
     let real_input = include_str!("day05_input.txt");
     test_part_one!(real_input => 828);
