@@ -21,7 +21,10 @@ pub fn solve(input: &mut Input) -> Result<u16, String> {
     seat_ids.sort_unstable();
 
     if input.is_part_one() {
-        Ok(seat_ids[seat_ids.len() - 1])
+        seat_ids
+            .last()
+            .copied()
+            .ok_or_else(|| "No seats in input".to_string())
     } else {
         let non_adjacent_seats = seat_ids
             .windows(2)
