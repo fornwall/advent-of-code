@@ -1,31 +1,48 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u16, String> {
-    let mut seat_ids = input
-        .text
-        .lines()
+fn parse_seat_specifier(specifier: &str) -> u16 {
+    specifier
+        .chars()
+        .map(|c| matches!(c, 'B' | 'R') as u16)
+        .rev()
         .enumerate()
-        .map(|(line_idx, line)| {
-            let binary_string = line
-                .replace(&['B', 'R'][..], "1")
-                .replace(&['F', 'L'][..], "0");
+        .map(|(offset, bit_flag)| bit_flag << offset)
+        .sum()
+}
 
-            u16::from_str_radix(&binary_string, 2).map_err(|_| {
-                format!(
-                    "Line {}: Invalid format - not eight B|F|R|L characters",
-                    line_idx + 1
-                )
-            })
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-    seat_ids.sort_unstable();
+pub fn solve(input: &mut Input) -> Result<u16, String> {
+    let seat_ids = input.text.lines().map(parse_seat_specifier);
 
     if input.is_part_one() {
         seat_ids
-            .last()
-            .copied()
+            .max()
             .ok_or_else(|| "No seats in input".to_string())
     } else {
+        let mut seats = [0_u16; 127];
+        for seat_id in seat_ids {
+            let row = seat_id / 8;
+            let col = seat_id % 8;
+            seats[row as usize] |= 1 << col;
+        }
+
+        for this_seat_id in 0..u16::MAX {
+            let row = this_seat_id / 8;
+            let col = this_seat_id % 8;
+
+            if seats[row as usize] & (1 << col) > 0 {
+                // This is set - is next?
+                let next_seat_id = this_seat_id + 1;
+                let row = next_seat_id / 8;
+                let col = next_seat_id % 8;
+                if seats[row as usize] & (1 << col) == 0 {
+                    return Ok(next_seat_id);
+                }
+            }
+        }
+        Err("No gap found".to_string())
+        /*
+        let mut seat_ids = seat_ids.collect::<Vec<_>>();
+        seat_ids.sort_unstable();
         let non_adjacent_seats = seat_ids
             .windows(2)
             // "It's a completely full flight, so your seat should be the only missing boarding pass in your list":
@@ -36,6 +53,7 @@ pub fn solve(input: &mut Input) -> Result<u16, String> {
         } else {
             Err("No unique gap found".to_string())
         }
+         */
     }
 }
 
