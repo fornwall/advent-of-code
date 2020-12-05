@@ -30,7 +30,7 @@ pub fn solve(input: &mut Input) -> Result<u16, String> {
             let col = this_seat_id % 8;
 
             if seats[row as usize] & (1 << col) > 0 {
-                // This is set - is next?
+                // This is occupied - is next one? Otherwise we have found the wanted gap.
                 let next_seat_id = this_seat_id + 1;
                 let row = next_seat_id / 8;
                 let col = next_seat_id % 8;
