@@ -18,7 +18,7 @@ pub fn solve(input: &mut Input) -> Result<u16, String> {
             .max()
             .ok_or_else(|| "No seats in input".to_string())
     } else {
-        let mut seats = [0_u16; 127];
+        let mut seats = [0_u8; 127];
         for seat_id in seat_ids {
             let row = seat_id / 8;
             let col = seat_id % 8;
