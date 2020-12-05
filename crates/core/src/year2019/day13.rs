@@ -5,7 +5,7 @@ use crate::input::Input;
 use super::day13_renderer::Renderer;
 
 pub fn solve(input: &mut Input) -> Result<Word, String> {
-    let mut program = Program::parse(&input.text)?;
+    let mut program = Program::parse(input.text)?;
 
     let is_part_one = input.is_part_one();
 

@@ -9,14 +9,14 @@ pub enum Part {
     Two,
 }
 
-pub struct Input {
+pub struct Input<'a> {
     pub part: Part,
-    pub text: String,
+    pub text: &'a str,
     #[cfg(feature = "visualization")]
     pub painter: PainterRef,
 }
 
-impl Input {
+impl<'a> Input<'a> {
     pub const fn is_part_one(&self) -> bool {
         matches!(self.part, Part::One)
     }
@@ -31,20 +31,20 @@ impl Input {
     }
 
     #[cfg(test)]
-    pub fn part_one(text: &str) -> Self {
+    pub const fn part_one(text: &'a str) -> Self {
         Self {
             part: Part::One,
-            text: text.to_string(),
+            text,
             #[cfg(feature = "visualization")]
             painter: Box::new(MockPainter {}),
         }
     }
 
     #[cfg(test)]
-    pub fn part_two(text: &str) -> Self {
+    pub const fn part_two(text: &'a str) -> Self {
         Self {
             part: Part::Two,
-            text: text.to_string(),
+            text,
             #[cfg(feature = "visualization")]
             painter: Box::new(MockPainter {}),
         }

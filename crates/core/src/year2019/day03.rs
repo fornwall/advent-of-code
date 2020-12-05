@@ -187,7 +187,7 @@ fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let (first_line, second_line) = input_lines(&input.text)?;
+    let (first_line, second_line) = input_lines(input.text)?;
     let first_wire_segments: Vec<LineSegment> =
         parse_wire_points(first_line).collect::<Result<_, _>>()?;
 

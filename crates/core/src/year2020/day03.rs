@@ -33,7 +33,7 @@ impl Map {
 }
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
-    let map = Map::parse(&input.text)?;
+    let map = Map::parse(input.text)?;
     let slopes = input.part_values(vec![(3, 1)], vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]);
 
     #[cfg(feature = "visualization")]

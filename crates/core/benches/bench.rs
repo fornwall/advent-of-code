@@ -81,7 +81,7 @@ fn solve_parts(b: &mut Bencher, year: u16, day: u8, part: u8) {
 
     b.iter(|| {
         #[cfg(feature = "count-allocations")]
-        GLOBAL.reset_and_fail_after(2);
+        GLOBAL.reset_and_fail_after(1);
 
         solve(year, day, part, &input).unwrap();
 

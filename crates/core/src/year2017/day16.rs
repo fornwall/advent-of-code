@@ -78,7 +78,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     }
     let mut programs = vec![b'a'; 16];
     let mut rounds = input.part_values(1, 1_000_000_000);
-    let (mut moves, substitutions) = compile(&input.text, &programs);
+    let (mut moves, substitutions) = compile(input.text, &programs);
 
     while rounds > 0 {
         if (rounds & 1) == 1 {

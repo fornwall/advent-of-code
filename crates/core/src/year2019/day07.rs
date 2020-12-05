@@ -4,7 +4,7 @@ use crate::input::Input;
 use std::cell::RefCell;
 
 pub fn solve(input: &mut Input) -> Result<i64, String> {
-    let program = Program::parse(&input.text)?;
+    let program = Program::parse(input.text)?;
     let mut phase_settings = if input.is_part_one() {
         [0, 1, 2, 3, 4]
     } else {

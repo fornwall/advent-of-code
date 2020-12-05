@@ -327,7 +327,7 @@ fn shortest_path(
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     if input.is_part_one() {
         return steps_to_gather_all_keys(
-            &input.text,
+            input.text,
             #[cfg(feature = "visualization")]
             &mut input.painter,
             #[cfg(feature = "visualization")]

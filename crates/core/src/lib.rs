@@ -61,7 +61,7 @@ pub fn solve(
     let mut input = Input {
         // FIXME: Validate parts.
         part: if part == 1 { Part::One } else { Part::Two },
-        text: input_string.to_string(),
+        text: input_string,
         #[cfg(feature = "visualization")]
         painter,
     };
