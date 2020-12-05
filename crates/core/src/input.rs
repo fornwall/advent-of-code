@@ -54,14 +54,14 @@ impl Input {
 #[macro_export]
 macro_rules! test_part_one {
     ($input:tt => $expected:expr) => {
-        assert_eq!(Ok($expected), solve(&mut Input::part_one($input)));
+        assert_eq!(solve(&mut Input::part_one($input)), Ok($expected));
     };
 }
 
 #[macro_export]
 macro_rules! test_part_two {
     ($input:tt => $expected:expr) => {
-        assert_eq!(Ok($expected), solve(&mut Input::part_two($input)));
+        assert_eq!(solve(&mut Input::part_two($input)), Ok($expected));
     };
 }
 

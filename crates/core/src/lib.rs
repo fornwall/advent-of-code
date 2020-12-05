@@ -197,6 +197,7 @@ pub fn solve(
         (2020, 3, _) => to_stringer_input(year2020::day03::solve, &mut input),
         (2020, 4, _) => to_stringer_input(year2020::day04::solve, &mut input),
         (2020, 5, _) => to_stringer_input(year2020::day05::solve, &mut input),
+        (2020, 6, _) => to_stringer_input(year2020::day06::solve, &mut input),
         _ => Err(format!(
             "Unsupported year={}, day={}, part={}",
             year, day, part

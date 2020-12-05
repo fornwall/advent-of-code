@@ -182,3 +182,4 @@ run_bench!(2020, 2);
 run_bench!(2020, 3);
 run_bench!(2020, 4);
 run_bench!(2020, 5);
+run_bench!(2020, 6);
