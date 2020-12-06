@@ -16,8 +16,8 @@ fn parse_seat_specifier(specifier: &str) -> SeatId {
 pub fn solve(input: &mut Input) -> Result<SeatId, String> {
     if let Some(invalid_line_idx) = input.text.lines().enumerate().find_map(|(line_idx, line)| {
         if line.len() != 10
-            || line[0..7].chars().any(|c| !matches!(c, 'F' | 'B'))
-            || line[7..10].chars().any(|c| !matches!(c, 'L' | 'R'))
+            || !line[0..7].chars().all(|c| matches!(c, 'F' | 'B'))
+            || !line[7..10].chars().all(|c| matches!(c, 'L' | 'R'))
         {
             Some(line_idx)
         } else {
@@ -25,7 +25,7 @@ pub fn solve(input: &mut Input) -> Result<SeatId, String> {
         }
     }) {
         return Err(format!(
-            "Line {}: Not expected format (7 'F' or 'B' letters followed by 3 'L' or 'R' ones)",
+            "Line {}: Not expected format (7 'F' or 'B' characters followed by 3 'L' or 'R' ones)",
             invalid_line_idx
         ));
     }
