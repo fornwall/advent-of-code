@@ -10,7 +10,7 @@ type AnswersBitSet = u32;
 fn person_answers_to_bit_set(answers: &str) -> AnswersBitSet {
     answers
         .bytes()
-        .map(|char| 1 << (char - b'a'))
+        .map(|question_identifier| 1 << (question_identifier - b'a'))
         .sum::<AnswersBitSet>()
 }
 
