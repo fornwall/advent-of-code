@@ -87,7 +87,6 @@ fn solve_parts(b: &mut Bencher, year: u16, day: u8, part: u8) {
 
         #[cfg(feature = "count-allocations")]
         {
-            println!("Number of allocations: {}", GLOBAL.get());
             GLOBAL.reset();
         }
     });
@@ -183,3 +182,4 @@ run_bench!(2020, 3);
 run_bench!(2020, 4);
 run_bench!(2020, 5);
 run_bench!(2020, 6);
+run_bench!(2020, 7);

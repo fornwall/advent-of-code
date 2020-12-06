@@ -1,4 +1,5 @@
 use crate::input::Input;
+use std::ops::{BitAnd, BitOr};
 
 type AnswersBitSet = u32;
 
@@ -27,8 +28,10 @@ pub fn solve(input: &mut Input) -> Result<AnswersBitSet, String> {
 
     let initial_bit_set = input.part_values(0, AnswersBitSet::MAX);
 
-    let bit_set_merger = |answers_set, person_answers| {
-        input.part_values(answers_set | person_answers, answers_set & person_answers)
+    let bit_set_merger = if input.is_part_one() {
+        BitOr::bitor
+    } else {
+        BitAnd::bitand
     };
 
     let computer = |text: &str| {
