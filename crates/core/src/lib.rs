@@ -56,6 +56,8 @@ pub fn solve(
 
     if input_string.is_empty() {
         return Err("Empty input".to_string());
+    } else if !input_string.is_ascii() {
+        return Err("Non-ASCII input".to_string());
     }
 
     let mut input = Input {
