@@ -17,7 +17,9 @@ jobs:
     - name: Show rust version
       run: rustc --version
     - name: Test and check (stable)
-      run: make check
+      run: |
+        make check
+        cd crates/core && cargo test --features count-allocations
       if: matrix.rust == 'stable'
     - name: Test and check (nightly)
       run: |

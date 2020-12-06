@@ -66,3 +66,15 @@ pub fn tests() {
     test_part_one!(real_input => 6686);
     test_part_two!(real_input => 3476);
 }
+
+#[cfg(feature = "count-allocations")]
+#[test]
+pub fn no_memory_allocations() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day06_input.txt");
+    let allocations = allocation_counter::count(|| {
+        test_part_one!(real_input => 6686);
+        test_part_two!(real_input => 3476);
+    });
+    assert_eq!(allocations, 0);
+}
