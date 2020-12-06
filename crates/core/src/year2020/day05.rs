@@ -1,16 +1,35 @@
 use crate::input::Input;
 
-fn parse_seat_specifier(specifier: &str) -> u16 {
+type SeatId = u16;
+
+/// Parse a 10 letter seat specifier as a binary string.
+/// It treats 'B' and 'R' as '1', others ('L' and 'F') as '0'.
+fn parse_seat_specifier(specifier: &str) -> SeatId {
     specifier
         .chars()
-        .map(|c| matches!(c, 'B' | 'R') as u16)
-        .rev()
+        .map(|c| matches!(c, 'B' | 'R') as SeatId)
         .enumerate()
-        .map(|(offset, bit_flag)| bit_flag << offset)
+        .map(|(bit_index, bit_flag)| bit_flag << (9 - bit_index))
         .sum()
 }
 
-pub fn solve(input: &mut Input) -> Result<u16, String> {
+pub fn solve(input: &mut Input) -> Result<SeatId, String> {
+    if let Some(invalid_line_idx) = input.text.lines().enumerate().find_map(|(line_idx, line)| {
+        if line.len() != 10
+            || line[0..7].chars().any(|c| !matches!(c, 'F' | 'B'))
+            || line[7..10].chars().any(|c| !matches!(c, 'L' | 'R'))
+        {
+            Some(line_idx)
+        } else {
+            None
+        }
+    }) {
+        return Err(format!(
+            "Line {}: Not expected format (7 'F' or 'B' letters followed by 3 'L' or 'R' ones)",
+            invalid_line_idx
+        ));
+    }
+
     let seat_ids = input.text.lines().map(parse_seat_specifier);
 
     if input.is_part_one() {
@@ -25,15 +44,13 @@ pub fn solve(input: &mut Input) -> Result<u16, String> {
             seats[row as usize] |= 1 << col;
         }
 
-        for this_seat_id in 0..u16::MAX {
-            let row = this_seat_id / 8;
-            let col = this_seat_id % 8;
-
+        for this_seat_id in 0..SeatId::MAX {
+            let (row, col) = (this_seat_id / 8, this_seat_id % 8);
             if seats[row as usize] & (1 << col) > 0 {
-                // This is occupied - is next one? Otherwise we have found the wanted gap.
+                // This seat is occupied - is the next one?
+                // Otherwise we have found the searched after gap.
                 let next_seat_id = this_seat_id + 1;
-                let row = next_seat_id / 8;
-                let col = next_seat_id % 8;
+                let (row, col) = (next_seat_id / 8, next_seat_id % 8);
                 if seats[row as usize] & (1 << col) == 0 {
                     return Ok(next_seat_id);
                 }
