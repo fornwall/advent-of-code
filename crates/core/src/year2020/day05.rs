@@ -38,6 +38,7 @@ pub fn solve(input: &mut Input) -> Result<SeatId, String> {
             .ok_or_else(|| "No seats in input".to_string())
     } else {
         let mut seats = [0_u8; 127];
+
         for seat_id in seat_ids {
             let (row, col) = (seat_id / 8, seat_id % 8);
             seats[row as usize] |= 1 << col;
@@ -46,17 +47,20 @@ pub fn solve(input: &mut Input) -> Result<SeatId, String> {
         for this_seat_id in 0..SeatId::MAX {
             let (row, col) = (this_seat_id / 8, this_seat_id % 8);
             let this_seat_occupied = seats[row as usize] & (1 << col) > 0;
+
             if this_seat_occupied {
                 // This seat is occupied - is the next one?
                 // Otherwise we have found the searched after gap.
                 let next_seat_id = this_seat_id + 1;
                 let (row, col) = (next_seat_id / 8, next_seat_id % 8);
                 let next_seat_occupied = seats[row as usize] & (1 << col) == 0;
+
                 if next_seat_occupied {
                     return Ok(next_seat_id);
                 }
             }
         }
+
         Err("No gap found".to_string())
     }
 }
