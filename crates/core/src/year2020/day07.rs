@@ -102,10 +102,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }
 
     Ok(if input.is_part_one() {
-        let outermost_bags = reactions.keys().copied().collect::<HashSet<&str>>();
         let mut gold_ancestors: HashSet<&str> = HashSet::new();
         insert_ancestors(&child_to_parent, "shiny gold", &mut gold_ancestors, 0)?;
-        gold_ancestors.intersection(&outermost_bags).count() as u32
+        gold_ancestors.len() as u32
     } else {
         count_total_bags(&reactions, "shiny gold", 0)?
     })
