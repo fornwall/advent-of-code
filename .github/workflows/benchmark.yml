@@ -36,7 +36,7 @@ jobs:
       run: |
         cd crates/core
         cargo bench -- --save-baseline old-baseline
-        critcmp --export new-baseline > old-baseline.json
+        critcmp --export old-baseline > old-baseline.json
     - name: Upload benchmark on previous commit
       uses: actions/upload-artifact@v2
       with:
