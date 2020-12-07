@@ -1,6 +1,8 @@
 use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
+const MAX_DEPTH: u32 = 100;
+
 #[derive(Debug)]
 struct BagEntry<'a> {
     amount: u32,
@@ -11,25 +13,48 @@ fn insert_ancestors<'a>(
     child_to_parent: &'a HashMap<&'a str, Vec<&str>>,
     child_bag_type: &'a str,
     ancestors: &mut HashSet<&'a str>,
-) {
+    height: u32,
+) -> Result<(), String> {
+    if height > MAX_DEPTH {
+        return Err(format!(
+            "Too deep tree (possibly recursive) - bailing at depth {}",
+            MAX_DEPTH
+        ));
+    }
+
     if let Some(parents) = child_to_parent.get(child_bag_type) {
         ancestors.extend(parents);
         for parent in parents {
-            insert_ancestors(child_to_parent, parent, ancestors);
+            insert_ancestors(child_to_parent, parent, ancestors, height + 1)?;
         }
     }
+    Ok(())
 }
 
-fn count_total_bags<'a>(reactions: &'a HashMap<&'a str, Vec<BagEntry>>, bag_type: &'a str) -> u32 {
+fn count_total_bags<'a>(
+    reactions: &'a HashMap<&'a str, Vec<BagEntry>>,
+    bag_type: &'a str,
+    depth: u32,
+) -> Result<u32, String> {
+    if depth > MAX_DEPTH {
+        return Err(format!(
+            "Too deep tree (possibly recursive) - bailing at depth {}",
+            MAX_DEPTH
+        ));
+    }
+
     reactions
         .get(bag_type)
         .map(|resulting_entries| {
             resulting_entries
                 .iter()
-                .map(|entry| entry.amount * (count_total_bags(reactions, entry.bag_type) + 1))
-                .sum::<u32>()
+                .map(|entry| {
+                    count_total_bags(reactions, entry.bag_type, depth + 1)
+                        .map(|value| entry.amount * (value + 1))
+                })
+                .sum::<Result<u32, String>>()
         })
-        .unwrap_or(0_u32)
+        .unwrap_or(Ok(0_u32))
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -47,14 +72,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let mut parts = line.split(" bags contain ");
         let from_bag = parts.next().ok_or_else(on_error)?;
 
-        let mut to = Vec::new();
-        let to_part = parts
+        let mut children_entries = Vec::new();
+        let to_parts = parts
             .next()
             .ok_or_else(on_error)?
             .strip_suffix('.')
             .ok_or_else(on_error)?;
 
-        for to_part in to_part.split(", ") {
+        for to_part in to_parts.split(", ") {
             let mut amount_and_bag_type = to_part.splitn(2, ' ');
             let amount = amount_and_bag_type
                 .next()
@@ -70,19 +95,19 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     .or_insert(Vec::new())
                     .push(from_bag);
             } else {
-                to.push(BagEntry { amount, bag_type });
+                children_entries.push(BagEntry { amount, bag_type });
             }
         }
-        reactions.insert(from_bag, to);
+        reactions.insert(from_bag, children_entries);
     }
 
     Ok(if input.is_part_one() {
         let outermost_bags = reactions.keys().copied().collect::<HashSet<&str>>();
         let mut distinct_roots: HashSet<&str> = HashSet::new();
-        insert_ancestors(&child_to_parent, "shiny gold", &mut distinct_roots);
+        insert_ancestors(&child_to_parent, "shiny gold", &mut distinct_roots, 0)?;
         distinct_roots.intersection(&outermost_bags).count() as u32
     } else {
-        count_total_bags(&reactions, "shiny gold")
+        count_total_bags(&reactions, "shiny gold", 0)?
     })
 }
 
