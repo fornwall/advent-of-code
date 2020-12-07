@@ -6,6 +6,9 @@ pub fn visit_rooms<F>(input_string: &str, mut callback: F) -> Result<(), String>
 where
     F: FnMut(i32),
 {
+    if input_string.len() == 1 {
+        return Err("Invalid one character input".to_string());
+    }
     let input_string = &input_string[1..input_string.len() - 1];
 
     let apply_direction = |direction, position: &mut (i32, i32)| match direction {
