@@ -8,15 +8,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: nightly-2020-11-21
     - name: Run benchmark on current commit
-      run: cd crates/core && cargo +nightly-2020-11-21 bench > new-benchmark.txt
+      run: |
+        cd crates/core
+        cargo bench -- --save-baseline new-baseline
+        critcmp --export new-baseline > new-baseline.json
     - name: Upload benchmark on current commit
       uses: actions/upload-artifact@v2
       with:
         name: new-benchmark
-        path: crates/core/new-benchmark.txt
+        path: crates/core/new-baseline.json
 
   benchmark-previous:
     runs-on: ubuntu-latest
@@ -25,17 +26,18 @@ jobs:
       with:
         fetch-depth: 2
     - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: nightly-2020-11-21
     - name: Checkout previous commit
       run: git checkout HEAD~1
     - name: Run benchmark on previous commit
-      run: cd crates/core && cargo +nightly-2020-11-21 bench > old-benchmark.txt
+      run: |
+        cd crates/core
+        cargo bench -- --save-baseline old-baseline
+        critcmp --export new-baseline > old-baseline.json
     - name: Upload benchmark on previous commit
       uses: actions/upload-artifact@v2
       with:
         name: old-benchmark
-        path: crates/core/old-benchmark.txt
+        path: crates/core/old-baseline.json
 
   compare-benchmarks:
     needs: [benchmark-current, benchmark-previous]
@@ -48,11 +50,11 @@ jobs:
       with:
         python-version: '3.9'
     - uses: hecrj/setup-rust-action@v1
-    - name: Install cargo benchcmp
-      run: cargo install cargo-benchcmp
+    - name: Install critcmp
+      run: cargo install critcmp
     - name: Compare benchmarks on current and previous commit
       run: |
-        cargo benchcmp old-benchmark/old-benchmark.txt new-benchmark/new-benchmark.txt > benchcmp.txt
+        cargo critcmp old-benchmark/old-baseline.json new-benchmark/new-baseline.json > benchcmp.txt
         cat benchcmp.txt
     - name: Format commit comment
       id: get-comment-body

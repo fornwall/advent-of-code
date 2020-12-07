@@ -2,10 +2,10 @@ NIGHTLY_DATE = 2020-11-21 # Update versions in .github/workflows as well.
 NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 
 CARGO_COMMAND = cargo
-CLIPPY_PARAMS = -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
+CLIPPY_PARAMS = --all-targets -- -W clippy::cargo -W clippy::nursery -W clippy::expect_used -W clippy::unwrap_used -W clippy::items_after_statements -W clippy::if_not_else -W clippy::trivially_copy_pass_by_ref -W clippy::match_same_arms
 ifeq ($(NIGHTLY),1)
+  CLIPPY_PARAMS := --all-features $(CLIPPY_PARAMS)
   CARGO_COMMAND += +$(NIGHTLY_TOOLCHAIN)
-  CLIPPY_PARAMS := --all-features --all-targets $(CLIPPY_PARAMS)
 else
   CLIPPY_PARAMS += -D warnings
 endif

@@ -12,7 +12,12 @@ homepage = "https://github.com/fornwall/advent-of-code"
 readme = "README.md"
 edition = "2018"
 
+[[bin]]
+name = "advent-of-code"
+bench = false
+
 [lib]
+bench = false
 name = "advent_of_code"
 
 [features]
@@ -24,4 +29,8 @@ count-allocations = ["allocation-counter"]
 allocation-counter = { version = "0", optional = true }
 
 [dev-dependencies]
-paste = "1.0"
+criterion = "0.3"
+
+[[bench]]
+name = "benchmark"
+harness = false
