@@ -1,5 +1,5 @@
 use crate::input::Input;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 struct BagEntry<'a> {
@@ -7,36 +7,20 @@ struct BagEntry<'a> {
     bag_type: &'a str,
 }
 
-type BagId = usize;
-
-struct BagIdAssigner<'a> {
-    bag_names: Vec<&'a str>,
-}
-
-impl<'a> BagIdAssigner<'a> {
-    fn new() -> Self {
-        BagIdAssigner {
-            bag_names: Vec::new(),
+fn insert_ancestors<'a>(
+    child_to_parent: &'a HashMap<&'a str, Vec<&str>>,
+    child_bag_type: &'a str,
+    ancestors: &mut HashSet<&'a str>,
+) {
+    if let Some(parents) = child_to_parent.get(child_bag_type) {
+        ancestors.extend(parents);
+        for parent in parents {
+            insert_ancestors(child_to_parent, parent, ancestors);
         }
     }
-    fn assign_id(&mut self, bag_name: &'a str) -> BagId {
-        self.bag_names.push(bag_name);
-        self.bag_names.len()
-    }
 }
 
-fn can_contain_shiny_gold(reactions: &HashMap<&str, Vec<BagEntry>>, bag_type: &str) -> bool {
-    reactions
-        .get(bag_type)
-        .map(|resulting_entries| {
-            resulting_entries.iter().any(|entry| {
-                entry.bag_type == "shiny gold" || can_contain_shiny_gold(reactions, entry.bag_type)
-            })
-        })
-        .unwrap_or(false)
-}
-
-fn count_total_bags(reactions: &HashMap<&str, Vec<BagEntry>>, bag_type: &str) -> u32 {
+fn count_total_bags<'a>(reactions: &'a HashMap<&'a str, Vec<BagEntry>>, bag_type: &'a str) -> u32 {
     reactions
         .get(bag_type)
         .map(|resulting_entries| {
@@ -50,34 +34,53 @@ fn count_total_bags(reactions: &HashMap<&str, Vec<BagEntry>>, bag_type: &str) ->
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut reactions: HashMap<&str, Vec<BagEntry>> = HashMap::new();
+    let mut child_to_parent: HashMap<&str, Vec<&str>> = HashMap::new();
 
-    for line in input.text.lines() {
+    for (line_idx, line) in input
+        .text
+        .lines()
+        .enumerate()
+        .filter(|(_line_idx, line)| !line.contains("no other bags"))
+    {
+        let on_error = || format!("Line {}: Invalid format", line_idx + 1);
+
         let mut parts = line.split(" bags contain ");
-        let from_bag = parts.next().unwrap();
-        let to_part = parts.next().unwrap().strip_suffix('.').unwrap();
+        let from_bag = parts.next().ok_or_else(on_error)?;
 
         let mut to = Vec::new();
-        if to_part != "no other bags" {
-            for to_part in to_part.split(", ") {
-                let mut amount_and_bag_type = to_part.splitn(2, ' ');
-                let amount = amount_and_bag_type.next().unwrap().parse::<u32>().unwrap();
-                let bag_type: &str = amount_and_bag_type.next().unwrap();
-                let bag_type = if amount > 1 {
-                    bag_type.strip_suffix(" bags").unwrap()
-                } else {
-                    bag_type.strip_suffix(" bag").unwrap()
-                };
+        let to_part = parts
+            .next()
+            .ok_or_else(on_error)?
+            .strip_suffix('.')
+            .ok_or_else(on_error)?;
+
+        for to_part in to_part.split(", ") {
+            let mut amount_and_bag_type = to_part.splitn(2, ' ');
+            let amount = amount_and_bag_type
+                .next()
+                .ok_or_else(on_error)?
+                .parse::<u32>()
+                .map_err(|_| on_error())?;
+            let bag_type: &str = amount_and_bag_type.next().ok_or_else(on_error)?;
+            let bag_type = bag_type.rsplitn(2, ' ').nth(1).ok_or_else(on_error)?;
+
+            if input.is_part_one() {
+                child_to_parent
+                    .entry(bag_type)
+                    .or_insert(Vec::new())
+                    .push(from_bag);
+            } else {
                 to.push(BagEntry { amount, bag_type });
             }
-            reactions.insert(from_bag, to);
         }
+        reactions.insert(from_bag, to);
     }
 
     Ok(if input.is_part_one() {
-        reactions
-            .keys()
-            .filter(|bag_type| can_contain_shiny_gold(&reactions, bag_type))
-            .count() as u32
+        let outermost_bags = reactions.keys().copied().collect::<HashSet<&str>>();
+        let mut distinct_roots: HashSet<&str> = HashSet::new();
+        insert_ancestors(&child_to_parent, "shiny gold", &mut distinct_roots);
+        distinct_roots.intersection(&outermost_bags).count() as u32
     } else {
         count_total_bags(&reactions, "shiny gold")
     })
