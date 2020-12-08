@@ -8,13 +8,14 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::expect_used \
 	-W clippy::if_not_else \
 	-W clippy::items_after_statements \
-	-W clippy::unreadable-literal \
+	-W clippy::linkedlist \
 	-W clippy::match_same_arms \
 	-W clippy::nursery \
 	-W clippy::option_if_let_else \
 	-W clippy::redundant_closure_for_method_calls \
 	-W clippy::similar_names \
 	-W clippy::trivially_copy_pass_by_ref \
+	-W clippy::unreadable-literal \
 	-W clippy::unseparated-literal-suffix \
 	-W clippy::unwrap_used
 ifeq ($(NIGHTLY),1)

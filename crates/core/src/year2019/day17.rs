@@ -1,5 +1,5 @@
 use super::int_code::Program;
-use std::collections::LinkedList;
+use std::collections::VecDeque;
 use std::slice::Iter;
 
 pub fn part1(input_string: &str) -> Result<String, String> {
@@ -278,9 +278,9 @@ fn find_longest_repeated_subsequence(sequence: &[String]) -> Option<&[String]> {
     }
 }
 
-fn find_subseq_covering(seq: &[String], subseqs: &[&[String]]) -> Option<LinkedList<usize>> {
+fn find_subseq_covering(seq: &[String], subseqs: &[&[String]]) -> Option<VecDeque<usize>> {
     if seq.is_empty() {
-        Some(LinkedList::new())
+        Some(VecDeque::new())
     } else {
         for (i, subseq) in subseqs.iter().enumerate() {
             if seq.starts_with(subseq) {
@@ -298,7 +298,7 @@ fn find_subseq_covering(seq: &[String], subseqs: &[&[String]]) -> Option<LinkedL
 fn find_covering_subsequences(
     seq: &[String],
     num_subsequences: usize,
-) -> Option<(Vec<&[String]>, LinkedList<usize>)> {
+) -> Option<(Vec<&[String]>, VecDeque<usize>)> {
     fn fill_subsequences<'a>(
         seq: &'a [String],
         num_subsequences: usize,
