@@ -66,7 +66,7 @@ line_width = (
     + 3 * space_between_columns
 )
 print("```diff")
-print("@@" + "Benchmark Difference".center(line_width - 2) + "@@")
+print(("@@" + "Benchmark Difference".center(line_width - 2) + "@@").replace(" ", " "))
 
 # Table title:
 title_name = "Name"
@@ -79,7 +79,7 @@ line = " " * (desired_name_len - len(title_name)) + title_name
 line += " " * (desired_old_len - len(title_old)) + title_old
 line += " " * (desired_new_len - len(title_new)) + title_new
 line += " " * space_between_columns + title_change
-print("# " + line)
+print(("# " + line).replace(" ", " "))
 
 for (name, new_time, old_time) in table_rows:
     percentage_change = int(100 * (new_time / old_time - 1))
