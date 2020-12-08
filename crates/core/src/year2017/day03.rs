@@ -125,5 +125,5 @@ fn test_part1() {
 
 #[test]
 fn test_part2() {
-    assert_eq!(Ok(349975), part2(include_str!("day03_input.txt")));
+    assert_eq!(Ok(349_975), part2(include_str!("day03_input.txt")));
 }

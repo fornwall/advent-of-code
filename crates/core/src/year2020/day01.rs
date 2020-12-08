@@ -80,13 +80,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 pub fn tests() {
     use crate::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
 
-    test_part_one!("1721\n979\n366\n299\n675\n1456" => 514579);
+    test_part_one!("1721\n979\n366\n299\n675\n1456" => 514_579);
     test_part_one_error!("" => "No 2 expenses sum to 2020");
     test_part_one_error!("1" => "No 2 expenses sum to 2020");
     test_part_one_error!("1\n2" => "No 2 expenses sum to 2020");
     test_part_one_error!("1\n2\n3" => "No 2 expenses sum to 2020");
 
-    test_part_two!("1721\n979\n366\n299\n675\n1456" => 241861950);
+    test_part_two!("1721\n979\n366\n299\n675\n1456" => 241_861_950);
     test_part_two_error!("asdf" => "Line 1: Cannot parse expense (invalid digit found in string)");
     test_part_two_error!("12\nasdf" => "Line 2: Cannot parse expense (invalid digit found in string)");
     test_part_two_error!("" => "No 3 expenses sum to 2020");
@@ -95,6 +95,6 @@ pub fn tests() {
     test_part_two_error!("1\n2\n3" => "No 3 expenses sum to 2020");
 
     let real_input = include_str!("day01_input.txt");
-    test_part_one!(real_input => 138379);
-    test_part_two!(real_input => 85491920);
+    test_part_one!(real_input => 138_379);
+    test_part_two!(real_input => 85_491_920);
 }

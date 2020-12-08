@@ -35,10 +35,10 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
 
 #[test]
 fn test_part1() {
-    assert_eq!(Ok(374269), part1(include_str!("day05_input.txt")));
+    assert_eq!(Ok(374_269), part1(include_str!("day05_input.txt")));
 }
 
 #[test]
 fn test_part2() {
-    assert_eq!(Ok(27720699), part2(include_str!("day05_input.txt")));
+    assert_eq!(Ok(27_720_699), part2(include_str!("day05_input.txt")));
 }

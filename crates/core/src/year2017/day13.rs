@@ -79,5 +79,5 @@ fn test_part2() {
 6: 4"
         )
     );
-    assert_eq!(Ok(3873662), part2(include_str!("day13_input.txt")));
+    assert_eq!(Ok(3_873_662), part2(include_str!("day13_input.txt")));
 }

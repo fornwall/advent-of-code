@@ -7,6 +7,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::expect_used \
 	-W clippy::if_not_else \
 	-W clippy::items_after_statements \
+	-W clippy::unreadable-literal \
 	-W clippy::match_same_arms \
 	-W clippy::nursery \
 	-W clippy::trivially_copy_pass_by_ref \
