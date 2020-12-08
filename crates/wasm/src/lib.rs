@@ -7,13 +7,11 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
 fn as_string(value: &JsValue) -> String {
-    if let Some(string) = value.as_string() {
-        string
-    } else if let Some(number) = value.as_f64() {
-        number.to_string()
-    } else {
-        "".to_string()
-    }
+    value.as_string().unwrap_or_else(|| {
+        value
+            .as_f64()
+            .map_or_else(|| "".to_string(), |number| number.to_string())
+    })
 }
 
 #[wasm_bindgen]
