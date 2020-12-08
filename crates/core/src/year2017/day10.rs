@@ -15,7 +15,7 @@ pub fn solution(input_string: &str, part1: bool) -> Result<String, String> {
             })
             .collect::<Result<Vec<_>, _>>()?
     } else {
-        let to_append = [17u8, 31u8, 73u8, 47u8, 23u8];
+        let to_append = [17_u8, 31_u8, 73_u8, 47_u8, 23_u8];
         input_string
             .bytes()
             .chain(to_append.iter().copied())

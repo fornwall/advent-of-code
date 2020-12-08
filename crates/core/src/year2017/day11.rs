@@ -6,7 +6,7 @@ pub fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
 
     let mut furthest = 0;
 
-    let mut location = (0i32, 0i32);
+    let mut location = (0_i32, 0_i32);
     for step in input_string.split(',') {
         let diff = match step {
             "n" => (0, 2),
