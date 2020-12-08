@@ -10,6 +10,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::unreadable-literal \
 	-W clippy::match_same_arms \
 	-W clippy::nursery \
+	-W clippy::similar_names \
 	-W clippy::trivially_copy_pass_by_ref \
 	-W clippy::unseparated-literal-suffix \
 	-W clippy::unwrap_used

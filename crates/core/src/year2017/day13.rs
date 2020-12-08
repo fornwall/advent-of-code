@@ -1,10 +1,12 @@
-fn solution(input_string: &str, part1: bool) -> Result<usize, String> {
+use crate::Input;
+
+pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX_DELAY: usize = 10_000_000;
 
-    let layers = input_string.lines().count();
+    let layers = input.text.lines().count();
     let mut scanner_ranges = vec![0; layers];
 
-    for (line_index, line) in input_string.lines().enumerate() {
+    for (line_index, line) in input.text.lines().enumerate() {
         let error_message = || {
             format!(
                 "Invalid input at line {}: Not '${{NUMBER}}: ${{NUMBER}}",
@@ -24,7 +26,7 @@ fn solution(input_string: &str, part1: bool) -> Result<usize, String> {
         scanner_ranges[depth] = range;
     }
 
-    'delay: for delay in if part1 { 0..1 } else { 0..MAX_DELAY } {
+    'delay: for delay in 0..input.part_values(1, MAX_DELAY) {
         let mut trip_severity = 0;
 
         for (position, &current_range) in scanner_ranges.iter().enumerate() {
@@ -32,7 +34,7 @@ fn solution(input_string: &str, part1: bool) -> Result<usize, String> {
                 let time = delay + position;
                 let caught = time % (2 * (current_range - 1)) == 0;
                 if caught {
-                    if part1 {
+                    if input.is_part_one() {
                         trip_severity += position * current_range;
                     } else {
                         continue 'delay;
@@ -41,43 +43,16 @@ fn solution(input_string: &str, part1: bool) -> Result<usize, String> {
             }
         }
 
-        return Ok(if part1 { trip_severity } else { delay });
+        return Ok(input.part_values(trip_severity, delay));
     }
 
     Err("No solution found".to_string())
 }
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    solution(input_string, false)
-}
 
 #[test]
-fn test_part1() {
-    assert_eq!(
-        Ok(24),
-        part1(
-            "0: 3
-1: 2
-4: 4
-6: 4"
-        )
-    );
-    assert_eq!(Ok(748), part1(include_str!("day13_input.txt")));
-}
-
-#[test]
-fn test_part2() {
-    assert_eq!(
-        Ok(10),
-        part2(
-            "0: 3
-1: 2
-4: 4
-6: 4"
-        )
-    );
-    assert_eq!(Ok(3_873_662), part2(include_str!("day13_input.txt")));
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day13_input.txt");
+    test_part_one!(real_input => 748);
+    test_part_two!(real_input => 3_873_662);
 }

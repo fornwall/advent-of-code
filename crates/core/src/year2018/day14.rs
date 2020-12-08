@@ -17,9 +17,9 @@ where
 
     let mut loop_count = 0;
     loop {
-        let score0 = scores[elf_positions.0 as usize];
-        let score1 = scores[elf_positions.1 as usize];
-        let current_recipes_score = score0 + score1;
+        let score_0 = scores[elf_positions.0 as usize];
+        let score_1 = scores[elf_positions.1 as usize];
+        let current_recipes_score = score_0 + score_1;
 
         let done = if current_recipes_score < 10 {
             push_score(&mut scores, current_recipes_score)
@@ -31,8 +31,8 @@ where
             return Ok(scores);
         }
 
-        elf_positions.0 = (elf_positions.0 + 1 + score0 as u32) % scores.len() as u32;
-        elf_positions.1 = (elf_positions.1 + 1 + score1 as u32) % scores.len() as u32;
+        elf_positions.0 = (elf_positions.0 + 1 + score_0 as u32) % scores.len() as u32;
+        elf_positions.1 = (elf_positions.1 + 1 + score_1 as u32) % scores.len() as u32;
 
         loop_count += 1;
         if loop_count > MAX_ITERATIONS {

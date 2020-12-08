@@ -1,12 +1,13 @@
+use crate::Input;
 use std::cmp::max;
 use std::collections::HashMap;
 
-fn solution(input_string: &str, part1: bool) -> Result<i32, String> {
+pub fn solve(input: &mut Input) -> Result<i32, String> {
     let mut registers: HashMap<&str, i32> = HashMap::new();
 
     let mut highest_value = 0;
 
-    for line in input_string.lines() {
+    for line in input.text.lines() {
         let parts: Vec<&str> = line.split(' ').collect();
         if parts.len() != 7 {
             return Err("Invalid input - every line should have 7 words".to_string());
@@ -41,7 +42,7 @@ fn solution(input_string: &str, part1: bool) -> Result<i32, String> {
         }
     }
 
-    if part1 {
+    if input.is_part_one() {
         registers
             .values()
             .max()
@@ -52,20 +53,10 @@ fn solution(input_string: &str, part1: bool) -> Result<i32, String> {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    solution(input_string, false)
-}
-
 #[test]
-fn test_part1() {
-    assert_eq!(Ok(6061), part1(include_str!("day08_input.txt")));
-}
-
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(6696), part2(include_str!("day08_input.txt")));
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day08_input.txt");
+    test_part_one!(real_input => 6061);
+    test_part_two!(real_input => 6696);
 }
