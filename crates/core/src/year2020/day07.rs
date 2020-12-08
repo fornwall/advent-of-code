@@ -92,7 +92,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             if input.is_part_one() {
                 child_to_parent
                     .entry(bag_type)
-                    .or_insert(Vec::new())
+                    .or_insert_with(Vec::new)
                     .push(from_bag);
             } else {
                 children_entries.push(BagEntry { amount, bag_type });
