@@ -132,7 +132,7 @@ fn parse_wire_points<'a>(
         (initial_position, initial_step),
         |(current_position, current_step), word| {
             if let (Some(first_char), Some(Ok(steps))) =
-                (word.chars().next(), word.get(1..).map(|n| n.parse::<u32>()))
+                (word.chars().next(), word.get(1..).map(str::parse))
             {
                 let start_position = *current_position;
 

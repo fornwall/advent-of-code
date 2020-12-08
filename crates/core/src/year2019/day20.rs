@@ -27,7 +27,7 @@ impl Maze {
         let rows = input.lines().count();
         let cols = input
             .lines()
-            .map(|line| line.len())
+            .map(str::len)
             .max()
             .ok_or("Internal error: No max line length")?;
 

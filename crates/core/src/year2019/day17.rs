@@ -10,7 +10,7 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 }
 
 fn part1_map(map: &str) -> Result<String, String> {
-    let map: Vec<&[u8]> = map.trim().lines().map(|line| line.as_bytes()).collect();
+    let map: Vec<&[u8]> = map.trim().lines().map(str::as_bytes).collect();
     if map.len() < 3 {
         return Err("Too small input (less than three lines)".to_string());
     } else if map.iter().filter(|row| row.len() != map[0].len()).count() > 0 {
@@ -108,7 +108,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
 
     let output = program.run_for_output()?;
     let map: String = output.iter().map(|&b| (b as u8) as char).collect();
-    let map: Vec<&[u8]> = map.lines().map(|line| line.as_bytes()).collect();
+    let map: Vec<&[u8]> = map.lines().map(str::as_bytes).collect();
     // Strip away last two lines with blank line and "Main:" prompt:
     if map.len() < 5 {
         return Err("Too small input (less than five lines)".to_string());
@@ -239,7 +239,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
         return last_output
             .iter()
             .find(|&&value| value > 255)
-            .map(|value| value.to_string())
+            .map(i64::to_string)
             .ok_or_else(|| "No output > 255 produced".to_string());
     }
 

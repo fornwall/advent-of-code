@@ -45,7 +45,7 @@ fn count_total_bags<'a>(
 
     reactions
         .get(bag_type)
-        .map(|resulting_entries| {
+        .map_or(Ok(0_u32), |resulting_entries| {
             resulting_entries
                 .iter()
                 .map(|entry| {
@@ -54,7 +54,6 @@ fn count_total_bags<'a>(
                 })
                 .sum::<Result<u32, String>>()
         })
-        .unwrap_or(Ok(0_u32))
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {

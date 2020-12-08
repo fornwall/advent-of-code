@@ -55,19 +55,21 @@ impl Computer {
     }
 
     fn execute_instruction(&mut self) -> Result<(), String> {
-        if self.has_exited() {
-            return Err("Cannot executed an exited program".to_string());
-        }
-        match self.instructions[self.instruction_pointer as usize] {
-            Instruction::Acc(parameter) => {
+        if self.has_exited() {}
+        match self.instructions.get(self.instruction_pointer as usize) {
+            Some(Instruction::Acc(parameter)) => {
                 self.accumulator += parameter;
             }
-            Instruction::Jmp(parameter) => {
+            Some(Instruction::Jmp(parameter)) => {
                 self.instruction_pointer += parameter;
                 return Ok(());
             }
-            Instruction::Nop(_) => {}
+            Some(Instruction::Nop(_)) => {}
+            None => {
+                return Err("Cannot executed an exited program".to_string());
+            }
         };
+
         self.instruction_pointer += 1;
         Ok(())
     }

@@ -72,7 +72,7 @@ pub fn part1(input_string: &str) -> Result<String, String> {
 pub fn part2(input_string: &str) -> Result<String, String> {
     let offset = input_string
         .get(0..7)
-        .map(|slice| slice.parse::<usize>())
+        .map(str::parse)
         .ok_or_else(|| "Invalid input".to_string())?
         .map_err(|_| "Invalid input".to_string())?;
     let digits = parse_digits(input_string)?;

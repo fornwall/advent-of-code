@@ -214,7 +214,7 @@ fn execute_battle(mut groups: Vec<ArmyGroup>) -> Vec<ArmyGroup> {
             break;
         }
 
-        groups.retain(|g| g.is_alive());
+        groups.retain(ArmyGroup::is_alive);
 
         let alive_sides = groups.iter().fold((false, false), |acc, g| {
             let mut result = acc;

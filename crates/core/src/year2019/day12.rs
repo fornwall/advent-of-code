@@ -101,7 +101,7 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
     let mut cycles: [Option<u64>; 3] = [None; 3];
 
     let mut step = 0;
-    while cycles.iter().any(|x| x.is_none()) {
+    while cycles.iter().any(Option::is_none) {
         moons.step();
         step += 1;
 
