@@ -6,7 +6,8 @@ use advent::solver_server::{Solver, SolverServer};
 use advent::{ProblemInput, ProblemOutput};
 
 mod advent {
-    #![allow(clippy::unwrap_used, clippy::future_not_send)]
+    #![allow(warnings)]
+    #![allow(clippy)]
     tonic::include_proto!("advent");
 }
 
