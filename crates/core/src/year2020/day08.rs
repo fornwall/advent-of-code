@@ -77,19 +77,38 @@ impl Computer {
     }
 }
 
-fn check_if_exits(computer: &mut Computer) -> Result<bool, String> {
-    let mut executed_instructions = vec![false; computer.instructions.len()];
-    while !computer.has_exited() && !executed_instructions[computer.instruction_pointer as usize] {
-        executed_instructions[computer.instruction_pointer as usize] = true;
-        computer.execute_instruction()?;
+struct ComputerChecker {
+    executed_instructions: Vec<bool>,
+}
+
+impl ComputerChecker {
+    fn new(computer: &Computer) -> Self {
+        Self {
+            executed_instructions: vec![false; computer.instructions.len()],
+        }
     }
-    Ok(computer.has_exited())
+
+    fn check_if_exits(&mut self, computer: &mut Computer) -> Result<bool, String> {
+        self.executed_instructions
+            .iter_mut()
+            .for_each(|v| *v = false);
+
+        while !computer.has_exited()
+            && !self.executed_instructions[computer.instruction_pointer as usize]
+        {
+            self.executed_instructions[computer.instruction_pointer as usize] = true;
+            computer.execute_instruction()?;
+        }
+        Ok(computer.has_exited())
+    }
 }
 
 pub fn solve(input: &mut Input) -> Result<Word, String> {
     let mut computer = Computer::parse(input.text)?;
+    let mut computer_checker = ComputerChecker::new(&computer);
+
     if input.is_part_one() {
-        check_if_exits(&mut computer)?;
+        computer_checker.check_if_exits(&mut computer)?;
         Ok(computer.accumulator)
     } else {
         for i in 0..computer.instructions.len() {
@@ -102,7 +121,7 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
                         Instruction::Jmp(parameter)
                     };
 
-                    if check_if_exits(&mut computer)? {
+                    if computer_checker.check_if_exits(&mut computer)? {
                         return Ok(computer.accumulator);
                     }
 
