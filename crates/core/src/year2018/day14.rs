@@ -31,8 +31,8 @@ where
             return Ok(scores);
         }
 
-        elf_positions.0 = (elf_positions.0 + 1 + score_0 as u32) % scores.len() as u32;
-        elf_positions.1 = (elf_positions.1 + 1 + score_1 as u32) % scores.len() as u32;
+        elf_positions.0 = (elf_positions.0 + 1 + u32::from(score_0)) % scores.len() as u32;
+        elf_positions.1 = (elf_positions.1 + 1 + u32::from(score_1)) % scores.len() as u32;
 
         loop_count += 1;
         if loop_count > MAX_ITERATIONS {

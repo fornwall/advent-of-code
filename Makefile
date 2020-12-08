@@ -4,6 +4,7 @@ NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 CARGO_COMMAND = cargo
 CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::cargo \
+	-W clippy::cast_lossless \
 	-W clippy::expect_used \
 	-W clippy::if_not_else \
 	-W clippy::items_after_statements \

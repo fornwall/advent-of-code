@@ -2,8 +2,8 @@ use super::int_code::{Program, Word};
 
 fn check(program: &Program, x: i32, y: i32) -> Result<bool, String> {
     let mut program_copy = program.clone();
-    program_copy.input(x as Word);
-    program_copy.input(y as Word);
+    program_copy.input(Word::from(x));
+    program_copy.input(Word::from(y));
     let output = program_copy.run_for_output()?;
     if output.is_empty() {
         return Err("No output produced".to_string());

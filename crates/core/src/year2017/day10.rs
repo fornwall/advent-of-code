@@ -43,7 +43,7 @@ pub fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     }
 
     Ok(if part1 {
-        (list[0] as u32 * list[1] as u32).to_string()
+        (u32::from(list[0]) * u32::from(list[1])).to_string()
     } else {
         list.chunks(16)
             .map(|block| block.iter().fold(0, |acc, x| acc ^ x))
