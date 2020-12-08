@@ -16,7 +16,7 @@ Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust. Consi
 - [crates/fuzzing-hfuzz](crates/fuzzing-hfuzz): Fuzzing of the solutions using [hongfuzz](https://honggfuzz.dev/).
 - [crates/fuzzing-libfuzzer](crates/fuzzing-libfuzzer): Fuzzing of the solutions using [libFuzzer](https://llvm.org/docs/LibFuzzer.html).
 - [crates/python](crates/python): A python library wrapping the solutions using [PyO3](https://pyo3.rs/).
-- [crates/wasm](crates/wasm): The solutions built as WebAssembly.
+- [crates/wasm](crates/wasm): The solutions built as WebAssembly using [wasm-pack](https://rustwasm.github.io/wasm-pack/).
   - Published to a static site at [https://aoc.fornwall.net](https://aoc.fornwall.net).
   - Published as a Node.js package.
   - Deployed to [Cloudflare Workers](https://workers.cloudflare.com/).
