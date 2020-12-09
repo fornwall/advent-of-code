@@ -9,8 +9,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly-2020-11-21
+
     - name: Generate code coverage
-      run: cargo +nightly tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml
+      # What about -all-features and --workspace?
+      run: cargo +nightly-2020-11-21 tarpaulin --verbose --timeout 120 --out Xml
       working-directory: crates/core
 
     - name: Upload to codecov.io
