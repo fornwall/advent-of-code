@@ -1,7 +1,7 @@
 use crate::input::Input;
 
-/// Search for a subsequence [window_start, window_end) which sums to the desired sum.
-fn window_summing_to<T>(sequence: &[T], desired_sum: T) -> Option<(usize, usize)>
+/// Search for a subsequence which sums to the desired sum.
+fn subsequence_summing_to<T>(sequence: &[T], desired_sum: T) -> Option<&[T]>
 where
     T: std::ops::AddAssign + Copy + PartialEq + PartialOrd + std::ops::SubAssign,
 {
@@ -10,7 +10,7 @@ where
 
     for window_end in 1..sequence.len() {
         if window_sum == desired_sum {
-            return Some((window_start, window_end));
+            return Some(&sequence[window_start..window_end]);
         }
 
         window_sum += sequence[window_end];
@@ -48,8 +48,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         .skip(PREAMBLE_LENGTH)
         .find_map(|(idx, &number)| {
             for j in (idx - PREAMBLE_LENGTH)..idx {
-                for k in (idx - PREAMBLE_LENGTH)..idx {
-                    if j != k && numbers[j] + numbers[k] == number {
+                for k in j + 1..idx {
+                    if numbers[j] + numbers[k] == number {
                         return None;
                     }
                 }
@@ -62,9 +62,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         return Ok(invalid_number);
     }
 
-    window_summing_to(&numbers, invalid_number)
-        .map(|(window_start, window_end)| {
-            let (min, max) = numbers[window_start..window_end]
+    subsequence_summing_to(&numbers, invalid_number)
+        .map(|subsequence| {
+            let (min, max) = subsequence
                 .iter()
                 .fold((u64::MAX, u64::MIN), |(min, max), &number| {
                     (std::cmp::min(min, number), std::cmp::max(max, number))
