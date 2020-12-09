@@ -25,13 +25,17 @@ const COMMAND_LINE_TO = 22;
 const COMMAND_MOVE_TO = 23;
 const COMMAND_PLAY_SOUND = 24;
 const COMMAND_DRAW_TEXT = 25;
+const COMMAND_TEXT_FILL = 26;
 
 export default function Renderer(message, layers, onNewAspectRatio, audioPlayer) {
     const {buffer, offset, length} = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
-    let ctx = layers[0];
-    // ctx.filter = 'blur(4px)';
+    const ctx = layers[0];
+
+    const overlayCtx = layers[1];
+    overlayCtx.fillStyle = 'white';
+
     this.done = false;
 
     this.render = () => {
@@ -42,6 +46,8 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
             switch (command) {
                 case COMMAND_CLEAR: {
                     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    overlayCtx.clearRect(0, 0, overlayCtx.canvas.width, overlayCtx.canvas.height);
+                    this.renderStatusText();
                     break;
                 }
                 case COMMAND_END_FRAME: {
@@ -149,32 +155,41 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     break;
                 }
                 case COMMAND_DRAW_TEXT: {
+                    const alignment = reader.next();
                     const x = reader.nextFloat();
                     const y = reader.nextFloat();
                     const fontSize = reader.nextFloat();
                     const text = reader.nextString();
 
-                    let textLayer = layers[1];
-                    const actualFontSize = fontSize * textLayer.canvas.height;
+                    const actualFontSize = fontSize * overlayCtx.canvas.height;
 
-                    textLayer.font = 'normal ' + actualFontSize + 'px Arial';
-                    textLayer.textAlign = 'center';
-                    textLayer.textBaseline = 'middle';
+                    overlayCtx.font = 'normal ' + actualFontSize + 'px Monospace';
+                    if (alignment == 0) {
+                        overlayCtx.textAlign = 'left';
+                        overlayCtx.textBaseline = 'top';
+                    } else {
+                        overlayCtx.textAlign = 'center';
+                        overlayCtx.textBaseline = 'middle';
+                    }
 
-                    const boxMargin = 0;
-                    const textWidth = textLayer.measureText(text).width;
-                    textLayer.fillStyle = 'rgba(13, 12, 26, 0.3)';
-                    const rectX = textLayer.canvas.width*x - textWidth/2 - boxMargin;
-                    const rectY = textLayer.canvas.height*y - actualFontSize/2;
-                    const rectWidth = textWidth + boxMargin*2;
-                    const rectHeight = actualFontSize;
-                    textLayer.fillRect(rectX, rectY, rectWidth, rectHeight);
+                    if (alignment != 0) { // FIXME: Hack - use separate flag?
+                        const boxMargin = 0;
+                        const textWidth = overlayCtx.measureText(text).width;
+                        const rectX = overlayCtx.canvas.width*x - textWidth/2 - boxMargin;
+                        const rectY = overlayCtx.canvas.height*y - actualFontSize/2;
+                        const rectWidth = textWidth + boxMargin*2;
+                        const rectHeight = actualFontSize;
+                        const savedFillStyle = overlayCtx.fillStyle;
+                        overlayCtx.fillStyle = 'rgba(13, 12, 26, 0.3)';
+                        overlayCtx.fillRect(rectX, rectY, rectWidth, rectHeight);
+                        overlayCtx.fillStyle = savedFillStyle;
+                    }
 
-                    textLayer.fillStyle = 'white';
-                    // const savedTransform = textLayer.getTransform();
-                    // textLayer.resetTransform();
-                    textLayer.fillText(text, textLayer.canvas.width*x, textLayer.canvas.height*y);
-                    // textLayer.setTransform(savedTransform);
+                    overlayCtx.fillText(text, overlayCtx.canvas.width*x, overlayCtx.canvas.height*y);
+                    break;
+                }
+                case COMMAND_TEXT_FILL: {
+                    overlayCtx.fillStyle = reader.nextString();
                     break;
                 }
                 default:
@@ -187,29 +202,34 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
 
     this.renderStatusText = () => {
         if (!this.statusText) return;
-        let textLayer = layers[1];
+
+        // Save state and restore at end, so that other text rendering
+        // is unaffected by status text rendering:
+        overlayCtx.save();
 
         const yOffset = 0;
         const boxMargin = 10;
         const textHeight = 80;
-        textLayer.font = textHeight + 'px Monospace';
+        overlayCtx.font = textHeight + 'px Monospace';
 
-        textLayer.clearRect(0, 0, textLayer.canvas.width, textLayer.canvas.height);
+        overlayCtx.clearRect(0, 0, overlayCtx.canvas.width, overlayCtx.canvas.height);
 
-        const textWidth = textLayer.measureText(this.statusText).width;
+        const textWidth = overlayCtx.measureText(this.statusText).width;
 
-        textLayer.fillStyle = 'rgba(13, 12, 26, 0.3)';
-        const rectX = textLayer.canvas.width/2 - textWidth/2 - boxMargin;
+        overlayCtx.fillStyle = 'rgba(13, 12, 26, 0.3)';
+        const rectX = overlayCtx.canvas.width/2 - textWidth/2 - boxMargin;
         const rectY = yOffset;
         const rectWidth = textWidth + boxMargin*2;
         const rectHeight = textHeight;
-        textLayer.fillRect(rectX, rectY, rectWidth, rectHeight);
+        overlayCtx.fillRect(rectX, rectY, rectWidth, rectHeight);
 
-        textLayer.fillStyle = 'white';
-        textLayer.strokeStyle = 'black';
-        textLayer.textBaseline = 'top';
-        textLayer.textAlign = 'center';
-        const maxWidth = textLayer.canvas.width;
-        textLayer.fillText(this.statusText, textLayer.canvas.width/2, yOffset, maxWidth);
+        overlayCtx.fillStyle = 'white';
+        overlayCtx.strokeStyle = 'black';
+        overlayCtx.textBaseline = 'top';
+        overlayCtx.textAlign = 'center';
+        const maxWidth = overlayCtx.canvas.width;
+        overlayCtx.fillText(this.statusText, overlayCtx.canvas.width/2, yOffset, maxWidth);
+
+        overlayCtx.restore();
     };
 }

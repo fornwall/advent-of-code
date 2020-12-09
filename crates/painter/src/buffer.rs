@@ -34,7 +34,7 @@ pub struct CircularOutputBuffer {
 impl CircularOutputBuffer {
     pub fn new() -> Self {
         let mut result = Self {
-            shared_buffer: vec![0; 4 * 1024 * 1024],
+            shared_buffer: vec![0; 16 * 1024 * 1024],
             non_flushed_writes: 0,
         };
 

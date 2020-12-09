@@ -1,3 +1,4 @@
+pub mod computer;
 pub mod day01;
 #[cfg(feature = "visualization")]
 pub mod day01_renderer;
@@ -10,4 +11,6 @@ pub mod day05;
 pub mod day06;
 pub mod day07;
 pub mod day08;
+#[cfg(feature = "visualization")]
+pub mod day08_renderer;
 pub mod day09;

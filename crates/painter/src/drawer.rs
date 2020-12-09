@@ -27,6 +27,12 @@ enum Command {
     MoveTo,
     PlaySound,
     DrawText,
+    FillTextStyle,
+}
+
+enum TextAlignment {
+    TopLeft,
+    Center,
 }
 
 pub struct CommandBufferPainter {
@@ -40,6 +46,23 @@ impl CommandBufferPainter {
             output_buffer: CircularOutputBuffer::new(),
             aspect_ratio: 1.0,
         }
+    }
+
+    fn draw_text_aligned(
+        &mut self,
+        x: f64,
+        y: f64,
+        font_size: f64,
+        text: &str,
+        alignment: TextAlignment,
+    ) {
+        self.output_buffer.write(Command::DrawText as i32);
+        self.output_buffer.write(alignment as i32);
+        self.output_buffer.write_float(x);
+        self.output_buffer.write_float(y);
+        self.output_buffer.write_float(font_size);
+        self.output_buffer.write_text(text);
+        self.output_buffer.flush_if_necessary();
     }
 }
 
@@ -203,13 +226,17 @@ impl Painter for CommandBufferPainter {
         self.output_buffer.flush_if_necessary();
     }
 
-    fn draw_text(&mut self, x: f64, y: f64, font_size: f64, text: &str) {
-        self.output_buffer.write(Command::DrawText as i32);
-        self.output_buffer.write_float(x);
-        self.output_buffer.write_float(y);
-        self.output_buffer.write_float(font_size);
-        self.output_buffer.write_text(text);
-        self.output_buffer.flush_if_necessary();
+    fn draw_text_centered(&mut self, x: f64, y: f64, font_size: f64, text: &str) {
+        self.draw_text_aligned(x, y, font_size, text, TextAlignment::Center);
+    }
+
+    fn draw_text_top_left(&mut self, x: f64, y: f64, font_size: f64, text: &str) {
+        self.draw_text_aligned(x, y, font_size, text, TextAlignment::TopLeft);
+    }
+
+    fn fill_text_style(&mut self, style: &str) {
+        self.output_buffer.write(Command::FillTextStyle as i32);
+        self.output_buffer.write_text(style);
     }
 
     fn log(&mut self, text: &str) {

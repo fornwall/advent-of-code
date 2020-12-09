@@ -88,7 +88,11 @@ pub trait Painter {
 
     fn play_sound(&mut self, sound_id: i32);
 
-    fn draw_text(&mut self, x: f64, y: f64, font_size: f64, text: &str);
+    fn draw_text_centered(&mut self, x: f64, y: f64, font_size: f64, text: &str);
+
+    fn draw_text_top_left(&mut self, x: f64, y: f64, font_size: f64, text: &str);
+
+    fn fill_text_style(&mut self, style: &str);
 
     fn log(&mut self, text: &str);
 }
@@ -150,7 +154,11 @@ impl Painter for MockPainter {
 
     fn play_sound(&mut self, _sound_id: i32) {}
 
-    fn draw_text(&mut self, _x: f64, _y: f64, _font_size: f64, _text: &str) {}
+    fn draw_text_centered(&mut self, _x: f64, _y: f64, _font_size: f64, _text: &str) {}
+
+    fn draw_text_top_left(&mut self, _x: f64, _y: f64, _font_size: f64, _text: &str) {}
+
+    fn fill_text_style(&mut self, _style: &str) {}
 
     fn log(&mut self, _text: &str) {}
 }

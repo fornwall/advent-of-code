@@ -309,14 +309,15 @@ setTimeout(async() => {
 
     // Paint the old copy (scaled):
     ctx.resetTransform();
-    // ctx.clearRect(0, 0, c.canvas.width, c.canvas.height);
     ctx.setTransform(ctx.canvas.width/composedCanvas.width, 0, 0, ctx.canvas.height/composedCanvas.height, 0, 0);
     ctx.drawImage(composedCanvas, 0, 0);
     ctx.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
 
     // Setup the correct transform for future painting:
+    const savedOverlayState = saveContextState(overlayCtx);
     overlayCtx.canvas.width = newWidth;
     overlayCtx.canvas.height = newHeight;
+    restoreContextState(overlayCtx, savedOverlayState);
     if (window.renderer) {
        window.renderer.renderStatusText();
     }
