@@ -1,5 +1,6 @@
 [![Crates.io](https://img.shields.io/crates/v/advent-of-code.svg)](https://crates.io/crates/advent-of-code)
 [![Docker Hub](https://img.shields.io/docker/v/fredrikfornwall/advent-of-code.svg?label=docker)](https://hub.docker.com/r/fredrikfornwall/advent-of-code)
+[![codecov](https://codecov.io/gh/fornwall/advent-of-code/branch/master/graph/badge.svg?token=BDNM8eS7I1)](https://codecov.io/gh/fornwall/advent-of-code)
 
 # Advent of Code solutions
 Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust.
