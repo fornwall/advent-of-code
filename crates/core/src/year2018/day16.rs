@@ -105,8 +105,13 @@ impl Input {
             if before || after {
                 let parts: Vec<u16> = line[9..]
                     .split(|c| c == '[' || c == ']' || c == ',')
-                    .filter(|s| !s.is_empty())
-                    .map(|n| n.trim().parse::<u16>().map_err(|_| "Invalid input"))
+                    .filter_map(|s| {
+                        if s.is_empty() {
+                            None
+                        } else {
+                            Some(s.trim().parse::<u16>().map_err(|_| "Invalid input"))
+                        }
+                    })
                     .collect::<Result<_, _>>()?;
 
                 if before {

@@ -13,9 +13,8 @@ impl Map {
         let rows = input.lines().count();
         let cols = input.lines().next().ok_or("Empty input")?.len();
         let grid: Vec<bool> = input
-            .chars()
-            .filter(|c| *c != '\n')
-            .map(|c| c == '#')
+            .bytes()
+            .filter_map(|c| if c == b'\n' { None } else { Some(c == b'#') })
             .collect();
 
         if grid.len() != cols * rows {

@@ -6,6 +6,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::cargo \
 	-W clippy::cast_lossless \
 	-W clippy::expect_used \
+	-W clippy::filter_map \
 	-W clippy::if_not_else \
 	-W clippy::items_after_statements \
 	-W clippy::linkedlist \
