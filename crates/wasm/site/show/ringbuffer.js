@@ -12,6 +12,7 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
       sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
       (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT,
   );
+  const dataByteView = new Int8Array(sharedArrayBuffer, sharedArrayBufferOffset + HEADER_BYTE_LENGTH);
   const dataFloatBuffer = new Float32Array(sharedArrayBuffer,
       sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
       (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT,
@@ -55,7 +56,11 @@ export function ReaderWithBuffer(sharedArrayBuffer, sharedArrayBufferOffset, len
   this.nextString = () => {
       const stringLengthInBytes = this.next();
       const stringLengthInI32 = Math.floor(stringLengthInBytes / 4) + (stringLengthInBytes % 4 == 0 ? 0 : 1);
-      const stringArray = dataBuffer.slice(this._readerPosition(), this._readerPosition() + stringLengthInI32);
+
+      const startOffsetBytes = this._readerPosition() * Int32Array.BYTES_PER_ELEMENT;
+      const endOffsetBytes = startOffsetBytes + stringLengthInBytes;
+      const stringArray = dataByteView.slice(startOffsetBytes, endOffsetBytes)
+
       unflushedReads += stringLengthInI32;
       return utf8decoder.decode(stringArray).substring(0, stringLengthInBytes);
   };

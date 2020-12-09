@@ -20,6 +20,7 @@ impl ComputerChecker {
         &mut self,
         computer: &mut Computer,
         #[cfg(feature = "visualization")] mut painter: &mut PainterRef,
+        #[cfg(feature = "visualization")] switched_instruction_idx: Option<usize>,
     ) -> Result<bool, String> {
         self.executed_instructions
             .iter_mut()
@@ -30,10 +31,14 @@ impl ComputerChecker {
         {
             self.executed_instructions[computer.instruction_pointer as usize] = true;
             computer.execute_instruction()?;
-
-            #[cfg(feature = "visualization")]
-            render(&mut painter, &computer, &self.executed_instructions);
         }
+        #[cfg(feature = "visualization")]
+        render(
+            &mut painter,
+            &computer,
+            &self.executed_instructions,
+            switched_instruction_idx,
+        );
         Ok(computer.has_exited())
     }
 }
@@ -43,17 +48,27 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
     let mut computer_checker = ComputerChecker::new(&computer);
 
     #[cfg(feature = "visualization")]
-    start_rendering(&mut input.painter, &computer);
+    start_rendering(&mut input.painter);
+
+    computer_checker.check_if_exits(
+        &mut computer,
+        #[cfg(feature = "visualization")]
+        &mut input.painter,
+        #[cfg(feature = "visualization")]
+        None,
+    )?;
 
     if input.is_part_one() {
-        computer_checker.check_if_exits(
-            &mut computer,
-            #[cfg(feature = "visualization")]
-            &mut input.painter,
-        )?;
         Ok(computer.accumulator)
     } else {
-        for i in 0..computer.instructions.len() {
+        // We only need to patch instructions that are actually executed in the unpatched program:
+        let executed_instructions_without_patch = computer_checker.executed_instructions.clone();
+
+        for i in executed_instructions_without_patch
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, &executed)| if executed { Some(idx) } else { None })
+        {
             let instruction = computer.instructions[i];
             match instruction {
                 Instruction::Jmp(parameter) | Instruction::Nop(parameter) => {
@@ -67,6 +82,8 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
                         &mut computer,
                         #[cfg(feature = "visualization")]
                         &mut input.painter,
+                        #[cfg(feature = "visualization")]
+                        Some(i),
                     )? {
                         return Ok(computer.accumulator);
                     }
