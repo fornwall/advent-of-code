@@ -1,16 +1,84 @@
 use crate::input::Input;
 
-pub fn solve(_input: &mut Input) -> Result<u32, String> {
-    Ok(0)
+/// Search for a subsequence [window_start, window_end) which sums to the desired sum.
+fn window_summing_to<T>(sequence: &[T], desired_sum: T) -> Option<(usize, usize)>
+where
+    T: std::ops::AddAssign + Copy + PartialEq + PartialOrd + std::ops::SubAssign,
+{
+    let mut window_start = 0;
+    let mut window_sum = sequence[window_start];
+
+    for window_end in 1..sequence.len() {
+        if window_sum == desired_sum {
+            return Some((window_start, window_end));
+        }
+
+        window_sum += sequence[window_end];
+
+        // Slide window to the right as long as current sum is too big:
+        while window_sum > desired_sum && window_start < window_end - 1 {
+            window_sum -= sequence[window_start];
+            window_start += 1;
+        }
+    }
+
+    None
+}
+
+pub fn solve(input: &mut Input) -> Result<u64, String> {
+    const PREAMBLE_LENGTH: usize = 25;
+
+    let numbers = input
+        .text
+        .lines()
+        .enumerate()
+        .map(|(line_idx, line)| {
+            line.parse::<u64>()
+                .map_err(|e| format!("Line {}: Invalid number - {}", line_idx + 1, e))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    if numbers.len() <= PREAMBLE_LENGTH {
+        return Err(format!("Too few input numbers ({})", numbers.len()));
+    }
+
+    let invalid_number = numbers
+        .iter()
+        .enumerate()
+        .skip(PREAMBLE_LENGTH)
+        .find_map(|(idx, &number)| {
+            for j in (idx - PREAMBLE_LENGTH)..idx {
+                for k in (idx - PREAMBLE_LENGTH)..idx {
+                    if j != k && numbers[j] + numbers[k] == number {
+                        return None;
+                    }
+                }
+            }
+            Some(number)
+        })
+        .ok_or_else(|| "No invalid number".to_string())?;
+
+    if input.is_part_one() {
+        return Ok(invalid_number);
+    }
+
+    window_summing_to(&numbers, invalid_number)
+        .map(|(window_start, window_end)| {
+            let (min, max) = numbers[window_start..window_end]
+                .iter()
+                .fold((u64::MAX, u64::MIN), |(min, max), &number| {
+                    (std::cmp::min(min, number), std::cmp::max(max, number))
+                });
+            min + max
+        })
+        .ok_or_else(|| format!("No contiguous set summing to {}", invalid_number))
 }
 
 #[test]
 pub fn tests() {
-    use crate::test_part_one; // {test_part_one, test_part_two};
+    use crate::{test_part_one, test_part_two};
 
-    test_part_one!("" => 0);
-
-    // let real_input = include_str!("day09_input.txt");
-    // test_part_one!(real_input => 0);
-    // test_part_two!(real_input => 0);
+    let real_input = include_str!("day09_input.txt");
+    test_part_one!(real_input => 50_047_984);
+    test_part_two!(real_input => 5_407_707);
 }

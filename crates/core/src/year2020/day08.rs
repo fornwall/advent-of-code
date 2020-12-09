@@ -2,6 +2,7 @@ use super::computer::{Computer, Instruction, Word};
 #[cfg(feature = "visualization")]
 use super::day08_renderer::{render, start_rendering};
 use crate::input::Input;
+#[cfg(feature = "visualization")]
 use crate::painter::PainterRef;
 
 struct ComputerChecker {
