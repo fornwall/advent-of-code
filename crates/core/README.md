@@ -43,3 +43,16 @@ $ docker pull fredrikfornwall/advent-of-code:latest
 $ echo 14 | docker run -i fredrikfornwall/advent-of-code:latest 2019 1 1
 2
 ```
+
+## Generating flamegraphs on macOS
+Install [flamegraph](https://github.com/flamegraph-rs/flamegraph) with `cargo install flamegraph` and build a benchmark binary with:
+
+```sh
+RUSTFLAGS='-g' cargo build --release --bench benchmark
+```
+
+This will create a benchmark binary under something like `ls ../../target/release/deps/benchmark-31ba773f80f7f5d8`. Then profile and generate a `flamegraph.svg` by running
+
+```sh
+sudo flamegraph ../../target/release/deps/benchmark-31ba773f80f7f5d8  --bench 2020_07_1
+```
