@@ -15,7 +15,7 @@ where
 
         window_sum += sequence[window_end];
 
-        // Slide window to the right as long as current sum is too big:
+        // Shorten window from the left as long as the current sum is too high:
         while window_sum > desired_sum && window_start < window_end - 1 {
             window_sum -= sequence[window_start];
             window_start += 1;
