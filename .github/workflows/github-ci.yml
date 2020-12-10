@@ -361,7 +361,11 @@ jobs:
       run: cargo install critcmp
     - name: Compare benchmarks on current and previous commit
       run: |
-        critcmp old-benchmark/old-baseline.json new-benchmark/new-baseline.json > benchcmp.txt
+        echo "Current directory"
+        pwd
+        echo "Listing files"
+        ls -lha
+        critcmp old-baseline.json new-baseline.json > benchcmp.txt
         cat benchcmp.txt
     - name: Format commit comment
       id: get-comment-body
