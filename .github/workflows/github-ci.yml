@@ -306,6 +306,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
     - uses: hecrj/setup-rust-action@v1
+      with:
         rust-version: nightly-2020-11-21
     - uses: actions/setup-node@v1
       with:
