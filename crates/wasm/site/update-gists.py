@@ -26,6 +26,9 @@ def add_header(src, year, day):
     )
     header += "\n// https://github.com/fornwall/advent-of-code"
 
+    # Put inlined modules last as they're not relevant compared to the solution:
+    suffix = "\n"
+
     inlined_modules = set()
     pattern = re.compile(r"use (super|crate)::(.*)::(.*?);")
     found = False
@@ -41,20 +44,20 @@ def add_header(src, year, day):
             path_in_repo = f"crates/core/src/{module_path}.rs"
         src_to_include = Path(f"../../../{path_in_repo}").read_text()
         module_rust = module.replace("::", " { pub mod ")
-        header += f"\n\n#[allow(dead_code)]\nmod {module_rust} {{\n"
-        header += f"    // This is https://github.com/fornwall/advent-of-code/tree/master/{path_in_repo} inlined to work in the Rust Playground."
+        suffix += f"\n\n#[allow(dead_code)]\nmod {module_rust} {{\n"
+        suffix += f"    // This is https://github.com/fornwall/advent-of-code/tree/master/{path_in_repo} inlined to work in the Rust Playground."
         for line in iter(src_to_include.splitlines()):
             if line:
-                header += f"\n    {line}"
+                suffix += f"\n    {line}"
             else:
-                header += "\n"
-        header += "\n" + "}" * (1 + module.count("::"))
+                suffix += "\n"
+        suffix += "\n" + "}" * (1 + module.count("::"))
         found = True
 
     src = re.sub(r"use super::(.*)?::", lambda match: f"use {match.group(1)}::", src)
     src = re.sub(r"use crate::(.*)?::", lambda match: f"use {match.group(1)}::", src)
 
-    return header + "\n\n" + src
+    return header + "\n\n" + src + suffix
 
 
 def replace_include_str(dirpath, src):
