@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advent of Code 2020 timings</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.2/plotly.min.js" integrity="sha512-1EhoxBp8gtoHT8J3xuOF253EC3R2LL3WF1lEKxD16iJbd3XhchzeNhAZCt7jjI5VbYBo/7xHo/nOtqSkLmEmIQ==" crossorigin="anonymous"></script>
+<style>
+h1 { text-align: center; }
+</style>
+</head>
+
+<body>
+  <h1>Advent of Code .... timings</h2>
+  <ul>
+      <li>This page tracks execution time of Advent of Code solutions in the <a href="https://github.com/fornwall/advent-of-code">github.com/fornwall/advent-of-code</a> repository.</li>
+      <li>Mean times from a <a href="https://bheisler.github.io/criterion.rs/book/index.html">Criterion.rs</a> benchmark (<a href="https://github.com/fornwall/advent-of-code/blob/master/crates/core/benches/benchmark.rs">source</a>) are listed.</li>
+      <li>Times are obtained from a benchmark run inside GitHub CI, so they vary somewhat across runs due to jitter in that environment.</li>
+      <li>The timings <b>does not</b> include file reading, but <b>do include</b> string parsing. The timed function has the signature <code>solve(year, day, part, input_string) -> String</code>.</li>
+      <li>Each part is run independently - part 1 is run separately from part 2, so the latter does not reuse parsed data or computations from the former.</li>
+      <li>The latest stable version of the Rust compiler is used, with <code>lto=true</code>, <code>codegen-units=1</code> and no unsafe code.</li>
+      <li>Years: <a href="?year=2017">2017</a> - <a href="?year=2018">2018</a> - <a href="?year=2019">2019</a> - <a href="?year=2020">2020</a></li>
+  </ul>
+  <div id="firstPlot" style="width: 100%"></div>
+  <div id="secondPlot" style="width: 100%"></div>
+  <script src="index.js"></script>
+</body>
+</html>
