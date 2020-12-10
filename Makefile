@@ -24,7 +24,7 @@ ifeq ($(NIGHTLY),1)
 endif
 ifeq ($(CLIPPY_PEDANTIC),1)
   CLIPPY_PARAMS += -W clippy::pedantic
-else
+else ifneq ($(NIGHTLY),1)
   CLIPPY_PARAMS += -D warnings
 endif
 
