@@ -298,3 +298,25 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+
+  deploy-to-netlify:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - uses: hecrj/setup-rust-action@v1
+        rust-version: nightly-2020-11-21
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
+    - name: Install wasm-pack
+      run: make install-wasm-pack
+    - name: Install the Netlify CLI
+      run: npm install netlify-cli -g
+    - name: Deploy to Netlify
+      run: make netlify
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

@@ -1,7 +1,6 @@
 [build]
-  publish = "crates/wasm/site"
-  functions = "crates/wasm/functions/"
-  command = "make netlify"
+  publish = "site"
+  functions = "functions/"
 
 [[redirects]]
   from = "/solve/*"

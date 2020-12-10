@@ -124,18 +124,14 @@ install-nightly:
 	rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src
 
 netlify:
-	curl -sSf -o /tmp/rustup.sh https://sh.rustup.rs && \
-		sh /tmp/rustup.sh -y && \
-		. $(HOME)/.cargo/env && \
-		make install-nightly && \
-		make install-wasm-pack && \
-		wasm-pack --version && \
-		make WASM_RELEASE=1 site-wasmpack && \
+	make WASM_RELEASE=1 site-wasmpack && \
 		make WASM_RELEASE=1 site-wasmpack-visualization && \
 		make site-downloads && \
 		make node-package && \
 		cd crates/wasm/functions && \
-		npm install
+		npm install && \
+		cd .. && \
+		netlify deploy --prod
 
 .PHONY: check install-cargo-deps bench site-downloads site-wasmpack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
 
