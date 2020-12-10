@@ -16,7 +16,7 @@ npm add advent-of-code-wasm
 The `advent-of-code-wasm` package exports a single `solve` function with the following signature:
 
 ```js
-function solve(day, part, input)
+function solve(year, day, part, input)
 ```
 
 Examples:
