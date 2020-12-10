@@ -101,6 +101,7 @@ jobs:
           python -m cibuildwheel --output-dir wheelhouse
       - uses: actions/upload-artifact@v2
         with:
+          name: wheels
           path: ./crates/python/wheelhouse/*.whl
 
   build-docker-image:
@@ -289,7 +290,7 @@ jobs:
     - name: Download built wheels
       uses: actions/download-artifact@v2
       with:
-        name: artifact
+        name: wheels
         path: dist
     - name: List files
       run: ls -lha dist
@@ -299,8 +300,85 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
 
+  benchmark-current:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - name: Install critcmp
+      run: cargo install critcmp
+    - name: Run benchmark on current commit
+      run: |
+        cd crates/core
+        cargo bench -- --save-baseline new-baseline
+        critcmp --export new-baseline > new-baseline.json
+    - name: Upload benchmark on current commit
+      uses: actions/upload-artifact@v2
+      with:
+        name: new-benchmark
+        path: crates/core/new-baseline.json
+
+  benchmark-previous:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - uses: hecrj/setup-rust-action@v1
+    - name: Install critcmp
+      run: cargo install critcmp
+    - name: Checkout previous commit
+      run: git checkout HEAD~1
+    - name: Run benchmark on previous commit
+      run: |
+        cd crates/core
+        cargo bench -- --save-baseline old-baseline
+        critcmp --export old-baseline > old-baseline.json
+    - name: Upload benchmark on previous commit
+      uses: actions/upload-artifact@v2
+      with:
+        name: old-benchmark
+        path: crates/core/old-baseline.json
+
+  compare-benchmarks:
+    needs: [benchmark-current, benchmark-previous]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download new benchmark
+      uses: actions/download-artifact@v2
+      with:
+        name: new-benchmark
+    - name: Download old benchmark
+      uses: actions/download-artifact@v2
+      with:
+        name: old-benchmark
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - uses: hecrj/setup-rust-action@v1
+    - name: Install critcmp
+      run: cargo install critcmp
+    - name: Compare benchmarks on current and previous commit
+      run: |
+        critcmp old-benchmark/old-baseline.json new-benchmark/new-baseline.json > benchcmp.txt
+        cat benchcmp.txt
+    - name: Format commit comment
+      id: get-comment-body
+      run: |
+        body=$(./.github/workflows/benchcmp-to-diff.py benchcmp.txt)
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}"
+        echo ::set-output name=body::$body
+    - name: Post commit comment
+      uses: peter-evans/commit-comment@v1
+      with:
+        body: ${{ steps.get-comment-body.outputs.body }}
+    - run: ls -lha .github/workflows/
+
   deploy-to-netlify:
-    needs: bump-version
+    needs: [bump-version, benchmark-current]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -318,8 +396,98 @@ jobs:
         make install-wasm-pack
     - name: Install the Netlify CLI
       run: npm install netlify-cli -g
+    - name: Download new benchmark
+      uses: actions/download-artifact@v2
+      with:
+        name: new-benchmark
+        path: crates/wasm/site
     - name: Deploy to Netlify
       run: make netlify
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  check-seed:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - name: Check seed
+      run: cd crates/fuzzing-afl && timeout 900s ./check-seed.sh
+      continue-on-error: true
+
+  fuzz-afl:
+    runs-on: ubuntu-latest
+    # Allow failures as LLVM is not always available for installation:
+    continue-on-error: true
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - name: Install current LLVM
+      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+    - name: Fuzz with AFL
+      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
+    - name: Upload crashes found by fuzzing
+      uses: actions/upload-artifact@v2
+      with:
+        path: ./crates/fuzzing-afl/target/fuzz-findings/crashes
+        name: fuzzing-crashes-afl
+
+  fuzz-libfuzzer:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly-2020-11-21
+    - name: Fuzz with libfuzzer
+      run: timeout 1800s make fuzz-libfuzzer
+      continue-on-error: true
+    - name: Upload crashes found by fuzzing
+      uses: actions/upload-artifact@v2
+      with:
+        path: crates/fuzzing-libfuzzer/fuzz/artifacts/fuzz_target/
+        name: fuzzing-crashes-libfuzzer
+
+  fuzz-honggfuzz:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - name: Install honggfuzz dependencies
+      run: sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
+    - name: Fuzz with honggfuzz
+      run: timeout 1800s make fuzz-hfuzz
+      continue-on-error: true
+      env:
+        HFUZZ_RUN_ARGS: "-t 10 --exit_upon_crash"
+    - name: Upload crashes found by fuzzing
+      uses: actions/upload-artifact@v2
+      with:
+        path: crates/fuzzing-hfuzz/hfuzz_workspace/advent-of-code-fuzzing-hfuzz/*.fuzz
+        name: fuzzing-crashes-honggfuzz
+
+  coverage:
+    runs-on: ubuntu-latest
+    container:
+      image: xd009642/tarpaulin
+      options: --security-opt seccomp=unconfined
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly-2020-11-21
+
+    - name: Generate code coverage
+      # What about -all-features and --workspace?
+      run: cargo +nightly-2020-11-21 tarpaulin --verbose --timeout 120 --out Xml
+      working-directory: crates/core
+
+    - name: Upload to codecov.io
+      uses: codecov/codecov-action@v1
+      with:
+        directory: crates/core
