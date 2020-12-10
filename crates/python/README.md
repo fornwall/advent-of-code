@@ -21,8 +21,8 @@ Examples:
 ```python
 from advent_of_code import solve
 
-assert "3" == solve(1, 1, "14")
-assert "30" == solve(3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4")
+assert "2" == solve(2019, 1, 1, "14")
+assert "30" == solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4")
 ```
 
 # Usage as a command line tool
