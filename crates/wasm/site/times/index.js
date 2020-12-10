@@ -1,8 +1,8 @@
 const currentYear = new URLSearchParams(window.location.search).get('year') || '2020';
-document.querySelector('h1').textContent = `Advent of Code ${currentYear} timings`;
+document.querySelector('h1').textContent = `Advent of Code ${currentYear} execution times`;
 
 async function run() {
-  const baselineResponse = await fetch('/new-baseline.json');
+  const baselineResponse = await fetch('https://aoc.fornwall.net/new-baseline.json');
   const baselineJson = await baselineResponse.json();
   const benchmarks = Object.entries(baselineJson['benchmarks']);
   const extractMeanTime = (info) => info['criterion_estimates_v1']['mean']['point_estimate'];
@@ -31,7 +31,7 @@ async function run() {
      trace.y.push(runtimeMicroSeconds);
   }
   const barLayout = {
-      title: 'Execution time per day and part',
+      // showlegend: false,
       barmode: 'group',
       yaxis: {
         title: 'Execution time (microseconds)',
