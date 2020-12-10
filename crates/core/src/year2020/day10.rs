@@ -44,13 +44,13 @@ pub fn solve(input: &mut Input) -> Result<JoltageAmount, String> {
         for (idx, joltage) in joltages.iter().enumerate() {
             let this_distinct_count = distinct_ways_counts[idx];
 
-            for (offset, _) in joltages[(idx + 1)..]
+            joltages[(idx + 1)..]
                 .iter()
                 .take_while(|&higher_joltage| higher_joltage - joltage <= MAX_DIFF)
                 .enumerate()
-            {
-                distinct_ways_counts[idx + offset + 1] += this_distinct_count;
-            }
+                .for_each(|(offset, _)| {
+                    distinct_ways_counts[idx + offset + 1] += this_distinct_count;
+                });
         }
 
         Ok(distinct_ways_counts[distinct_ways_counts.len() - 1])

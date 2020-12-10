@@ -1,50 +1,14 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-#[derive(Debug)]
-struct Nanobot {
-    pos: Pos,
-    radius: i32,
-}
-
-impl Nanobot {
-    fn parse(input_string: &str) -> Result<Vec<Self>, String> {
-        input_string
-            .lines()
-            .enumerate()
-            .map(|(line_index, line)| {
-                let line_number = line_index + 1;
-                let parts: Vec<&str> = line
-                    .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
-                    .collect();
-                let error_message = || format!("Invalid input on line {}", line_number);
-                if parts.len() != 8 {
-                    return Err(error_message());
-                }
-                let error_mapper = |_| error_message();
-                let x = parts[2].parse::<i32>().map_err(error_mapper)?;
-                let y = parts[3].parse::<i32>().map_err(error_mapper)?;
-                let z = parts[4].parse::<i32>().map_err(error_mapper)?;
-                let pos = Pos::new(x, y, z);
-                let radius = parts[7].parse::<i32>().map_err(error_mapper)?;
-                Ok(Self { pos, radius })
-            })
-            .collect::<Result<Vec<Self>, String>>()
-    }
-
-    const fn is_bot_within_range(&self, other: &Self) -> bool {
-        self.pos.distance_between(other.pos) <= self.radius
-    }
-}
-
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-struct Pos {
+struct Position {
     x: i32,
     y: i32,
     z: i32,
 }
 
-impl Pos {
+impl Position {
     const fn new(x: i32, y: i32, z: i32) -> Self {
         Self { x, y, z }
     }
@@ -68,9 +32,13 @@ impl Pos {
             z: std::cmp::max(self.z, p.z),
         }
     }
+
+    pub const fn distance_between(&self, other: Self) -> i32 {
+        (self.x - other.x).abs() + (self.y - other.y).abs() + (self.z - other.z).abs()
+    }
 }
 
-impl std::ops::Index<usize> for Pos {
+impl std::ops::Index<usize> for Position {
     type Output = i32;
 
     fn index(&self, i: usize) -> &i32 {
@@ -83,7 +51,7 @@ impl std::ops::Index<usize> for Pos {
     }
 }
 
-impl std::ops::Add<(i32, i32, i32)> for Pos {
+impl std::ops::Add<(i32, i32, i32)> for Position {
     type Output = Self;
 
     fn add(self, other: (i32, i32, i32)) -> Self {
@@ -91,7 +59,7 @@ impl std::ops::Add<(i32, i32, i32)> for Pos {
     }
 }
 
-impl std::ops::Add<Pos> for Pos {
+impl std::ops::Add<Position> for Position {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -99,7 +67,7 @@ impl std::ops::Add<Pos> for Pos {
     }
 }
 
-impl std::ops::Sub<Pos> for Pos {
+impl std::ops::Sub<Position> for Position {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
@@ -107,7 +75,7 @@ impl std::ops::Sub<Pos> for Pos {
     }
 }
 
-impl std::ops::IndexMut<usize> for Pos {
+impl std::ops::IndexMut<usize> for Position {
     fn index_mut(&mut self, i: usize) -> &mut i32 {
         match i {
             0 => &mut self.x,
@@ -118,32 +86,70 @@ impl std::ops::IndexMut<usize> for Pos {
     }
 }
 
-// min/max are both INCLUSIVE
+#[derive(Debug)]
+struct Nanobot {
+    pos: Position,
+    radius: i32,
+}
+
+impl Nanobot {
+    fn parse(input_string: &str) -> Result<Vec<Self>, String> {
+        input_string
+            .lines()
+            .enumerate()
+            .map(|(line_index, line)| {
+                let line_number = line_index + 1;
+                let parts: Vec<&str> = line
+                    .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
+                    .collect();
+                let error_message = || format!("Invalid input on line {}", line_number);
+                if parts.len() != 8 {
+                    return Err(error_message());
+                }
+                let error_mapper = |_| error_message();
+                let x = parts[2].parse::<i32>().map_err(error_mapper)?;
+                let y = parts[3].parse::<i32>().map_err(error_mapper)?;
+                let z = parts[4].parse::<i32>().map_err(error_mapper)?;
+                let pos = Position::new(x, y, z);
+                let radius = parts[7].parse::<i32>().map_err(error_mapper)?;
+                Ok(Self { pos, radius })
+            })
+            .collect::<Result<Vec<Self>, String>>()
+    }
+
+    const fn is_bot_within_range(&self, other: &Self) -> bool {
+        self.pos.distance_between(other.pos) <= self.radius
+    }
+}
+
+/// An axis-aligned bounding box (AABB).
+///
+/// The min and max values are both inclusive.
 #[derive(Copy, Clone, Debug)]
 struct AABB {
-    min: Pos,
-    max: Pos,
+    min: Position,
+    max: Position,
 }
 
 impl AABB {
     const fn new() -> Self {
-        let min = Pos::with_value(std::i32::MAX);
-        let max = Pos::with_value(std::i32::MIN);
+        let min = Position::with_value(std::i32::MAX);
+        let max = Position::with_value(std::i32::MIN);
         Self { min, max }
     }
 
-    const fn with_corners(min: Pos, max: Pos) -> Self {
+    const fn with_corners(min: Position, max: Position) -> Self {
         Self { min, max }
     }
 
-    fn add_point(&mut self, pos: Pos) {
+    fn add_point(&mut self, pos: Position) {
         self.min = self.min.min(pos);
         self.max = self.max.max(pos);
     }
 
-    fn add_sphere(&mut self, center: Pos, radius: i32) {
-        self.add_point(center - Pos::with_value(radius));
-        self.add_point(center + Pos::with_value(radius));
+    fn add_sphere(&mut self, center: Position, radius: i32) {
+        self.add_point(center - Position::with_value(radius));
+        self.add_point(center + Position::with_value(radius));
     }
 
     fn overlaps(&self, bot: &Nanobot) -> bool {
@@ -155,8 +161,8 @@ impl AABB {
         bots.iter().filter(|bot| self.overlaps(bot)).count()
     }
 
-    fn distance_from(&self, point: Pos) -> i32 {
-        let mut closest: Pos = point;
+    fn distance_from(&self, point: Position) -> i32 {
+        let mut closest: Position = point;
 
         for i in 0..3 {
             if closest[i] > self.max[i] {
@@ -190,25 +196,8 @@ impl AABB {
 
         w.saturating_mul(h).saturating_mul(d)
     }
-
-    #[allow(dead_code)]
-    const fn contains(&self, pt: Pos) -> bool {
-        pt.x >= self.min.x
-            && pt.x <= self.max.x
-            && pt.y >= self.min.y
-            && pt.y <= self.max.y
-            && pt.z >= self.min.z
-            && pt.z <= self.max.z
-    }
 }
 
-impl Pos {
-    pub const fn distance_between(&self, other: Self) -> i32 {
-        (self.x - other.x).abs() + (self.y - other.y).abs() + (self.z - other.z).abs()
-    }
-}
-
-#[derive(Debug)]
 struct OctreeNode {
     level: u8,
     max_possible: usize,
@@ -253,18 +242,22 @@ impl OctreeNode {
     }
 }
 
+/// An octree is a tree data structure in which each internal node has exactly eight children.
+/// - https://en.wikipedia.org/wiki/Octree
+///
+/// Three-dimensional space is partitioned by recursively subdividing it into eight octants.
 struct Octree {
     _root: Rc<RefCell<OctreeNode>>,
     leaves: Vec<Rc<RefCell<OctreeNode>>>,
 }
 
 impl Octree {
+    /// Create a new octree containing all the bots.
     fn new(bots: &[Nanobot]) -> Self {
-        let bounds = bots.iter().fold(AABB::new(), |aabb, bot| {
-            let mut result = aabb;
-            result.add_sphere(bot.pos, bot.radius);
-            result
-        });
+        let mut bounds = AABB::new();
+        for bot in bots {
+            bounds.add_sphere(bot.pos, bot.radius);
+        }
 
         let root = Rc::new(RefCell::new(OctreeNode {
             level: 0,
@@ -296,7 +289,7 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
 pub fn part2(input_string: &str) -> Result<i32, String> {
     let bots = Nanobot::parse(input_string)?;
     let mut octree = Octree::new(&bots);
-    let origin = Pos::new(0, 0, 0);
+    let origin = Position::new(0, 0, 0);
     let mut best_leaf: Option<Rc<RefCell<OctreeNode>>> = None;
 
     while let Some(leaf) = octree.leaves.pop() {
