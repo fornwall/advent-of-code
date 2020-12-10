@@ -2,7 +2,7 @@ const currentYear = new URLSearchParams(window.location.search).get('year') || '
 document.querySelector('h1').textContent = `Advent of Code ${currentYear} timings`;
 
 async function run() {
-  const baselineResponse = await fetch('https://fornwall.net/baseline.json');
+  const baselineResponse = await fetch('/new-baseline.json');
   const baselineJson = await baselineResponse.json();
   const benchmarks = Object.entries(baselineJson['benchmarks']);
   const extractMeanTime = (info) => info['criterion_estimates_v1']['mean']['point_estimate'];
