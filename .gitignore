@@ -24,4 +24,4 @@ __pycache__/
 *.so
 *.egg-info/
 
-flamegraph.svg
+flamegraph*.svg
