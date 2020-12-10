@@ -1,5 +1,4 @@
 [![npm](https://img.shields.io/npm/v/advent-of-code-wasm.svg)](https://www.npmjs.com/package/advent-of-code-wasm)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/8cb47a76-7cd7-4545-9f10-56ba075c8e41/deploy-status)](https://app.netlify.com/sites/mystifying-blackwell-9e705f/deploys)
 
 # advent-of-code-wasm
 Solutions to [Advent of Code](https://adventofcode.com/) implemented in Rust and compiled to WebAssembly.
