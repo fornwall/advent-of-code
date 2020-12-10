@@ -3,6 +3,8 @@ use crate::input::Input;
 type JoltageAmount = u64;
 
 pub fn solve(input: &mut Input) -> Result<JoltageAmount, String> {
+    // "Any given adapter can take an input 1, 2, or 3 jolts lower than
+    // its rating and still produce its rated output joltage":
     const MAX_DIFF: JoltageAmount = 3;
 
     let mut joltages = std::iter::once(Ok(0))
@@ -14,6 +16,9 @@ pub fn solve(input: &mut Input) -> Result<JoltageAmount, String> {
         .collect::<Result<Vec<_>, _>>()?;
 
     joltages.sort_unstable();
+
+    // "In addition, your device has a built-in joltage adapter rated
+    // for 3 jolts higher than the highest-rated adapter in your bag":
     joltages.push(joltages[joltages.len() - 1] + MAX_DIFF);
 
     if input.is_part_one() {
@@ -54,11 +59,15 @@ pub fn solve(input: &mut Input) -> Result<JoltageAmount, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::{test_part_one, test_part_one_error, test_part_two};
 
     let example = "16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4";
     test_part_one!(example => 35);
     test_part_two!(example => 8);
+
+    test_part_one_error!(" " => "Line 1: Invalid joltage - invalid digit found in string");
+    test_part_one_error!("100" => "Too big difference between adapters - cannot go from 0 to 100");
+    test_part_one!("1" => 1);
     test_part_two!("1" => 1);
 
     let real_input = include_str!("day10_input.txt");
