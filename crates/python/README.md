@@ -13,7 +13,7 @@ pip install --upgrade advent-of-code
 The `advent_of_code` package exports a single `solve` function with the following signature:
 
 ```js
-def solve(day: int, part: int, input: str) -> str
+def solve(year: int, day: int, part: int, input: str) -> str
 ```
 
 Examples:
