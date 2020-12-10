@@ -312,8 +312,10 @@ jobs:
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
-    - name: Install wasm-pack
-      run: make install-wasm-pack
+    - name: Install wasm-pack and nightly
+      run: |
+        make install-nightly
+        make install-wasm-pack
     - name: Install the Netlify CLI
       run: npm install netlify-cli -g
     - name: Deploy to Netlify
