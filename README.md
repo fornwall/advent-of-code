@@ -1,5 +1,4 @@
 [![Build](https://github.com/fornwall/advent-of-code/workflows/Github%20CI/badge.svg)](https://github.com/fornwall/advent-of-code/actions?query=workflow%3A%22Github+CI%22)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/8cb47a76-7cd7-4545-9f10-56ba075c8e41/deploy-status)](https://app.netlify.com/sites/mystifying-blackwell-9e705f/deploys)
 
 # Advent of Code solutions
 Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust. Consists of the following parts:
