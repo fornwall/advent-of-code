@@ -1,14 +1,18 @@
 use crate::input::Input;
 
+#[derive(Clone)]
 struct Grid {
-    data: Vec<u8>,
-    scratch: Vec<u8>,
+    /// True if occupied, false if empty.
+    seats: Vec<bool>,
+    scratch: Vec<bool>,
+    /// For a seat at seats[seat_idx], visibility_map[seat_idx] contains the indices into seats that are visible.
+    visibility_map: Vec<Vec<u16>>,
     cols: i32,
     rows: i32,
 }
 
 impl Grid {
-    fn parse(input: &str) -> Result<Self, String> {
+    fn parse(input: &str, part_one: bool) -> Result<Self, String> {
         let rows = input.lines().count() as i32;
         let cols = input.lines().next().ok_or("No lines")?.len() as i32;
         if input.lines().any(|line| line.len() != cols as usize) {
@@ -18,93 +22,103 @@ impl Grid {
         if data.iter().any(|c| !matches!(c, b'#' | b'L' | b'.')) {
             return Err("Invalid input - only '#', 'L', '.' and '\n' expected".to_string());
         }
-        let scratch = data.clone();
+
+        let mut data_pos_to_seat_idx = vec![0; data.len()];
+        let mut seats_counter = 0;
+        for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+            data_pos_to_seat_idx[idx] = seats_counter as u16;
+            seats_counter += 1;
+        }
+
+        // Build up visibility map:
+        let mut visibility_map = vec![Vec::new(); seats_counter];
+        for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+            let x = (idx as i32) % cols;
+            let y = (idx as i32) / cols;
+            for dx in -1..=1 {
+                for dy in -1..=1 {
+                    if dx == 0 && dy == 0 {
+                        continue;
+                    }
+
+                    let mut new_x = x + dx;
+                    let mut new_y = y + dy;
+                    loop {
+                        if new_x < 0 || new_y < 0 || new_x >= cols || new_y >= rows {
+                            break;
+                        }
+
+                        let visited_idx = (new_x + cols * new_y) as usize;
+                        if matches!(data[visited_idx], b'#' | b'L') {
+                            visibility_map[data_pos_to_seat_idx[idx] as usize]
+                                .push(data_pos_to_seat_idx[visited_idx]);
+                            break;
+                        }
+
+                        if part_one {
+                            break;
+                        }
+
+                        new_x += dx;
+                        new_y += dy;
+                    }
+                }
+            }
+        }
+
+        let mut seats = vec![false; seats_counter];
+        for (idx, &char) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+            seats[data_pos_to_seat_idx[idx] as usize] = char == b'#';
+        }
+
+        let scratch = seats.clone();
+
         Ok(Self {
-            data,
+            seats,
             scratch,
+            visibility_map,
             cols,
             rows,
         })
     }
 
-    fn at(&self, x: i32, y: i32) -> Option<u8> {
-        if x < 0 || y < 0 || x >= self.cols || y >= self.rows {
-            None
-        } else {
-            Some(self.data[(x + self.cols * y) as usize])
-        }
-    }
-
-    fn evolve(&mut self, part_one: bool) -> bool {
-        for y in 0..self.rows {
-            'col: for x in 0..self.cols {
-                let idx = (x + y * self.cols) as usize;
-                let current_value = self.data[(x + y * self.cols) as usize];
-                if current_value == b'.' {
-                    continue;
+    fn evolve(&mut self, leave_when_seeing: i32) -> bool {
+        for (idx, visible) in self.visibility_map.iter().enumerate() {
+            let mut seen_occupied_counter = 0;
+            for &position in visible {
+                if self.seats[position as usize] {
+                    seen_occupied_counter += 1;
                 }
-                let occupied_adjacent_for_leave = if part_one { 4 } else { 5 };
-
-                let mut adjacent_occupied = 0;
-                for dx in -1..=1 {
-                    for dy in -1..=1 {
-                        if !(dx == 0 && dy == 0) {
-                            let mut new_x = x + dx;
-                            let mut new_y = y + dy;
-                            loop {
-                                match self.at(new_x, new_y) {
-                                    Some(b'#') => {
-                                        if current_value == b'L' {
-                                            self.scratch[idx] = current_value;
-                                            continue 'col;
-                                        }
-                                        adjacent_occupied += 1;
-                                        if current_value == b'#'
-                                            && adjacent_occupied >= occupied_adjacent_for_leave
-                                        {
-                                            self.scratch[idx] = b'L';
-                                            continue 'col;
-                                        }
-                                        break;
-                                    }
-                                    Some(b'L') | None => {
-                                        break;
-                                    }
-                                    _ => {}
-                                }
-                                new_x += dx;
-                                new_y += dy;
-                                if part_one {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                self.scratch[idx] = b'#';
             }
+            self.scratch[idx] = if !self.seats[idx] && seen_occupied_counter == 0 {
+                // Free seat that is now taken
+                true
+            } else if self.seats[idx] && seen_occupied_counter >= leave_when_seeing {
+                // Occupied seat that is now left.
+                false
+            } else {
+                self.seats[idx]
+            };
         }
 
-        std::mem::swap(&mut self.scratch, &mut self.data);
-        self.scratch != self.data
+        std::mem::swap(&mut self.scratch, &mut self.seats);
+        self.scratch != self.seats
     }
 }
 
-#[allow(clippy::naive_bytecount)]
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX_ITERATIONS: u32 = 10_000;
     let mut iteration = 0;
 
-    let mut grid = Grid::parse(input.text)?;
-    while grid.evolve(input.is_part_one()) {
+    let mut grid = Grid::parse(input.text, input.is_part_one())?;
+    while grid.evolve(input.part_values(4, 5)) {
         iteration += 1;
         if iteration >= MAX_ITERATIONS {
             return Err(format!("Aborting after {} iterations", iteration));
         }
     }
 
-    return Ok(grid.data.iter().filter(|&&c| c == b'#').count());
+    return Ok(grid.seats.iter().filter(|&&occupied| occupied).count());
 }
 
 #[test]
@@ -127,4 +141,15 @@ L.LLLLL.LL";
     let real_input = include_str!("day11_input.txt");
     test_part_one!(real_input => 2222);
     test_part_two!(real_input => 2032);
+}
+#[cfg(feature = "count-allocations")]
+#[test]
+pub fn no_memory_allocations() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day11_input.txt");
+    let allocations = allocation_counter::count(|| {
+        test_part_one!(real_input => 2222);
+        test_part_two!(real_input => 2032);
+    });
+    assert_eq!(allocations, 28);
 }
