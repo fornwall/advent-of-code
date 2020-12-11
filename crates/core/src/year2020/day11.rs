@@ -13,6 +13,8 @@ struct Grid {
     scratch: Vec<bool>,
     visibility_map: Vec<VisibilityEntry>,
     visibility_array: Vec<u16>,
+    to_visit: Vec<u16>,
+    to_visit_scratch: Vec<u16>,
     cols: i32,
     rows: i32,
 }
@@ -94,19 +96,30 @@ impl Grid {
         }
 
         let scratch = seats.clone();
+        let mut to_visit = vec![0_u16; seats.len()];
+        for (idx, element) in to_visit.iter_mut().enumerate() {
+            *element = idx as u16;
+        }
+        let to_visit_scratch = Vec::with_capacity(seats.len());
 
         Ok(Self {
             seats,
             scratch,
             visibility_map,
             visibility_array,
+            to_visit,
+            to_visit_scratch,
             cols,
             rows,
         })
     }
 
     fn evolve(&mut self, leave_when_seeing: usize) -> bool {
-        for (idx, visibility) in self.visibility_map.iter().enumerate() {
+        self.to_visit_scratch.clear();
+
+        for u16_idx in self.to_visit.iter() {
+            let idx = *u16_idx as usize;
+            let visibility = self.visibility_map[idx];
             let seen_from_here_count = self.visibility_array
                 [(visibility.start as usize)..(visibility.end as usize)]
                 .iter()
@@ -115,9 +128,11 @@ impl Grid {
 
             self.scratch[idx] = if !self.seats[idx] && seen_from_here_count == 0 {
                 // Free seat that is now taken
+                self.to_visit_scratch.push(*u16_idx);
                 true
             } else if self.seats[idx] && seen_from_here_count >= leave_when_seeing {
                 // Occupied seat that is now left.
+                self.to_visit_scratch.push(*u16_idx);
                 false
             } else {
                 self.seats[idx]
@@ -125,6 +140,7 @@ impl Grid {
         }
 
         std::mem::swap(&mut self.scratch, &mut self.seats);
+        std::mem::swap(&mut self.to_visit_scratch, &mut self.to_visit);
         self.scratch != self.seats
     }
 }
