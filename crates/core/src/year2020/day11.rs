@@ -82,18 +82,17 @@ impl Grid {
         })
     }
 
-    fn evolve(&mut self, leave_when_seeing: i32) -> bool {
+    fn evolve(&mut self, leave_when_seeing: usize) -> bool {
         for (idx, visible) in self.visibility_map.iter().enumerate() {
-            let mut seen_occupied_counter = 0;
-            for &position in visible {
-                if self.seats[position as usize] {
-                    seen_occupied_counter += 1;
-                }
-            }
-            self.scratch[idx] = if !self.seats[idx] && seen_occupied_counter == 0 {
+            let seen_from_here_count = visible
+                .iter()
+                .filter(|&&idx| self.seats[idx as usize])
+                .count();
+
+            self.scratch[idx] = if !self.seats[idx] && seen_from_here_count == 0 {
                 // Free seat that is now taken
                 true
-            } else if self.seats[idx] && seen_occupied_counter >= leave_when_seeing {
+            } else if self.seats[idx] && seen_from_here_count >= leave_when_seeing {
                 // Occupied seat that is now left.
                 false
             } else {
