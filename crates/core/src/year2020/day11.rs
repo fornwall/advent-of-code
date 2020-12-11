@@ -1,12 +1,18 @@
 use crate::input::Input;
 
+#[derive(Copy, Clone)]
+struct VisibilityEntry {
+    start: u16,
+    end: u16,
+}
+
 #[derive(Clone)]
 struct Grid {
     /// True if occupied, false if empty.
     seats: Vec<bool>,
     scratch: Vec<bool>,
-    /// For a seat at seats[seat_idx], visibility_map[seat_idx] contains the indices into seats that are visible.
-    visibility_map: Vec<Vec<u16>>,
+    visibility_map: Vec<VisibilityEntry>,
+    visibility_array: Vec<u16>,
     cols: i32,
     rows: i32,
 }
@@ -18,6 +24,16 @@ impl Grid {
         if input.lines().any(|line| line.len() != cols as usize) {
             return Err("Not all lines have equal length".to_string());
         }
+
+        if rows * cols > i32::from(u16::MAX) {
+            return Err(format!(
+                "Too big input ({}x{}) - max supported seats is {}",
+                cols,
+                rows,
+                u16::MAX
+            ));
+        }
+
         let data: Vec<u8> = input.bytes().filter(|&c| c != b'\n').collect();
         if data.iter().any(|c| !matches!(c, b'#' | b'L' | b'.')) {
             return Err("Invalid input - only '#', 'L', '.' and '\n' expected".to_string());
@@ -30,11 +46,15 @@ impl Grid {
             seats_counter += 1;
         }
 
-        // Build up visibility map:
-        let mut visibility_map = vec![Vec::new(); seats_counter];
+        let mut visibility_map = vec![VisibilityEntry { start: 0, end: 0 }; seats_counter];
+        let mut visibility_array = Vec::with_capacity(seats_counter * 8);
         for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
             let x = (idx as i32) % cols;
             let y = (idx as i32) / cols;
+            let mut visibility_entry = VisibilityEntry {
+                start: visibility_array.len() as u16,
+                end: visibility_array.len() as u16,
+            };
             for dx in -1..=1 {
                 for dy in -1..=1 {
                     if dx == 0 && dy == 0 {
@@ -50,8 +70,8 @@ impl Grid {
 
                         let visited_idx = (new_x + cols * new_y) as usize;
                         if matches!(data[visited_idx], b'#' | b'L') {
-                            visibility_map[data_pos_to_seat_idx[idx] as usize]
-                                .push(data_pos_to_seat_idx[visited_idx]);
+                            visibility_entry.end += 1;
+                            visibility_array.push(data_pos_to_seat_idx[visited_idx] as u16);
                             break;
                         }
 
@@ -64,6 +84,8 @@ impl Grid {
                     }
                 }
             }
+
+            visibility_map[data_pos_to_seat_idx[idx] as usize] = visibility_entry;
         }
 
         let mut seats = vec![false; seats_counter];
@@ -77,14 +99,16 @@ impl Grid {
             seats,
             scratch,
             visibility_map,
+            visibility_array,
             cols,
             rows,
         })
     }
 
     fn evolve(&mut self, leave_when_seeing: usize) -> bool {
-        for (idx, visible) in self.visibility_map.iter().enumerate() {
-            let seen_from_here_count = visible
+        for (idx, visibility) in self.visibility_map.iter().enumerate() {
+            let seen_from_here_count = self.visibility_array
+                [(visibility.start as usize)..(visibility.end as usize)]
                 .iter()
                 .filter(|&&idx| self.seats[idx as usize])
                 .count();
@@ -143,12 +167,12 @@ L.LLLLL.LL";
 }
 #[cfg(feature = "count-allocations")]
 #[test]
-pub fn no_memory_allocations() {
+pub fn limited_memory_allocations() {
     use crate::{test_part_one, test_part_two};
     let real_input = include_str!("day11_input.txt");
     let allocations = allocation_counter::count(|| {
         test_part_one!(real_input => 2222);
         test_part_two!(real_input => 2032);
     });
-    assert_eq!(allocations, 28);
+    assert!(allocations < 100);
 }
