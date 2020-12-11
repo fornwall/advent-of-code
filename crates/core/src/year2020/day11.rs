@@ -94,14 +94,16 @@ impl Grid {
 #[allow(clippy::naive_bytecount)]
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX_ITERATIONS: u32 = 10_000;
-    let mut grid = Grid::parse(input.text)?;
     let mut iteration = 0;
+
+    let mut grid = Grid::parse(input.text)?;
     while grid.evolve(input.is_part_one()) {
         iteration += 1;
         if iteration >= MAX_ITERATIONS {
             return Err(format!("Aborting after {} iterations", iteration));
         }
     }
+
     return Ok(grid.data.iter().filter(|&&c| c == b'#').count());
 }
 
