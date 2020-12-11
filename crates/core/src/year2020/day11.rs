@@ -10,7 +10,7 @@ struct Grid {
 impl Grid {
     fn parse(input: &str) -> Result<Self, String> {
         let rows = input.lines().count() as i32;
-        let cols = input.lines().next().ok_or("No rows")?.len() as i32;
+        let cols = input.lines().next().ok_or("No lines")?.len() as i32;
         if input.lines().any(|line| line.len() != cols as usize) {
             return Err("Not all lines have equal length".to_string());
         }
