@@ -98,7 +98,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     let mut iteration = 0;
     while grid.evolve(input.is_part_one()) {
         iteration += 1;
-        if iteration > MAX_ITERATIONS {
+        if iteration >= MAX_ITERATIONS {
             return Err(format!("Aborting after {} iterations", iteration));
         }
     }
