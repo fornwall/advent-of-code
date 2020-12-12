@@ -10,15 +10,12 @@ pub struct VisibilityEntry {
 
 #[derive(Clone)]
 pub struct Grid {
-    /// True if occupied, false if empty.
-    pub seats: Vec<bool>,
-    pub scratch: Vec<bool>,
+    /// 1 if occupied, 0 if empty.
+    pub seats: Vec<u8>,
     pub visibility_map: Vec<VisibilityEntry>,
     pub visibility_array: Vec<u16>,
     pub to_visit: Vec<u16>,
-    pub to_visit_scratch: Vec<u16>,
-    pub cols: i32,
-    pub rows: i32,
+    pub changed: Vec<u16>,
 }
 
 impl Grid {
@@ -43,19 +40,23 @@ impl Grid {
         }
 
         let data: Vec<u8> = input.bytes().filter(|&c| c != b'\n').collect();
-        if data.iter().any(|c| !matches!(c, b'#' | b'L' | b'.')) {
-            return Err("Invalid input - only '#', 'L', '.' and '\n' expected".to_string());
-        }
 
         let mut data_pos_to_seat_idx = vec![0; data.len()];
         let mut seats_counter = 0;
-        for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
-            data_pos_to_seat_idx[idx] = seats_counter as u16;
+        for (idx, &c) in data.iter().enumerate() {
+            if c == b'.' || c == b'\n' {
+                // Ok.
+            } else if c == b'L' {
+                // Free seat.
+                data_pos_to_seat_idx[idx] = seats_counter as u16;
 
-            #[cfg(feature = "visualization")]
-            renderer.add_idx_mapping(seats_counter, idx as i32 % cols, idx as i32 / cols);
+                #[cfg(feature = "visualization")]
+                renderer.add_idx_mapping(seats_counter, idx as i32 % cols, idx as i32 / cols);
 
-            seats_counter += 1;
+                seats_counter += 1;
+            } else {
+                return Err("Invalid input - only 'L', '.' and '\n' expected".to_string());
+            }
         }
 
         let mut visibility_map = vec![VisibilityEntry { start: 0, end: 0 }; seats_counter];
@@ -81,7 +82,7 @@ impl Grid {
                         }
 
                         let visited_idx = (new_x + cols * new_y) as usize;
-                        if matches!(data[visited_idx], b'#' | b'L') {
+                        if data[visited_idx] == b'L' {
                             visibility_entry.end += 1;
                             visibility_array.push(data_pos_to_seat_idx[visited_idx] as u16);
                             break;
@@ -100,58 +101,59 @@ impl Grid {
             visibility_map[data_pos_to_seat_idx[idx] as usize] = visibility_entry;
         }
 
-        let mut seats = vec![false; seats_counter];
-        for (idx, &char) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
-            seats[data_pos_to_seat_idx[idx] as usize] = char == b'#';
-        }
+        let seats = vec![0; seats_counter];
 
-        let scratch = seats.clone();
         let mut to_visit = vec![0_u16; seats.len()];
         for (idx, element) in to_visit.iter_mut().enumerate() {
             *element = idx as u16;
         }
-        let to_visit_scratch = Vec::with_capacity(seats.len());
+
+        let changed = Vec::with_capacity(seats.len());
 
         Ok(Self {
             seats,
-            scratch,
             visibility_map,
             visibility_array,
             to_visit,
-            to_visit_scratch,
-            cols,
-            rows,
+            changed,
         })
     }
 
-    fn evolve(&mut self, leave_when_seeing: usize) -> bool {
-        self.to_visit_scratch.clear();
+    fn evolve(&mut self, leave_when_seeing: u8) -> bool {
+        let seats = &mut self.seats;
+        let visibility_map = &self.visibility_map;
+        let visibility_array = &self.visibility_array;
+        let changed = &mut self.changed;
 
-        for &u16_idx in self.to_visit.iter() {
-            let idx = u16_idx as usize;
-            let visibility = self.visibility_map[idx];
-            let seen_from_here_count = self.visibility_array
+        self.to_visit.retain(|&visited_seat_idx| {
+            let idx = visited_seat_idx as usize;
+            let seat_occupied = seats[idx] == 1;
+            let visibility = visibility_map[idx];
+            let seen_from_here_count = visibility_array
                 [(visibility.start as usize)..(visibility.end as usize)]
                 .iter()
-                .filter(|&&idx| self.seats[idx as usize])
-                .count();
+                .map(|&idx| seats[idx as usize])
+                .sum::<u8>();
 
-            self.scratch[idx] = if !self.seats[idx] && seen_from_here_count == 0 {
-                // Free seat that is now taken
-                self.to_visit_scratch.push(u16_idx);
+            // Free seat that is now taken or occupied seat that is now left.
+            if (!seat_occupied && seen_from_here_count == 0)
+                || (seat_occupied && seen_from_here_count >= leave_when_seeing)
+            {
+                changed.push(visited_seat_idx);
                 true
-            } else if self.seats[idx] && seen_from_here_count >= leave_when_seeing {
-                // Occupied seat that is now left.
-                self.to_visit_scratch.push(u16_idx);
-                false
             } else {
-                self.seats[idx]
-            };
-        }
+                // If seat occupance has not changed in a cycle, it will never change,
+                // so we never need to re-visit it.
+                false
+            }
+        });
 
-        std::mem::swap(&mut self.scratch, &mut self.seats);
-        std::mem::swap(&mut self.to_visit_scratch, &mut self.to_visit);
-        self.scratch != self.seats
+        let changed = !self.changed.is_empty();
+        self.changed
+            .iter()
+            .for_each(|&idx| seats[idx as usize] = (seats[idx as usize] + 1) % 2);
+        self.changed.clear();
+        changed
     }
 }
 
@@ -178,7 +180,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         }
     }
 
-    return Ok(grid.seats.iter().filter(|&&occupied| occupied).count());
+    return Ok(grid.seats.iter().filter(|&&s| s == 1).count());
 }
 
 #[test]
