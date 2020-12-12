@@ -8,7 +8,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         let start_day = 1;
         let end_day = match year {
             2017 => 16,
-            2020 => 11,
+            2020 => 12,
             _ => 25,
         };
         for day in start_day..=end_day {

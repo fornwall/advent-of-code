@@ -16,3 +16,6 @@ pub mod day08_renderer;
 pub mod day09;
 pub mod day10;
 pub mod day11;
+#[cfg(feature = "visualization")]
+pub mod day11_renderer;
+pub mod day12;

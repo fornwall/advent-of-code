@@ -1,26 +1,32 @@
+#[cfg(feature = "visualization")]
+use super::day11_renderer::Renderer;
 use crate::input::Input;
 
 #[derive(Copy, Clone)]
-struct VisibilityEntry {
+pub struct VisibilityEntry {
     start: u16,
     end: u16,
 }
 
 #[derive(Clone)]
-struct Grid {
+pub struct Grid {
     /// True if occupied, false if empty.
-    seats: Vec<bool>,
-    scratch: Vec<bool>,
-    visibility_map: Vec<VisibilityEntry>,
-    visibility_array: Vec<u16>,
-    to_visit: Vec<u16>,
-    to_visit_scratch: Vec<u16>,
-    cols: i32,
-    rows: i32,
+    pub seats: Vec<bool>,
+    pub scratch: Vec<bool>,
+    pub visibility_map: Vec<VisibilityEntry>,
+    pub visibility_array: Vec<u16>,
+    pub to_visit: Vec<u16>,
+    pub to_visit_scratch: Vec<u16>,
+    pub cols: i32,
+    pub rows: i32,
 }
 
 impl Grid {
-    fn parse(input: &str, part_one: bool) -> Result<Self, String> {
+    fn parse(
+        input: &str,
+        part_one: bool,
+        #[cfg(feature = "visualization")] renderer: &mut Renderer,
+    ) -> Result<Self, String> {
         let rows = input.lines().count() as i32;
         let cols = input.lines().next().ok_or("No lines")?.len() as i32;
         if input.lines().any(|line| line.len() != cols as usize) {
@@ -45,6 +51,10 @@ impl Grid {
         let mut seats_counter = 0;
         for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
             data_pos_to_seat_idx[idx] = seats_counter as u16;
+
+            #[cfg(feature = "visualization")]
+            renderer.add_idx_mapping(seats_counter, idx % cols, x / cols);
+
             seats_counter += 1;
         }
 
@@ -149,7 +159,15 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX_ITERATIONS: u32 = 10_000;
     let mut iteration = 0;
 
-    let mut grid = Grid::parse(input.text, input.is_part_one())?;
+    #[cfg(feature = "visualization")]
+    let mut renderer = Renderer::new(&mut input.painter);
+
+    let mut grid = Grid::parse(
+        input.text,
+        input.is_part_one(),
+        #[cfg(feature = "visualization")]
+        &mut renderer,
+    )?;
     while grid.evolve(input.part_values(4, 5)) {
         iteration += 1;
         if iteration >= MAX_ITERATIONS {
