@@ -53,7 +53,7 @@ impl Grid {
             data_pos_to_seat_idx[idx] = seats_counter as u16;
 
             #[cfg(feature = "visualization")]
-            renderer.add_idx_mapping(seats_counter, idx % cols, x / cols);
+            renderer.add_idx_mapping(seats_counter, idx as i32 % cols, idx as i32 / cols);
 
             seats_counter += 1;
         }
@@ -159,16 +159,19 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX_ITERATIONS: u32 = 10_000;
     let mut iteration = 0;
 
+    let leave_when_seeing = input.part_values(4, 5);
+    let part_one = input.is_part_one();
+
     #[cfg(feature = "visualization")]
     let mut renderer = Renderer::new(&mut input.painter);
 
     let mut grid = Grid::parse(
         input.text,
-        input.is_part_one(),
+        part_one,
         #[cfg(feature = "visualization")]
         &mut renderer,
     )?;
-    while grid.evolve(input.part_values(4, 5)) {
+    while grid.evolve(leave_when_seeing) {
         iteration += 1;
         if iteration >= MAX_ITERATIONS {
             return Err(format!("Aborting after {} iterations", iteration));
