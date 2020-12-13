@@ -6,3 +6,7 @@ exclude = [ "crates/painter", "crates/fuzzing-afl" ]
 lto = true
 panic = 'abort'
 codegen-units = 1
+
+[profile.bench]
+lto = true
+codegen-units = 1
