@@ -1,4 +1,4 @@
-use super::day12::{SHIP_DIRECTION_ENTITY_IDX, SHIP_POSITION_ENTITY_IDX, WAYPOINT_ENTITY_IDX};
+use super::day12::{SHIP_POSITION_ENTITY_IDX, WAYPOINT_ENTITY_IDX};
 use crate::painter::PainterRef;
 
 pub struct Renderer<'a> {
@@ -29,6 +29,14 @@ impl<'a> Renderer<'a> {
             max_x = std::cmp::max(max_x, ship.0);
             min_y = std::cmp::min(min_y, ship.1);
             max_y = std::cmp::max(max_y, ship.1);
+            if !part_one {
+                let waypoint_relative = entities[WAYPOINT_ENTITY_IDX];
+                let waypoint = (waypoint_relative.0 + ship.0, waypoint_relative.1 + ship.1);
+                min_x = std::cmp::min(min_x, waypoint.0);
+                max_x = std::cmp::max(max_x, waypoint.0);
+                min_y = std::cmp::min(min_y, waypoint.1);
+                max_y = std::cmp::max(max_y, waypoint.1);
+            }
         }
 
         let grid_width = (max_x - min_x) as i32;
@@ -37,14 +45,14 @@ impl<'a> Renderer<'a> {
         let grid_display_width = 1.0 / grid_width as f64;
         let grid_display_height = (1.0 / grid_height as f64) / self.painter.aspect_ratio();
 
-        self.painter.line_width(grid_display_width * 3.);
+        self.painter.line_width(0.002);
 
         // Mark origin:
         self.painter.fill_style_rgb(125, 125, 0);
         self.painter.fill_circle(
             -min_x as f64 * grid_display_width,
             -min_y as f64 * grid_display_height,
-            grid_display_width * 10.,
+            0.005,
         );
 
         let mut last_ship_position = self.entities_over_time[0][SHIP_POSITION_ENTITY_IDX];
@@ -64,6 +72,19 @@ impl<'a> Renderer<'a> {
             self.painter.move_to(start_x, start_y);
             self.painter.line_to(end_x, end_y);
             self.painter.stroke();
+
+            if !part_one {
+                self.painter.meta_switch_layer(1);
+                self.painter.fill_style_rgb_packed(0x00FF00);
+                let waypoint_position = entities[WAYPOINT_ENTITY_IDX];
+                let draw_x =
+                    (new_ship_position.0 + waypoint_position.0 - min_x) as f64 * grid_display_width;
+                let draw_y = (new_ship_position.1 + waypoint_position.1 - min_y) as f64
+                    * grid_display_height;
+                self.painter.fill_circle(draw_x, draw_y, 0.005);
+                self.painter.meta_switch_layer(0);
+            }
+
             self.painter.meta_delay(100);
 
             last_ship_position = new_ship_position;

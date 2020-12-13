@@ -31,7 +31,7 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
     const {buffer, offset, length} = message.data;
     const reader = new ReaderWithBuffer(buffer, offset, length);
 
-    const ctx = layers[0];
+    let ctx = layers[0];
 
     const overlayCtx = layers[1];
     overlayCtx.fillStyle = 'white';
@@ -155,6 +155,9 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     break;
                 }
                 case COMMAND_DRAW_TEXT: {
+                    overlayCtx.save();
+                    overlayCtx.resetTransform();
+
                     const alignment = reader.next();
                     const x = reader.nextFloat();
                     const y = reader.nextFloat();
@@ -186,6 +189,7 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
                     }
 
                     overlayCtx.fillText(text, overlayCtx.canvas.width*x, overlayCtx.canvas.height*y);
+                    overlayCtx.restore();
                     break;
                 }
                 case COMMAND_TEXT_FILL: {
@@ -206,6 +210,7 @@ export default function Renderer(message, layers, onNewAspectRatio, audioPlayer)
         // Save state and restore at end, so that other text rendering
         // is unaffected by status text rendering:
         overlayCtx.save();
+        overlayCtx.resetTransform();
 
         const yOffset = 0;
         const boxMargin = 10;

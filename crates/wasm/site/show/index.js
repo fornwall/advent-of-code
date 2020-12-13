@@ -317,6 +317,7 @@ setTimeout(async() => {
     const savedOverlayState = saveContextState(overlayCtx);
     overlayCtx.canvas.width = newWidth;
     overlayCtx.canvas.height = newHeight;
+    overlayCtx.setTransform(canvas.width, 0, 0, canvas.width, 0, 0);
     restoreContextState(overlayCtx, savedOverlayState);
     if (window.renderer) {
        window.renderer.renderStatusText();
