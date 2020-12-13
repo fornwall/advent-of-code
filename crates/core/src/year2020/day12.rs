@@ -2,9 +2,9 @@
 use super::day12_renderer::Renderer;
 use crate::input::Input;
 
-pub(crate) const SHIP_POSITION_ENTITY_IDX: usize = 0;
-pub(crate) const SHIP_DIRECTION_ENTITY_IDX: usize = 1;
-pub(crate) const WAYPOINT_ENTITY_IDX: usize = 2;
+pub const SHIP_POSITION_ENTITY_IDX: usize = 0;
+pub const SHIP_DIRECTION_ENTITY_IDX: usize = 1;
+pub const WAYPOINT_ENTITY_IDX: usize = 2;
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
     let ship_position = (0, 0);
