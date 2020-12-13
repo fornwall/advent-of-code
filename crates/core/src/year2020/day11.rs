@@ -8,9 +8,6 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     let leave_when_seeing = input.part_values(4, 5);
     let part_one = input.is_part_one();
 
-    #[cfg(feature = "visualization")]
-    let mut renderer = Renderer::new(&mut input.painter);
-
     let rows = input.text.lines().count() as i32;
     let cols = input.text.lines().next().ok_or("No lines")?.len() as i32;
     if input.text.lines().any(|line| line.len() != cols as usize) {
@@ -25,6 +22,9 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             u16::MAX
         ));
     }
+
+    #[cfg(feature = "visualization")]
+    let mut renderer = Renderer::new(&mut input.painter, cols, rows);
 
     let data: Vec<u8> = input.text.bytes().filter(|&c| c != b'\n').collect();
 
@@ -111,6 +111,9 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             seats[change_idx as usize] = !seats[change_idx as usize];
             false
         });
+
+        #[cfg(feature = "visualization")]
+        renderer.render(iteration, &seats[0..seats.len() - 1]);
 
         if to_visit.is_empty() {
             return Ok(seats.iter().filter(|&&occupied| occupied).count());
