@@ -2,6 +2,135 @@
 use super::day11_renderer::Renderer;
 use crate::input::Input;
 
+#[derive(Clone)]
+pub struct Grid;
+
+impl Grid {
+    fn parse(
+        input: &str,
+        part_one: bool,
+        #[cfg(feature = "visualization")] renderer: &mut Renderer,
+        leave_when_seeing: usize,
+    ) -> Result<usize, String> {
+        const MAX_ITERATIONS: u32 = 10_000;
+
+        let rows = input.lines().count() as i32;
+        let cols = input.lines().next().ok_or("No lines")?.len() as i32;
+        if input.lines().any(|line| line.len() != cols as usize) {
+            return Err("Not all lines have equal length".to_string());
+        }
+
+        if rows * cols > i32::from(u16::MAX) {
+            return Err(format!(
+                "Too big input ({}x{}) - max supported seats is {}",
+                cols,
+                rows,
+                u16::MAX
+            ));
+        }
+
+        let data: Vec<u8> = input.bytes().filter(|&c| c != b'\n').collect();
+        if data.iter().any(|c| !matches!(c, b'L' | b'.')) {
+            return Err("Invalid input - only 'L', '.' and '\n' expected".to_string());
+        }
+
+        let mut data_pos_to_seat_idx = vec![0; data.len()];
+        let mut seats_counter = 0;
+        for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+            data_pos_to_seat_idx[idx] = seats_counter as u16;
+
+            #[cfg(feature = "visualization")]
+            renderer.add_idx_mapping(seats_counter, idx as i32 % cols, idx as i32 / cols);
+
+            seats_counter += 1;
+        }
+
+        // An extra proxy at end for pointing to.
+        let mut seats = vec![false; seats_counter + 1];
+        let mut to_visit = (0..seats_counter as u16).collect::<Vec<u16>>();
+        let mut visibility_map = Vec::with_capacity(seats_counter);
+        for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+            let x = (idx as i32) % cols;
+            let y = (idx as i32) / cols;
+            let mut visibility_entry = [seats_counter as u16; 8];
+            let mut visibility_count = 0;
+            for dx in -1..=1 {
+                for dy in -1..=1 {
+                    if dx == 0 && dy == 0 {
+                        continue;
+                    }
+
+                    let mut new_x = x + dx;
+                    let mut new_y = y + dy;
+                    loop {
+                        if new_x < 0 || new_y < 0 || new_x >= cols || new_y >= rows {
+                            break;
+                        }
+
+                        let visited_idx = (new_x + cols * new_y) as usize;
+                        if data[visited_idx] == b'L' {
+                            visibility_entry[visibility_count] =
+                                data_pos_to_seat_idx[visited_idx] as u16;
+                            visibility_count += 1;
+                            break;
+                        }
+
+                        if part_one {
+                            break;
+                        }
+
+                        new_x += dx;
+                        new_y += dy;
+                    }
+                }
+            }
+
+            visibility_map.push(visibility_entry);
+        }
+
+        let mut changes: Vec<u16> = Vec::with_capacity(seats_counter);
+
+        let mut iteration = 0;
+        loop {
+            to_visit.retain(|&u16_idx| {
+                let idx = u16_idx as usize;
+                let seen_from_here_count = visibility_map[idx]
+                    .iter()
+                    .filter(|&&idx| seats[idx as usize])
+                    .count();
+
+                // Free seat that is now taken or ccupied seat that is now left:
+                if (!seats[idx] && seen_from_here_count == 0)
+                    || (seats[idx] && seen_from_here_count >= leave_when_seeing)
+                {
+                    changes.push(u16_idx);
+                    true
+                } else {
+                    false
+                }
+            });
+
+            changes.retain(|&change_idx| {
+                seats[change_idx as usize] = !seats[change_idx as usize];
+                false
+            });
+            //for &change_idx in changes.iter() {
+            //seats[change_idx as usize] = !seats[change_idx as usize];
+            //}
+            //changes.clear();
+
+            if to_visit.is_empty() {
+                return Ok(seats.iter().filter(|&&occupied| occupied).count());
+            } else {
+                iteration += 1;
+                if iteration >= MAX_ITERATIONS {
+                    return Err(format!("Aborting after {} iterations", iteration));
+                }
+            }
+        }
+    }
+}
+
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     let leave_when_seeing = input.part_values(4, 5);
     let part_one = input.is_part_one();
@@ -9,125 +138,13 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     #[cfg(feature = "visualization")]
     let mut renderer = Renderer::new(&mut input.painter);
 
-    const MAX_ITERATIONS: u32 = 10_000;
-
-    let rows = input.text.lines().count() as i32;
-    let cols = input.text.lines().next().ok_or("No lines")?.len() as i32;
-    if input.text.lines().any(|line| line.len() != cols as usize) {
-        return Err("Not all lines have equal length".to_string());
-    }
-
-    if rows * cols > i32::from(u16::MAX) {
-        return Err(format!(
-            "Too big input ({}x{}) - max supported seats is {}",
-            cols,
-            rows,
-            u16::MAX
-        ));
-    }
-
-    let mut data_pos_to_seat_idx = vec![0; input.text.len()];
-    let mut seats_counter = 0;
-    let mut idx_counter = 0;
-    let mut any_invalid = false;
-    let data: Vec<u8> = input
-        .text
-        .bytes()
-        .filter(|&c| c != b'\n')
-        .inspect(|&c| {
-            if c == b'L' {
-                data_pos_to_seat_idx[idx_counter] = seats_counter as u16;
-                seats_counter += 1
-            } else if c != b'.' {
-                any_invalid = true;
-            }
-            idx_counter += 1;
-        })
-        .collect();
-
-    if any_invalid {
-        return Err("Invalid input - only 'L', '.' and '\n' expected".to_string());
-    }
-
-    // An extra proxy at end.
-    let mut seats = vec![false; seats_counter + 1];
-    let mut to_visit = (0..seats_counter as u16).collect::<Vec<u16>>();
-    let mut visibility_map = Vec::with_capacity(seats_counter);
-    for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
-        let x = (idx as i32) % cols;
-        let y = (idx as i32) / cols;
-        let mut visibility_entry = [seats_counter as u16; 8];
-        let mut visibility_count = 0;
-        for dx in -1..=1 {
-            for dy in -1..=1 {
-                if dx == 0 && dy == 0 {
-                    continue;
-                }
-
-                let mut new_x = x + dx;
-                let mut new_y = y + dy;
-                loop {
-                    if new_x < 0 || new_y < 0 || new_x >= cols || new_y >= rows {
-                        break;
-                    }
-
-                    let visited_idx = (new_x + cols * new_y) as usize;
-                    if data[visited_idx] == b'L' {
-                        visibility_entry[visibility_count] =
-                            data_pos_to_seat_idx[visited_idx] as u16;
-                        visibility_count += 1;
-                        break;
-                    }
-
-                    if part_one {
-                        break;
-                    }
-
-                    new_x += dx;
-                    new_y += dy;
-                }
-            }
-        }
-
-        visibility_map.push(visibility_entry);
-    }
-
-    let mut changes: Vec<u16> = Vec::with_capacity(seats_counter);
-
-    let mut iteration = 0;
-    loop {
-        to_visit.retain(|&u16_idx| {
-            let idx = u16_idx as usize;
-            let seen_from_here_count = visibility_map[idx]
-                .iter()
-                .filter(|&&idx| seats[idx as usize])
-                .count();
-
-            // Free seat that is now taken or ccupied seat that is now left:
-            if (!seats[idx] && seen_from_here_count == 0)
-                || (seats[idx] && seen_from_here_count >= leave_when_seeing)
-            {
-                changes.push(u16_idx);
-                true
-            } else {
-                false
-            }
-        });
-
-        changes.retain(|&change_idx| {
-            seats[change_idx as usize] = !seats[change_idx as usize];
-            false
-        });
-
-        if to_visit.is_empty() {
-            return Ok(seats.iter().filter(|&&occupied| occupied).count());
-        } else {
-            iteration += 1;
-            if iteration >= MAX_ITERATIONS {
-                return Err(format!("Aborting after {} iterations", iteration));
-            }
-        }
-    }
+    Grid::parse(
+        input.text,
+        part_one,
+        #[cfg(feature = "visualization")]
+        &mut renderer,
+        leave_when_seeing,
+    )
 }
 
 #[test]
