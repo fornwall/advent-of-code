@@ -1,3 +1,5 @@
+/* eslint camelcase: ["error", {allow: ["wasm_bindgen"]}] */
+
 addEventListener('fetch', (event) => {
   event.respondWith(handleRequest(event.request));
 });
