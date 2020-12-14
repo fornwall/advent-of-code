@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-grpc-server"
-version = "2019.12.235"
+version = "2019.12.236"
 keywords = ["advent-of-code", "rust", "warp"]
 categories = ["algorithms", "rust-patterns", "grpc"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
