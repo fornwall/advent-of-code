@@ -10,53 +10,57 @@
 //
 // Or use the webm-cleaner scirpt:
 // $ webm-cleaner in.webm
-export default function CanvasRecorder(canvas, audioStream, videoBitsPerSecond) {
-    this.start = () => {
-        const mimeType = [
-            'video/webm;codecs=vp9',
-            'video/webm',
-            'video/vp8',
-            'video/webm;codecs=vp8',
-            'video/webm;codecs=daala',
-            'video/webm;codecs=h264',
-            'video/mpeg',
-        ].find(MediaRecorder.isTypeSupported);
+export default function CanvasRecorder(
+  canvas,
+  audioStream,
+  videoBitsPerSecond
+) {
+  this.start = () => {
+    const mimeType = [
+      "video/webm;codecs=vp9",
+      "video/webm",
+      "video/vp8",
+      "video/webm;codecs=vp8",
+      "video/webm;codecs=daala",
+      "video/webm;codecs=h264",
+      "video/mpeg",
+    ].find(MediaRecorder.isTypeSupported);
 
-        if (!mimeType) {
-            throw new Error('No supported mime type found for MediaRecorder');
-        }
+    if (!mimeType) {
+      throw new Error("No supported mime type found for MediaRecorder");
+    }
 
-        const videoStream = canvas.captureStream();
-        let streamToRecord;
-        if (audioStream) {
-            // const videoTrack = videoStream.getVideoTracks()[0];
-            const audioTrack = audioStream.getAudioTracks()[0];
-            console.log('audio stream', audioStream, 'audio track', audioTrack);
-            // streamToRecord = new MediaStream([audioTrack, videoTrack]);
-            videoStream.addTrack(audioTrack);
-            streamToRecord = videoStream;
-        } else {
-            streamToRecord = videoStream;
-        }
-        this.mediaRecorder = new MediaRecorder(streamToRecord, {
-            mimeType,
-            videoBitsPerSecond: videoBitsPerSecond || 5000000,
-        });
+    const videoStream = canvas.captureStream();
+    let streamToRecord;
+    if (audioStream) {
+      // const videoTrack = videoStream.getVideoTracks()[0];
+      const audioTrack = audioStream.getAudioTracks()[0];
+      console.log("audio stream", audioStream, "audio track", audioTrack);
+      // streamToRecord = new MediaStream([audioTrack, videoTrack]);
+      videoStream.addTrack(audioTrack);
+      streamToRecord = videoStream;
+    } else {
+      streamToRecord = videoStream;
+    }
+    this.mediaRecorder = new MediaRecorder(streamToRecord, {
+      mimeType,
+      videoBitsPerSecond: videoBitsPerSecond || 5000000,
+    });
 
-        this.mediaRecorder.ondataavailable = (event) => {
-            const url = window.URL.createObjectURL(event.data);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = this.fileName;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        };
-
-        this.mediaRecorder.start();
+    this.mediaRecorder.ondataavailable = (event) => {
+      const url = window.URL.createObjectURL(event.data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = this.fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
     };
 
-    this.stopAndSave = (fileName) => {
-        this.fileName = fileName || 'recording.webm';
-        this.mediaRecorder.stop();
-    };
+    this.mediaRecorder.start();
+  };
+
+  this.stopAndSave = (fileName) => {
+    this.fileName = fileName || "recording.webm";
+    this.mediaRecorder.stop();
+  };
 }

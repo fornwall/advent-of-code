@@ -1,41 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Advent of Code API</title>
+    <meta name="description" content="API to solve Advent of Code problems" />
 
-<head>
-  <meta charset="utf-8" />
-  <title>Advent of Code API</title>
-  <meta name="description" content="API to solve Advent of Code problems" />
+    <!-- https://cdnjs.com/libraries/swagger-ui -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui-bundle.min.js"
+      integrity="sha512-SRuebWqYcm2ITWgLa9iVSMjNJELVm/QebgNN1oRH75wTM+xIfXJFJWkUPwtDIsV81ae8zGIAXt6+LoGrbBfjDQ=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui-standalone-preset.min.js"
+      integrity="sha512-ZUCBiUmCK1/IkMDPuv1XiTEx60crsiZenBCtumb3OVgNrTFFtkGQeWXy6qHTR1RoLr4FTS+GrTWLKnyiT5uyAg=="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui.min.css"
+      integrity="sha512-c9Fmh2rJWb5kaFhvVlPcBLrFdzrVXkdTofQAozw6MfOsC3DwN6pHrpqk9gm8qwJh9wURiK1Hv57/GxmzJzew8g=="
+      crossorigin="anonymous"
+    />
 
-  <!-- https://cdnjs.com/libraries/swagger-ui -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui-bundle.min.js" integrity="sha512-SRuebWqYcm2ITWgLa9iVSMjNJELVm/QebgNN1oRH75wTM+xIfXJFJWkUPwtDIsV81ae8zGIAXt6+LoGrbBfjDQ==" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui-standalone-preset.min.js" integrity="sha512-ZUCBiUmCK1/IkMDPuv1XiTEx60crsiZenBCtumb3OVgNrTFFtkGQeWXy6qHTR1RoLr4FTS+GrTWLKnyiT5uyAg==" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui.min.css" integrity="sha512-c9Fmh2rJWb5kaFhvVlPcBLrFdzrVXkdTofQAozw6MfOsC3DwN6pHrpqk9gm8qwJh9wURiK1Hv57/GxmzJzew8g==" crossorigin="anonymous" />
+    <style>
+      .info {
+        margin-bottom: 0 !important;
+      }
+    </style>
+  </head>
 
-  <style>
-    .info {
-      margin-bottom: 0 !important;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div id="swagger-ui"></div>
-
-</body>
-<script>
-  const ui = SwaggerUIBundle({
-    url: "/openapi.json",
-    dom_id: '#swagger-ui',
-    presets: [
-      SwaggerUIBundle.presets.apis,
-      SwaggerUIBundle.SwaggerUIStandalonePreset
-    ],
-    defaultModelsExpandDepth: 1,
-    displayRequestDuration: true,
-    docExpansion: "full",
-    deepLinking: true,
-  });
-</script>
-
+  <body>
+    <div id="swagger-ui"></div>
+  </body>
+  <script>
+    const ui = SwaggerUIBundle({
+      url: "/openapi.json",
+      dom_id: "#swagger-ui",
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIBundle.SwaggerUIStandalonePreset,
+      ],
+      defaultModelsExpandDepth: 1,
+      displayRequestDuration: true,
+      docExpansion: "full",
+      deepLinking: true,
+    });
+  </script>
 </html>

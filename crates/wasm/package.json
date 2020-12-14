@@ -4,12 +4,15 @@
   "description": "Project to run eslint",
   "scripts": {
     "lint": "eslint **/*.js",
-    "fix": "eslint --fix **/*.js"
+    "fix": "eslint --fix **/*.js",
+    "format": "npx prettier --write ."
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^7.15.0",
-    "eslint-config-google": "^0.7.0"
+    "eslint-config-google": "^0.7.0",
+    "eslint-config-prettier": "^7.0.0",
+    "prettier": "2.2.1"
   }
 }

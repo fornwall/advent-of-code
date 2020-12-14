@@ -1,9 +1,11 @@
 {
   "openapi": "3.0.3",
-  "tags": [{
-    "name": "advent-of-code",
-    "description": "Solve Advent of Code problems"
-  }],
+  "tags": [
+    {
+      "name": "advent-of-code",
+      "description": "Solve Advent of Code problems"
+    }
+  ],
   "info": {
     "version": "1.0.0",
     "title": "Advent of Code API",
@@ -36,9 +38,7 @@
       "post": {
         "summary": "Solve a problem",
         "operationId": "solve",
-        "tags": [
-          "advent-of-code"
-        ],
+        "tags": ["advent-of-code"],
         "description": "Solve a specific Advent of Code problem for the input given in the posted request body.",
         "parameters": [
           {
@@ -50,11 +50,7 @@
               "type": "integer",
               "minimum": 2017,
               "maximum": 2019,
-              "enum": [
-                2019,
-                2018,
-                2017
-              ]
+              "enum": [2019, 2018, 2017]
             }
           },
           {
@@ -104,10 +100,7 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 2,
-              "enum": [
-                1,
-                2
-              ]
+              "enum": [1, 2]
             }
           }
         ],

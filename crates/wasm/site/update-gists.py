@@ -166,3 +166,4 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
 if not dry_run:
     with open(MAPPING_FILE_NAME, "w") as outfile:
         json.dump(gist_mapping, outfile, indent=2)
+        outfile.write("\n")
