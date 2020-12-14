@@ -108,6 +108,8 @@ window.addEventListener("pageshow", () => {
       dayElement.value = problem.day;
       partElement.value = problem.part;
       if (problem.input) inputElement.value = problem.input;
+
+      dayElement.dispatchEvent(new Event('change'));
     } catch (error) {
       console.error(error);
     }
@@ -197,6 +199,7 @@ function run() {
   [yearElement, dayElement, partElement, inputElement].forEach((element) =>
     element.addEventListener("change", storeForm)
   );
+
 }
 
 run();
