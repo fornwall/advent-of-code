@@ -1,4 +1,5 @@
 use crate::input::Input;
+use std::collections::HashMap;
 
 #[derive(Copy, Clone)]
 struct BitMask {
@@ -30,7 +31,7 @@ impl BitMask {
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut bit_mask = BitMask::new();
-    let mut memory = [0_u64; 65535];
+    let mut memory = HashMap::new();
 
     for (line_idx, line) in input.text.lines().enumerate() {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);
@@ -41,13 +42,13 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             let mut parts = remainder.split("] = ");
             let address = parts.next().unwrap().parse::<u64>().unwrap();
             let value = parts.next().unwrap().parse::<u64>().unwrap();
-            memory[address as usize] = bit_mask.apply(value);
+            memory.insert(address, bit_mask.apply(value));
         } else {
             return Err(on_error());
         }
     }
 
-    Ok(memory.iter().sum())
+    Ok(memory.values().sum())
 }
 
 #[test]
