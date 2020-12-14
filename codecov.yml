@@ -1,0 +1,11 @@
+# Coverage with Tarpaulin is unfortunately too fragile,
+# so we don't want codecov to fail builds.
+
+coverage:
+  status:
+    project:
+      default:
+        target: 0%
+    patch:
+      default:
+        target: 0%
