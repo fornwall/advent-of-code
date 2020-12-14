@@ -11,7 +11,7 @@ Solutions are implemented in Rust in the [core crate](https://github.com/fornwal
 It can be invoked using [grpcurl](https://github.com/fullstorydev/grpcurl) as shown below:
 
 ```sh
-grpcurl -plaintext \
+grpcurl \
   -proto ./proto/advent.proto \
   -d '{"year": 2019, "day": 1, "part": 1, "text": "12334"}' \
   advent-grpc.fly.dev:443 \
@@ -21,7 +21,7 @@ grpcurl -plaintext \
 Show a UI using [grpcui](https://github.com/fullstorydev/grpcui):
 
 ```sh
-grpcui -proto proto/advent.proto -plaintext advent-grpc.fly.dev:443
+grpcui -proto proto/advent.proto advent-grpc.fly.dev:443
 ```
 
 A [fredrikfornwall/advent-of-code-grpc-server](https://hub.docker.com/r/fredrikfornwall/advent-of-code-grpc-server) Docker image which starts the server on port 50051 is also available on Docker Hub:
