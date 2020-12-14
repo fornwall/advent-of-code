@@ -4,8 +4,9 @@ self.importScripts("advent_of_code_wasm.js");
 self.onmessage = async (message) => {
   try {
     const { year, day, part, input } = message.data;
-    const wasm = await self.wasmReadyPromise;
 
+    await self.wasmReadyPromise;
+    // const wasm = await self.wasmReadyPromise;
     // If building with atomics, "memory" gets mangled to "__wbindgen_export_0":
     // https://github.com/rustwasm/wasm-bindgen/issues/2114
     // const wasmMemory = wasm.memory ? wasm.memory : wasm.__wbindgen_export_0;
@@ -21,9 +22,7 @@ self.onmessage = async (message) => {
     self.postMessage({ done: true, answer });
   } catch (e) {
     console.log(e);
-    if (!e.errorAlreadyReported) {
-      self.postMessage({ errorMessage: e.message });
-    }
+    self.postMessage({ errorMessage: e.message });
   }
 };
 
@@ -31,10 +30,7 @@ self.wasmReadyPromise = (async () => {
   try {
     return await wasm_bindgen("advent_of_code_wasm_bg.wasm");
   } catch (e) {
-    console.error("WebAssembly not working", e);
-    const errorMessage = "WebAssembly not working - " + e.message;
-    self.postMessage({ errorMessage });
-    throw { message: e.message, errorAlreadyReported: true };
+    throw new Error("WebAssembly not working - " + e.message);
   }
   return result;
 })();

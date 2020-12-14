@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "eslint **/*.js",
     "fix": "eslint --fix **/*.js",
-    "format": "npx prettier --write ."
+    "format": "npx prettier --write .",
+    "check": "eslint . --ext .js && npx prettier --check ."
   },
   "author": "",
   "license": "MIT",
