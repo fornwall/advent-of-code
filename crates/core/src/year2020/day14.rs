@@ -41,30 +41,6 @@ struct BitMaskV2 {
     floating_offsets: Vec<u8>,
 }
 
-impl BitMaskV2 {
-    fn apply_helper(
-        memory: &mut HashMap<u64, u64>,
-        address: u64,
-        value: u64,
-        remaining_floats: &[u8],
-    ) {
-        if remaining_floats.is_empty() {
-            memory.insert(address, value);
-        } else {
-            Self::apply_helper(memory, address, value, &remaining_floats[1..]);
-
-            let float_mask = 1 << remaining_floats[0];
-            let address_with_float_set = address | float_mask;
-            Self::apply_helper(
-                memory,
-                address_with_float_set,
-                value,
-                &remaining_floats[1..],
-            );
-        }
-    }
-}
-
 impl BitMask for BitMaskV2 {
     fn new() -> Self {
         Self {
@@ -93,6 +69,30 @@ impl BitMask for BitMaskV2 {
     fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64) {
         let new_address = (address | self.ones) & self.floating_bitmask;
         Self::apply_helper(memory, new_address, value, &self.floating_offsets);
+    }
+}
+
+impl BitMaskV2 {
+    fn apply_helper(
+        memory: &mut HashMap<u64, u64>,
+        address: u64,
+        value: u64,
+        remaining_floats: &[u8],
+    ) {
+        if remaining_floats.is_empty() {
+            memory.insert(address, value);
+        } else {
+            Self::apply_helper(memory, address, value, &remaining_floats[1..]);
+
+            let float_mask = 1 << remaining_floats[0];
+            let address_with_float_set = address | float_mask;
+            Self::apply_helper(
+                memory,
+                address_with_float_set,
+                value,
+                &remaining_floats[1..],
+            );
+        }
     }
 }
 
