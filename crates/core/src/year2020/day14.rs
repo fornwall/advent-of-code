@@ -44,23 +44,17 @@ struct BitMaskV2 {
 impl BitMaskV2 {
     fn apply_helper(
         memory: &mut HashMap<u64, u64>,
-        address_with_floats_unset: u64,
+        address: u64,
         value: u64,
         remaining_floats: &[u8],
     ) {
-        if !remaining_floats.is_empty() {
+        if remaining_floats.is_empty() {
+            memory.insert(address, value);
+        } else {
+            Self::apply_helper(memory, address, value, &remaining_floats[1..]);
+
             let float_mask = 1 << remaining_floats[0];
-
-            memory.insert(address_with_floats_unset, value);
-            Self::apply_helper(
-                memory,
-                address_with_floats_unset,
-                value,
-                &remaining_floats[1..],
-            );
-
-            let address_with_float_set = address_with_floats_unset | float_mask;
-            memory.insert(address_with_float_set, value);
+            let address_with_float_set = address | float_mask;
             Self::apply_helper(
                 memory,
                 address_with_float_set,
