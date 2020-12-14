@@ -19,7 +19,7 @@ echo "Running benchmark with filter $FILTER"
 sudo flamegraph \
     $FILE_TO_RUN \
     --bench \
-    --profile-time 20 \
+    --profile-time 60 \
     "$FILTER"
 
 sudo chown $USER flamegraph.svg

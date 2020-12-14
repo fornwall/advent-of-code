@@ -124,9 +124,12 @@ impl BitMaskV2 {
     }
 }
 
-fn solve_with_bit_mask<T: BitMask>(input_string: &str) -> Result<u64, String> {
+fn solve_with_bit_mask<T: BitMask>(
+    input_string: &str,
+    initial_capacity: usize,
+) -> Result<u64, String> {
     let mut bit_mask = T::new();
-    let mut memory = HashMap::new();
+    let mut memory = HashMap::with_capacity(initial_capacity);
 
     for (line_idx, line) in input_string.lines().enumerate() {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);
@@ -166,9 +169,9 @@ fn solve_with_bit_mask<T: BitMask>(input_string: &str) -> Result<u64, String> {
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     if input.is_part_one() {
-        solve_with_bit_mask::<BitMaskV1>(input.text)
+        solve_with_bit_mask::<BitMaskV1>(input.text, 1000)
     } else {
-        solve_with_bit_mask::<BitMaskV2>(input.text)
+        solve_with_bit_mask::<BitMaskV2>(input.text, 100_000)
     }
 }
 
