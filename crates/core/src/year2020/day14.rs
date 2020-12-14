@@ -4,7 +4,11 @@ use std::collections::HashMap;
 trait BitMask {
     fn new() -> Self;
     fn parse(&mut self, input: &str);
-    fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64);
+    fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64)
+        -> Result<(), String>;
+    fn too_slow(&self) -> bool {
+        false
+    }
 }
 
 struct BitMaskV1 {
@@ -29,9 +33,15 @@ impl BitMask for BitMaskV1 {
         }
     }
 
-    fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64) {
+    fn apply(
+        &self,
+        memory: &mut HashMap<u64, u64>,
+        address: u64,
+        value: u64,
+    ) -> Result<(), String> {
         let new_value = (value & self.zeroes) | self.ones;
         memory.insert(address, new_value);
+        Ok(())
     }
 }
 
@@ -66,9 +76,18 @@ impl BitMask for BitMaskV2 {
         }
     }
 
-    fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64) {
+    fn apply(
+        &self,
+        memory: &mut HashMap<u64, u64>,
+        address: u64,
+        value: u64,
+    ) -> Result<(), String> {
         let new_address = (address | self.ones) & self.floating_bitmask;
-        Self::apply_helper(memory, new_address, value, &self.floating_offsets);
+        Self::apply_helper(memory, new_address, value, &self.floating_offsets)
+    }
+
+    fn too_slow(&self) -> bool {
+        self.floating_offsets.len() >= 10
     }
 }
 
@@ -78,11 +97,20 @@ impl BitMaskV2 {
         address: u64,
         value: u64,
         remaining_floats: &[u8],
-    ) {
+    ) -> Result<(), String> {
+        const MEMORY_LIMIT: usize = 100_000;
+
         if remaining_floats.is_empty() {
+            if memory.len() >= MEMORY_LIMIT {
+                return Err(format!(
+                    "Aborting due to memory usage (refusing to go above {} stored addresses)",
+                    MEMORY_LIMIT
+                ));
+            }
             memory.insert(address, value);
+            Ok(())
         } else {
-            Self::apply_helper(memory, address, value, &remaining_floats[1..]);
+            Self::apply_helper(memory, address, value, &remaining_floats[1..])?;
 
             let float_mask = 1 << remaining_floats[0];
             let address_with_float_set = address | float_mask;
@@ -91,7 +119,7 @@ impl BitMaskV2 {
                 address_with_float_set,
                 value,
                 &remaining_floats[1..],
-            );
+            )
         }
     }
 }
@@ -112,6 +140,9 @@ fn solve_with_bit_mask<T: BitMask>(input_string: &str) -> Result<u64, String> {
                 return Err(on_error());
             }
             bit_mask.parse(bit_mask_str);
+            if bit_mask.too_slow() {
+                return Err(format!("Line {}: Bit mask would be too slow", line_idx + 1));
+            }
         } else if let Some(remainder) = line.strip_prefix("mem[") {
             let mut parts = remainder.split("] = ");
             let address = parts
@@ -124,7 +155,7 @@ fn solve_with_bit_mask<T: BitMask>(input_string: &str) -> Result<u64, String> {
                 .ok_or_else(on_error)?
                 .parse::<u64>()
                 .map_err(|_| on_error())?;
-            bit_mask.apply(&mut memory, address, value);
+            bit_mask.apply(&mut memory, address, value)?;
         } else {
             return Err(on_error());
         }
