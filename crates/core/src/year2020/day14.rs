@@ -44,7 +44,7 @@ impl BitMask for BitMaskV1 {
 struct BitMaskV2 {
     ones: u64,
     floating_bitmask: u64,
-    floating_offsets: Vec<u8>,
+    floating_offsets: Vec<u64>,
 }
 
 impl BitMask for BitMaskV2 {
@@ -65,7 +65,7 @@ impl BitMask for BitMaskV2 {
                 b'1' => self.ones |= 1 << offset,
                 b'X' => {
                     self.floating_bitmask &= !(1 << offset);
-                    self.floating_offsets.push(offset as u8);
+                    self.floating_offsets.push(1 << offset);
                 }
                 _ => {}
             }
@@ -73,45 +73,36 @@ impl BitMask for BitMaskV2 {
     }
 
     fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String> {
+        const MEMORY_LIMIT: usize = 100_000;
+        if memory.len() >= MEMORY_LIMIT {
+            return Err(format!(
+                "Aborting due to memory usage (refusing to go above {} stored addresses)",
+                MEMORY_LIMIT
+            ));
+        }
+
         let new_address = (address | self.ones) & self.floating_bitmask;
-        Self::apply_helper(memory, new_address, value, &self.floating_offsets)
+
+        let up_until = (1 << self.floating_offsets.len()) as i32;
+        for binary_value in 0..up_until {
+            let mut resulting = new_address;
+
+            // https://lemire.me/blog/2018/02/21/iterating-over-set-bits-quickly/
+            // "The trick is that bitset & -bitset returns an integer having just the least
+            // significant bit of bitset turned on, all other bits are off":
+            let mut bit_set = binary_value;
+            while bit_set != 0 {
+                resulting |= self.floating_offsets[bit_set.trailing_zeros() as usize];
+                bit_set ^= bit_set & -bit_set;
+            }
+
+            memory.insert(resulting, value);
+        }
+        Ok(())
     }
 
     fn too_slow(&self) -> bool {
         self.floating_offsets.len() >= 10
-    }
-}
-
-impl BitMaskV2 {
-    fn apply_helper(
-        memory: &mut Memory,
-        address: u64,
-        value: u64,
-        remaining_floats: &[u8],
-    ) -> Result<(), String> {
-        const MEMORY_LIMIT: usize = 100_000;
-
-        if remaining_floats.is_empty() {
-            if memory.len() >= MEMORY_LIMIT {
-                return Err(format!(
-                    "Aborting due to memory usage (refusing to go above {} stored addresses)",
-                    MEMORY_LIMIT
-                ));
-            }
-            memory.insert(address, value);
-            Ok(())
-        } else {
-            Self::apply_helper(memory, address, value, &remaining_floats[1..])?;
-
-            let float_mask = 1 << remaining_floats[0];
-            let address_with_float_set = address | float_mask;
-            Self::apply_helper(
-                memory,
-                address_with_float_set,
-                value,
-                &remaining_floats[1..],
-            )
-        }
     }
 }
 
