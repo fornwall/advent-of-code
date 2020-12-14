@@ -42,9 +42,12 @@ impl BitMask for BitMaskV1 {
 }
 
 struct BitMaskV2 {
+    /// Bitmask with bits being 1 if they should always be set.
+    /// Example: "10XX110" causes `ones` to be 0b1000110.
     ones: u64,
+    /// Bitmask with bits being 0 if they are undecided.
+    /// Example: "10XX110" causes `floating_bitmask` to be 0b1100111.
     floating_bitmask: u64,
-    floating_offsets: Vec<u64>,
 }
 
 impl BitMask for BitMaskV2 {
@@ -52,12 +55,10 @@ impl BitMask for BitMaskV2 {
         Self {
             ones: 0,
             floating_bitmask: 0,
-            floating_offsets: Vec::with_capacity(36),
         }
     }
 
     fn parse(&mut self, input: &str) {
-        self.floating_offsets.clear();
         self.floating_bitmask = u64::MAX;
         self.ones = 0;
         for (offset, c) in input.bytes().rev().enumerate() {
@@ -65,7 +66,6 @@ impl BitMask for BitMaskV2 {
                 b'1' => self.ones |= 1 << offset,
                 b'X' => {
                     self.floating_bitmask &= !(1 << offset);
-                    self.floating_offsets.push(1 << offset);
                 }
                 _ => {}
             }
@@ -74,6 +74,8 @@ impl BitMask for BitMaskV2 {
 
     fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String> {
         const MEMORY_LIMIT: usize = 100_000;
+        const ALL_36_BITS_SET: u64 = 0b1111_1111_1111_1111_1111_1111_1111_1111_1111;
+
         if memory.len() >= MEMORY_LIMIT {
             return Err(format!(
                 "Aborting due to memory usage (refusing to go above {} stored addresses)",
@@ -81,28 +83,51 @@ impl BitMask for BitMaskV2 {
             ));
         }
 
-        let new_address = (address | self.ones) & self.floating_bitmask;
+        // We start with a base address with the ones from the bitmask set
+        // and the undecided bits cleared.
+        let base_address = (address | self.ones) & self.floating_bitmask;
 
-        let up_until = (1 << self.floating_offsets.len()) as i32;
-        for binary_value in 0..up_until {
-            let mut resulting = new_address;
+        // We want to iterate over all possible combinations of undecided bits.
+        // Start a counter with undecided bits set to 0 and other bits set to 1.
+        let mut floating_counter = self.floating_bitmask;
+        loop {
+            // Invert the counter to get the bits to set in this iteration:
+            let floating_address = base_address | !floating_counter;
+            memory.insert(floating_address, value);
 
-            // https://lemire.me/blog/2018/02/21/iterating-over-set-bits-quickly/
-            // "The trick is that bitset & -bitset returns an integer having just the least
-            // significant bit of bitset turned on, all other bits are off":
-            let mut bit_set = binary_value;
-            while bit_set != 0 {
-                resulting |= self.floating_offsets[bit_set.trailing_zeros() as usize];
-                bit_set ^= bit_set & -bit_set;
+            // If we have all 36 bits set there are no undecided bits left
+            // to iterate over and we are done.
+            if floating_counter & ALL_36_BITS_SET == ALL_36_BITS_SET {
+                break;
             }
 
-            memory.insert(resulting, value);
+            // Increase the counter by 1 to toggle of bits we no longer want to set.
+            //
+            //  Iteration 1: 0000
+            //  Iteration 2: 0001
+            //  Iteration 3: 0010
+            //  Finally:     1111
+            //
+            // But, the undecided bits are spread out. If the floating_bitmask is:
+            //  floating_bitmask: 0110
+            // the first addition will be as desired:
+            //  floating_counter: 0111
+            // But the next one will result in:
+            //  floating_counter: 1000
+            // By OR:ing wih the original floating_bitmask we get the desired value:
+            //  floating_counter: 1111
+            // And that works in general, by bringing back lower bits cleared by the
+            // "overflow" when lower set bits are carried right by addition.
+            //
+            // Thanks to svetlin_zarev on reddit who came up with and shared this!
+            floating_counter += 1;
+            floating_counter |= self.floating_bitmask;
         }
         Ok(())
     }
 
     fn too_slow(&self) -> bool {
-        self.floating_offsets.len() >= 10
+        self.floating_bitmask.count_zeros() >= 10
     }
 }
 
