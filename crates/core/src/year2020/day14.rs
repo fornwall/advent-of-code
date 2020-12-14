@@ -1,11 +1,12 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
+type Memory = HashMap<u64, u64>;
+
 trait BitMask {
     fn new() -> Self;
     fn parse(&mut self, input: &str);
-    fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64)
-        -> Result<(), String>;
+    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String>;
     fn too_slow(&self) -> bool {
         false
     }
@@ -33,12 +34,7 @@ impl BitMask for BitMaskV1 {
         }
     }
 
-    fn apply(
-        &self,
-        memory: &mut HashMap<u64, u64>,
-        address: u64,
-        value: u64,
-    ) -> Result<(), String> {
+    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String> {
         let new_value = (value & self.zeroes) | self.ones;
         memory.insert(address, new_value);
         Ok(())
@@ -76,12 +72,7 @@ impl BitMask for BitMaskV2 {
         }
     }
 
-    fn apply(
-        &self,
-        memory: &mut HashMap<u64, u64>,
-        address: u64,
-        value: u64,
-    ) -> Result<(), String> {
+    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String> {
         let new_address = (address | self.ones) & self.floating_bitmask;
         Self::apply_helper(memory, new_address, value, &self.floating_offsets)
     }
@@ -93,7 +84,7 @@ impl BitMask for BitMaskV2 {
 
 impl BitMaskV2 {
     fn apply_helper(
-        memory: &mut HashMap<u64, u64>,
+        memory: &mut Memory,
         address: u64,
         value: u64,
         remaining_floats: &[u8],
@@ -129,7 +120,7 @@ fn solve_with_bit_mask<T: BitMask>(
     initial_capacity: usize,
 ) -> Result<u64, String> {
     let mut bit_mask = T::new();
-    let mut memory = HashMap::with_capacity(initial_capacity);
+    let mut memory = Memory::with_capacity(initial_capacity);
 
     for (line_idx, line) in input_string.lines().enumerate() {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);
