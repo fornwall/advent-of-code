@@ -1,6 +1,7 @@
 Cargo.lock
 .DS_Store
 target/
+generated/
 **/*.rs.bk
 *.swp
 *.log
