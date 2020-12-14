@@ -1,65 +1,8 @@
-name: Github CI
+name: Deploys
 
 on: push
 
 jobs:
-  test-rust:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        rust: [stable, nightly-2020-11-21]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: ${{ matrix.rust }}
-    - name: Show rust version
-      run: rustc --version
-    - name: Test and check (stable)
-      run: |
-        make check
-        cd crates/core && cargo test --features count-allocations
-      if: matrix.rust == 'stable'
-    - name: Test and check (nightly)
-      run: |
-        rustup component add clippy rustfmt --toolchain nightly-2020-11-21
-        make NIGHTLY=1 check
-      if: matrix.rust == 'nightly-2020-11-21'
-      continue-on-error: true
-
-  test-python:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.9]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Test with Python ${{ matrix.python-version }}
-      run: make test-python
-
-  test-wasm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ '12.x', '15.x' ]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: 'https://registry.npmjs.org'
-    - name: Install wasm-pack
-      run: make install-wasm-pack
-    - name: Test with Node ${{ matrix.node-version }}
-      run: make node-package
-
   build-python-wheels:
     env:
       CIBW_SKIP: "cp27-* cp34-* cp35-* cp36-* pp* *i686 *win32"
@@ -104,41 +47,6 @@ jobs:
           name: wheels
           path: ./crates/python/wheelhouse/*.whl
 
-  build-docker-image:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build docker image
-      run: docker build --tag throwaway crates/core
-
-  bump-version:
-    needs: [test-rust, test-python, test-wasm, build-docker-image, build-python-wheels]
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-    - name: Install bump2version
-      run: pip install bump2version
-    - name: Setup git for commit
-      run: |
-        git config --global user.name 'Bump version workflow'
-        git config --global user.email 'bumpversion@users.noreply.github.com'
-    - name: Update gist mapping
-      run: pip install requests && ./update-gists.py && git add gist-mapping.json
-      working-directory: crates/wasm/site
-      env:
-        GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
-    - name: Upload new gist-mapping.json
-      uses: actions/upload-artifact@v2
-      with:
-        name: gist-mapping
-        path: crates/wasm/site/gist-mapping.json
-    - name: Bump version and commit
-      run: "bump2version --commit --allow-dirty patch"
-    - name: Push changes to git
-      run: git push
-
   release-core-docker-image:
     needs: bump-version
     runs-on: ubuntu-latest
@@ -163,7 +71,6 @@ jobs:
         docker push ${DOCKER_IMAGE_NAME}
 
   publish-and-deploy-http-server:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -178,10 +85,9 @@ jobs:
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-http-server
       run: |
-        NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
-        bump2version patch
-        IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
-        echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
+        VERSION=`bump2version patch --dry-run --list | grep current_version | cut -d = -f 2`
+        IMAGE=${DOCKER_IMAGE_NAME}:${VERSION}
+        echo "Version: $VERSION - about to build and push ${IMAGE}"
         cd crates/http-server
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
@@ -197,7 +103,6 @@ jobs:
         args: "deploy"
 
   publish-and-deploy-grpc-server:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -212,9 +117,9 @@ jobs:
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-grpc-server
       run: |
-        NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
+        VERSION=`bump2version patch --dry-run --list | grep current_version | cut -d = -f 2`
         bump2version patch
-        IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        IMAGE=${DOCKER_IMAGE_NAME}:${VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
         cd crates/grpc-server
         cp -Rf ../core core
@@ -231,14 +136,13 @@ jobs:
         args: "deploy"
 
   deploy-cloudflare-worker:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
     - name: Deploy to Cloudflare
       env:
-        CF_API_TOKEN: ${{ secrets.CLOuDFLARE_API_TOKEN }}
+        CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       run: |
         make install-wasm-pack
         sudo npm install -g @cloudflare/wrangler
@@ -246,7 +150,6 @@ jobs:
         wrangler publish
 
   release-npm-packages:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -255,11 +158,6 @@ jobs:
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
-    - uses: actions/setup-python@v2
-    - name: Install bump2version
-      run: pip install bump2version
-    - name: Bump version
-      run: bump2version patch
     - name: Publish npm packages
       run: |
         make install-wasm-pack
@@ -271,16 +169,10 @@ jobs:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
   release-rust-crate:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
     - uses: hecrj/setup-rust-action@v1
-    - name: Install bump2version
-      run: pip install bump2version
-    - name: Bump version
-      run: bump2version patch
     - name: Login to cargo
       run: cargo login ${CRATES_API_TOKEN}
       env:
@@ -289,7 +181,6 @@ jobs:
       run: cd crates/core && cargo publish --allow-dirty
 
   release-pypi-package:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - name: Download built wheels
@@ -383,11 +274,10 @@ jobs:
     - run: ls -lha .github/workflows/
 
   deploy-to-netlify:
-    needs: [bump-version, benchmark-current]
+    needs: benchmark-current
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
     - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: nightly-2020-11-21
@@ -401,11 +291,6 @@ jobs:
         make install-wasm-pack
     - name: Install the Netlify CLI
       run: npm install netlify-cli -g
-    - name: Download new gist-mapping.json
-      uses: actions/download-artifact@v2
-      with:
-        name: gist-mapping
-        path: crates/wasm/site
     - name: Download new benchmark
       uses: actions/download-artifact@v2
       with:
@@ -416,88 +301,3 @@ jobs:
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-  check-seed:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-    - name: Check seed
-      run: cd crates/fuzzing-afl && timeout 900s ./check-seed.sh
-      continue-on-error: true
-
-  fuzz-afl:
-    runs-on: ubuntu-latest
-    # Allow failures as LLVM is not always available for installation:
-    continue-on-error: true
-    steps:
-    - name: Check out source code
-      uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-    - name: Install current LLVM
-      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-    - name: Fuzz with AFL
-      run: LLVM_CONFIG=llvm-config-11 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
-    - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v2
-      with:
-        path: ./crates/fuzzing-afl/target/fuzz-findings/crashes
-        name: fuzzing-crashes-afl
-
-  fuzz-libfuzzer:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out source code
-      uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: nightly-2020-11-21
-    - name: Fuzz with libfuzzer
-      run: timeout 1800s make fuzz-libfuzzer
-      continue-on-error: true
-    - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v2
-      with:
-        path: crates/fuzzing-libfuzzer/fuzz/artifacts/fuzz_target/
-        name: fuzzing-crashes-libfuzzer
-
-  fuzz-honggfuzz:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out source code
-      uses: actions/checkout@v2
-    - uses: hecrj/setup-rust-action@v1
-    - name: Install honggfuzz dependencies
-      run: sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
-    - name: Fuzz with honggfuzz
-      run: timeout 1800s make fuzz-hfuzz
-      continue-on-error: true
-      env:
-        HFUZZ_RUN_ARGS: "-t 10 --exit_upon_crash"
-    - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v2
-      with:
-        path: crates/fuzzing-hfuzz/hfuzz_workspace/advent-of-code-fuzzing-hfuzz/*.fuzz
-        name: fuzzing-crashes-honggfuzz
-
-  coverage:
-    runs-on: ubuntu-latest
-    container:
-      image: xd009642/tarpaulin
-      options: --security-opt seccomp=unconfined
-    steps:
-    - uses: actions/checkout@v2
-
-    - uses: hecrj/setup-rust-action@v1
-      with:
-        rust-version: nightly-2020-11-21
-
-    - name: Generate code coverage
-      # What about -all-features and --workspace?
-      run: cargo +nightly-2020-11-21 tarpaulin --verbose --timeout 120 --out Xml
-      working-directory: crates/core
-
-    - name: Upload to codecov.io
-      uses: codecov/codecov-action@v1
-      with:
-        directory: crates/core
