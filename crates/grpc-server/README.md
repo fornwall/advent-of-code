@@ -11,8 +11,7 @@ Solutions are implemented in Rust in the [core crate](https://github.com/fornwal
 It can be invoked using [grpcurl](https://github.com/fullstorydev/grpcurl) as shown below:
 
 ```sh
-grpcurl \
-  -proto ./proto/advent.proto \
+grpcurl -proto proto/advent.proto \
   -d '{"year": 2019, "day": 1, "part": 1, "text": "12334"}' \
   advent-grpc.fly.dev:443 \
   advent.Solver/Solve
