@@ -37,33 +37,33 @@ impl BitMask for BitMaskV1 {
 
 struct BitMaskV2 {
     ones: u64,
+    floating_bitmask: u64,
     floating_offsets: Vec<u8>,
 }
 
 impl BitMaskV2 {
     fn apply_helper(
         memory: &mut HashMap<u64, u64>,
-        address: u64,
+        address_with_floats_unset: u64,
         value: u64,
         remaining_floats: &[u8],
     ) {
         if !remaining_floats.is_empty() {
             let float_mask = 1 << remaining_floats[0];
 
-            let address_with_float_set = address | float_mask;
-            memory.insert(address_with_float_set, value);
+            memory.insert(address_with_floats_unset, value);
             Self::apply_helper(
                 memory,
-                address_with_float_set,
+                address_with_floats_unset,
                 value,
                 &remaining_floats[1..],
             );
 
-            let address_with_float_unset = address & !float_mask;
-            memory.insert(address_with_float_unset, value);
+            let address_with_float_set = address_with_floats_unset | float_mask;
+            memory.insert(address_with_float_set, value);
             Self::apply_helper(
                 memory,
-                address_with_float_unset,
+                address_with_float_set,
                 value,
                 &remaining_floats[1..],
             );
@@ -75,25 +75,30 @@ impl BitMask for BitMaskV2 {
     fn new() -> Self {
         Self {
             ones: 0,
+            floating_bitmask: 0,
             floating_offsets: Vec::with_capacity(36),
         }
     }
 
     fn parse(&mut self, input: &str) {
         self.floating_offsets.clear();
+        self.floating_bitmask = u64::MAX;
         self.ones = 0;
         for (offset, c) in input.bytes().rev().enumerate() {
             match c {
                 b'1' => self.ones |= 1 << offset,
-                b'X' => self.floating_offsets.push(offset as u8),
+                b'X' => {
+                    self.floating_bitmask &= !(1 << offset);
+                    self.floating_offsets.push(offset as u8);
+                }
                 _ => {}
             }
         }
     }
 
     fn apply(&self, memory: &mut HashMap<u64, u64>, address: u64, value: u64) {
-        let with_ones = address | self.ones;
-        Self::apply_helper(memory, with_ones, value, &self.floating_offsets);
+        let new_address = (address | self.ones) & self.floating_bitmask;
+        Self::apply_helper(memory, new_address, value, &self.floating_offsets);
     }
 }
 
