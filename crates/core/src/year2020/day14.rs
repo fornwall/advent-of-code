@@ -117,7 +117,7 @@ impl BitMask for BitMaskV2 {
             // By OR:ing wih the original floating_bitmask we get the desired value:
             //  floating_counter: 1111
             // And that works in general, by bringing back lower bits cleared by the
-            // "overflow" when lower set bits are carried right by addition.
+            // "overflow" when lower set bits are carried left by addition.
             //
             // Thanks to svetlin_zarev on reddit who came up with and shared this!
             floating_counter += 1;
