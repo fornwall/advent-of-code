@@ -1,5 +1,4 @@
 use crate::input::Input;
-use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -23,20 +22,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             return Ok(next_number);
         }
 
-        match value_to_turn.entry(next_number) {
-            Entry::Vacant(entry) => {
-                // "If that was the first time the number has been spoken, the current player says 0."
-                entry.insert(turn);
-                next_number = 0;
-            }
-            Entry::Occupied(mut entry) => {
-                // "Otherwise, the number had been spoken before; the current player announces
-                // how many turns apart the number is from when it was previously spoken."
-                let last_spoken_turn = *entry.get();
-                next_number = turn - last_spoken_turn;
-                entry.insert(turn);
-            }
-        }
+        next_number = value_to_turn
+            .insert(next_number, turn)
+            // If the number had been spoken before; the current player announces
+            // how many turns apart the number is from when it was previously spoken:
+            .map(|last_spoken_turn| turn - last_spoken_turn)
+            // If that was the first time the number has been spoken, the current player says 0:
+            .unwrap_or(0);
 
         // Actually, if we're still starting:
         if turn < starting_numbers.len() as u32 {
