@@ -1,17 +1,30 @@
 use crate::input::Input;
-use std::collections::HashMap;
+use std::collections::HashSet;
+use std::hash::Hasher;
 
-type Memory = HashMap<u64, u64>;
+struct CustomHash;
+
+impl Hasher for CustomHash {
+    fn finish(&self) -> u64 {
+        todo!()
+    }
+    fn write(&mut self, _: &[u8]) {
+        todo!()
+    }
+}
+
+type Memory = HashSet<u64>;
 
 trait BitMask {
     fn new() -> Self;
     fn parse(&mut self, input: &str);
-    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String>;
+    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<u64, String>;
     fn too_slow(&self) -> bool {
         false
     }
 }
 
+#[derive(Copy, Clone)]
 struct BitMaskV1 {
     zeroes: u64,
     ones: u64,
@@ -34,13 +47,16 @@ impl BitMask for BitMaskV1 {
         }
     }
 
-    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String> {
-        let new_value = (value & self.zeroes) | self.ones;
-        memory.insert(address, new_value);
-        Ok(())
+    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<u64, String> {
+        Ok(if memory.insert(address) {
+            (value & self.zeroes) | self.ones
+        } else {
+            0
+        })
     }
 }
 
+#[derive(Copy, Clone)]
 struct BitMaskV2 {
     /// Bitmask with bits being 1 if they should always be set.
     /// Example: "10XX110" causes `ones` to be 0b1000110.
@@ -72,9 +88,11 @@ impl BitMask for BitMaskV2 {
         }
     }
 
-    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<(), String> {
+    fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<u64, String> {
         const MEMORY_LIMIT: usize = 100_000;
         const ALL_36_BITS_SET: u64 = 0b1111_1111_1111_1111_1111_1111_1111_1111_1111;
+
+        let mut sum = 0;
 
         if memory.len() >= MEMORY_LIMIT {
             return Err(format!(
@@ -93,7 +111,9 @@ impl BitMask for BitMaskV2 {
         loop {
             // Invert the counter to get the bits to set in this iteration:
             let floating_address = base_address | !floating_counter;
-            memory.insert(floating_address, value);
+            if memory.insert(floating_address) {
+                sum += value;
+            }
 
             // If we have all 36 bits set there are no undecided bits left
             // to iterate over and we are done.
@@ -123,7 +143,7 @@ impl BitMask for BitMaskV2 {
             floating_counter += 1;
             floating_counter |= self.floating_bitmask;
         }
-        Ok(())
+        Ok(sum)
     }
 
     fn too_slow(&self) -> bool {
@@ -131,16 +151,17 @@ impl BitMask for BitMaskV2 {
     }
 }
 
-fn solve_with_bit_mask<T: BitMask>(
+fn solve_with_bit_mask<T: BitMask + Copy + Clone>(
     input_string: &str,
     initial_capacity: usize,
 ) -> Result<u64, String> {
     let mut bit_mask = T::new();
     let mut memory = Memory::with_capacity(initial_capacity);
+    let mut sum = 0;
+    let mut bit_mask_stack = Vec::with_capacity(100);
 
     for (line_idx, line) in input_string.lines().enumerate() {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);
-
         if let Some(bit_mask_str) = line.strip_prefix("mask = ") {
             if bit_mask_str.len() != 36
                 || bit_mask_str
@@ -149,10 +170,16 @@ fn solve_with_bit_mask<T: BitMask>(
             {
                 return Err(on_error());
             }
+            bit_mask_stack.push(bit_mask);
             bit_mask.parse(bit_mask_str);
-            if bit_mask.too_slow() {
-                return Err(format!("Line {}: Bit mask would be too slow", line_idx + 1));
-            }
+        }
+    }
+
+    for (line_idx, line) in input_string.lines().rev().enumerate() {
+        let on_error = || format!("Line {} from end: Invalid format", line_idx + 1);
+
+        if line.starts_with("mask = ") {
+            bit_mask = bit_mask_stack.pop().unwrap();
         } else if let Some(remainder) = line.strip_prefix("mem[") {
             let mut parts = remainder.split("] = ");
             let address = parts
@@ -165,13 +192,13 @@ fn solve_with_bit_mask<T: BitMask>(
                 .ok_or_else(on_error)?
                 .parse::<u64>()
                 .map_err(|_| on_error())?;
-            bit_mask.apply(&mut memory, address, value)?;
+            sum += bit_mask.apply(&mut memory, address, value)?;
         } else {
             return Err(on_error());
         }
     }
 
-    Ok(memory.values().sum())
+    Ok(sum)
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
