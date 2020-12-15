@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(_input: &mut Input) -> Result<u64, String> {
     Ok(0)
 }
 
