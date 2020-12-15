@@ -1,23 +1,39 @@
 use crate::input::Input;
 use std::collections::HashSet;
-use std::hash::Hasher;
+use std::hash::{BuildHasherDefault, Hasher};
 
-struct CustomHash;
+struct CustomHash {
+    hash: u64,
+}
 
-impl Hasher for CustomHash {
-    fn finish(&self) -> u64 {
-        todo!()
-    }
-    fn write(&mut self, _: &[u8]) {
-        todo!()
+impl Default for CustomHash {
+    #[inline]
+    fn default() -> Self {
+        Self { hash: 0 }
     }
 }
 
-type Memory = HashSet<u64>;
+impl Hasher for CustomHash {
+    fn finish(&self) -> u64 {
+        self.hash as u64
+    }
+
+    fn write(&mut self, _: &[u8]) {
+        unimplemented!()
+    }
+
+    fn write_u64(&mut self, value: u64) {
+        // From Fx Hash.
+        self.hash = value.wrapping_mul(0x51_7c_c1_b7_27_22_0a_95)
+    }
+}
+
+type CustomBuildHasher = BuildHasherDefault<CustomHash>;
+
+type Memory = HashSet<u64, CustomBuildHasher>;
 
 trait BitMask {
-    fn new() -> Self;
-    fn parse(&mut self, input: &str);
+    fn parse(input: &str) -> Self;
     fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<u64, String>;
     fn too_slow(&self) -> bool {
         false
@@ -31,20 +47,17 @@ struct BitMaskV1 {
 }
 
 impl BitMask for BitMaskV1 {
-    fn new() -> Self {
-        Self { zeroes: 0, ones: 0 }
-    }
-
-    fn parse(&mut self, input: &str) {
-        self.zeroes = u64::MAX;
-        self.ones = 0;
+    fn parse(input: &str) -> Self {
+        let mut zeroes = u64::MAX;
+        let mut ones = 0;
         for (offset, c) in input.bytes().rev().enumerate() {
             match c {
-                b'1' => self.ones |= 1 << offset,
-                b'0' => self.zeroes &= !(1 << offset),
+                b'1' => ones |= 1 << offset,
+                b'0' => zeroes &= !(1 << offset),
                 _ => {}
             }
         }
+        Self { zeroes, ones }
     }
 
     fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<u64, String> {
@@ -67,24 +80,21 @@ struct BitMaskV2 {
 }
 
 impl BitMask for BitMaskV2 {
-    fn new() -> Self {
-        Self {
-            ones: 0,
-            floating_bitmask: 0,
-        }
-    }
-
-    fn parse(&mut self, input: &str) {
-        self.floating_bitmask = u64::MAX;
-        self.ones = 0;
+    fn parse(input: &str) -> Self {
+        let mut floating_bitmask = u64::MAX;
+        let mut ones = 0;
         for (offset, c) in input.bytes().rev().enumerate() {
             match c {
-                b'1' => self.ones |= 1 << offset,
+                b'1' => ones |= 1 << offset,
                 b'X' => {
-                    self.floating_bitmask &= !(1 << offset);
+                    floating_bitmask &= !(1 << offset);
                 }
                 _ => {}
             }
+        }
+        Self {
+            floating_bitmask,
+            ones,
         }
     }
 
@@ -151,13 +161,16 @@ impl BitMask for BitMaskV2 {
     }
 }
 
+enum Command {
+    PopBitMask,
+    Set(u64, u64),
+}
+
 fn solve_with_bit_mask<T: BitMask + Copy + Clone>(
     input_string: &str,
     initial_capacity: usize,
 ) -> Result<u64, String> {
-    let mut bit_mask = T::new();
-    let mut memory = Memory::with_capacity(initial_capacity);
-    let mut sum = 0;
+    let mut commands = Vec::with_capacity(600);
     let mut bit_mask_stack = Vec::with_capacity(100);
 
     for (line_idx, line) in input_string.lines().enumerate() {
@@ -170,16 +183,8 @@ fn solve_with_bit_mask<T: BitMask + Copy + Clone>(
             {
                 return Err(on_error());
             }
-            bit_mask_stack.push(bit_mask);
-            bit_mask.parse(bit_mask_str);
-        }
-    }
-
-    for (line_idx, line) in input_string.lines().rev().enumerate() {
-        let on_error = || format!("Line {} from end: Invalid format", line_idx + 1);
-
-        if line.starts_with("mask = ") {
-            bit_mask = bit_mask_stack.pop().unwrap();
+            commands.push(Command::PopBitMask);
+            bit_mask_stack.push(T::parse(bit_mask_str));
         } else if let Some(remainder) = line.strip_prefix("mem[") {
             let mut parts = remainder.split("] = ");
             let address = parts
@@ -192,9 +197,28 @@ fn solve_with_bit_mask<T: BitMask + Copy + Clone>(
                 .ok_or_else(on_error)?
                 .parse::<u64>()
                 .map_err(|_| on_error())?;
-            sum += bit_mask.apply(&mut memory, address, value)?;
+            commands.push(Command::Set(address, value));
         } else {
             return Err(on_error());
+        }
+    }
+
+    let mut current_bit_mask = bit_mask_stack
+        .pop()
+        .ok_or_else(|| "Internal error".to_string())?;
+    let mut memory =
+        Memory::with_capacity_and_hasher(initial_capacity, CustomBuildHasher::default());
+    let mut sum = 0;
+    for command in commands.iter().skip(1).rev() {
+        match command {
+            Command::PopBitMask => {
+                current_bit_mask = bit_mask_stack
+                    .pop()
+                    .ok_or_else(|| "Internal error".to_string())?;
+            }
+            &Command::Set(address, value) => {
+                sum += current_bit_mask.apply(&mut memory, address, value)?;
+            }
         }
     }
 
