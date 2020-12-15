@@ -1,42 +1,48 @@
 use crate::input::Input;
-use std::collections::HashMap;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let target_turn: u32 = input.part_values(2020, 30_000_000);
-    let mut value_to_turn: HashMap<u32, u32> = HashMap::with_capacity(target_turn as usize / 1000);
+    const NEVER_SEEN: u32 = 0;
 
-    let starting_numbers = input
+    let target_turn: u32 = input.part_values(2020, 30_000_000);
+    let mut value_to_turn: Vec<u32> = vec![0; target_turn as usize];
+    let mut next_number = 0;
+    let mut turn = 0;
+
+    for (idx, starting_number) in input
         .text
         .split(',')
         .map(|s| {
             s.parse::<u32>()
                 .map_err(|error| format!("Invalid input: {}", error))
         })
-        .collect::<Result<Vec<_>, _>>()?;
+        .enumerate()
+    {
+        next_number = starting_number?;
+        value_to_turn[next_number as usize] = (idx + 1) as u32;
+        turn += 1;
+    }
 
-    let mut next_number = starting_numbers[0];
-    let mut turn = 1;
-
-    loop {
-        if turn == target_turn {
-            return Ok(next_number);
+    while turn != target_turn {
+        if next_number >= target_turn {
+            return Err(format!("Too big number: {}", next_number));
         }
 
-        next_number = value_to_turn
-            .insert(next_number, turn)
+        let last_spoken_turn = value_to_turn[next_number as usize];
+        value_to_turn[next_number as usize] = turn;
+
+        next_number = if last_spoken_turn == NEVER_SEEN {
+            // If that was the first time the number has been spoken, the current player says 0:
+            0
+        } else {
             // If the number had been spoken before; the current player announces
             // how many turns apart the number is from when it was previously spoken:
-            .map(|last_spoken_turn| turn - last_spoken_turn)
-            // If that was the first time the number has been spoken, the current player says 0:
-            .unwrap_or(0);
-
-        // Actually, if we're still starting:
-        if turn < starting_numbers.len() as u32 {
-            next_number = starting_numbers[turn as usize];
-        }
+            turn - last_spoken_turn
+        };
 
         turn += 1;
     }
+
+    Ok(next_number)
 }
 
 #[test]
