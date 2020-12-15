@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let target_turn: u32 = input.part_values(2020, 30_000_000);
-    let mut value_to_turn: HashMap<u32, u32> = HashMap::with_capacity(target_turn as usize / 100);
+    let mut value_to_turn: HashMap<u32, u32> = HashMap::with_capacity(target_turn as usize / 1000);
 
     let starting_numbers = input
         .text
