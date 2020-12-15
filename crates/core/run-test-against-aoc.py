@@ -19,7 +19,7 @@ with open(sessions_file) as f:
 os.environ["BROWSER"] = "true"
 
 if "AOC_YEAR" in os.environ:
-    years_string = os.environ['AOC_YEAR']
+    years_string = os.environ["AOC_YEAR"]
     if "-" in years_string:
         (years_start, years_end) = years_string.split("-")
         years = range(int(years_start), int(years_end) + 1)
