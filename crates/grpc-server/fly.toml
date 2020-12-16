@@ -1,7 +1,7 @@
 app = "advent-grpc"
 
 [build]
-  image = "fredrikfornwall/advent-of-code-grpc-server:2019.12.244"
+  image = "fredrikfornwall/advent-of-code-grpc-server:2019.12.245"
 
 [[services]]
   internal_port = 50051
