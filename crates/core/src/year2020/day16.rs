@@ -1,5 +1,4 @@
 use crate::input::Input;
-use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     const MAX_FIELD_VALUE: u32 = 1024;
@@ -12,20 +11,20 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let your_ticket_str = parts.next().ok_or_else(on_error)?;
     let nearby_tickets_str = parts.next().ok_or_else(on_error)?;
 
-    let mut my_ticket = Vec::new();
+    let mut your_ticket_values = Vec::new();
     for part in your_ticket_str
         .lines()
         .nth(1)
         .ok_or_else(on_error)?
         .split(',')
     {
-        my_ticket.push(part.parse::<u32>().map_err(map_error)?);
+        your_ticket_values.push(part.parse::<u32>().map_err(map_error)?);
     }
 
     let mut departure_fields = Vec::with_capacity(6);
     let mut field_ranges = Vec::new();
     for line in ticket_fields_str.lines() {
-        let mut field_range = vec![false; (MAX_FIELD_VALUE - 1) as usize];
+        let mut field_range = vec![false; (MAX_FIELD_VALUE + 1) as usize];
 
         let mut line_parts = line.splitn(2, ": ");
 
@@ -67,10 +66,10 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         field_ranges.push(field_range);
     }
 
-    if my_ticket.len() != field_ranges.len() {
+    if your_ticket_values.len() != field_ranges.len() {
         return Err(format!(
             "Your ticket contains {} fields, but {} fields are specified",
-            my_ticket.len(),
+            your_ticket_values.len(),
             field_ranges.len()
         ));
     } else if field_ranges.len() > 32 {
@@ -80,20 +79,19 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         ));
     }
 
-    let mut possibilities_bitmask: u32 = 0;
-    for field_idx in 0..field_ranges.len() {
-        possibilities_bitmask |= 1 << field_idx;
-    }
-    let mut possible_fields_for_position = vec![possibilities_bitmask; my_ticket.len()];
+    // Set the lowest field_ranges.len() bits:
+    let possibilities_bitmask: u32 = (1 << field_ranges.len()) as u32 - 1;
+    let mut possible_fields_for_position = vec![possibilities_bitmask; your_ticket_values.len()];
 
     let mut error_rate = 0;
     for line in nearby_tickets_str.lines().skip(1) {
         'outer: for (field_position, value_str) in line.split(',').enumerate() {
             let value = value_str.parse::<u32>().map_err(map_error)?;
-            if value >= MAX_FIELD_VALUE {
-                return Err("Too high field value".to_string());
+            if value > MAX_FIELD_VALUE {
+                return Err(format!("Invalid field value: {}", value));
             }
-            if field_ranges.iter().any(|range| range[value as usize]) {
+            let valid_ticket = field_ranges.iter().any(|range| range[value as usize]);
+            if valid_ticket {
                 if input.is_part_one() {
                     continue 'outer;
                 } else {
@@ -108,25 +106,32 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
     }
 
-    if !input.is_part_one() {
+    if input.is_part_one() {
+        Ok(u64::from(error_rate))
+    } else {
         let mut departure_values_multiplied = 1_u64;
-        let mut identified_positions = HashSet::new();
+        let mut identified_positions = vec![false; field_ranges.len()];
+
         loop {
             let mut any_change = false;
-            for position in 0..my_ticket.len() {
+            for position in 0..your_ticket_values.len() {
                 let possible_fields = possible_fields_for_position[position];
-                if possible_fields.count_ones() == 1 && identified_positions.insert(position) {
+                if possible_fields.count_ones() == 1 && !identified_positions[position] {
+                    identified_positions[position] = true;
+
                     let field_idx = possible_fields.trailing_zeros();
                     if departure_fields.contains(&field_idx) {
-                        departure_values_multiplied *= u64::from(my_ticket[position as usize]);
+                        departure_values_multiplied *=
+                            u64::from(your_ticket_values[position as usize]);
                     }
                     any_change = true;
-                    let bit_mask = !(1 << field_idx);
+
+                    let clear_possibility_bitmask = !(1 << field_idx);
                     for (idx, possible_fields) in
                         possible_fields_for_position.iter_mut().enumerate()
                     {
                         if idx != position {
-                            *possible_fields &= bit_mask;
+                            *possible_fields &= clear_possibility_bitmask;
                         }
                     }
                 }
@@ -136,10 +141,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             }
         }
 
-        return Ok(departure_values_multiplied);
+        Ok(departure_values_multiplied)
     }
-
-    Ok(u64::from(error_rate))
 }
 
 #[test]
