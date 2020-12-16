@@ -1,3 +1,4 @@
+import gistMapping from "./gist-mapping.json";
 const worker = new Worker("./worker.js", { name: "solver" });
 
 const yearElement = document.getElementById("year");
@@ -74,6 +75,13 @@ function execute(wasm) {
   }
 }
 
+function isVisualisationEnabled() {
+  return (
+    !runWasmElement.disabled &&
+    !!gistMapping?.[yearElement.value]?.[dayElement.value]?.["visualization"]
+  );
+}
+
 function visualize() {
   const [year, day, part, input] = [
     yearElement.value,
@@ -99,6 +107,37 @@ function storeForm() {
   );
 }
 
+async function clipboardReadMayWork() {
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    if (navigator.permissions) {
+      const permission = await navigator.permissions.query({
+        name: "clipboard-read",
+      });
+      return permission.state !== "denied";
+    } else {
+      return true;
+    }
+  } else {
+    return false;
+  }
+}
+
+runApiElement.addEventListener("click", () => execute(false));
+runWasmElement.addEventListener("click", () => execute(true));
+
+showElement.addEventListener("click", visualize);
+showElement.disabled = !isVisualisationEnabled();
+
+[yearElement, dayElement].forEach((element) =>
+  element.addEventListener("change", () => {
+    showElement.disabled = !isVisualisationEnabled();
+  })
+);
+
+[yearElement, dayElement, partElement, inputElement].forEach((element) =>
+  element.addEventListener("change", storeForm)
+);
+
 window.addEventListener("pageshow", () => {
   const problemString = window.localStorage.getItem("problem");
   if (problemString) {
@@ -116,89 +155,42 @@ window.addEventListener("pageshow", () => {
   }
 });
 
-async function clipboardReadMayWork() {
-  if (navigator.clipboard && navigator.clipboard.readText) {
-    if (navigator.permissions) {
-      const permission = await navigator.permissions.query({
-        name: "clipboard-read",
-      });
-      return permission.state !== "denied";
-    } else {
-      return true;
-    }
-  } else {
-    return false;
+document.getElementById("open-input").addEventListener("click", () => {
+  const link = `https://adventofcode.com/${yearElement.value}/day/${dayElement.value}/input`;
+  window.open(link);
+});
+
+const savedInterval = { value: null };
+document.getElementById("output").addEventListener("click", (event) => {
+  if (savedInterval.value) {
+    clearTimeout(savedInterval.value);
   }
-}
-
-function run() {
-  runApiElement.addEventListener("click", () => execute(false));
-  runWasmElement.addEventListener("click", () => execute(true));
-  showElement.addEventListener("click", visualize);
-
-  document.getElementById("open-input").addEventListener("click", () => {
-    const link = `https://adventofcode.com/${yearElement.value}/day/${dayElement.value}/input`;
-    window.open(link);
-  });
-
-  const savedInterval = { value: null };
-  document.getElementById("output").addEventListener("click", (event) => {
-    if (savedInterval.value) {
-      clearTimeout(savedInterval.value);
-    }
-    navigator.clipboard.writeText(event.target.textContent);
-    event.target.classList.add("copied");
-    savedInterval.value = setTimeout(
-      () => event.target.classList.remove("copied"),
-      2000
-    );
-  });
-
-  clipboardReadMayWork().then((enabled) => {
-    const pasteButton = document.getElementById("paste");
-    if (enabled) {
-      pasteButton.addEventListener("click", async () => {
-        inputElement.value = await navigator.clipboard.readText();
-        storeForm();
-      });
-    } else {
-      pasteButton.disabled = true;
-    }
-  });
-
-  fetch("gist-mapping.json")
-    .then((response) => response.json())
-    .then((mapping) => {
-      function isVisualisationEnabled() {
-        return (
-          !runWasmElement.disabled &&
-          !!mapping?.[yearElement.value]?.[dayElement.value]?.["visualization"]
-        );
-      }
-      showElement.disabled = !isVisualisationEnabled();
-      [yearElement, dayElement].forEach((element) =>
-        element.addEventListener("change", () => {
-          showElement.disabled = !isVisualisationEnabled();
-        })
-      );
-
-      document
-        .getElementById("open-playground")
-        .addEventListener("click", () => {
-          const gistId =
-            mapping?.[yearElement.value]?.[dayElement.value]?.["gist"];
-          if (gistId) {
-            const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=${gistId}`;
-            window.open(link);
-          } else {
-            alert("Not available yet!");
-          }
-        });
-    });
-
-  [yearElement, dayElement, partElement, inputElement].forEach((element) =>
-    element.addEventListener("change", storeForm)
+  navigator.clipboard.writeText(event.target.textContent);
+  event.target.classList.add("copied");
+  savedInterval.value = setTimeout(
+    () => event.target.classList.remove("copied"),
+    2000
   );
-}
+});
 
-run();
+clipboardReadMayWork().then((enabled) => {
+  const pasteButton = document.getElementById("paste");
+  if (enabled) {
+    pasteButton.addEventListener("click", async () => {
+      inputElement.value = await navigator.clipboard.readText();
+      storeForm();
+    });
+  } else {
+    pasteButton.disabled = true;
+  }
+});
+
+document.getElementById("open-playground").addEventListener("click", () => {
+  const gistId = gistMapping?.[yearElement.value]?.[dayElement.value]?.["gist"];
+  if (gistId) {
+    const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=${gistId}`;
+    window.open(link);
+  } else {
+    alert("Not available yet!");
+  }
+});

@@ -61,17 +61,20 @@ site-downloads:
 	cd crates/wasm && \
 		curl https://adventofcode.com/favicon.ico > site/favicon.ico
 
-site-wasmpack:
-	cd crates/wasm && $(WASM_PACK_COMMAND)
+site-pack:
+	cd crates/wasm && \
+		$(WASM_PACK_COMMAND) && \
+		cd site && \
+		webpack
 
-site-wasmpack-visualization:
+site-pack-visualization:
 	cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)
 
-wasm-size: site-wasmpack
+wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
 run-devserver:
-	cd crates/wasm/site && devserver --header "Cross-Origin-Opener-Policy: same-origin" --header "Cross-Origin-Embedder-Policy: require-corp"
+	cd crates/wasm/site && webpack serve
 
 watch-and-build-wasm:
 	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND)'
@@ -124,8 +127,9 @@ install-nightly:
 	rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src
 
 netlify:
-	make WASM_RELEASE=1 site-wasmpack && \
-		make WASM_RELEASE=1 site-wasmpack-visualization && \
+	npm install -g webpack webpack-cli && \
+		make WASM_RELEASE=1 site-pack && \
+		make WASM_RELEASE=1 site-pack-visualization && \
 		make site-downloads && \
 		make node-package && \
 		cd crates/wasm/functions && \
@@ -133,5 +137,5 @@ netlify:
 		cd .. && \
 		netlify deploy --prod
 
-.PHONY: check install-cargo-deps bench site-downloads site-wasmpack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
+.PHONY: check install-cargo-deps bench site-downloads site-pack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
 
