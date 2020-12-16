@@ -1,25 +1,5 @@
 use crate::input::Input;
 
-struct FieldRule {
-    range: [u64; 16],
-}
-
-impl FieldRule {
-    fn new() -> Self {
-        Self { range: [0; 16] }
-    }
-
-    fn add_range(&mut self, start: u32, end_inclusive: u32) {
-        for i in start..=end_inclusive {
-            self.range[(i / 64) as usize] |= 1 << (i % 64);
-        }
-    }
-
-    fn is_included(&self, value: u32) -> bool {
-        self.range[(value / 64) as usize] & (1 << (value % 64)) != 0
-    }
-}
-
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     const MAX_FIELD_VALUE: u32 = 1024;
 
@@ -42,15 +22,15 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     }
 
     let mut departure_fields = Vec::with_capacity(6);
-    let mut field_rules = Vec::with_capacity(your_ticket_values.len());
+    let mut field_ranges = Vec::new();
     for line in ticket_fields_str.lines() {
-        let mut field_rule = FieldRule::new();
+        let mut field_range = vec![false; (MAX_FIELD_VALUE + 1) as usize];
 
         let mut line_parts = line.splitn(2, ": ");
 
         let field_name = line_parts.next().ok_or_else(on_error)?;
         if field_name.starts_with("departure") {
-            departure_fields.push(field_rules.len() as u32);
+            departure_fields.push(field_ranges.len() as u32);
         }
 
         let or_str = line_parts.next().ok_or_else(on_error)?;
@@ -79,26 +59,28 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 ));
             }
 
-            field_rule.add_range(range_start, range_end);
+            for value in range_start..=range_end {
+                field_range[value as usize] = true;
+            }
         }
-        field_rules.push(field_rule);
+        field_ranges.push(field_range);
     }
 
-    if your_ticket_values.len() != field_rules.len() {
+    if your_ticket_values.len() != field_ranges.len() {
         return Err(format!(
             "Your ticket contains {} fields, but {} fields are specified",
             your_ticket_values.len(),
-            field_rules.len()
+            field_ranges.len()
         ));
-    } else if field_rules.len() > 32 {
+    } else if field_ranges.len() > 32 {
         return Err(format!(
             "Max 32 fields supported (input had {})",
-            field_rules.len()
+            field_ranges.len()
         ));
     }
 
     // Set the lowest field_ranges.len() bits:
-    let possibilities_bitmask: u32 = (1 << field_rules.len()) as u32 - 1;
+    let possibilities_bitmask: u32 = (1 << field_ranges.len()) as u32 - 1;
     let mut possible_fields_for_position = vec![possibilities_bitmask; your_ticket_values.len()];
 
     let mut error_rate = 0;
@@ -108,13 +90,13 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             if value > MAX_FIELD_VALUE {
                 return Err(format!("Invalid field value: {}", value));
             }
-            let valid_ticket = field_rules.iter().any(|range| range.is_included(value));
+            let valid_ticket = field_ranges.iter().any(|range| range[value as usize]);
             if valid_ticket {
                 if input.is_part_one() {
                     continue 'outer;
                 } else {
-                    for (field_idx, range) in field_rules.iter().enumerate() {
-                        if !range.is_included(value) {
+                    for (field_idx, range) in field_ranges.iter().enumerate() {
+                        if !range[value as usize] {
                             possible_fields_for_position[field_position] &= !(1 << field_idx);
                         }
                     }
@@ -128,7 +110,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         Ok(u64::from(error_rate))
     } else {
         let mut departure_values_multiplied = 1_u64;
-        let mut identified_positions = vec![false; field_rules.len()];
+        let mut identified_positions = vec![false; field_ranges.len()];
 
         loop {
             let mut any_change = false;
