@@ -118,13 +118,13 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 let possible_fields = possible_fields_for_position[position];
                 if possible_fields.count_ones() == 1 && !identified_positions[position] {
                     identified_positions[position] = true;
+                    any_change = true;
 
                     let field_idx = possible_fields.trailing_zeros();
                     if departure_fields.contains(&field_idx) {
                         departure_values_multiplied *=
                             u64::from(your_ticket_values[position as usize]);
                     }
-                    any_change = true;
 
                     let clear_possibility_bitmask = !(1 << field_idx);
                     for (idx, possible_fields) in
