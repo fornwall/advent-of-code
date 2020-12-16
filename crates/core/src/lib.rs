@@ -210,6 +210,15 @@ pub fn solve(
         (2020, 14, _) => to_stringer_input(year2020::day14::solve, &mut input),
         (2020, 15, _) => to_stringer_input(year2020::day15::solve, &mut input),
         (2020, 16, _) => to_stringer_input(year2020::day16::solve, &mut input),
+        (2020, 17, _) => to_stringer_input(year2020::day17::solve, &mut input),
+        (2020, 18, _) => to_stringer_input(year2020::day18::solve, &mut input),
+        (2020, 19, _) => to_stringer_input(year2020::day19::solve, &mut input),
+        (2020, 20, _) => to_stringer_input(year2020::day20::solve, &mut input),
+        (2020, 21, _) => to_stringer_input(year2020::day21::solve, &mut input),
+        (2020, 22, _) => to_stringer_input(year2020::day22::solve, &mut input),
+        (2020, 23, _) => to_stringer_input(year2020::day23::solve, &mut input),
+        (2020, 24, _) => to_stringer_input(year2020::day24::solve, &mut input),
+        (2020, 25, _) => to_stringer_input(year2020::day25::solve, &mut input),
         _ => Err(format!(
             "Unsupported year={}, day={}, part={}",
             year, day, part
