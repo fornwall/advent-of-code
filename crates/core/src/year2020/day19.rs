@@ -101,8 +101,8 @@ impl Rules {
                         }
                     }
                 }
-                Rule::Sequences(choices) => {
-                    for chosen_sequence in choices.iter() {
+                Rule::Sequences(sequences) => {
+                    for chosen_sequence in sequences.iter() {
                         let mut remaining_sequence = chosen_sequence.clone();
                         remaining_sequence.extend(&partial_match.remaining_sequence[1..]);
 
