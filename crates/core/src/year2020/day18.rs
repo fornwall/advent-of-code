@@ -120,7 +120,7 @@ impl Parser {
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
-    let mut parser = Parser::new(!input.is_part_one());
+    let mut parser = Parser::new(input.is_part_two());
     input
         .text
         .lines()

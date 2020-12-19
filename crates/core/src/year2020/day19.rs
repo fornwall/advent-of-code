@@ -2,79 +2,99 @@ use crate::input::Input;
 
 #[derive(Clone)]
 enum Rule {
+    /// A literal character represented by its ASCII value.
     Character(u8),
+
+    /// A list of options, where each option is a sequence of rule id:s.
+    ///
+    /// Example: The rule
+    ///     "119 92 | 87 13"
+    /// is represented as:
+    ///     [[119, 92], [87, 13]]
     Sequences(Vec<Vec<RuleId>>),
 }
 
 impl Rule {
-    fn parse(pattern_str: &str) -> Self {
-        if pattern_str.as_bytes()[0] == b'"' {
-            Self::Character(pattern_str.as_bytes()[1])
-        } else {
-            Self::Sequences(
-                pattern_str
-                    .split(" | ")
-                    .map(|s| s.split(" ").map(|s| s.parse().unwrap()).collect())
-                    .collect(),
-            )
+    fn parse(rule_str: &str) -> Result<Self, ()> {
+        if rule_str.is_empty() {
+            return Err(());
         }
+
+        let bytes = rule_str.as_bytes();
+        Ok(if bytes[0] == b'"' {
+            if bytes.len() != 3 || bytes[2] != b'"' {
+                return Err(());
+            }
+            Self::Character(bytes[1])
+        } else {
+            let sequences = rule_str
+                .split(" | ")
+                .map(|s| s.split(' ').map(str::parse).collect())
+                .collect::<Result<_, _>>()
+                .map_err(|_| ())?;
+            Self::Sequences(sequences)
+        })
     }
 }
 
 type RuleId = u8;
 
 struct Rules {
+    /// The rules indexed by rule id:s.
     rules: Vec<Rule>,
 }
 
 impl Rules {
-    fn parse(rules_str: &str) -> Self {
+    fn parse(rules_str: &str) -> Result<Self, ()> {
         let mut rules = Self {
             rules: vec![Rule::Character(0); 255],
         };
         for rule_line in rules_str.lines() {
-            rules.add_line(rule_line);
+            rules.add_line(rule_line)?;
         }
-        rules
+        Ok(rules)
     }
 
-    fn add_line(&mut self, rule_line: &str) {
+    fn add_line(&mut self, rule_line: &str) -> Result<(), ()> {
         let mut rule_line_parts = rule_line.split(": ");
-        let rule_idx_str = rule_line_parts.next().unwrap();
-        let pattern_str = rule_line_parts.next().unwrap();
+        let rule_idx_str = rule_line_parts.next().ok_or(())?;
+        let pattern_str = rule_line_parts.next().ok_or(())?;
 
-        let rule_idx = rule_idx_str.parse::<RuleId>().unwrap();
-        let pattern = Rule::parse(pattern_str);
+        let rule_idx = rule_idx_str.parse::<RuleId>().map_err(|_| ())?;
+        let pattern = Rule::parse(pattern_str)?;
 
         self.rules[rule_idx as usize] = pattern;
+        Ok(())
     }
 
     fn matches(&self, line: &str) -> bool {
-        struct Match<'a> {
-            remaining_input: &'a str,
+        struct PartialMatch<'a> {
+            remaining_input: &'a [u8],
             remaining_sequence: Vec<RuleId>,
         }
 
         let mut stack = Vec::new();
-        stack.push(Match {
-            remaining_input: line,
+        stack.push(PartialMatch {
+            remaining_input: line.as_bytes(),
             remaining_sequence: vec![0],
         });
 
-        while let Some(m) = stack.pop() {
-            match &self.rules[m.remaining_sequence[0] as usize] {
+        while let Some(partial_match) = stack.pop() {
+            match &self.rules[partial_match.remaining_sequence[0] as usize] {
                 &Rule::Character(value) => {
-                    if m.remaining_input.as_bytes()[0] == value {
-                        let end_of_input = m.remaining_input.len() == 1;
-                        let end_of_rule_sequence = m.remaining_sequence.len() == 1;
+                    if partial_match.remaining_input[0] == value {
+                        let end_of_input = partial_match.remaining_input.len() == 1;
+                        let end_of_rule_sequence = partial_match.remaining_sequence.len() == 1;
+
                         match (end_of_input, end_of_rule_sequence) {
                             (true, true) => {
                                 return true;
                             }
                             (false, false) => {
-                                stack.push(Match {
-                                    remaining_input: &m.remaining_input[1..],
-                                    remaining_sequence: m.remaining_sequence[1..].to_vec(),
+                                stack.push(PartialMatch {
+                                    remaining_input: &partial_match.remaining_input[1..],
+                                    remaining_sequence: partial_match.remaining_sequence[1..]
+                                        .to_vec(),
                                 });
                             }
                             _ => {}
@@ -84,9 +104,10 @@ impl Rules {
                 Rule::Sequences(choices) => {
                     for chosen_sequence in choices.iter() {
                         let mut remaining_sequence = chosen_sequence.clone();
-                        remaining_sequence.extend(&m.remaining_sequence[1..]);
-                        stack.push(Match {
-                            remaining_input: m.remaining_input,
+                        remaining_sequence.extend(&partial_match.remaining_sequence[1..]);
+
+                        stack.push(PartialMatch {
+                            remaining_input: partial_match.remaining_input,
                             remaining_sequence,
                         });
                     }
@@ -99,15 +120,17 @@ impl Rules {
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let on_error = || "Invalid input".to_string();
+    let map_error = |_| on_error();
+
     let mut input_parts = input.text.split("\n\n");
     let rules_str = input_parts.next().ok_or_else(on_error)?;
     let messages_str = input_parts.next().ok_or_else(on_error)?;
 
-    let mut rules = Rules::parse(rules_str);
+    let mut rules = Rules::parse(rules_str).map_err(map_error)?;
 
     if input.is_part_two() {
-        rules.add_line("8: 42 | 42 8");
-        rules.add_line("11: 42 31 | 42 11 31");
+        rules.add_line("8: 42 | 42 8").map_err(map_error)?;
+        rules.add_line("11: 42 31 | 42 11 31").map_err(map_error)?;
     }
 
     Ok(messages_str
