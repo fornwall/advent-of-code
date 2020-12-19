@@ -1,24 +1,22 @@
 use crate::input::Input;
 
-#[derive(Clone, Debug)]
-enum RulePattern {
-    Character { value: u8 },
-    Choices { choices: Vec<Vec<RuleId>> },
+#[derive(Clone)]
+enum Rule {
+    Character(u8),
+    Sequences(Vec<Vec<RuleId>>),
 }
 
-impl RulePattern {
+impl Rule {
     fn parse(pattern_str: &str) -> Self {
         if pattern_str.as_bytes()[0] == b'"' {
-            Self::Character {
-                value: pattern_str.as_bytes()[1],
-            }
+            Self::Character(pattern_str.as_bytes()[1])
         } else {
-            Self::Choices {
-                choices: pattern_str
+            Self::Sequences(
+                pattern_str
                     .split(" | ")
                     .map(|s| s.split(" ").map(|s| s.parse().unwrap()).collect())
                     .collect(),
-            }
+            )
         }
     }
 }
@@ -26,13 +24,13 @@ impl RulePattern {
 type RuleId = u8;
 
 struct Rules {
-    patterns: Vec<RulePattern>,
+    rules: Vec<Rule>,
 }
 
 impl Rules {
     fn parse(rules_str: &str) -> Self {
         let mut rules = Self {
-            patterns: vec![RulePattern::Character { value: 0 }; 255],
+            rules: vec![Rule::Character(0); 255],
         };
         for rule_line in rules_str.lines() {
             rules.add_line(rule_line);
@@ -46,9 +44,9 @@ impl Rules {
         let pattern_str = rule_line_parts.next().unwrap();
 
         let rule_idx = rule_idx_str.parse::<RuleId>().unwrap();
-        let pattern = RulePattern::parse(pattern_str);
+        let pattern = Rule::parse(pattern_str);
 
-        self.patterns[rule_idx as usize] = pattern;
+        self.rules[rule_idx as usize] = pattern;
     }
 
     fn matches(&self, line: &str) -> bool {
@@ -64,8 +62,8 @@ impl Rules {
         });
 
         while let Some(m) = stack.pop() {
-            match &self.patterns[m.remaining_sequence[0] as usize] {
-                &RulePattern::Character { value } => {
+            match &self.rules[m.remaining_sequence[0] as usize] {
+                &Rule::Character(value) => {
                     if m.remaining_input.as_bytes()[0] == value {
                         let end_of_input = m.remaining_input.len() == 1;
                         let end_of_rule_sequence = m.remaining_sequence.len() == 1;
@@ -83,7 +81,7 @@ impl Rules {
                         }
                     }
                 }
-                RulePattern::Choices { choices } => {
+                Rule::Sequences(choices) => {
                     for chosen_sequence in choices.iter() {
                         let mut remaining_sequence = chosen_sequence.clone();
                         remaining_sequence.extend(&m.remaining_sequence[1..]);
