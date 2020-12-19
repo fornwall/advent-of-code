@@ -1,79 +1,120 @@
 use crate::input::Input;
-use regex::Regex;
-use std::collections::HashMap;
 
-fn expand_rule(rule_idx: &str, rules: &HashMap<&str, Vec<String>>, depth: u32) -> String {
-    if depth > 17 {
-        return "".to_string();
-    }
-    let parts = rules.get(rule_idx).unwrap();
-    let mut result = String::new();
-    result += "(";
-    for part in parts.iter() {
-        if part == "a" || part == "b" || part == "|" {
-            result += &part;
+#[derive(Clone, Debug)]
+enum RulePattern {
+    Character { value: u8 },
+    Choices { choices: Vec<Vec<RuleId>> },
+}
+
+impl RulePattern {
+    fn parse(pattern_str: &str) -> Self {
+        if pattern_str.as_bytes()[0] == b'"' {
+            Self::Character {
+                value: pattern_str.as_bytes()[1],
+            }
         } else {
-            result += &expand_rule(&part, &rules, depth + 1);
+            Self::Choices {
+                choices: pattern_str
+                    .split(" | ")
+                    .map(|s| s.split(" ").map(|s| s.parse().unwrap()).collect())
+                    .collect(),
+            }
         }
     }
-    result += ")";
-    result
+}
+
+type RuleId = u8;
+
+struct Rules {
+    patterns: Vec<RulePattern>,
+}
+
+impl Rules {
+    fn parse(rules_str: &str) -> Self {
+        let mut rules = Self {
+            patterns: vec![RulePattern::Character { value: 0 }; 255],
+        };
+        for rule_line in rules_str.lines() {
+            rules.add_line(rule_line);
+        }
+        rules
+    }
+
+    fn add_line(&mut self, rule_line: &str) {
+        let mut rule_line_parts = rule_line.split(": ");
+        let rule_idx_str = rule_line_parts.next().unwrap();
+        let pattern_str = rule_line_parts.next().unwrap();
+
+        let rule_idx = rule_idx_str.parse::<RuleId>().unwrap();
+        let pattern = RulePattern::parse(pattern_str);
+
+        self.patterns[rule_idx as usize] = pattern;
+    }
+
+    fn matches(&self, line: &str) -> bool {
+        struct Match<'a> {
+            remaining_input: &'a str,
+            remaining_sequence: Vec<RuleId>,
+        }
+
+        let mut stack = Vec::new();
+        stack.push(Match {
+            remaining_input: line,
+            remaining_sequence: vec![0],
+        });
+
+        while let Some(m) = stack.pop() {
+            match &self.patterns[m.remaining_sequence[0] as usize] {
+                &RulePattern::Character { value } => {
+                    if m.remaining_input.as_bytes()[0] == value {
+                        let end_of_input = m.remaining_input.len() == 1;
+                        let end_of_rule_sequence = m.remaining_sequence.len() == 1;
+                        match (end_of_input, end_of_rule_sequence) {
+                            (true, true) => {
+                                return true;
+                            }
+                            (false, false) => {
+                                stack.push(Match {
+                                    remaining_input: &m.remaining_input[1..],
+                                    remaining_sequence: m.remaining_sequence[1..].to_vec(),
+                                });
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+                RulePattern::Choices { choices } => {
+                    for chosen_sequence in choices.iter() {
+                        let mut remaining_sequence = chosen_sequence.clone();
+                        remaining_sequence.extend(&m.remaining_sequence[1..]);
+                        stack.push(Match {
+                            remaining_input: m.remaining_input,
+                            remaining_sequence,
+                        });
+                    }
+                }
+            }
+        }
+        false
+    }
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let on_error = || "Invalid input".to_string();
     let mut input_parts = input.text.split("\n\n");
-    let rules_part = input_parts.next().ok_or_else(on_error)?;
-    let messages_part = input_parts.next().ok_or_else(on_error)?;
+    let rules_str = input_parts.next().ok_or_else(on_error)?;
+    let messages_str = input_parts.next().ok_or_else(on_error)?;
 
-    //let mut expanded_rules = HashMap::new();
-    let mut rules = HashMap::new();
+    let mut rules = Rules::parse(rules_str);
 
-    for rule_line in rules_part.lines() {
-        let mut rule_line_parts = rule_line.split(": ");
-        let rule_idx = rule_line_parts.next().ok_or_else(on_error)?;
-        let rule_parts: Vec<String> = rule_line_parts
-            .next()
-            .ok_or_else(on_error)?
-            .split(" ")
-            .map(|p| p.replace('"', ""))
-            .collect();
-        rules.insert(rule_idx, rule_parts);
+    if input.is_part_two() {
+        rules.add_line("8: 42 | 42 8");
+        rules.add_line("11: 42 31 | 42 11 31");
     }
 
-    if !input.is_part_one() {
-        rules.insert(
-            "8",
-            vec![
-                "42".to_string(),
-                "|".to_string(),
-                "42".to_string(),
-                "8".to_string(),
-            ],
-        );
-        rules.insert(
-            "11",
-            vec![
-                "42".to_string(),
-                "31".to_string(),
-                "|".to_string(),
-                "42".to_string(),
-                "11".to_string(),
-                "31".to_string(),
-            ],
-        );
-    }
-
-    println!("RULE 0: {:?}", rules.get("0"));
-    let expanded_rule_zero = expand_rule("0", &rules, 0);
-    println!("Expanded 0: {}", expanded_rule_zero);
-    let regexp = format!("^{}$", expanded_rule_zero);
-    println!("regexp: {}", regexp);
-
-    let re = Regex::new(&regexp).unwrap();
-    Ok(messages_part
+    Ok(messages_str
         .lines()
-        .filter(|line| re.is_match(line))
+        .filter(|line| rules.matches(line))
         .count() as u64)
 }
 
