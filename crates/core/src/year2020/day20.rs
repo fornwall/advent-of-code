@@ -171,6 +171,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     }
 
     let mut corners = Vec::new();
+    let mut top_left_corner = None;
 
     for this_tile in tiles.iter() {
         let mut matching_edges_bitmask = 0_u64;
@@ -195,42 +196,56 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         if matching_edges_bitmask.count_ones() == 2 {
             corners.push(this_tile);
         }
+        if matching_edges_bitmask == 0b0110 {
+            // Edges to right and below
+            top_left_corner = Some(this_tile);
+        }
     }
 
     if input.is_part_one() {
         return Ok(corners.iter().map(|tile| tile.id as u64).product());
     }
 
-    let a_corner = corners[0];
+    let top_left_corner = top_left_corner.unwrap();
     // Just pick any corner as top right:
     let mut remaining_tiles = tiles
         .iter()
-        .filter(|tile| tile.id != a_corner.id)
+        .filter(|tile| tile.id != top_left_corner.id)
         .copied()
         .collect::<HashSet<Tile>>();
 
     println!("Others: {}", remaining_tiles.len());
-    println!("Initial tile:");
-    a_corner.debug_print();
+    println!("Initial top left corner:");
+    top_left_corner.debug_print();
 
     // From (x,y) to tile at position.
     let mut map: HashMap<(u8, u8), Tile> = HashMap::new();
 
-    let current_right_corner = a_corner.edges[1];
-    map.insert((0, 0), *a_corner);
+    map.insert((0, 0), *top_left_corner);
 
     // Start going right:
-    let mut x = 1;
+    let mut x = 0;
     let mut y = 0;
     loop {
         let mut tile_to_remove = None;
+        let tile_to_append_to = map.get(&(x, y)).unwrap();
         'tileLoop: for remaining_tile in remaining_tiles.iter() {
             for (edge_idx, &edge) in remaining_tile.edges.iter().enumerate() {
-                if edge == current_right_corner {
+                if edge == tile_to_append_to.edges[1] {
+                    // 3 is to the left.
+                    let counterclockwise_rotations_needed = 3 - edge_idx;
+                    let clockwise_rotations_needed = if counterclockwise_rotations_needed == 1 {
+                        3
+                    } else if counterclockwise_rotations_needed == 3 {
+                        1
+                    } else {
+                        counterclockwise_rotations_needed
+                    };
                     x += 1;
-                    map.insert((x, y), *remaining_tile);
-                    println!("Found tile fitting to the right");
-                    remaining_tile.debug_print();
+                    map.insert(
+                        (x, y),
+                        remaining_tile.rotate_clockwise_multiple(clockwise_rotations_needed as u8),
+                    );
                     tile_to_remove = Some(*remaining_tile);
                     break 'tileLoop;
                 }
@@ -243,19 +258,14 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
     }
 
+    // Debug render:
+    println!("DEBUG");
+    for x in 0..=1 {
+        map.get(&(x, 0)).unwrap().debug_print();
+        println!();
+    }
+
     Ok(0)
-    /*
-    Ok(tiles
-        .iter()
-        .filter_map(|tile| {
-            if tile.matching_edges_bitmask == 2 {
-                Some(tile.id as u64)
-            } else {
-                None
-            }
-        })
-        .product())
-     */
 }
 
 #[test]
@@ -286,6 +296,9 @@ pub fn test_rotate() {
         rotated_tile.rotate_clockwise(),
         tile.rotate_clockwise_multiple(2)
     );
+
+    assert_eq!(tile, tile.rotate_clockwise_multiple(0));
+    assert_eq!(tile, tile.rotate_clockwise_multiple(4));
 }
 
 #[test]
@@ -425,7 +438,7 @@ Tile 3079:
 ..#.......
 ..#.###...";
     test_part_one!(example=> 20_899_048_083_289);
-    //test_part_two!(example => 273);
+    test_part_two!(example => 273);
 
     let real_input = include_str!("day20_input.txt");
     test_part_one!(real_input => 21_599_955_909_991);
