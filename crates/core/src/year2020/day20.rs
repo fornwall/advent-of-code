@@ -15,6 +15,37 @@ struct Tile {
 }
 
 impl Tile {
+    fn transform_to_match(&self, coming_from_edge_idx: usize, edge_bitmask: EdgeBitmask) -> Self {
+        let matching_edge_idx = match coming_from_edge_idx {
+            0 => 2,
+            2 => 0,
+            1 => 3,
+            3 => 1,
+            _ => {
+                panic!(
+                    "transform_to_match: Invalid coming_from_edge_idx {}",
+                    coming_from_edge_idx
+                );
+            }
+        };
+
+        let mut current = *self;
+        for flip in 0..=2 {
+            for _rotation in 0..=3 {
+                if current.edges[matching_edge_idx as usize] == edge_bitmask {
+                    return current;
+                }
+                current = current.rotate_clockwise();
+            }
+            if flip == 1 {
+                current = current.flip_horizontal();
+            } else {
+                current = current.flip_vertical();
+            }
+        }
+        panic!("transform_to_match not found");
+    }
+
     fn debug_print(&self) {
         for i in 0..8 {
             let formatted_string = format!("{:0>8b}", self.body[i])
@@ -22,6 +53,12 @@ impl Tile {
                 .replace('0', ".");
             println!("{}", formatted_string);
         }
+    }
+
+    fn debug_row(&self, i: u8) -> String {
+        format!("{:0>8b}", self.body[i as usize])
+            .replace('1', "#")
+            .replace('0', ".")
     }
 
     fn debug_edge(&self, edge_idx: u8) {
@@ -237,6 +274,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let top_left_corner = top_left_corner.unwrap();
     for &edge in top_left_corner.edges.iter() {
         edge_to_tile_idx[edge as usize].retain(|&e| e != top_left_corner.id);
+        edge_to_tile_idx[flip_edge(edge) as usize].retain(|&e| e != top_left_corner.id);
     }
     composed_image.insert((0, 0), top_left_corner);
 
@@ -270,6 +308,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         continue;
                     }
                 };
+                if new_x >= composed_image_width || new_y >= composed_image_width {
+                    continue;
+                }
                 if composed_image.contains_key(&(new_x, new_y)) {
                     continue;
                 }
@@ -281,25 +322,54 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                     .edges
                     .iter()
                     .enumerate()
-                    .find_map(|(idx, &e)| if e == edge { Some(idx) } else { None })
+                    .find_map(|(idx, &e)| {
+                        if e == edge || e == flip_edge(edge) {
+                            Some(idx)
+                        } else {
+                            None
+                        }
+                    })
                     .unwrap();
                 println!(
                     "Which edge idx: {}, while coming from {}",
                     which_edge_idx, edge_idx
                 );
+                println!("Searching for edge");
+                popped_tile.debug_edge(edge_idx as u8);
+                let tile_with_matching_edge =
+                    tile_with_matching_edge.transform_to_match(edge_idx, edge);
 
                 for &edge in tile_with_matching_edge.edges.iter() {
                     edge_to_tile_idx[edge as usize].retain(|&e| e != tile_with_matching_edge.id);
+                    edge_to_tile_idx[flip_edge(edge) as usize]
+                        .retain(|&e| e != tile_with_matching_edge.id);
                 }
                 //println!("edge to tile id: {:?}", edge_to_tile_idx);
-                composed_image.insert((new_x, new_y), *tile_with_matching_edge);
+                composed_image.insert((new_x, new_y), tile_with_matching_edge);
 
-                stack.push((new_x, new_y, *tile_with_matching_edge));
+                stack.push((new_x, new_y, tile_with_matching_edge));
             }
         }
     }
 
     println!("Placed tiles: {}", composed_image.len());
+    for y in 0..composed_image_width {
+        for x in 0..composed_image_width {
+            let tile = composed_image.get(&(x, y)).unwrap();
+            print!("{} ", tile.id);
+        }
+        println!();
+    }
+
+    for y in 0..composed_image_width {
+        for row in 0..8 {
+            for x in 0..composed_image_width {
+                let tile = composed_image.get(&(x, y)).unwrap();
+                print!("{}", tile.debug_row(row));
+            }
+            println!();
+        }
+    }
     Ok(0)
 }
 fn try_find(
@@ -548,7 +618,7 @@ Tile 3079:
 ..#.......
 ..#.###...";
     test_part_one!(example=> 20_899_048_083_289);
-    //test_part_two!(example => 273);
+    test_part_two!(example => 273);
 
     let real_input = include_str!("day20_input.txt");
     test_part_one!(real_input => 21_599_955_909_991);
