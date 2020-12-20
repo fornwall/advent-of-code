@@ -3,13 +3,20 @@ use crate::input::Input;
 type EdgeBitmask = u16;
 type TileId = u16;
 
+#[derive(Copy, Clone)]
+struct Tile {
+    id: u16,
+    edges: [EdgeBitmask; 4],
+    body: u64,
+}
+
 fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
     // Only the first 10 bits of the edge bitmask is used.
     number.reverse_bits() >> 6
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
-    let mut tiles: Vec<(TileId, [EdgeBitmask; 4])> = Vec::new();
+    let mut tiles: Vec<Tile> = Vec::new();
 
     for tile_str in input.text.split("\n\n") {
         let mut tile_id = 0;
@@ -50,16 +57,20 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 }
             }
         }
-        tiles.push((tile_id, this_edges));
+        tiles.push(Tile {
+            id: tile_id,
+            edges: this_edges,
+            body: 0,
+        });
     }
 
     let mut result = 1;
-    'outer: for &(tile_id, edges) in tiles.iter() {
+    'outer: for this_tile in tiles.iter() {
         let mut matching_edges = 0_u64;
-        for &(other_tile_id, other_edges) in tiles.iter() {
-            if tile_id != other_tile_id {
-                for &this_edge in edges.iter() {
-                    for &other_edge in other_edges.iter() {
+        for other_tile in tiles.iter() {
+            if this_tile.id != other_tile.id {
+                for &this_edge in this_tile.edges.iter() {
+                    for &other_edge in other_tile.edges.iter() {
                         if this_edge == other_edge || this_edge == flip_edge(other_edge) {
                             matching_edges += 1;
                             if matching_edges > 2 {
@@ -71,7 +82,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             }
         }
         if matching_edges == 2 {
-            result *= tile_id as u64;
+            result *= this_tile.id as u64;
         }
     }
     Ok(result)
