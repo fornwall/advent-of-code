@@ -268,7 +268,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 
     // The composed image is square:
     let composed_image_width = (tiles.len() as f64).sqrt() as u8;
-    println!("Composed image width: {}", composed_image_width);
 
     let mut top_left_corner = None;
     let mut corners = Vec::new();

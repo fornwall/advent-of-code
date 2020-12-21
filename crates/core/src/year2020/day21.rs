@@ -3,13 +3,15 @@ use std::collections::{HashMap, HashSet};
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let on_error = || "Invalid input";
-    //let mut ingredient_to_possible_allergens = HashMap::new();
-    let mut allergen_to_idx = HashMap::new();
-    let mut allergen_names = Vec::new();
-    let mut ingredient_to_idx = HashMap::new();
-    let mut ingredient_names = Vec::new();
-    let mut ingredient_occurences = Vec::new();
-    let mut allergen_to_possible_ingredients = Vec::new();
+
+    let mut allergen_to_idx = HashMap::with_capacity(8);
+    let mut allergen_names = Vec::with_capacity(8);
+
+    let mut ingredient_to_idx = HashMap::with_capacity(200);
+    let mut ingredient_names = Vec::with_capacity(200);
+
+    let mut ingredient_occurences = Vec::with_capacity(200);
+    let mut allergen_to_possible_ingredients = Vec::with_capacity(8);
 
     for line in input.text.lines() {
         let mut line_parts = line.splitn(2, " (contains ");
