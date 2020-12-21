@@ -108,7 +108,7 @@ impl Tile {
         }
         for tile in tiles.iter_mut() {
             let tile_id = tile.id;
-            for (edge_idx, edge) in tile.edges.iter_mut().enumerate() {
+            for edge in tile.edges.iter_mut() {
                 if let Some(&other_tile_id) = edge_to_tile_idx[edge.bitmask as usize]
                     .iter()
                     .find(|&&other_tile_id| other_tile_id != tile_id)
@@ -121,96 +121,59 @@ impl Tile {
         Ok(tiles)
     }
 
-    fn transform_to_match(&self, x: u8, y: u8, composed_image: &HashMap<(u8, u8), Self>) -> Self {
-        let mut desired_edges = [None; 4];
-        for i in 0_usize..4 {
-            let (x, y) = match i {
-                0 if y > 0 => (x, y - 1),
-                1 => (x + 1, y),
-                2 => (x, y + 1),
-                3 if x > 0 => (x - 1, y),
-                _ => {
-                    continue;
-                }
-            };
-            if let Some(tile) = composed_image.get(&(x, y)) {
-                println!(
-                    "Found edge to match (at {},{}), direction {} - that should be",
-                    x, y, i
-                );
-                tile.debug_edge(match i {
-                    0 => 2,
-                    1 => 3,
-                    2 => 0,
-                    3 => 1,
-                    _ => {
-                        panic!("Invalid edge");
-                    }
-                });
-                desired_edges[i] = Some(
-                    tile.edges[match i {
-                        0 => 2,
-                        1 => 3,
-                        2 => 0,
-                        3 => 1,
-                        _ => {
-                            panic!("Invalid edge");
-                        }
-                    }]
-                    .bitmask,
-                );
-            }
-        }
-
+    fn transform_to_match(
+        &self,
+        x: u8,
+        y: u8,
+        composed_image: &HashMap<(u8, u8), Self>,
+        composed_image_width: u8,
+    ) -> Self {
         let mut current = *self;
         for flip in 0..=2 {
             for _rotation in 0..=3 {
-                let mut all_matches = true;
-                for i in 0_usize..4 {
-                    if let Some(e) = desired_edges[i] {
-                        print!("Checking edge {}... ", i);
-                        if e == current.edges[i].bitmask {
-                            println!("YES");
-                        } else {
-                            println!("NO");
-                            all_matches = false;
+                if current.edges[0].matching.is_none() == (y == 0)
+                    && current.edges[1].matching.is_none() == (x + 1 == composed_image_width)
+                    && current.edges[2].matching.is_none() == (y + 1 == composed_image_width)
+                    && current.edges[3].matching.is_none() == (x == 0)
+                {
+                    let mut possible = true;
+                    if x != 0 {
+                        if let Some(tile_to_left) = composed_image.get(&(x - 1, y)) {
+                            if Some(tile_to_left.id) != current.edges[3].matching {
+                                possible = false;
+                            }
                         }
                     }
-                }
-                if all_matches {
-                    return current;
+                    if y != 0 {
+                        if let Some(tile_above) = composed_image.get(&(x, y - 1)) {
+                            if Some(tile_above.id) != current.edges[0].matching {
+                                possible = false;
+                            }
+                        }
+                    }
+                    if let Some(tile_to_right) = composed_image.get(&(x + 1, y)) {
+                        if Some(tile_to_right.id) != current.edges[1].matching {
+                            possible = false;
+                        }
+                    }
+                    if let Some(tile_below) = composed_image.get(&(x, y + 1)) {
+                        if Some(tile_below.id) != current.edges[2].matching {
+                            possible = false;
+                        }
+                    }
+                    if possible {
+                        return current;
+                    }
                 }
                 current = current.rotate_clockwise();
             }
             if flip == 1 {
-                current = current.flip_horizontal();
-            } else {
                 current = current.flip_vertical();
+            } else {
+                current = current.flip_horizontal();
             }
         }
         panic!("transform_to_match not found");
-    }
-
-    fn debug_print(&self) {
-        for i in 0..8 {
-            let formatted_string = format!("{:0>8b}", self.body[i])
-                .replace('1', "#")
-                .replace('0', ".");
-            println!("{}", formatted_string);
-        }
-    }
-
-    fn debug_row(&self, i: u8) -> String {
-        format!("{:0>8b}", self.body[i as usize])
-            .replace('1', "#")
-            .replace('0', ".")
-    }
-
-    fn debug_edge(&self, edge_idx: u8) {
-        let edge = format!("  {:0>10b}", self.edges[edge_idx as usize].bitmask)
-            .replace('1', "#")
-            .replace('0', ".");
-        println!("  id={}, {}", self.id, edge);
     }
 
     fn rotate_clockwise(&self) -> Self {
@@ -284,7 +247,7 @@ const fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
 /// - The outermost edges tile edges won't line up with any other tiles.
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut tiles = Tile::parse(input.text)?;
-    let mut top_left_corner = None;
+    let mut bottom_left_corner = None;
 
     let composed_square_width = (tiles.len() as f64).sqrt() as u8;
     for &mut tile in tiles.iter_mut() {
@@ -296,7 +259,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
 
         if matching_edges_bitmask == 0b0110 {
-            top_left_corner = Some(tile);
+            bottom_left_corner = Some(tile);
         }
     }
 
@@ -322,11 +285,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     // From (x,y) to tile at position.
     let mut composed_image: HashMap<(u8, u8), Tile> = HashMap::new();
 
-    let top_left_corner = top_left_corner.unwrap();
+    let top_left_corner = bottom_left_corner.unwrap();
     composed_image.insert((0, 0), top_left_corner);
-
-    println!("Initial top left corner (id={}):", top_left_corner.id);
-    top_left_corner.debug_print();
 
     let mut stack = Vec::new();
     stack.push((0, 0, top_left_corner));
@@ -349,47 +309,18 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 {
                     continue;
                 }
-                println!(
-                    "Found matching tile {} to place at x={}, y={}",
-                    tile_with_matching_edge.id, new_x, new_y
-                );
 
-                let transformed_tile =
-                    tile_with_matching_edge.transform_to_match(new_x, new_y, &composed_image);
-                if new_x == 2 {
-                    println!("Left edge of newly found");
-                    transformed_tile.debug_edge(3);
-                    println!("Does it really match?");
-                    composed_image
-                        .get(&(new_x - 1, new_y))
-                        .unwrap()
-                        .debug_edge(1);
-                }
+                let transformed_tile = tile_with_matching_edge.transform_to_match(
+                    new_x,
+                    new_y,
+                    &composed_image,
+                    composed_square_width,
+                );
 
                 composed_image.insert((new_x, new_y), transformed_tile);
 
                 stack.push((new_x, new_y, transformed_tile));
             }
-        }
-    }
-
-    // FIXME: 2473 is not rotated correctly
-    println!("Placed tiles: {}", composed_image.len());
-    for y in 0..composed_square_width {
-        for x in 0..composed_square_width {
-            let tile = composed_image.get(&(x, y)).unwrap();
-            print!("{} ", tile.id);
-        }
-        println!();
-    }
-
-    for y in 0..composed_square_width {
-        for row in 0..8 {
-            for x in 0..composed_square_width {
-                let tile = composed_image.get(&(x, y)).unwrap();
-                print!("{}", tile.debug_row(row));
-            }
-            println!();
         }
     }
 
@@ -418,15 +349,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             != 0
     };
 
-    println!();
-    println!("###### Renddering anew");
-    for y in 0..composed_image_width_pixels {
-        for x in 0..composed_image_width_pixels {
-            print!("{}", if is_black_at(1, y, x) { '#' } else { '.' });
-        }
-        println!();
-    }
-
     // Search for the main body "#    ##    ##    ###",
     // of length 20, in the sea monster pattern:
     // "                  # "
@@ -436,7 +358,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     for &direction in &[0_u8, 1, 2, 3] {
         for &flip in &[1_i8, -1] {
             let mut monster_count = 0;
-            // TODO: Check boundary condition..
             for x in 1..(composed_image_width_pixels - 1) {
                 for y in 0..(composed_image_width_pixels - monster_body_len + 1) {
                     if is_black_at(direction, x, y)
@@ -456,10 +377,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         && is_black_at(direction, (x as i8 + flip) as u8, y + 16)
                     {
                         monster_count += 1;
-                        println!(
-                            "############ Found sea monster. x={}, y={}, direction={}",
-                            x, y, direction
-                        );
                     }
                 }
             }
@@ -671,5 +588,5 @@ Tile 3079:
 
     let real_input = include_str!("day20_input.txt");
     test_part_one!(real_input => 21_599_955_909_991);
-    // test_part_two!(real_input => 0);
+    test_part_two!(real_input => 2495);
 }
