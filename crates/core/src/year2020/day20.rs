@@ -62,11 +62,11 @@ impl Tile {
                 for i in 0_usize..4 {
                     if let Some(e) = desired_edges[i] {
                         print!("Checking edge {}... ", i);
-                        if e != current.edges[i] {
+                        if e == current.edges[i] {
+                            println!("YES");
+                        } else {
                             println!("NO");
                             all_matches = false;
-                        } else {
-                            println!("YES");
                         }
                     }
                 }
@@ -488,7 +488,7 @@ pub fn test_rotate() {
     let tile = Tile {
         id: 0,
         edges: [1, 2, 3, 4],
-        body: [0b10100000, 0b01010000, 0, 0, 0, 0, 0, 0],
+        body: [0b1010_0000, 0b0101_0000, 0, 0, 0, 0, 0, 0],
     };
 
     let rotated_tile = tile.rotate_clockwise();
@@ -521,29 +521,29 @@ pub fn test_flip() {
     let tile = Tile {
         id: 17,
         edges: [0b1, 0b10, 0b11, 0b100],
-        body: [0b10100000, 0b01010000, 0, 0, 0, 0, 0, 0],
+        body: [0b1010_0000, 0b0101_0000, 0, 0, 0, 0, 0, 0],
     };
 
     let horizontally_flipped = tile.flip_horizontal();
     assert_eq!(17, horizontally_flipped.id);
     assert_eq!(
         horizontally_flipped.edges,
-        [0b1000000000, 0b100, 0b1100000000, 0b10]
+        [0b10_0000_0000, 0b100, 0b11_0000_0000, 0b10]
     );
     assert_eq!(
         horizontally_flipped.body,
-        [0b00000101, 0b00001010, 0, 0, 0, 0, 0, 0]
+        [0b0000_0101, 0b0000_1010, 0, 0, 0, 0, 0, 0]
     );
 
     let vertically_flipped = tile.flip_vertical();
     assert_eq!(17, vertically_flipped.id);
     assert_eq!(
         vertically_flipped.edges,
-        [0b11, 0b0100000000, 0b1, 0b0010000000]
+        [0b11, 0b01_0000_0000, 0b1, 0b00_1000_0000]
     );
     assert_eq!(
         vertically_flipped.body,
-        [0, 0, 0, 0, 0, 0, 0b01010000, 0b10100000],
+        [0, 0, 0, 0, 0, 0, 0b0101_0000, 0b1010_0000],
     );
 }
 

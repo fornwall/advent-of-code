@@ -1,19 +1,127 @@
 use crate::input::Input;
+use std::collections::{HashMap, HashSet};
 
-pub fn solve(_input: &mut Input) -> Result<u64, String> {
-    Ok(0)
+pub fn solve(input: &mut Input) -> Result<String, String> {
+    let on_error = || "Invalid input";
+    //let mut ingredient_to_possible_allergens = HashMap::new();
+    let mut allergen_to_idx = HashMap::new();
+    let mut allergen_names = Vec::new();
+    let mut ingredient_to_idx = HashMap::new();
+    let mut ingredient_names = Vec::new();
+    let mut ingredient_occurences = Vec::new();
+    let mut allergen_to_possible_ingredients = Vec::new();
+
+    for line in input.text.lines() {
+        let mut line_parts = line.splitn(2, " (contains ");
+
+        let ingredients = line_parts.next().ok_or_else(on_error)?;
+        let mut current_ingredients = HashSet::new();
+        for ingredient_name in ingredients.split(' ') {
+            let num_ingredients = ingredient_to_idx.len();
+            let ingredient_id = *ingredient_to_idx
+                .entry(ingredient_name)
+                .or_insert(num_ingredients);
+
+            if ingredient_id == ingredient_occurences.len() {
+                ingredient_occurences.push(1);
+                ingredient_names.push(ingredient_name);
+            } else {
+                ingredient_occurences[ingredient_id] += 1;
+            }
+
+            current_ingredients.insert(ingredient_id);
+        }
+
+        if let Some(allergens) = line_parts.next().ok_or_else(on_error)?.strip_suffix(')') {
+            for allergen_name in allergens.split(", ") {
+                let num_allergens = allergen_to_idx.len();
+                let allergen_id = *allergen_to_idx
+                    .entry(allergen_name)
+                    .or_insert(num_allergens);
+                if allergen_id == allergen_names.len() {
+                    allergen_names.push(allergen_name);
+                    allergen_to_possible_ingredients.push(current_ingredients.clone());
+                } else {
+                    let existing = &allergen_to_possible_ingredients[allergen_id];
+                    let mut new_ingredients = current_ingredients.clone();
+                    new_ingredients.retain(|i| existing.contains(i));
+                    allergen_to_possible_ingredients[allergen_id] = new_ingredients;
+                }
+            }
+        } else {
+            return Err(on_error().to_string());
+        }
+    }
+
+    if input.is_part_one() {
+        return Ok((0..ingredient_to_idx.len())
+            .map(|ingredient_id| {
+                if allergen_to_possible_ingredients
+                    .iter()
+                    .any(|possible| possible.contains(&ingredient_id))
+                {
+                    0
+                } else {
+                    ingredient_occurences[ingredient_id]
+                }
+            })
+            .sum::<u64>()
+            .to_string());
+    }
+
+    let mut identified_products = allergen_to_possible_ingredients
+        .iter()
+        .filter_map(|possibilities| {
+            if possibilities.len() == 1 {
+                Some(*possibilities.iter().next().unwrap())
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<usize>>();
+
+    while let Some(product_id) = identified_products.pop() {
+        for possibilities in allergen_to_possible_ingredients.iter_mut() {
+            if possibilities.len() > 1
+                && possibilities.remove(&product_id)
+                && possibilities.len() == 1
+            {
+                let p = possibilities.iter().next().unwrap();
+                identified_products.push(*p);
+            }
+        }
+    }
+
+    let mut ingredient_and_allergents = allergen_to_possible_ingredients
+        .iter()
+        .enumerate()
+        .map(|(idx, possible_ingredients)| (possible_ingredients.iter().next().unwrap(), idx))
+        .collect::<Vec<_>>();
+    ingredient_and_allergents.sort_unstable_by(|a, b| {
+        let a_allergen_name = allergen_names[a.1];
+        let b_allergen_name = allergen_names[b.1];
+        a_allergen_name.cmp(b_allergen_name)
+    });
+
+    Ok(ingredient_and_allergents
+        .iter()
+        .map(|(&ingredient_id, _)| ingredient_names[ingredient_id])
+        .collect::<Vec<_>>()
+        .join(","))
 }
 
 #[test]
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
 
-    let example_part_one = "";
-    test_part_one!(example_part_one => 0);
-    let example_part_two = "";
-    test_part_two!(example_part_two => 0);
+    let example = "mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
+trh fvjkl sbzzf mxmxvkd (contains dairy)
+sqjhc fvjkl (contains soy)
+sqjhc mxmxvkd sbzzf (contains fish)";
+    test_part_one!(example => "5".to_string());
+    test_part_two!(example => "mxmxvkd,sqjhc,fvjkl".to_string());
 
-    // let real_input = include_str!("day21_input.txt");
-    // test_part_one!(real_input => 0);
-    // test_part_two!(real_input => 0);
+    let real_input = include_str!("day21_input.txt");
+    test_part_one!(real_input => "2317".to_string());
+    test_part_two!(real_input => "kbdgs,sqvv,slkfgq,vgnj,brdd,tpd,csfmb,lrnz".to_string());
 }
