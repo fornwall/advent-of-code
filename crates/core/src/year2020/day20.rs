@@ -316,20 +316,22 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
     }
 
-    let is_hash_at = |direction: u8, pixel_x: u8, monster_direction: u8| {
+    let is_hash_at = |direction: u8, sideway: u8, offset: u8| {
         let (pixel_x, pixel_y) = match direction {
-            1 => (monster_direction, pixel_x),
-            3 => (composed_image_pixel_width - 1 - monster_direction, pixel_x),
-            0 => (pixel_x, monster_direction),
-            2 => (pixel_x, composed_image_pixel_width - 1 - monster_direction),
+            0 => (sideway, offset),
+            1 => (offset, sideway),
+            2 => (sideway, composed_image_pixel_width - 1 - offset),
+            3 => (composed_image_pixel_width - 1 - offset, sideway),
             _ => {
                 panic!("Invalid direction");
             }
         };
+
         let tile_x = pixel_x / 8;
         let tile_y = pixel_y / 8;
         let bit = pixel_x % 8;
         let row = pixel_y % 8;
+
         composed_image
             .get(&(tile_x as u8, tile_y as u8))
             .unwrap()
@@ -338,8 +340,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             != 0
     };
 
-    // Search for the main body "#    ##    ##    ###",
-    // of length 20, in the sea monster pattern:
+    // Search for the main body center streak "#    ##    ##    ###"
+    // of length 20, and then look at the sides for the full shape:
     //
     // "                  # "
     // "#    ##    ##    ###"
@@ -348,23 +350,23 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     for &direction in &[0_u8, 1, 2, 3] {
         for &flip in &[1_i8, -1] {
             let mut monster_count = 0;
-            for offset in 1..(composed_image_pixel_width - 1) {
-                for sideway in 0..(composed_image_pixel_width - monster_body_len + 1) {
-                    if is_hash_at(direction, offset, sideway)
-                        && is_hash_at(direction, offset, sideway + 5)
-                        && is_hash_at(direction, offset, sideway + 6)
-                        && is_hash_at(direction, offset, sideway + 11)
-                        && is_hash_at(direction, offset, sideway + 12)
-                        && is_hash_at(direction, offset, sideway + 17)
-                        && is_hash_at(direction, offset, sideway + 18)
-                        && is_hash_at(direction, offset, sideway + 19)
-                        && is_hash_at(direction, (offset as i8 - flip) as u8, sideway + 18)
-                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 1)
-                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 4)
-                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 7)
-                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 10)
-                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 13)
-                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 16)
+            for offset in 0..(composed_image_pixel_width - monster_body_len + 1) {
+                for sideway in 1..(composed_image_pixel_width - 1) {
+                    if is_hash_at(direction, sideway, offset)
+                        && is_hash_at(direction, sideway, offset + 5)
+                        && is_hash_at(direction, sideway, offset + 6)
+                        && is_hash_at(direction, sideway, offset + 11)
+                        && is_hash_at(direction, sideway, offset + 12)
+                        && is_hash_at(direction, sideway, offset + 17)
+                        && is_hash_at(direction, sideway, offset + 18)
+                        && is_hash_at(direction, sideway, offset + 19)
+                        && is_hash_at(direction, (sideway as i8 - flip) as u8, offset + 18)
+                        && is_hash_at(direction, (sideway as i8 + flip) as u8, offset + 1)
+                        && is_hash_at(direction, (sideway as i8 + flip) as u8, offset + 4)
+                        && is_hash_at(direction, (sideway as i8 + flip) as u8, offset + 7)
+                        && is_hash_at(direction, (sideway as i8 + flip) as u8, offset + 10)
+                        && is_hash_at(direction, (sideway as i8 + flip) as u8, offset + 13)
+                        && is_hash_at(direction, (sideway as i8 + flip) as u8, offset + 16)
                     {
                         monster_count += 1;
                     }
