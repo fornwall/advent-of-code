@@ -13,7 +13,8 @@ struct Edge {
 impl Edge {
     fn flipped(self) -> Self {
         Self {
-            bitmask: flip_edge(self.bitmask),
+            // Only the first 10 bits of the edge bitmask is used:
+            bitmask: self.bitmask.reverse_bits() >> 6,
             matching: self.matching,
         }
     }
@@ -103,7 +104,7 @@ impl Tile {
         for tile in tiles.iter() {
             for &edge in tile.edges.iter() {
                 edge_to_tile_idx[edge.bitmask as usize].push(tile.id);
-                edge_to_tile_idx[flip_edge(edge.bitmask) as usize].push(tile.id);
+                edge_to_tile_idx[edge.flipped().bitmask as usize].push(tile.id);
             }
         }
         for tile in tiles.iter_mut() {
@@ -234,11 +235,6 @@ impl Tile {
     }
 }
 
-const fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
-    // Only the first 10 bits of the edge bitmask is used.
-    number.reverse_bits() >> 6
-}
-
 /// Key properties from the problem description:
 ///
 /// - Each tile is a 8x8 grid.
@@ -246,22 +242,14 @@ const fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
 /// - The composed image is square.
 /// - The outermost edges tile edges won't line up with any other tiles.
 pub fn solve(input: &mut Input) -> Result<u64, String> {
-    let mut tiles = Tile::parse(input.text)?;
-    let mut bottom_left_corner = None;
+    let tiles = Tile::parse(input.text)?;
 
     let composed_square_width = (tiles.len() as f64).sqrt() as u8;
-    for &mut tile in tiles.iter_mut() {
-        let mut matching_edges_bitmask = 0_u64;
-        for (edge_idx, &edge) in tile.edges.iter().enumerate() {
-            if edge.matching.is_some() {
-                matching_edges_bitmask |= 1 << edge_idx;
-            }
-        }
 
-        if matching_edges_bitmask == 0b0110 {
-            bottom_left_corner = Some(tile);
-        }
-    }
+    let top_left_corner = *tiles
+        .iter()
+        .find(|tile| tile.edges[0].matching.is_none() && tile.edges[3].matching.is_none())
+        .ok_or_else(|| "No top left corner found".to_string())?;
 
     if input.is_part_one() {
         return Ok(tiles
@@ -282,18 +270,17 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             .product());
     }
 
-    // From (x,y) to tile at position.
     let mut composed_image: HashMap<(u8, u8), Tile> = HashMap::new();
-
-    let top_left_corner = bottom_left_corner.unwrap();
     composed_image.insert((0, 0), top_left_corner);
 
     let mut stack = Vec::new();
     stack.push((0, 0, top_left_corner));
+
     while let Some((x, y, popped_tile)) = stack.pop() {
         for (edge_idx, &edge) in popped_tile.edges.iter().enumerate() {
             if let Some(matched_tile) = edge.matching {
                 let tile_with_matching_edge = tiles.iter().find(|t| t.id == matched_tile).unwrap();
+
                 let (new_x, new_y) = match edge_idx {
                     0 if y > 0 => (x, y - 1),
                     1 => (x + 1, y),
@@ -400,6 +387,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     Err("No sea monster found".to_string())
 }
 
+#[cfg(test)]
 fn edge(bitmask: EdgeBitmask) -> Edge {
     Edge {
         bitmask,
