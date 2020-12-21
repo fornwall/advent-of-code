@@ -10,7 +10,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut ingredient_to_idx = HashMap::with_capacity(200);
     let mut ingredient_names = Vec::with_capacity(200);
 
-    let mut ingredient_occurences = Vec::with_capacity(200);
+    let mut ingredient_occurences: Vec<u16> = Vec::with_capacity(200);
     let mut allergen_to_possible_ingredients = Vec::with_capacity(8);
 
     for line in input.text.lines() {
@@ -65,7 +65,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                 {
                     None
                 } else {
-                    Some(ingredient_occurences[ingredient_id])
+                    Some(u64::from(ingredient_occurences[ingredient_id]))
                 }
             })
             .sum::<u64>()

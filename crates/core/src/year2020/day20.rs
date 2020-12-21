@@ -1,12 +1,11 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-type EdgeBitmask = u16;
-type TileId = u16;
-
 #[derive(Copy, Clone, Debug)]
 struct Edge {
-    bitmask: EdgeBitmask,
+    /// Bitmask where '#' is set bit, '.' is unset. Only 10 first bits used.
+    bitmask: u16,
+    /// The tile that matches on the other end.
     matching: Option<TileId>,
 }
 
@@ -20,13 +19,15 @@ impl Edge {
     }
 }
 
+type TileId = u16;
+
 #[derive(Copy, Clone, Debug)]
 struct Tile {
     id: TileId,
     /// Indexed by 0,1,3,4 = Top,Right,Bottom,Left.
     edges: [Edge; 4],
     /// Indexed by row. Lowest bit to the right.
-    /// Example: "#..#...." is stored as 0b10010000.
+    /// Example: The row "#..#...." is stored as 0b10010000.
     body: [u8; 8],
 }
 
@@ -38,7 +39,7 @@ impl Tile {
             let mut this_edges = [Edge {
                 bitmask: 0,
                 matching: None,
-            }; 4]; // Top, Right, Bottom, Left
+            }; 4];
             let mut body = [0_u8; 8];
 
             for (line_idx, line) in tile_str.lines().enumerate() {
@@ -122,6 +123,14 @@ impl Tile {
         Ok(tiles)
     }
 
+    fn is_corner(&self) -> bool {
+        self.edges
+            .iter()
+            .filter(|edge| edge.matching.is_none())
+            .count()
+            == 2
+    }
+
     fn transform_to_match(
         &self,
         x: u8,
@@ -130,7 +139,8 @@ impl Tile {
         composed_image_width: u8,
     ) -> Self {
         let mut current = *self;
-        for flip in 0..=2 {
+
+        for _flip in 0..=1 {
             for _rotation in 0..=3 {
                 if current.edges[0].matching.is_none() == (y == 0)
                     && current.edges[1].matching.is_none() == (x + 1 == composed_image_width)
@@ -168,11 +178,7 @@ impl Tile {
                 }
                 current = current.rotate_clockwise();
             }
-            if flip == 1 {
-                current = current.flip_vertical();
-            } else {
-                current = current.flip_horizontal();
-            }
+            current = current.flip_horizontal();
         }
         panic!("transform_to_match not found");
     }
@@ -199,21 +205,6 @@ impl Tile {
             id: self.id,
             edges: rotated_edges,
             body: rotated_body,
-        }
-    }
-
-    fn flip_vertical(&self) -> Self {
-        let mut flipped_body = self.body;
-        flipped_body.reverse();
-        Self {
-            id: self.id,
-            edges: [
-                self.edges[2],
-                self.edges[1].flipped(),
-                self.edges[0],
-                self.edges[3].flipped(),
-            ],
-            body: flipped_body,
         }
     }
 
@@ -244,31 +235,21 @@ impl Tile {
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let tiles = Tile::parse(input.text)?;
 
-    let composed_square_width = (tiles.len() as f64).sqrt() as u8;
+    if input.is_part_one() {
+        return Ok(tiles
+            .iter()
+            .filter(|tile| tile.is_corner())
+            .map(|tile| tile.id as u64)
+            .product());
+    }
+
+    let composed_image_tile_width = (tiles.len() as f64).sqrt() as u8;
+    let composed_image_pixel_width = composed_image_tile_width * 8;
 
     let top_left_corner = *tiles
         .iter()
         .find(|tile| tile.edges[0].matching.is_none() && tile.edges[3].matching.is_none())
         .ok_or_else(|| "No top left corner found".to_string())?;
-
-    if input.is_part_one() {
-        return Ok(tiles
-            .iter()
-            .filter_map(|tile| {
-                if tile
-                    .edges
-                    .iter()
-                    .filter(|edge| edge.matching.is_none())
-                    .count()
-                    == 2
-                {
-                    Some(tile.id as u64)
-                } else {
-                    None
-                }
-            })
-            .product());
-    }
 
     let mut composed_image: HashMap<(u8, u8), Tile> = HashMap::new();
     composed_image.insert((0, 0), top_left_corner);
@@ -290,8 +271,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         continue;
                     }
                 };
-                if new_x >= composed_square_width
-                    || new_y >= composed_square_width
+                if new_x >= composed_image_tile_width
+                    || new_y >= composed_image_tile_width
                     || composed_image.contains_key(&(new_x, new_y))
                 {
                     continue;
@@ -301,7 +282,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                     new_x,
                     new_y,
                     &composed_image,
-                    composed_square_width,
+                    composed_image_tile_width,
                 );
 
                 composed_image.insert((new_x, new_y), transformed_tile);
@@ -311,19 +292,16 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
     }
 
-    let composed_image_width_pixels = composed_square_width * 8;
-
-    let is_black_at = |direction: u8, pixel_x: u8, monster_direction: u8| {
+    let is_hash_at = |direction: u8, pixel_x: u8, monster_direction: u8| {
         let (pixel_x, pixel_y) = match direction {
             1 => (monster_direction, pixel_x),
-            3 => (composed_image_width_pixels - 1 - monster_direction, pixel_x),
+            3 => (composed_image_pixel_width - 1 - monster_direction, pixel_x),
             0 => (pixel_x, monster_direction),
-            2 => (pixel_x, composed_image_width_pixels - 1 - monster_direction),
+            2 => (pixel_x, composed_image_pixel_width - 1 - monster_direction),
             _ => {
                 panic!("Invalid direction");
             }
         };
-        //println!("Checking {}, {}", pixel_x, pixel_y);
         let tile_x = pixel_x / 8;
         let tile_y = pixel_y / 8;
         let bit = pixel_x % 8;
@@ -346,23 +324,23 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     for &direction in &[0_u8, 1, 2, 3] {
         for &flip in &[1_i8, -1] {
             let mut monster_count = 0;
-            for x in 1..(composed_image_width_pixels - 1) {
-                for y in 0..(composed_image_width_pixels - monster_body_len + 1) {
-                    if is_black_at(direction, x, y)
-                        && is_black_at(direction, x, y + 5)
-                        && is_black_at(direction, x, y + 6)
-                        && is_black_at(direction, x, y + 11)
-                        && is_black_at(direction, x, y + 12)
-                        && is_black_at(direction, x, y + 17)
-                        && is_black_at(direction, x, y + 18)
-                        && is_black_at(direction, x, y + 19)
-                        && is_black_at(direction, (x as i8 - flip) as u8, y + 18)
-                        && is_black_at(direction, (x as i8 + flip) as u8, y + 1)
-                        && is_black_at(direction, (x as i8 + flip) as u8, y + 4)
-                        && is_black_at(direction, (x as i8 + flip) as u8, y + 7)
-                        && is_black_at(direction, (x as i8 + flip) as u8, y + 10)
-                        && is_black_at(direction, (x as i8 + flip) as u8, y + 13)
-                        && is_black_at(direction, (x as i8 + flip) as u8, y + 16)
+            for offset in 1..(composed_image_pixel_width - 1) {
+                for sideway in 0..(composed_image_pixel_width - monster_body_len + 1) {
+                    if is_hash_at(direction, offset, sideway)
+                        && is_hash_at(direction, offset, sideway + 5)
+                        && is_hash_at(direction, offset, sideway + 6)
+                        && is_hash_at(direction, offset, sideway + 11)
+                        && is_hash_at(direction, offset, sideway + 12)
+                        && is_hash_at(direction, offset, sideway + 17)
+                        && is_hash_at(direction, offset, sideway + 18)
+                        && is_hash_at(direction, offset, sideway + 19)
+                        && is_hash_at(direction, (offset as i8 - flip) as u8, sideway + 18)
+                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 1)
+                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 4)
+                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 7)
+                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 10)
+                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 13)
+                        && is_hash_at(direction, (offset as i8 + flip) as u8, sideway + 16)
                     {
                         monster_count += 1;
                     }
@@ -388,7 +366,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 }
 
 #[cfg(test)]
-fn edge(bitmask: EdgeBitmask) -> Edge {
+fn edge(bitmask: u16) -> Edge {
     Edge {
         bitmask,
         matching: None,
@@ -448,21 +426,6 @@ pub fn test_flip() {
     assert_eq!(
         horizontally_flipped.body,
         [0b0000_0101, 0b0000_1010, 0, 0, 0, 0, 0, 0]
-    );
-
-    let vertically_flipped = tile.flip_vertical();
-    assert_eq!(17, vertically_flipped.id);
-    assert_eq!(
-        vertically_flipped
-            .edges
-            .iter()
-            .map(|e| e.bitmask)
-            .collect::<Vec<_>>(),
-        [0b11, 0b01_0000_0000, 0b1, 0b00_1000_0000]
-    );
-    assert_eq!(
-        vertically_flipped.body,
-        [0, 0, 0, 0, 0, 0, 0b0101_0000, 0b1010_0000],
     );
 }
 
