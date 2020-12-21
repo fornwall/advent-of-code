@@ -62,10 +62,13 @@ impl Tile {
     }
 
     fn debug_edge(&self, edge_idx: u8) {
-        println!(
+        let edge = format!(
             "  id={}    {:0>10b}",
             self.id, self.edges[edge_idx as usize]
-        );
+        )
+        .replace('1', "#")
+        .replace('0', ".");
+        println!("{}", edge);
     }
 
     fn rotate_clockwise(&self) -> Self {
@@ -336,8 +339,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 );
                 println!("Searching for edge");
                 popped_tile.debug_edge(edge_idx as u8);
-                let tile_with_matching_edge =
-                    tile_with_matching_edge.transform_to_match(edge_idx, edge);
 
                 for &edge in tile_with_matching_edge.edges.iter() {
                     edge_to_tile_idx[edge as usize].retain(|&e| e != tile_with_matching_edge.id);
@@ -345,13 +346,14 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         .retain(|&e| e != tile_with_matching_edge.id);
                 }
                 //println!("edge to tile id: {:?}", edge_to_tile_idx);
-                composed_image.insert((new_x, new_y), tile_with_matching_edge);
+                composed_image.insert((new_x, new_y), *tile_with_matching_edge);
 
-                stack.push((new_x, new_y, tile_with_matching_edge));
+                stack.push((new_x, new_y, *tile_with_matching_edge));
             }
         }
     }
 
+    // FIXME: 2473 is not rotated correctly
     println!("Placed tiles: {}", composed_image.len());
     for y in 0..composed_image_width {
         for x in 0..composed_image_width {
@@ -370,8 +372,96 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             println!();
         }
     }
-    Ok(0)
+
+    let composed_image_width_pixels = composed_image_width * 8;
+
+    let is_black_at = |direction: u8, pixel_x: u8, monster_direction: u8| {
+        let (pixel_x, pixel_y) = match direction {
+            1 => (monster_direction, pixel_x),
+            3 => (composed_image_width_pixels - 1 - monster_direction, pixel_x),
+            0 => (pixel_x, monster_direction),
+            2 => (pixel_x, composed_image_width_pixels - 1 - monster_direction),
+            _ => {
+                panic!("Invalid direction");
+            }
+        };
+        //println!("Checking {}, {}", pixel_x, pixel_y);
+        let tile_x = pixel_x / 8;
+        let tile_y = pixel_y / 8;
+        let bit = pixel_x % 8;
+        let row = pixel_y % 8;
+        composed_image
+            .get(&(tile_x as u8, tile_y as u8))
+            .unwrap()
+            .body[row as usize]
+            & (1 << (7 - bit))
+            != 0
+    };
+
+    println!();
+    println!("###### Renddering anew");
+    for y in 0..composed_image_width_pixels {
+        for x in 0..composed_image_width_pixels {
+            print!("{}", if is_black_at(1, y, x) { '#' } else { '.' });
+        }
+        println!();
+    }
+
+    // Search for the main body "#    ##    ##    ###",
+    // of length 20, in the sea monster pattern:
+    // "                  # "
+    // "#    ##    ##    ###"
+    // " #  #  #  #  #  #   "
+    let monster_body_len = 20;
+    for &direction in &[0_u8, 1, 2, 3] {
+        for &flip in &[1_i8, -1] {
+            let mut monster_count = 0;
+            // TODO: Check boundary condition..
+            for x in 1..(composed_image_width_pixels - 1) {
+                for y in 0..(composed_image_width_pixels - monster_body_len + 1) {
+                    if is_black_at(direction, x, y)
+                        && is_black_at(direction, x, y + 5)
+                        && is_black_at(direction, x, y + 6)
+                        && is_black_at(direction, x, y + 11)
+                        && is_black_at(direction, x, y + 12)
+                        && is_black_at(direction, x, y + 17)
+                        && is_black_at(direction, x, y + 18)
+                        && is_black_at(direction, x, y + 19)
+                        && is_black_at(direction, (x as i8 - flip * 1) as u8, y + 18)
+                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 1)
+                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 4)
+                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 7)
+                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 10)
+                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 13)
+                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 16)
+                    {
+                        monster_count += 1;
+                        println!(
+                            "############ Found sea monster. x={}, y={}, direction={}",
+                            x, y, direction
+                        );
+                    }
+                }
+            }
+
+            if monster_count != 0 {
+                return Ok(tiles
+                    .iter()
+                    .map(|t| {
+                        t.body
+                            .iter()
+                            .map(|row| row.count_ones() as u64)
+                            .sum::<u64>()
+                    })
+                    .sum::<u64>()
+                    - monster_count * 15);
+            }
+        }
+    }
+
+    Err("No sea monster found".to_string())
 }
+
 fn try_find(
     x: u8,
     y: u8,
