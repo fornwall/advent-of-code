@@ -4,7 +4,7 @@ use std::collections::HashMap;
 type EdgeBitmask = u16;
 type TileId = u16;
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Debug)]
 struct Edge {
     bitmask: EdgeBitmask,
     matching: Option<TileId>,
@@ -19,7 +19,7 @@ impl Edge {
     }
 }
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Debug)]
 struct Tile {
     id: TileId,
     /// Indexed by 0,1,3,4 = Top,Right,Bottom,Left.
@@ -351,6 +351,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 
     // Search for the main body "#    ##    ##    ###",
     // of length 20, in the sea monster pattern:
+    //
     // "                  # "
     // "#    ##    ##    ###"
     // " #  #  #  #  #  #   "
@@ -416,7 +417,14 @@ pub fn test_rotate() {
 
     let rotated_tile = tile.rotate_clockwise();
     assert_eq!(rotated_tile.id, tile.id);
-    assert_eq!(rotated_tile.edges, [edge(4), edge(1), edge(2), edge(3)]);
+    assert_eq!(
+        rotated_tile
+            .edges
+            .iter()
+            .map(|e| e.bitmask)
+            .collect::<Vec<_>>(),
+        [4, 1, 2, 3]
+    );
     // #.#.....
     // .#.#....
     // [6 empty rows]
@@ -442,13 +450,12 @@ pub fn test_flip() {
     let horizontally_flipped = tile.flip_horizontal();
     assert_eq!(17, horizontally_flipped.id);
     assert_eq!(
-        horizontally_flipped.edges,
-        [
-            edge(0b10_0000_0000),
-            edge(0b100),
-            edge(0b11_0000_0000),
-            edge(0b10)
-        ]
+        horizontally_flipped
+            .edges
+            .iter()
+            .map(|e| e.bitmask)
+            .collect::<Vec<_>>(),
+        [0b10_0000_0000, 0b100, 0b11_0000_0000, 0b10]
     );
     assert_eq!(
         horizontally_flipped.body,
@@ -458,13 +465,12 @@ pub fn test_flip() {
     let vertically_flipped = tile.flip_vertical();
     assert_eq!(17, vertically_flipped.id);
     assert_eq!(
-        vertically_flipped.edges,
-        [
-            edge(0b11),
-            edge(0b01_0000_0000),
-            edge(0b1),
-            edge(0b00_1000_0000)
-        ]
+        vertically_flipped
+            .edges
+            .iter()
+            .map(|e| e.bitmask)
+            .collect::<Vec<_>>(),
+        [0b11, 0b01_0000_0000, 0b1, 0b00_1000_0000]
     );
     assert_eq!(
         vertically_flipped.body,
