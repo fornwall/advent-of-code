@@ -45,9 +45,10 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                     allergen_to_possible_ingredients.push(current_ingredients.clone());
                 } else {
                     let existing = &allergen_to_possible_ingredients[allergen_id];
-                    let mut new_ingredients = current_ingredients.clone();
-                    new_ingredients.retain(|i| existing.contains(i));
-                    allergen_to_possible_ingredients[allergen_id] = new_ingredients;
+                    allergen_to_possible_ingredients[allergen_id] = current_ingredients
+                        .intersection(existing)
+                        .copied()
+                        .collect();
                 }
             }
         } else {
@@ -115,6 +116,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             },
         )
         .collect::<Result<Vec<_>, _>>()?;
+
     ingredient_and_allergents.sort_unstable_by(|a, b| {
         let a_allergen_name = allergen_names[a.1];
         let b_allergen_name = allergen_names[b.1];

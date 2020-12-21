@@ -5,16 +5,122 @@ type EdgeBitmask = u16;
 type TileId = u16;
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Debug)]
+struct Edge {
+    bitmask: EdgeBitmask,
+    matching: Option<TileId>,
+}
+
+impl Edge {
+    fn flipped(self) -> Self {
+        Self {
+            bitmask: flip_edge(self.bitmask),
+            matching: self.matching,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Hash, Eq, PartialEq, Debug)]
 struct Tile {
     id: TileId,
     /// Indexed by 0,1,3,4 = Top,Right,Bottom,Left.
-    edges: [EdgeBitmask; 4],
+    edges: [Edge; 4],
     /// Indexed by row. Lowest bit to the right.
     /// Example: "#..#...." is stored as 0b10010000.
     body: [u8; 8],
 }
 
 impl Tile {
+    fn parse(input: &str) -> Result<Vec<Self>, String> {
+        let mut tiles = Vec::new();
+        for tile_str in input.split("\n\n") {
+            let mut tile_id = 0;
+            let mut this_edges = [Edge {
+                bitmask: 0,
+                matching: None,
+            }; 4]; // Top, Right, Bottom, Left
+            let mut body = [0_u8; 8];
+
+            for (line_idx, line) in tile_str.lines().enumerate() {
+                if line_idx == 0 {
+                    if !(line.len() == 10 && line.starts_with("Tile ") && line.ends_with(':')) {
+                        return Err("Invalid tile header".to_string());
+                    }
+                    tile_id = line[5..9]
+                        .parse::<u16>()
+                        .map_err(|_| "Invalid tile header - cannot parse tile id")?;
+                } else {
+                    let bytes = line.as_bytes();
+                    if !(bytes.len() == 10 && bytes.iter().all(|c| matches!(c, b'#' | b'.'))) {
+                        return Err(
+                            "Invalid tile line (not 10 in length and only '.' and '#'".to_string()
+                        );
+                    }
+
+                    if line_idx > 1 && line_idx < 10 {
+                        for i in 0..8 {
+                            if bytes[i + 1] == b'#' {
+                                body[line_idx - 2] |= 1 << (7 - i);
+                            }
+                        }
+                    }
+
+                    if line_idx == 1 {
+                        // Top edge:
+                        for i in 0..10 {
+                            if bytes[i] == b'#' {
+                                this_edges[0].bitmask |= 1 << (9 - i);
+                            }
+                        }
+                    } else if line_idx == 10 {
+                        // Bottom edge:
+                        for i in 0..10 {
+                            if bytes[i] == b'#' {
+                                this_edges[2].bitmask |= 1 << (9 - i);
+                            }
+                        }
+                    }
+
+                    if bytes[0] == b'#' {
+                        // Left edge:
+                        this_edges[3].bitmask |= 1 << (10 - line_idx);
+                    }
+
+                    if bytes[9] == b'#' {
+                        // Right edge.
+                        this_edges[1].bitmask |= 1 << (10 - line_idx);
+                    }
+                }
+            }
+            tiles.push(Tile {
+                id: tile_id,
+                edges: this_edges,
+                body,
+            });
+        }
+
+        // Mapped from edge bitmask to list of tile_id:s.
+        let mut edge_to_tile_idx = vec![Vec::new(); 1024];
+        for tile in tiles.iter() {
+            for &edge in tile.edges.iter() {
+                edge_to_tile_idx[edge.bitmask as usize].push(tile.id);
+                edge_to_tile_idx[flip_edge(edge.bitmask) as usize].push(tile.id);
+            }
+        }
+        for tile in tiles.iter_mut() {
+            let tile_id = tile.id;
+            for (edge_idx, edge) in tile.edges.iter_mut().enumerate() {
+                if let Some(&other_tile_id) = edge_to_tile_idx[edge.bitmask as usize]
+                    .iter()
+                    .find(|&&other_tile_id| other_tile_id != tile_id)
+                {
+                    edge.matching = Some(other_tile_id);
+                }
+            }
+        }
+
+        Ok(tiles)
+    }
+
     fn transform_to_match(&self, x: u8, y: u8, composed_image: &HashMap<(u8, u8), Self>) -> Self {
         let mut desired_edges = [None; 4];
         for i in 0_usize..4 {
@@ -50,7 +156,8 @@ impl Tile {
                         _ => {
                             panic!("Invalid edge");
                         }
-                    }],
+                    }]
+                    .bitmask,
                 );
             }
         }
@@ -62,7 +169,7 @@ impl Tile {
                 for i in 0_usize..4 {
                     if let Some(e) = desired_edges[i] {
                         print!("Checking edge {}... ", i);
-                        if e == current.edges[i] {
+                        if e == current.edges[i].bitmask {
                             println!("YES");
                         } else {
                             println!("NO");
@@ -100,7 +207,7 @@ impl Tile {
     }
 
     fn debug_edge(&self, edge_idx: u8) {
-        let edge = format!("  {:0>10b}", self.edges[edge_idx as usize])
+        let edge = format!("  {:0>10b}", self.edges[edge_idx as usize].bitmask)
             .replace('1', "#")
             .replace('0', ".");
         println!("  id={}, {}", self.id, edge);
@@ -138,9 +245,9 @@ impl Tile {
             id: self.id,
             edges: [
                 self.edges[2],
-                flip_edge(self.edges[1]),
+                self.edges[1].flipped(),
                 self.edges[0],
-                flip_edge(self.edges[3]),
+                self.edges[3].flipped(),
             ],
             body: flipped_body,
         }
@@ -154,9 +261,9 @@ impl Tile {
         Self {
             id: self.id,
             edges: [
-                flip_edge(self.edges[0]),
+                self.edges[0].flipped(),
                 self.edges[3],
-                flip_edge(self.edges[2]),
+                self.edges[2].flipped(),
                 self.edges[1],
             ],
             body: flipped_body,
@@ -169,142 +276,53 @@ const fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
     number.reverse_bits() >> 6
 }
 
+/// Key properties from the problem description:
+///
+/// - Each tile is a 8x8 grid.
+/// - Each tile edge is 10 bits (so max 1024 distinct values).
+/// - The composed image is square.
+/// - The outermost edges tile edges won't line up with any other tiles.
 pub fn solve(input: &mut Input) -> Result<u64, String> {
-    let mut tiles: Vec<Tile> = Vec::new();
-    // Mapped from edge bitmask to list of (tile_id, edge_direction) pairs,
-    // where edge_direction is 0,1,3,4 = Top,Right,Bottom,Left.
-    let mut edge_to_tile_idx = vec![Vec::new(); 1024];
-
-    for tile_str in input.text.split("\n\n") {
-        let mut tile_id = 0;
-        let mut this_edges = [0 as EdgeBitmask; 4]; // Top, Right, Bottom, Left
-        let mut body = [0_u8; 8];
-        for (line_idx, line) in tile_str.lines().enumerate() {
-            if line_idx == 0 {
-                if !(line.len() == 10 && line.starts_with("Tile ") && line.ends_with(':')) {
-                    return Err("Invalid tile header".to_string());
-                }
-                tile_id = line[5..9]
-                    .parse::<u16>()
-                    .map_err(|_| "Invalid tile header - cannot parse tile id")?;
-            } else {
-                let bytes = line.as_bytes();
-                if !(bytes.len() == 10 && bytes.iter().all(|c| matches!(c, b'#' | b'.'))) {
-                    return Err(
-                        "Invalid tile line (not 10 in length and only '.' and '#'".to_string()
-                    );
-                }
-
-                if line_idx > 1 && line_idx < 10 {
-                    for i in 0..8 {
-                        if bytes[i + 1] == b'#' {
-                            body[line_idx - 2] |= 1 << (7 - i);
-                        }
-                    }
-                }
-
-                if line_idx == 1 {
-                    // Top edge:
-                    for i in 0..10 {
-                        if bytes[i] == b'#' {
-                            this_edges[0] |= 1 << (9 - i);
-                        }
-                    }
-                } else if line_idx == 10 {
-                    // Bottom edge:
-                    for i in 0..10 {
-                        if bytes[i] == b'#' {
-                            this_edges[2] |= 1 << (9 - i);
-                        }
-                    }
-                }
-                if bytes[9] == b'#' {
-                    // Right edge.
-                    this_edges[1] |= 1 << (10 - line_idx);
-                }
-                if bytes[0] == b'#' {
-                    // Left edge:
-                    this_edges[3] |= 1 << (10 - line_idx);
-                }
-            }
-        }
-
-        /*
-        println!("### Tile {}", tile_id);
-        println!("  Top:    {:0>10b}", this_edges[0]);
-        println!("  Right:  {:0>10b}", this_edges[1]);
-        println!("  Bottom: {:0>10b}", this_edges[2]);
-        println!("  Left:   {:0>10b}", this_edges[3]);
-        for i in 0..8 {
-            println!("  Body[{}]:   {:0>8b}", i, body[i]);
-        }
-        println!();
-         */
-
-        edge_to_tile_idx[this_edges[0] as usize].push(tile_id);
-        edge_to_tile_idx[this_edges[1] as usize].push(tile_id);
-        edge_to_tile_idx[this_edges[2] as usize].push(tile_id);
-        edge_to_tile_idx[this_edges[3] as usize].push(tile_id);
-        edge_to_tile_idx[flip_edge(this_edges[0]) as usize].push(tile_id);
-        edge_to_tile_idx[flip_edge(this_edges[1]) as usize].push(tile_id);
-        edge_to_tile_idx[flip_edge(this_edges[2]) as usize].push(tile_id);
-        edge_to_tile_idx[flip_edge(this_edges[3]) as usize].push(tile_id);
-
-        tiles.push(Tile {
-            id: tile_id,
-            edges: this_edges,
-            body,
-            //matching_edges_bitmask: 0,
-        });
-    }
-
-    // The composed image is square:
-    let composed_image_width = (tiles.len() as f64).sqrt() as u8;
-
+    let mut tiles = Tile::parse(input.text)?;
     let mut top_left_corner = None;
-    let mut corners = Vec::new();
 
-    for &this_tile in tiles.iter() {
+    let composed_square_width = (tiles.len() as f64).sqrt() as u8;
+    for &mut tile in tiles.iter_mut() {
         let mut matching_edges_bitmask = 0_u64;
-        //for other_tile in tiles.iter() {
-        //if this_tile.id != other_tile.id {
-        for (this_edge_idx, &this_edge) in this_tile.edges.iter().enumerate() {
-            let edge_match = &edge_to_tile_idx[this_edge as usize];
-            //let flipped_edge_match = &edge_to_tile_idx[flip_edge(this_edge) as usize];
-            let normal_match =
-                edge_match.len() > 1 || (edge_match.len() == 1 && edge_match[0] != this_tile.id);
-            //let flipped_match = flipped_edge_match.len() > 1
-            //|| (flipped_edge_match.len() == 1 && flipped_edge_match[0] != this_tile.id);
-            if normal_match {
-                //|| flipped_match {
-                //for &other_edge in other_tile.edges.iter() {
-                //if this_edge == other_edge || this_edge == flip_edge(other_edge) {
-                matching_edges_bitmask |= 1 << this_edge_idx;
+        for (edge_idx, &edge) in tile.edges.iter().enumerate() {
+            if edge.matching.is_some() {
+                matching_edges_bitmask |= 1 << edge_idx;
             }
-            //}
         }
-        //}
-        //}
-        if matching_edges_bitmask.count_ones() == 2 {
-            corners.push(this_tile);
-            if matching_edges_bitmask == 0b0110 {
-                top_left_corner = Some(this_tile);
-            }
+
+        if matching_edges_bitmask == 0b0110 {
+            top_left_corner = Some(tile);
         }
     }
 
     if input.is_part_one() {
-        return Ok(corners.iter().map(|tile| u64::from(tile.id)).product());
+        return Ok(tiles
+            .iter()
+            .filter_map(|tile| {
+                if tile
+                    .edges
+                    .iter()
+                    .filter(|edge| edge.matching.is_none())
+                    .count()
+                    == 2
+                {
+                    Some(tile.id as u64)
+                } else {
+                    None
+                }
+            })
+            .product());
     }
 
     // From (x,y) to tile at position.
     let mut composed_image: HashMap<(u8, u8), Tile> = HashMap::new();
 
     let top_left_corner = top_left_corner.unwrap();
-    for &edge in top_left_corner.edges.iter() {
-        edge_to_tile_idx[edge as usize].retain(|&e| e != top_left_corner.id);
-        edge_to_tile_idx[flip_edge(edge) as usize].retain(|&e| e != top_left_corner.id);
-    }
     composed_image.insert((0, 0), top_left_corner);
 
     println!("Initial top left corner (id={}):", top_left_corner.id);
@@ -313,12 +331,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut stack = Vec::new();
     stack.push((0, 0, top_left_corner));
     while let Some((x, y, popped_tile)) = stack.pop() {
-        // Remove popped tile from edge_to_tile_idx
         for (edge_idx, &edge) in popped_tile.edges.iter().enumerate() {
-            let matched_tile = &edge_to_tile_idx[edge as usize];
-            if matched_tile.len() == 1 {
-                let tile_with_matching_edge =
-                    tiles.iter().find(|t| t.id == matched_tile[0]).unwrap();
+            if let Some(matched_tile) = edge.matching {
+                let tile_with_matching_edge = tiles.iter().find(|t| t.id == matched_tile).unwrap();
                 let (new_x, new_y) = match edge_idx {
                     0 if y > 0 => (x, y - 1),
                     1 => (x + 1, y),
@@ -328,8 +343,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         continue;
                     }
                 };
-                if new_x >= composed_image_width
-                    || new_y >= composed_image_width
+                if new_x >= composed_square_width
+                    || new_y >= composed_square_width
                     || composed_image.contains_key(&(new_x, new_y))
                 {
                     continue;
@@ -351,12 +366,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         .debug_edge(1);
                 }
 
-                for &edge in transformed_tile.edges.iter() {
-                    edge_to_tile_idx[edge as usize].retain(|&e| e != transformed_tile.id);
-                    edge_to_tile_idx[flip_edge(edge) as usize]
-                        .retain(|&e| e != transformed_tile.id);
-                }
-                //println!("edge to tile id: {:?}", edge_to_tile_idx);
                 composed_image.insert((new_x, new_y), transformed_tile);
 
                 stack.push((new_x, new_y, transformed_tile));
@@ -366,17 +375,17 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 
     // FIXME: 2473 is not rotated correctly
     println!("Placed tiles: {}", composed_image.len());
-    for y in 0..composed_image_width {
-        for x in 0..composed_image_width {
+    for y in 0..composed_square_width {
+        for x in 0..composed_square_width {
             let tile = composed_image.get(&(x, y)).unwrap();
             print!("{} ", tile.id);
         }
         println!();
     }
 
-    for y in 0..composed_image_width {
+    for y in 0..composed_square_width {
         for row in 0..8 {
-            for x in 0..composed_image_width {
+            for x in 0..composed_square_width {
                 let tile = composed_image.get(&(x, y)).unwrap();
                 print!("{}", tile.debug_row(row));
             }
@@ -384,7 +393,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
     }
 
-    let composed_image_width_pixels = composed_image_width * 8;
+    let composed_image_width_pixels = composed_square_width * 8;
 
     let is_black_at = |direction: u8, pixel_x: u8, monster_direction: u8| {
         let (pixel_x, pixel_y) = match direction {
@@ -473,17 +482,24 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     Err("No sea monster found".to_string())
 }
 
+fn edge(bitmask: EdgeBitmask) -> Edge {
+    Edge {
+        bitmask,
+        matching: None,
+    }
+}
+
 #[test]
 pub fn test_rotate() {
     let tile = Tile {
         id: 0,
-        edges: [1, 2, 3, 4],
+        edges: [edge(1), edge(2), edge(3), edge(4)],
         body: [0b1010_0000, 0b0101_0000, 0, 0, 0, 0, 0, 0],
     };
 
     let rotated_tile = tile.rotate_clockwise();
     assert_eq!(rotated_tile.id, tile.id);
-    assert_eq!(rotated_tile.edges, [4, 1, 2, 3]);
+    assert_eq!(rotated_tile.edges, [edge(4), edge(1), edge(2), edge(3)]);
     // #.#.....
     // .#.#....
     // [6 empty rows]
@@ -502,7 +518,7 @@ pub fn test_rotate() {
 pub fn test_flip() {
     let tile = Tile {
         id: 17,
-        edges: [0b1, 0b10, 0b11, 0b100],
+        edges: [edge(0b1), edge(0b10), edge(0b11), edge(0b100)],
         body: [0b1010_0000, 0b0101_0000, 0, 0, 0, 0, 0, 0],
     };
 
@@ -510,7 +526,12 @@ pub fn test_flip() {
     assert_eq!(17, horizontally_flipped.id);
     assert_eq!(
         horizontally_flipped.edges,
-        [0b10_0000_0000, 0b100, 0b11_0000_0000, 0b10]
+        [
+            edge(0b10_0000_0000),
+            edge(0b100),
+            edge(0b11_0000_0000),
+            edge(0b10)
+        ]
     );
     assert_eq!(
         horizontally_flipped.body,
@@ -521,7 +542,12 @@ pub fn test_flip() {
     assert_eq!(17, vertically_flipped.id);
     assert_eq!(
         vertically_flipped.edges,
-        [0b11, 0b01_0000_0000, 0b1, 0b00_1000_0000]
+        [
+            edge(0b11),
+            edge(0b01_0000_0000),
+            edge(0b1),
+            edge(0b00_1000_0000)
+        ]
     );
     assert_eq!(
         vertically_flipped.body,
