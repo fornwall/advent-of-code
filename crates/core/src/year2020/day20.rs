@@ -15,7 +15,7 @@ struct Tile {
 }
 
 impl Tile {
-    fn transform_to_match(&self, x: u8, y: u8, composed_image: &HashMap<(u8, u8), Tile>) -> Self {
+    fn transform_to_match(&self, x: u8, y: u8, composed_image: &HashMap<(u8, u8), Self>) -> Self {
         let mut desired_edges = [None; 4];
         for i in 0_usize..4 {
             let (x, y) = match i {
@@ -131,14 +131,6 @@ impl Tile {
         }
     }
 
-    fn rotate_clockwise_multiple(&self, steps: u8) -> Self {
-        let mut result = *self;
-        for _ in 0..steps {
-            result = result.rotate_clockwise();
-        }
-        result
-    }
-
     fn flip_vertical(&self) -> Self {
         let mut flipped_body = self.body;
         flipped_body.reverse();
@@ -172,7 +164,7 @@ impl Tile {
     }
 }
 
-fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
+const fn flip_edge(number: EdgeBitmask) -> EdgeBitmask {
     // Only the first 10 bits of the edge bitmask is used.
     number.reverse_bits() >> 6
 }
@@ -302,7 +294,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     }
 
     if input.is_part_one() {
-        return Ok(corners.iter().map(|tile| tile.id as u64).product());
+        return Ok(corners.iter().map(|tile| u64::from(tile.id)).product());
     }
 
     // From (x,y) to tile at position.
@@ -323,12 +315,10 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     while let Some((x, y, popped_tile)) = stack.pop() {
         // Remove popped tile from edge_to_tile_idx
         for (edge_idx, &edge) in popped_tile.edges.iter().enumerate() {
-            let tiles_with_matching_edge = &edge_to_tile_idx[edge as usize];
-            if tiles_with_matching_edge.len() == 1 {
-                let tile_with_matching_edge = tiles
-                    .iter()
-                    .find(|t| t.id == tiles_with_matching_edge[0])
-                    .unwrap();
+            let matched_tile = &edge_to_tile_idx[edge as usize];
+            if matched_tile.len() == 1 {
+                let tile_with_matching_edge =
+                    tiles.iter().find(|t| t.id == matched_tile[0]).unwrap();
                 let (new_x, new_y) = match edge_idx {
                     0 if y > 0 => (x, y - 1),
                     1 => (x + 1, y),
@@ -338,9 +328,10 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         continue;
                     }
                 };
-                if new_x >= composed_image_width || new_y >= composed_image_width {
-                    continue;
-                } else if composed_image.contains_key(&(new_x, new_y)) {
+                if new_x >= composed_image_width
+                    || new_y >= composed_image_width
+                    || composed_image.contains_key(&(new_x, new_y))
+                {
                     continue;
                 }
                 println!(
@@ -348,11 +339,11 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                     tile_with_matching_edge.id, new_x, new_y
                 );
 
-                let tile_with_matching_edge =
+                let transformed_tile =
                     tile_with_matching_edge.transform_to_match(new_x, new_y, &composed_image);
                 if new_x == 2 {
                     println!("Left edge of newly found");
-                    tile_with_matching_edge.debug_edge(3);
+                    transformed_tile.debug_edge(3);
                     println!("Does it really match?");
                     composed_image
                         .get(&(new_x - 1, new_y))
@@ -360,15 +351,15 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         .debug_edge(1);
                 }
 
-                for &edge in tile_with_matching_edge.edges.iter() {
-                    edge_to_tile_idx[edge as usize].retain(|&e| e != tile_with_matching_edge.id);
+                for &edge in transformed_tile.edges.iter() {
+                    edge_to_tile_idx[edge as usize].retain(|&e| e != transformed_tile.id);
                     edge_to_tile_idx[flip_edge(edge) as usize]
-                        .retain(|&e| e != tile_with_matching_edge.id);
+                        .retain(|&e| e != transformed_tile.id);
                 }
                 //println!("edge to tile id: {:?}", edge_to_tile_idx);
-                composed_image.insert((new_x, new_y), tile_with_matching_edge);
+                composed_image.insert((new_x, new_y), transformed_tile);
 
-                stack.push((new_x, new_y, tile_with_matching_edge));
+                stack.push((new_x, new_y, transformed_tile));
             }
         }
     }
@@ -447,13 +438,13 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         && is_black_at(direction, x, y + 17)
                         && is_black_at(direction, x, y + 18)
                         && is_black_at(direction, x, y + 19)
-                        && is_black_at(direction, (x as i8 - flip * 1) as u8, y + 18)
-                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 1)
-                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 4)
-                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 7)
-                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 10)
-                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 13)
-                        && is_black_at(direction, (x as i8 + flip * 1) as u8, y + 16)
+                        && is_black_at(direction, (x as i8 - flip) as u8, y + 18)
+                        && is_black_at(direction, (x as i8 + flip) as u8, y + 1)
+                        && is_black_at(direction, (x as i8 + flip) as u8, y + 4)
+                        && is_black_at(direction, (x as i8 + flip) as u8, y + 7)
+                        && is_black_at(direction, (x as i8 + flip) as u8, y + 10)
+                        && is_black_at(direction, (x as i8 + flip) as u8, y + 13)
+                        && is_black_at(direction, (x as i8 + flip) as u8, y + 16)
                     {
                         monster_count += 1;
                         println!(
@@ -470,7 +461,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                     .map(|t| {
                         t.body
                             .iter()
-                            .map(|row| row.count_ones() as u64)
+                            .map(|row| u64::from(row.count_ones()))
                             .sum::<u64>()
                     })
                     .sum::<u64>()
@@ -505,14 +496,6 @@ pub fn test_rotate() {
     // ......#.
     // [4 empty rows]
     assert_eq!(rotated_tile.body, [0b1, 0b10, 0b1, 0b10, 0, 0, 0, 0]);
-
-    assert_eq!(
-        rotated_tile.rotate_clockwise(),
-        tile.rotate_clockwise_multiple(2)
-    );
-
-    assert_eq!(tile, tile.rotate_clockwise_multiple(0));
-    assert_eq!(tile, tile.rotate_clockwise_multiple(4));
 }
 
 #[test]

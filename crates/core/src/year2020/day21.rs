@@ -57,14 +57,14 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     if input.is_part_one() {
         return Ok((0..ingredient_to_idx.len())
-            .map(|ingredient_id| {
+            .filter_map(|ingredient_id| {
                 if allergen_to_possible_ingredients
                     .iter()
                     .any(|possible| possible.contains(&ingredient_id))
                 {
-                    0
+                    None
                 } else {
-                    ingredient_occurences[ingredient_id]
+                    Some(ingredient_occurences[ingredient_id])
                 }
             })
             .sum::<u64>()
@@ -73,14 +73,17 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     let mut identified_products = allergen_to_possible_ingredients
         .iter()
-        .filter_map(|possibilities| {
-            if possibilities.len() == 1 {
-                Some(*possibilities.iter().next().unwrap())
+        .map(|possibilities| -> Result<usize, String> {
+            Ok(if possibilities.len() == 1 {
+                *possibilities
+                    .iter()
+                    .next()
+                    .ok_or_else(|| "Internal error".to_string())?
             } else {
-                None
-            }
+                0
+            })
         })
-        .collect::<Vec<usize>>();
+        .collect::<Result<Vec<usize>, _>>()?;
 
     while let Some(product_id) = identified_products.pop() {
         for possibilities in allergen_to_possible_ingredients.iter_mut() {
@@ -88,7 +91,10 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                 && possibilities.remove(&product_id)
                 && possibilities.len() == 1
             {
-                let p = possibilities.iter().next().unwrap();
+                let p = possibilities
+                    .iter()
+                    .next()
+                    .ok_or_else(|| "Internal error".to_string())?;
                 identified_products.push(*p);
             }
         }
@@ -97,8 +103,18 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut ingredient_and_allergents = allergen_to_possible_ingredients
         .iter()
         .enumerate()
-        .map(|(idx, possible_ingredients)| (possible_ingredients.iter().next().unwrap(), idx))
-        .collect::<Vec<_>>();
+        .map(
+            |(idx, possible_ingredients)| -> Result<(usize, usize), String> {
+                Ok((
+                    *possible_ingredients
+                        .iter()
+                        .next()
+                        .ok_or_else(|| "Internal error".to_string())?,
+                    idx,
+                ))
+            },
+        )
+        .collect::<Result<Vec<_>, _>>()?;
     ingredient_and_allergents.sort_unstable_by(|a, b| {
         let a_allergen_name = allergen_names[a.1];
         let b_allergen_name = allergen_names[b.1];
@@ -107,7 +123,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     Ok(ingredient_and_allergents
         .iter()
-        .map(|(&ingredient_id, _)| ingredient_names[ingredient_id])
+        .map(|&(ingredient_id, _)| ingredient_names[ingredient_id])
         .collect::<Vec<_>>()
         .join(","))
 }
