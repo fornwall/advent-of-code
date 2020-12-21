@@ -10,7 +10,7 @@ struct Edge {
 }
 
 impl Edge {
-    fn flipped(self) -> Self {
+    const fn flipped(self) -> Self {
         Self {
             // Only the first 10 bits of the edge bitmask is used:
             bitmask: self.bitmask.reverse_bits() >> 6,
@@ -68,15 +68,15 @@ impl Tile {
 
                     if line_idx == 1 {
                         // Top edge:
-                        for i in 0..10 {
-                            if bytes[i] == b'#' {
+                        for (i, &b) in bytes.iter().enumerate().take(10) {
+                            if b == b'#' {
                                 this_edges[0].bitmask |= 1 << (9 - i);
                             }
                         }
                     } else if line_idx == 10 {
                         // Bottom edge:
-                        for i in 0..10 {
-                            if bytes[i] == b'#' {
+                        for (i, &b) in bytes.iter().enumerate().take(10) {
+                            if b == b'#' {
                                 this_edges[2].bitmask |= 1 << (9 - i);
                             }
                         }
@@ -93,7 +93,7 @@ impl Tile {
                     }
                 }
             }
-            tiles.push(Tile {
+            tiles.push(Self {
                 id: tile_id,
                 edges: this_edges,
                 body,
@@ -238,29 +238,53 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     if input.is_part_one() {
         return Ok(tiles
             .iter()
-            .filter(|tile| tile.is_corner())
-            .map(|tile| tile.id as u64)
+            .filter_map(|tile| {
+                if tile.is_corner() {
+                    Some(u64::from(tile.id))
+                } else {
+                    None
+                }
+            })
             .product());
     }
 
     let composed_image_tile_width = (tiles.len() as f64).sqrt() as u8;
     let composed_image_pixel_width = composed_image_tile_width * 8;
 
-    let top_left_corner = *tiles
+    let a_corner = *tiles
         .iter()
-        .find(|tile| tile.edges[0].matching.is_none() && tile.edges[3].matching.is_none())
-        .ok_or_else(|| "No top left corner found".to_string())?;
+        .find(|tile| tile.is_corner())
+        .ok_or_else(|| "No corner found".to_string())?;
+    let starting_coordinates = match (
+        a_corner.edges[0].matching.is_none(),
+        a_corner.edges[1].matching.is_none(),
+        a_corner.edges[2].matching.is_none(),
+        a_corner.edges[3].matching.is_none(),
+    ) {
+        (true, false, false, true) => (0, 0),
+        (true, true, false, false) => (composed_image_tile_width - 1, 0),
+        (false, false, true, true) => (0, composed_image_tile_width - 1),
+        (false, true, true, false) => {
+            (composed_image_tile_width - 1, composed_image_tile_width - 1)
+        }
+        _ => {
+            return Err("Invalid input - tile with two matches is no".to_string());
+        }
+    };
 
     let mut composed_image: HashMap<(u8, u8), Tile> = HashMap::new();
-    composed_image.insert((0, 0), top_left_corner);
+    composed_image.insert(starting_coordinates, a_corner);
 
     let mut stack = Vec::new();
-    stack.push((0, 0, top_left_corner));
+    stack.push((starting_coordinates.0, starting_coordinates.1, a_corner));
 
     while let Some((x, y, popped_tile)) = stack.pop() {
         for (edge_idx, &edge) in popped_tile.edges.iter().enumerate() {
             if let Some(matched_tile) = edge.matching {
-                let tile_with_matching_edge = tiles.iter().find(|t| t.id == matched_tile).unwrap();
+                let tile_with_matching_edge = tiles
+                    .iter()
+                    .find(|t| t.id == matched_tile)
+                    .ok_or_else(|| "Internal error".to_string())?;
 
                 let (new_x, new_y) = match edge_idx {
                     0 if y > 0 => (x, y - 1),
@@ -366,7 +390,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 }
 
 #[cfg(test)]
-fn edge(bitmask: u16) -> Edge {
+const fn edge(bitmask: u16) -> Edge {
     Edge {
         bitmask,
         matching: None,
