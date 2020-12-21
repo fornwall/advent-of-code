@@ -15,24 +15,62 @@ struct Tile {
 }
 
 impl Tile {
-    fn transform_to_match(&self, coming_from_edge_idx: usize, edge_bitmask: EdgeBitmask) -> Self {
-        let matching_edge_idx = match coming_from_edge_idx {
-            0 => 2,
-            2 => 0,
-            1 => 3,
-            3 => 1,
-            _ => {
-                panic!(
-                    "transform_to_match: Invalid coming_from_edge_idx {}",
-                    coming_from_edge_idx
+    fn transform_to_match(&self, x: u8, y: u8, composed_image: &HashMap<(u8, u8), Tile>) -> Self {
+        let mut desired_edges = [None; 4];
+        for i in 0_usize..4 {
+            let (x, y) = match i {
+                0 if y > 0 => (x, y - 1),
+                1 => (x + 1, y),
+                2 => (x, y + 1),
+                3 if x > 0 => (x - 1, y),
+                _ => {
+                    continue;
+                }
+            };
+            if let Some(tile) = composed_image.get(&(x, y)) {
+                println!(
+                    "Found edge to match (at {},{}), direction {} - that should be",
+                    x, y, i
+                );
+                tile.debug_edge(match i {
+                    0 => 2,
+                    1 => 3,
+                    2 => 0,
+                    3 => 1,
+                    _ => {
+                        panic!("Invalid edge");
+                    }
+                });
+                desired_edges[i] = Some(
+                    tile.edges[match i {
+                        0 => 2,
+                        1 => 3,
+                        2 => 0,
+                        3 => 1,
+                        _ => {
+                            panic!("Invalid edge");
+                        }
+                    }],
                 );
             }
-        };
+        }
 
         let mut current = *self;
         for flip in 0..=2 {
             for _rotation in 0..=3 {
-                if current.edges[matching_edge_idx as usize] == edge_bitmask {
+                let mut all_matches = true;
+                for i in 0_usize..4 {
+                    if let Some(e) = desired_edges[i] {
+                        print!("Checking edge {}... ", i);
+                        if e != current.edges[i] {
+                            println!("NO");
+                            all_matches = false;
+                        } else {
+                            println!("YES");
+                        }
+                    }
+                }
+                if all_matches {
                     return current;
                 }
                 current = current.rotate_clockwise();
@@ -62,13 +100,10 @@ impl Tile {
     }
 
     fn debug_edge(&self, edge_idx: u8) {
-        let edge = format!(
-            "  id={}    {:0>10b}",
-            self.id, self.edges[edge_idx as usize]
-        )
-        .replace('1', "#")
-        .replace('0', ".");
-        println!("{}", edge);
+        let edge = format!("  {:0>10b}", self.edges[edge_idx as usize])
+            .replace('1', "#")
+            .replace('0', ".");
+        println!("  id={}, {}", self.id, edge);
     }
 
     fn rotate_clockwise(&self) -> Self {
@@ -281,13 +316,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     }
     composed_image.insert((0, 0), top_left_corner);
 
-    let mut remaining_tiles = tiles
-        .iter()
-        .filter(|tile| tile.id != top_left_corner.id)
-        .map(|tile| (tile.id, *tile))
-        .collect::<HashMap<TileId, Tile>>();
-
-    println!("Others: {}", remaining_tiles.len());
     println!("Initial top left corner (id={}):", top_left_corner.id);
     top_left_corner.debug_print();
 
@@ -313,32 +341,25 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 };
                 if new_x >= composed_image_width || new_y >= composed_image_width {
                     continue;
-                }
-                if composed_image.contains_key(&(new_x, new_y)) {
+                } else if composed_image.contains_key(&(new_x, new_y)) {
                     continue;
                 }
                 println!(
                     "Found matching tile {} to place at x={}, y={}",
                     tile_with_matching_edge.id, new_x, new_y
                 );
-                let which_edge_idx = tile_with_matching_edge
-                    .edges
-                    .iter()
-                    .enumerate()
-                    .find_map(|(idx, &e)| {
-                        if e == edge || e == flip_edge(edge) {
-                            Some(idx)
-                        } else {
-                            None
-                        }
-                    })
-                    .unwrap();
-                println!(
-                    "Which edge idx: {}, while coming from {}",
-                    which_edge_idx, edge_idx
-                );
-                println!("Searching for edge");
-                popped_tile.debug_edge(edge_idx as u8);
+
+                let tile_with_matching_edge =
+                    tile_with_matching_edge.transform_to_match(new_x, new_y, &composed_image);
+                if new_x == 2 {
+                    println!("Left edge of newly found");
+                    tile_with_matching_edge.debug_edge(3);
+                    println!("Does it really match?");
+                    composed_image
+                        .get(&(new_x - 1, new_y))
+                        .unwrap()
+                        .debug_edge(1);
+                }
 
                 for &edge in tile_with_matching_edge.edges.iter() {
                     edge_to_tile_idx[edge as usize].retain(|&e| e != tile_with_matching_edge.id);
@@ -346,9 +367,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                         .retain(|&e| e != tile_with_matching_edge.id);
                 }
                 //println!("edge to tile id: {:?}", edge_to_tile_idx);
-                composed_image.insert((new_x, new_y), *tile_with_matching_edge);
+                composed_image.insert((new_x, new_y), tile_with_matching_edge);
 
-                stack.push((new_x, new_y, *tile_with_matching_edge));
+                stack.push((new_x, new_y, tile_with_matching_edge));
             }
         }
     }
@@ -460,76 +481,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     }
 
     Err("No sea monster found".to_string())
-}
-
-fn try_find(
-    x: u8,
-    y: u8,
-    composed_image: &mut HashMap<(u8, u8), Tile>,
-    remaining_tiles: &mut HashMap<TileId, Tile>,
-) -> bool {
-    println!("About to search for (x,y)=({},{})", x, y);
-    let desired_left_edge = if x == 0 {
-        None
-    } else {
-        println!("Desired left edge:");
-        composed_image.get(&(x - 1, y)).unwrap().debug_edge(1);
-        Some(composed_image.get(&(x - 1, y)).unwrap().edges[1])
-    };
-    let desired_top_edge = if y == 0 {
-        None
-    } else {
-        println!("Desired top edge:");
-        composed_image.get(&(x, y - 1)).unwrap().debug_edge(2);
-        Some(composed_image.get(&(x, y - 1)).unwrap().edges[2])
-    };
-
-    if let Some(found_tile) = find_tile(desired_left_edge, desired_top_edge, &remaining_tiles) {
-        println!("Found (x,y)=({},{}) tile: {}", x, y, found_tile.id);
-        composed_image.insert((x, y), found_tile);
-        remaining_tiles.remove(&found_tile.id);
-        true
-    } else {
-        println!("Unable to find at (x,y) = ({}, {})", x, y);
-        false
-    }
-}
-
-fn find_tile(
-    left_edge: Option<EdgeBitmask>,
-    top_edge: Option<EdgeBitmask>,
-    remaining_tiles: &HashMap<TileId, Tile>,
-) -> Option<Tile> {
-    for remaining_tile in remaining_tiles.values() {
-        let mut trying_tile = *remaining_tile;
-        for flip in 0..=2 {
-            for _rotate in 0..=4 {
-                let mut possible = true;
-                if let Some(top_edge) = top_edge {
-                    if top_edge != trying_tile.edges[0] {
-                        possible = false;
-                    }
-                }
-                if let Some(left_edge) = left_edge {
-                    if left_edge != trying_tile.edges[3] {
-                        possible = false;
-                    }
-                }
-
-                if possible {
-                    return Some(trying_tile);
-                }
-
-                trying_tile = trying_tile.rotate_clockwise();
-            }
-            if flip == 0 {
-                trying_tile = trying_tile.flip_horizontal();
-            } else {
-                trying_tile = trying_tile.flip_vertical();
-            }
-        }
-    }
-    None
 }
 
 #[test]
