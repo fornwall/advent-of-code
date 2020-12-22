@@ -17,10 +17,11 @@ fn parse_player_cards(input: &str) -> Option<VecDeque<u8>> {
 
 fn play_recursive(player_1_cards: &mut VecDeque<u8>, player_2_cards: &mut VecDeque<u8>) -> Winner {
     #![allow(clippy::unwrap_used)]
-    let mut seen = HashSet::new();
+    let mut seen_1 = HashSet::new();
+    let mut seen_2 = HashSet::new();
 
     loop {
-        if !seen.insert((player_1_cards.clone(), player_2_cards.clone())) {
+        if !(seen_1.insert(player_1_cards.clone()) && seen_2.insert(player_2_cards.clone())) {
             return Winner::Player1;
         } else if player_1_cards.is_empty() {
             return Winner::Player2;
