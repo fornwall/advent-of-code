@@ -1,171 +1,141 @@
 use crate::input::Input;
+use std::collections::HashSet;
+
+#[derive(Copy, Clone)]
+struct CircleEntry {
+    next_cup_value: u32,
+    previous_cup_value: u32,
+}
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
-    println!("ABOUT TO SOLVE");
-    let input_bytes = input.text.bytes();
-    if input_bytes.len() != 9 {
-        return Err(format!(
-            "Format invalid input length - expected 9 characters, was {}",
-            input_bytes.len()
-        ));
-    }
-
-    let mut current_idx = 0_i32;
     let number_of_cups = input.part_values(9, 1_000_000);
-    let max_cup_value = number_of_cups as i32;
-    let mut cups = vec![0_u32; number_of_cups];
-    let mut next_cups = vec![0_u32; number_of_cups];
-
+    let max_cup_value = number_of_cups;
     let crab_moves = input.part_values(100, 10_000_000);
 
-    for (idx, byte) in input_bytes.enumerate() {
-        if !byte.is_ascii_digit() {
-            return Err("Invalid input - not all ASCII digits".to_string());
-        }
-        cups[idx as usize] = (byte - b'0') as u32;
+    let input_bytes = input.text.as_bytes();
+    let input_cup_values = if input_bytes.len() != 9 {
+        return Err(format!(
+            "Invalid input: Expected 9 characters as input, was {}",
+            input_bytes.len()
+        ));
+    } else if !input_bytes.iter().all(|b| b.is_ascii_digit()) {
+        return Err("Invalid input: Not all characters are digits".to_string());
+    } else if input_bytes.iter().collect::<HashSet<_>>().len() != 9 {
+        return Err("Invalid input: Not 9 distinct digits".to_string());
+    } else {
+        input_bytes
+            .iter()
+            .map(|b| (b - b'0') as u32)
+            .collect::<Vec<u32>>()
+    };
+
+    // Indexed by cup values, the array contains information about the circuler
+    // structure - the next and previous cup values in the circle:
+    let mut cups: Vec<CircleEntry> = vec![
+        CircleEntry {
+            next_cup_value: 0,
+            previous_cup_value: 0
+        };
+        number_of_cups as usize + 1
+    ];
+
+    for (input_idx, &cup_value) in input_cup_values.iter().enumerate() {
+        cups[cup_value as usize] = CircleEntry {
+            previous_cup_value: if input.is_part_one() || input_idx > 0 {
+                input_cup_values[if input_idx == 0 { 8 } else { input_idx - 1 }]
+            } else {
+                number_of_cups
+            },
+
+            next_cup_value: if input.is_part_one() || input_idx < 8 {
+                input_cup_values[(input_idx + 1) % 9]
+            } else {
+                10
+            },
+        };
     }
 
     if input.is_part_two() {
         for i in 9..number_of_cups {
-            cups[i] = i as u32 + 1;
+            // Zero indexed array:
+            let this_cup_value = i + 1;
+
+            cups[this_cup_value as usize] = CircleEntry {
+                previous_cup_value: if this_cup_value == 9 {
+                    input_cup_values[8]
+                } else {
+                    this_cup_value - 1
+                },
+
+                next_cup_value: if this_cup_value == max_cup_value {
+                    input_cup_values[0]
+                } else {
+                    this_cup_value + 1
+                },
+            };
         }
     }
 
     let mut current_move = 1;
+    let mut current_cup_value = input_cup_values[0];
+
     loop {
-        let current_cup = cups[current_idx as usize];
-        if current_move < 5 {
-            if input.is_part_one() {
-                println!("move {}: cups = {:?}", current_move, cups);
-            } else {
-                println!("move {}: cups = {:?}", current_move, &cups[0..20]);
-            }
-            println!("Current cup {}", current_cup);
-        }
+        let pickup_1 = cups[current_cup_value as usize].next_cup_value;
+        let pickup_2 = cups[pickup_1 as usize].next_cup_value;
+        let pickup_3 = cups[pickup_2 as usize].next_cup_value;
 
-        let mut destination_cup = if current_cup == 1 {
-            max_cup_value as u32
+        let mut destination_cup = if current_cup_value == 1 {
+            max_cup_value
         } else {
-            current_cup - 1
+            current_cup_value - 1
         };
-        while destination_cup == cups[((current_idx + 1) % max_cup_value) as usize]
-            || destination_cup == cups[((current_idx + 2) % max_cup_value) as usize]
-            || destination_cup == cups[((current_idx + 3) % max_cup_value) as usize]
+        while destination_cup == pickup_1
+            || destination_cup == pickup_2
+            || destination_cup == pickup_3
         {
-            if destination_cup == 1 {
-                destination_cup = max_cup_value as u32;
+            destination_cup = if destination_cup == 1 {
+                max_cup_value
             } else {
-                destination_cup -= 1;
-            }
-            //println!("checking for destination..");
+                destination_cup - 1
+            };
         }
 
-        //println!("Searching for destination cup: {}", destination_cup);
-        let destination_idx = (cups
-            .iter()
-            .enumerate()
-            .find_map(|(idx, &value)| {
-                if value == destination_cup {
-                    Some(idx)
-                } else {
-                    None
-                }
-            })
-            .unwrap()) as i32
-            % (number_of_cups as i32);
-        //println!("Destination cup value: {}", destination_cup);
-        //println!("Destination cup index: {}", destination_idx);
-
-        // Bring over current cup:
-        next_cups[current_idx as usize] = cups[current_idx as usize];
-
-        // Bring over target cups:
-        /*
-        println!(
-            "Bring over target cup to {} from {}",
-            (destination_idx + 1 - 4).rem_euclid(9),
-            (destination_idx + 1 - 1).rem_euclid(9)
+        // Pick up the three cups following the current one:
+        let (before_picked_up_sequence, after_picked_up_sequence) = (
+            cups[pickup_1 as usize].previous_cup_value,
+            cups[pickup_3 as usize].next_cup_value,
         );
-         */
-        next_cups[(destination_idx + 1 - 4).rem_euclid(number_of_cups as i32) as usize] =
-            cups[(destination_idx + 1 - 1).rem_euclid(number_of_cups as i32) as usize];
+        cups[before_picked_up_sequence as usize].next_cup_value = after_picked_up_sequence;
+        cups[after_picked_up_sequence as usize].previous_cup_value = before_picked_up_sequence;
 
-        // Bring over dropped cups:
-        /*
-        println!(
-            "First drop after: {}",
-            (destination_idx + 1 - 3).rem_euclid(9)
-        );
-         */
-        next_cups[(destination_idx + 1 - 3).rem_euclid(max_cup_value) as usize] =
-            cups[((current_idx + 1) % max_cup_value) as usize];
-        next_cups[(destination_idx + 2 - 3).rem_euclid(max_cup_value) as usize] =
-            cups[((current_idx + 2) % max_cup_value) as usize];
-        next_cups[(destination_idx + 3 - 3).rem_euclid(max_cup_value) as usize] =
-            cups[((current_idx + 3) % max_cup_value) as usize];
+        // Insert the picked up sequence after the destination cup:
+        let after_destination_cup = cups[destination_cup as usize].next_cup_value;
+        cups[after_destination_cup as usize].previous_cup_value = pickup_3;
+        cups[destination_cup as usize].next_cup_value = pickup_1;
+        cups[pickup_1 as usize].previous_cup_value = destination_cup;
+        cups[pickup_3 as usize].next_cup_value = after_destination_cup;
 
-        // Bring over cups after destination:
-        let mut i = 1;
-        loop {
-            let idx_after_destination = (destination_idx + i) % max_cup_value;
-            if idx_after_destination == current_idx {
-                break;
-            } else {
-                next_cups[idx_after_destination as usize] = cups[idx_after_destination as usize];
-            }
-
-            i += 1;
-        }
-
-        // Bring over cups after three picked up, but before destination:
-        let mut i = 1;
-        loop {
-            let idx_after_picked_up = (current_idx + i) % max_cup_value;
-            if (idx_after_picked_up + 3) % max_cup_value == destination_idx {
-                break;
-            } else {
-                /*
-                println!(
-                    "Bring over cups after three picked up, but before destination - to {} from {}",
-                    idx_after_picked_up,
-                    (idx_after_picked_up + 3) % 9,
-                );
-                 */
-                next_cups[idx_after_picked_up as usize] =
-                    cups[((idx_after_picked_up + 3) % max_cup_value) as usize];
-            }
-            i += 1;
-        }
-
-        std::mem::swap(&mut cups, &mut next_cups);
-
-        if current_move % 1000 == 0 {
-            println!("Move {}", current_move);
-        }
+        current_cup_value = cups[current_cup_value as usize].next_cup_value;
 
         if current_move == crab_moves {
             break;
+        } else {
+            current_move += 1;
         }
-        current_idx = (current_idx + 1) % max_cup_value;
-        current_move += 1;
     }
 
-    let one_idx = cups
-        .iter()
-        .enumerate()
-        .find_map(|(idx, &cup)| if cup == 1 { Some(idx) } else { None })
-        .unwrap();
-
     Ok(if input.is_part_one() {
-        cups.iter()
-            .cycle()
-            .skip((one_idx + 1) % number_of_cups)
-            .take(8)
-            .map(|&b| (b as u8 + b'0') as char)
-            .collect()
+        let mut result_string = String::new();
+        let mut previous_cup_value = 1_u32;
+        while (result_string.len() as u32) < number_of_cups - 1 {
+            previous_cup_value = cups[previous_cup_value as usize].next_cup_value;
+            result_string.push((previous_cup_value as u8 + b'0') as char);
+        }
+        result_string
     } else {
-        (cups[(one_idx + 1) % number_of_cups] as u64 + cups[(one_idx + 1) % number_of_cups] as u64)
-            .to_string()
+        let cup_after_one_value = cups[1].next_cup_value;
+        let cup_after_that_value = cups[cup_after_one_value as usize].next_cup_value;
+        (cup_after_one_value as u64 * cup_after_that_value as u64).to_string()
     })
 }
 
@@ -175,9 +145,9 @@ pub fn tests() {
 
     let example = "389125467";
     test_part_one!(example => "67384529".to_string());
-    //test_part_two!(example => "149245887792".to_string());
+    test_part_two!(example => "149245887792".to_string());
 
     let real_input = include_str!("day23_input.txt");
     test_part_one!(real_input => "65432978".to_string());
-    // test_part_two!(real_input => 0);
+    test_part_two!(real_input => "287230227046".to_string());
 }
