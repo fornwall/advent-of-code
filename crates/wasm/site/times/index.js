@@ -1,10 +1,12 @@
-const currentYear =
-  new URLSearchParams(window.location.search).get("year") || "2020";
-document.querySelector(
-  "h1"
-).textContent = `Advent of Code ${currentYear} execution times`;
+async function updatePage() {
+  const currentYear =
+    new URLSearchParams(window.location.hash.substring(1)).get("year") ||
+    "2020";
 
-async function run() {
+  document.querySelector(
+    "h1"
+  ).textContent = `Advent of Code ${currentYear} execution times`;
+
   const baselineResponse = await fetch(
     "https://aoc.fornwall.net/new-baseline.json"
   );
@@ -70,4 +72,7 @@ async function run() {
     Plotly.Plots.resize(document.getElementById("secondPlot"));
   });
 }
-run();
+
+updatePage();
+
+window.addEventListener("hashchange", updatePage);
