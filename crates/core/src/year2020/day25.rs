@@ -3,12 +3,13 @@ use crate::mod_exp::mod_exp;
 
 const MODULO: u64 = 20_201_227;
 
-const fn find_loop_size(subject_number: u64, desired_value: u64) -> u64 {
+const fn find_loop_size(desired_value: u64) -> u64 {
+    const SUBJECT_NUMBER: u64 = 7;
+
     let mut loop_count = 1;
     let mut value = 1;
     loop {
-        value *= subject_number;
-        value %= MODULO;
+        value = (value * SUBJECT_NUMBER) % MODULO;
         if value == desired_value {
             break loop_count;
         }
@@ -35,7 +36,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         .parse::<u64>()
         .map_err(|_| on_error())?;
 
-    let card_loop_size = find_loop_size(7, card_public_key);
+    let card_loop_size = find_loop_size(card_public_key);
 
     let encryption_key = mod_exp(
         i128::from(door_public_key),
