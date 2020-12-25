@@ -5,6 +5,7 @@ This crates provides solutions for Advent of Code problems.
 #![crate_name = "advent_of_code"]
 
 mod input;
+mod mod_exp;
 #[cfg(feature = "visualization")]
 pub mod painter;
 mod year2017;

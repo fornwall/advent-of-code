@@ -18,15 +18,15 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             "Invalid input: Expected 9 characters as input, was {}",
             input_bytes.len()
         ));
-    } else if !input_bytes.iter().all(|b| b.is_ascii_digit()) {
+    } else if !input_bytes.iter().all(u8::is_ascii_digit) {
         return Err("Invalid input: Not all characters are digits".to_string());
-    } else if input_bytes.iter().collect::<HashSet<_>>().len() != 9 {
-        return Err("Invalid input: Not 9 distinct digits".to_string());
-    } else {
+    } else if input_bytes.iter().collect::<HashSet<_>>().len() == 9 {
         input_bytes
             .iter()
-            .map(|b| (b - b'0') as u32)
+            .map(|b| u32::from(b - b'0'))
             .collect::<Vec<u32>>()
+    } else {
+        return Err("Invalid input: Not 9 distinct digits".to_string());
     };
 
     // Indexed by cup values, the array contains information about the circuler
@@ -124,18 +124,18 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
     }
 
+    let cup_after_one_value = cups[1].next_cup_value;
     Ok(if input.is_part_one() {
         let mut result_string = String::new();
-        let mut previous_cup_value = 1_u32;
+        let mut current_cup_value = cup_after_one_value;
         while (result_string.len() as u32) < number_of_cups - 1 {
-            previous_cup_value = cups[previous_cup_value as usize].next_cup_value;
-            result_string.push((previous_cup_value as u8 + b'0') as char);
+            result_string.push((current_cup_value as u8 + b'0') as char);
+            current_cup_value = cups[current_cup_value as usize].next_cup_value;
         }
         result_string
     } else {
-        let cup_after_one_value = cups[1].next_cup_value;
         let cup_after_that_value = cups[cup_after_one_value as usize].next_cup_value;
-        (cup_after_one_value as u64 * cup_after_that_value as u64).to_string()
+        (u64::from(cup_after_one_value) * u64::from(cup_after_that_value)).to_string()
     })
 }
 
