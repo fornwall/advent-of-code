@@ -45,10 +45,9 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
     }
 
-    let mut current_move = 1;
     let mut current_cup_value = input_cup_values[0];
 
-    loop {
+    for _move in 0..crab_moves {
         let pickup_1 = cups[current_cup_value as usize];
         let pickup_2 = cups[pickup_1 as usize];
         let pickup_3 = cups[pickup_2 as usize];
@@ -70,11 +69,8 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
 
         // Pick up the three cups following the current one:
-        let (before_picked_up_sequence, after_picked_up_sequence) = (
-            current_cup_value,
-            //cups[pickup_1 as usize].previous_cup_value,
-            cups[pickup_3 as usize],
-        );
+        let (before_picked_up_sequence, after_picked_up_sequence) =
+            (current_cup_value, cups[pickup_3 as usize]);
         cups[before_picked_up_sequence as usize] = after_picked_up_sequence;
 
         // Insert the picked up sequence after the destination cup:
@@ -83,12 +79,6 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         cups[pickup_3 as usize] = after_destination_cup;
 
         current_cup_value = cups[current_cup_value as usize];
-
-        if current_move == crab_moves {
-            break;
-        } else {
-            current_move += 1;
-        }
     }
 
     let cup_after_one_value = cups[1];
