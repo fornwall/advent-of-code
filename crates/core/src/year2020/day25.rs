@@ -17,6 +17,10 @@ const fn find_loop_size(subject_number: u64, desired_value: u64) -> u64 {
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
+    if input.is_part_two() {
+        return Ok(0);
+    }
+
     let on_error = || "Invalid input".to_string();
 
     let mut lines = input.text.lines();
