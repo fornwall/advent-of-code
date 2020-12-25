@@ -27,8 +27,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             return Err(format!("Too big number: {}", next_number));
         }
 
-        let last_spoken_turn = value_to_turn[next_number as usize];
-        value_to_turn[next_number as usize] = turn;
+        let last_spoken_turn = std::mem::replace(&mut value_to_turn[next_number as usize], turn);
 
         next_number = if last_spoken_turn == NEVER_SEEN {
             // If that was the first time the number has been spoken, the current player says 0:
