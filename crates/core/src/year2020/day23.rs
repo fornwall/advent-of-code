@@ -1,12 +1,6 @@
 use crate::input::Input;
 use std::collections::HashSet;
 
-#[derive(Copy, Clone)]
-struct CircleEntry {
-    next_cup_value: u32,
-    previous_cup_value: u32,
-}
-
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let number_of_cups = input.part_values(9, 1_000_000);
     let max_cup_value = number_of_cups;
@@ -30,48 +24,23 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     };
 
     // Indexed by cup values, the array contains information about the circuler
-    // structure - the next and previous cup values in the circle:
-    let mut cups: Vec<CircleEntry> = vec![
-        CircleEntry {
-            next_cup_value: 0,
-            previous_cup_value: 0
-        };
-        number_of_cups as usize + 1
-    ];
+    // structure - the next cup value in the circle:
+    let mut cups: Vec<u32> = vec![0; number_of_cups as usize + 1];
 
     for (input_idx, &cup_value) in input_cup_values.iter().enumerate() {
-        cups[cup_value as usize] = CircleEntry {
-            previous_cup_value: if input.is_part_one() || input_idx > 0 {
-                input_cup_values[if input_idx == 0 { 8 } else { input_idx - 1 }]
-            } else {
-                number_of_cups
-            },
-
-            next_cup_value: if input.is_part_one() || input_idx < 8 {
-                input_cup_values[(input_idx + 1) % 9]
-            } else {
-                10
-            },
+        cups[cup_value as usize] = if input.is_part_one() || input_idx < 8 {
+            input_cup_values[(input_idx + 1) % 9]
+        } else {
+            10
         };
     }
 
     if input.is_part_two() {
-        for i in 9..number_of_cups {
-            // Zero indexed array:
-            let this_cup_value = i + 1;
-
-            cups[this_cup_value as usize] = CircleEntry {
-                previous_cup_value: if this_cup_value == 9 {
-                    input_cup_values[8]
-                } else {
-                    this_cup_value - 1
-                },
-
-                next_cup_value: if this_cup_value == max_cup_value {
-                    input_cup_values[0]
-                } else {
-                    this_cup_value + 1
-                },
+        for cup_value in 10..=number_of_cups {
+            cups[cup_value as usize] = if cup_value == max_cup_value {
+                input_cup_values[0]
+            } else {
+                cup_value + 1
             };
         }
     }
@@ -80,9 +49,9 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut current_cup_value = input_cup_values[0];
 
     loop {
-        let pickup_1 = cups[current_cup_value as usize].next_cup_value;
-        let pickup_2 = cups[pickup_1 as usize].next_cup_value;
-        let pickup_3 = cups[pickup_2 as usize].next_cup_value;
+        let pickup_1 = cups[current_cup_value as usize];
+        let pickup_2 = cups[pickup_1 as usize];
+        let pickup_3 = cups[pickup_2 as usize];
 
         let mut destination_cup = if current_cup_value == 1 {
             max_cup_value
@@ -102,20 +71,18 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
         // Pick up the three cups following the current one:
         let (before_picked_up_sequence, after_picked_up_sequence) = (
-            cups[pickup_1 as usize].previous_cup_value,
-            cups[pickup_3 as usize].next_cup_value,
+            current_cup_value,
+            //cups[pickup_1 as usize].previous_cup_value,
+            cups[pickup_3 as usize],
         );
-        cups[before_picked_up_sequence as usize].next_cup_value = after_picked_up_sequence;
-        cups[after_picked_up_sequence as usize].previous_cup_value = before_picked_up_sequence;
+        cups[before_picked_up_sequence as usize] = after_picked_up_sequence;
 
         // Insert the picked up sequence after the destination cup:
-        let after_destination_cup = cups[destination_cup as usize].next_cup_value;
-        cups[after_destination_cup as usize].previous_cup_value = pickup_3;
-        cups[destination_cup as usize].next_cup_value = pickup_1;
-        cups[pickup_1 as usize].previous_cup_value = destination_cup;
-        cups[pickup_3 as usize].next_cup_value = after_destination_cup;
+        let after_destination_cup = cups[destination_cup as usize];
+        cups[destination_cup as usize] = pickup_1;
+        cups[pickup_3 as usize] = after_destination_cup;
 
-        current_cup_value = cups[current_cup_value as usize].next_cup_value;
+        current_cup_value = cups[current_cup_value as usize];
 
         if current_move == crab_moves {
             break;
@@ -124,17 +91,17 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
     }
 
-    let cup_after_one_value = cups[1].next_cup_value;
+    let cup_after_one_value = cups[1];
     Ok(if input.is_part_one() {
         let mut result_string = String::new();
         let mut current_cup_value = cup_after_one_value;
         while (result_string.len() as u32) < number_of_cups - 1 {
             result_string.push((current_cup_value as u8 + b'0') as char);
-            current_cup_value = cups[current_cup_value as usize].next_cup_value;
+            current_cup_value = cups[current_cup_value as usize];
         }
         result_string
     } else {
-        let cup_after_that_value = cups[cup_after_one_value as usize].next_cup_value;
+        let cup_after_that_value = cups[cup_after_one_value as usize];
         (u64::from(cup_after_one_value) * u64::from(cup_after_that_value)).to_string()
     })
 }
