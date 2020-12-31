@@ -53,6 +53,8 @@ for session in SESSIONS:
             puzzle = Puzzle(year=year, day=day, user=user)
             input_data = puzzle.input_data
             for part in parts:
+                if day == 25 and part == 2:
+                    continue
                 print(f"# Year {year}, Day {day}, part {part} - {session_description}")
 
                 api_to_use = os.environ.get("AOC_API")
