@@ -6,10 +6,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     #![allow(clippy::unwrap_used)]
     for year in 2017..=2020 {
         let start_day = 1;
-        let end_day = match year {
-            2017 => 16,
-            _ => 25,
-        };
+        let end_day = 25;
         for day in start_day..=end_day {
             let input_path = format!("src/year{}/day{:02}_input.txt", year, day);
             let input = read_to_string(input_path).unwrap();
