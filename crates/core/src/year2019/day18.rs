@@ -53,7 +53,7 @@ pub fn steps_to_gather_all_keys(
     let cols = input_string.lines().next().ok_or("Empty input")?.len();
     let mut map = vec![b'#'; rows * cols];
     let mut found_keys = HashMap::new();
-    let mut all_keys_bitset = 0 as KeyBitset;
+    let mut all_keys_bitset = 0_u32;
 
     let index_of = |x, y| x + y * cols;
 

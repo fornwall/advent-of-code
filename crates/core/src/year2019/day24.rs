@@ -104,7 +104,7 @@ impl Grid {
     }
 
     const fn count_bugs_at_edge(self, coming_from: Direction) -> u32 {
-        #![allow(clippy::large_digit_groups)]
+        #![allow(clippy::unusual_byte_groupings)]
         (self.value
             & match coming_from {
                 Direction::Up => 0b00000_00000_00000_00000_11111_u32,

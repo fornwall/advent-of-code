@@ -2,9 +2,9 @@ use std::collections::HashSet;
 
 type Frequency = i32;
 
-fn parse_frequency_changes<'a>(
-    input_string: &'a str,
-) -> impl Iterator<Item = Result<Frequency, String>> + Clone + 'a {
+fn parse_frequency_changes(
+    input_string: &str,
+) -> impl Iterator<Item = Result<Frequency, String>> + Clone + '_ {
     input_string.lines().enumerate().map(|(line_index, line)| {
         line.parse::<Frequency>().map_err(|error| {
             format!(

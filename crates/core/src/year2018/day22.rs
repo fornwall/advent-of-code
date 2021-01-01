@@ -141,7 +141,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
     let mut visited = HashSet::new();
 
     // (-(cost+heuristic), -cost, x, y, equipment)
-    to_visit.push((0, 0, 0 as Coordinate, 0 as Coordinate, Equipment::Torch));
+    to_visit.push((0, 0, 0_i16, 0_i16, Equipment::Torch));
 
     let heuristic = |x: Coordinate, y: Coordinate, equipment, g: &Grid| -> i32 {
         ((x - g.target_x).abs()

@@ -122,9 +122,9 @@ impl ops::AddAssign<Vector> for Vector {
     }
 }
 
-fn parse_wire_points<'a>(
-    string: &'a str,
-) -> impl Iterator<Item = Result<LineSegment, String>> + Clone + 'a {
+fn parse_wire_points(
+    string: &str,
+) -> impl Iterator<Item = Result<LineSegment, String>> + Clone + '_ {
     let initial_position = Vector::new(0, 0);
     let initial_step = 0_u32;
 
