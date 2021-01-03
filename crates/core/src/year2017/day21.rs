@@ -8,7 +8,7 @@ pub fn solve(_input: &mut Input) -> Result<u32, String> {
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
 
-    let real_input = include_str!("day17_input.txt");
+    let real_input = include_str!("day21_input.txt");
     test_part_one!(real_input => 0);
     test_part_two!(real_input => 0);
 }

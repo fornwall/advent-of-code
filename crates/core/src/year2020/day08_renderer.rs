@@ -1,4 +1,4 @@
-use super::computer::{Computer, Instruction};
+use super::day08::{Computer, Instruction};
 use crate::painter::PainterRef;
 
 pub fn start_rendering(painter: &mut PainterRef) {
