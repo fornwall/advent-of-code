@@ -1,5 +1,10 @@
-fn solution(input_string: &str, anagrams_are_equal: bool) -> Result<usize, String> {
-    Ok(input_string
+use crate::Input;
+
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let anagrams_are_equal = input.is_part_two();
+
+    Ok(input
+        .text
         .lines()
         .filter(|passphrase| {
             let mut words: Vec<Vec<char>> = passphrase
@@ -20,20 +25,11 @@ fn solution(input_string: &str, anagrams_are_equal: bool) -> Result<usize, Strin
         .count())
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    solution(input_string, false)
-}
-
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    solution(input_string, true)
-}
-
 #[test]
-fn test_part1() {
-    assert_eq!(Ok(325), part1(include_str!("day04_input.txt")));
-}
+fn test() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(119), part2(include_str!("day04_input.txt")));
+    let real_input = include_str!("day04_input.txt");
+    test_part_one!(real_input => 325);
+    test_part_two!(real_input => 119);
 }

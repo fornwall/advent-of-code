@@ -9,7 +9,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     for (line_index, line) in input.text.lines().enumerate() {
         let error_message = || {
             format!(
-                "Invalid input at line {}: Not '${{NUMBER}}: ${{NUMBER}}",
+                "Invalid input at line {}: Not '${{NUMBER}}: ${{NUMBER}}'",
                 line_index + 1
             )
         };

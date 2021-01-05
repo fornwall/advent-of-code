@@ -9,6 +9,7 @@ fn solution(input_string: &str, row_evaluator: fn(&Vec<u32>) -> u32) -> Result<u
     }
     Ok(checksum)
 }
+
 pub fn part1(input_string: &str) -> Result<u32, String> {
     solution(input_string, |row| {
         let min = row.iter().min().unwrap_or(&0);
