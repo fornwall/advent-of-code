@@ -2,7 +2,7 @@ use super::assembly::{Instruction, Program, Value};
 use crate::input::Input;
 
 fn is_prime(number: i32) -> bool {
-    let number_sqrt = (number as f64).sqrt() as i32;
+    let number_sqrt = f64::from(number).sqrt() as i32;
     (2..=number_sqrt).all(|i| number % i != 0)
 }
 

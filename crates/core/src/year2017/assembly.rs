@@ -31,7 +31,7 @@ impl Value {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) enum Instruction {
+pub enum Instruction {
     Snd(Value),
     Set(RegisterSpecifier, Value),
     Add(RegisterSpecifier, Value),
@@ -90,7 +90,7 @@ impl Instruction {
 }
 
 #[derive(Clone)]
-pub(crate) struct Program {
+pub struct Program {
     pub(crate) registers: Vec<NumberValue>,
     instruction_pointer: u8,
     pub(crate) terminated: bool,
