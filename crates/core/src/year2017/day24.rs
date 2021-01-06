@@ -1,29 +1,40 @@
 use crate::input::Input;
-use std::collections::HashSet;
 
-fn extend(pieces: &[(u8, u8)], used: &HashSet<usize>, last: u8, part_two: bool) -> (u32, u32) {
-    if pieces.len() == used.len() {
-        return (0, 0);
-    }
+type PieceComponent = u8;
+type Piece = (PieceComponent, PieceComponent);
 
-    let mut u = used.clone();
+fn score(bridge: &[Piece]) -> u32 {
+    bridge.iter().fold(0, |acc, &(start, end)| {
+        acc + u32::from(start) + u32::from(end)
+    })
+}
+
+fn extend(pieces: &Vec<Piece>, last: PieceComponent, part_two: bool) -> Vec<Piece> {
+    #![allow(clippy::ptr_arg)]
     pieces
         .iter()
         .enumerate()
-        // Only keep unused pieces that can be attached to `last` piece:
-        .filter(|&(idx, piece)| (piece.0 == last || piece.1 == last) && !used.contains(&idx))
-        .map(|(idx, piece)| {
-            u.insert(idx);
-            let new_last = piece.0 + piece.1 - last;
-            let (length, strength) = extend(pieces, &u, new_last, part_two);
-            u.remove(&idx);
-            (
-                length + u32::from(part_two),
-                strength + u32::from(piece.0) + u32::from(piece.1),
-            )
+        .filter_map(|(idx, &piece)| {
+            if piece.0 == last || piece.1 == last {
+                let mut pieces_cloned = pieces.clone();
+                pieces_cloned.swap_remove(idx);
+                let new_last = piece.0 + piece.1 - last;
+
+                let mut bridge = extend(&pieces_cloned, new_last, part_two);
+                bridge.push(piece);
+                Some(bridge)
+            } else {
+                None
+            }
         })
-        .max()
-        .unwrap_or((0, 0))
+        .max_by(|a, b| {
+            if part_two {
+                a.len().cmp(&b.len()).then(score(a).cmp(&score(b)))
+            } else {
+                score(a).cmp(&score(b))
+            }
+        })
+        .unwrap_or_else(Vec::new)
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -35,17 +46,17 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let first = parts
             .next()
             .ok_or_else(on_error)?
-            .parse::<u8>()
+            .parse::<PieceComponent>()
             .map_err(|_| on_error())?;
         let second = parts
             .next()
             .ok_or_else(on_error)?
-            .parse::<u8>()
+            .parse::<PieceComponent>()
             .map_err(|_| on_error())?;
         pieces.push((first, second));
     }
 
-    Ok(extend(&pieces, &HashSet::new(), 0, input.part_values(false, true)).1)
+    Ok(score(&extend(&pieces, 0, input.part_values(false, true))))
 }
 
 #[test]
