@@ -8,6 +8,8 @@ mod input;
 mod mod_exp;
 #[cfg(feature = "visualization")]
 pub mod painter;
+mod year2015;
+mod year2016;
 mod year2017;
 mod year2018;
 mod year2019;
@@ -73,6 +75,56 @@ pub fn solve(
     };
 
     let result = match (year, day, part) {
+        (2015, 1, _) => to_stringer_input(year2015::day01::solve, &mut input),
+        (2015, 2, _) => to_stringer_input(year2015::day02::solve, &mut input),
+        (2015, 3, _) => to_stringer_input(year2015::day03::solve, &mut input),
+        (2015, 4, _) => to_stringer_input(year2015::day04::solve, &mut input),
+        (2015, 5, _) => to_stringer_input(year2015::day05::solve, &mut input),
+        (2015, 6, _) => to_stringer_input(year2015::day06::solve, &mut input),
+        (2015, 7, _) => to_stringer_input(year2015::day07::solve, &mut input),
+        (2015, 8, _) => to_stringer_input(year2015::day08::solve, &mut input),
+        (2015, 9, _) => to_stringer_input(year2015::day09::solve, &mut input),
+        (2015, 10, _) => to_stringer_input(year2015::day10::solve, &mut input),
+        (2015, 11, _) => to_stringer_input(year2015::day11::solve, &mut input),
+        (2015, 12, _) => to_stringer_input(year2015::day12::solve, &mut input),
+        (2015, 13, _) => to_stringer_input(year2015::day13::solve, &mut input),
+        (2015, 14, _) => to_stringer_input(year2015::day14::solve, &mut input),
+        (2015, 15, _) => to_stringer_input(year2015::day15::solve, &mut input),
+        (2015, 16, _) => to_stringer_input(year2015::day16::solve, &mut input),
+        (2015, 17, _) => to_stringer_input(year2015::day17::solve, &mut input),
+        (2015, 18, _) => to_stringer_input(year2015::day18::solve, &mut input),
+        (2015, 19, _) => to_stringer_input(year2015::day19::solve, &mut input),
+        (2015, 20, _) => to_stringer_input(year2015::day20::solve, &mut input),
+        (2015, 21, _) => to_stringer_input(year2015::day21::solve, &mut input),
+        (2015, 22, _) => to_stringer_input(year2015::day22::solve, &mut input),
+        (2015, 23, _) => to_stringer_input(year2015::day23::solve, &mut input),
+        (2015, 24, _) => to_stringer_input(year2015::day24::solve, &mut input),
+        (2015, 25, _) => to_stringer_input(year2015::day25::solve, &mut input),
+        (2016, 1, _) => to_stringer_input(year2016::day01::solve, &mut input),
+        (2016, 2, _) => to_stringer_input(year2016::day02::solve, &mut input),
+        (2016, 3, _) => to_stringer_input(year2016::day03::solve, &mut input),
+        (2016, 4, _) => to_stringer_input(year2016::day04::solve, &mut input),
+        (2016, 5, _) => to_stringer_input(year2016::day05::solve, &mut input),
+        (2016, 6, _) => to_stringer_input(year2016::day06::solve, &mut input),
+        (2016, 7, _) => to_stringer_input(year2016::day07::solve, &mut input),
+        (2016, 8, _) => to_stringer_input(year2016::day08::solve, &mut input),
+        (2016, 9, _) => to_stringer_input(year2016::day09::solve, &mut input),
+        (2016, 10, _) => to_stringer_input(year2016::day10::solve, &mut input),
+        (2016, 11, _) => to_stringer_input(year2016::day11::solve, &mut input),
+        (2016, 12, _) => to_stringer_input(year2016::day12::solve, &mut input),
+        (2016, 13, _) => to_stringer_input(year2016::day13::solve, &mut input),
+        (2016, 14, _) => to_stringer_input(year2016::day14::solve, &mut input),
+        (2016, 15, _) => to_stringer_input(year2016::day15::solve, &mut input),
+        (2016, 16, _) => to_stringer_input(year2016::day16::solve, &mut input),
+        (2016, 17, _) => to_stringer_input(year2016::day17::solve, &mut input),
+        (2016, 18, _) => to_stringer_input(year2016::day18::solve, &mut input),
+        (2016, 19, _) => to_stringer_input(year2016::day19::solve, &mut input),
+        (2016, 20, _) => to_stringer_input(year2016::day20::solve, &mut input),
+        (2016, 21, _) => to_stringer_input(year2016::day21::solve, &mut input),
+        (2016, 22, _) => to_stringer_input(year2016::day22::solve, &mut input),
+        (2016, 23, _) => to_stringer_input(year2016::day23::solve, &mut input),
+        (2016, 24, _) => to_stringer_input(year2016::day24::solve, &mut input),
+        (2016, 25, _) => to_stringer_input(year2016::day25::solve, &mut input),
         (2017, 1, 1) => to_stringer(year2017::day01::part1, input_string),
         (2017, 1, 2) => to_stringer(year2017::day01::part2, input_string),
         (2017, 2, 1) => to_stringer(year2017::day02::part1, input_string),
