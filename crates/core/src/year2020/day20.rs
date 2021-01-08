@@ -255,6 +255,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         .iter()
         .find(|tile| tile.is_corner())
         .ok_or_else(|| "No corner found".to_string())?;
+
     let starting_coordinates = match (
         a_corner.edges[0].matching.is_none(),
         a_corner.edges[1].matching.is_none(),
