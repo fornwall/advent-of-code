@@ -71,14 +71,14 @@ macro_rules! test_part_two {
 
 #[macro_export]
 macro_rules! test_part_one_error {
-    ($input:tt => $expected:tt) => {
+    ($input:tt => $expected:expr) => {
         assert_eq!(Err($expected.into()), solve(&mut Input::part_one($input)));
     };
 }
 
 #[macro_export]
 macro_rules! test_part_two_error {
-    ($input:tt => $expected:tt) => {
+    ($input:tt => $expected:expr) => {
         assert_eq!(Err($expected.into()), solve(&mut Input::part_two($input)));
     };
 }
