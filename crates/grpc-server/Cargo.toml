@@ -12,9 +12,9 @@ edition = "2018"
 
 [dependencies]
 advent-of-code = { path = "../core" }
-prost = "0.6"
-tokio = {version = "0.2", features = ["stream", "macros"]}
-tonic = { git = "https://github.com/hyperium/tonic", rev = "2e964c78c666ecd6e6cfc37689d30300cad81f4c" }
+prost = "0.7"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"]}
+tonic = "0.4"
 
 [build-dependencies]
-tonic-build = "0.3"
+tonic-build = "0.4"
