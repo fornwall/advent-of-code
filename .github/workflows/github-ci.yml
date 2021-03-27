@@ -236,6 +236,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
     - name: Deploy to Cloudflare
       env:
         CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
