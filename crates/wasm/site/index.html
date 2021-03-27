@@ -1,268 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Advent of Code Solver</title>
-    <meta name="description" content="A solver of Advent of Code problems" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="preload"
-      href="/index.min.js"
-      as="script"
-      crossorigin="anonymous"
-    />
-    <link rel="modulepreload" href="/worker.js" />
-    <link rel="modulepreload" href="/advent_of_code_wasm.js" />
-    <link
-      rel="prefetch"
-      href="/advent_of_code_wasm_bg.wasm"
-      as="fetch"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta1/css/bootstrap.min.css"
-      integrity="sha512-thoh2veB35ojlAhyYZC0eaztTAUhxLvSZlWrNtlV01njqs/UdY3421Jg7lX0Gq9SRdGVQeL8xeBp9x1IPyL1wQ=="
-      crossorigin="anonymous"
-    />
 
-    <style>
-      .btn-primary {
-        background: #006bff;
+<head>
+  <meta charset="utf-8" />
+  <title>Advent of Code Solver</title>
+  <meta name="description" content="A solver of Advent of Code problems" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" href="/index.min.js" as="script" crossorigin="anonymous" />
+  <link rel="modulepreload" href="/worker.js" />
+  <link rel="modulepreload" href="/advent_of_code_wasm.js" />
+  <link rel="prefetch" href="/advent_of_code_wasm_bg.wasm" as="fetch" crossorigin="anonymous" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css"
+    integrity="sha512-N415hCJJdJx+1UBfULt+i+ihvOn42V/kOjOpp1UTh4CZ70Hx5bDlKryWaqEKfY/8EYOu/C2MuyaluJryK1Lb5Q=="
+    crossorigin="anonymous" />
+
+  <style>
+    .btn-primary {
+      background: #006bff;
+    }
+
+    .input-group .input-group-text {
+      min-width: 4em;
+    }
+
+    .blink {
+      animation: blinker 0.5s linear 3;
+    }
+
+    @keyframes blinker {
+      50% {
+        color: rgba(0, 0, 0, 0);
       }
+    }
 
-      .input-group .input-group-text {
-        min-width: 4em;
-      }
+    button .in-progress {
+      display: none;
+    }
 
-      .blink {
-        animation: blinker 0.5s linear 3;
-      }
+    button.in-progress .when-idle {
+      display: none;
+    }
 
-      @keyframes blinker {
-        50% {
-          color: rgba(0, 0, 0, 0);
-        }
-      }
+    button:not(.in-progress) .when-in-progress {
+      display: none;
+    }
 
-      button .in-progress {
-        display: none;
-      }
+    #output {
+      cursor: pointer;
+    }
 
-      button.in-progress .when-idle {
-        display: none;
-      }
+    #output::before {
+      float: right;
+    }
 
-      button:not(.in-progress) .when-in-progress {
-        display: none;
-      }
+    #output:not(.copied)::before {
+      content: url('data:image/svg+xml,<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-clipboard" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>');
+    }
 
-      #output {
-        cursor: pointer;
-      }
+    #output.copied::before {
+      content: url('data:image/svg+xml,<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/></svg>');
+    }
+  </style>
+</head>
 
-      #output::before {
-        float: right;
-      }
+<body>
+  <main class="container" style="max-width: 720px">
+    <form>
+      <div class="py-4 text-center">
+        <h1 class="mt-0">Advent of Code Solver</h1>
+        <p class="mb-0">
+          Solve
+          <a href="https://adventofcode.com/">Advent of Code</a> problems
+          using either Wasm or a <a href="/api/">HTTP API</a>. See also the
+          <a href="https://github.com/fornwall/advent-of-code">
+            GitHub repository</a>
+          and <a href="/times/">benchmarks</a>.
+        </p>
+      </div>
 
-      #output:not(.copied)::before {
-        content: url('data:image/svg+xml,<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-clipboard" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>');
-      }
-
-      #output.copied::before {
-        content: url('data:image/svg+xml,<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/></svg>');
-      }
-    </style>
-  </head>
-
-  <body>
-    <main class="container" style="max-width: 720px">
-      <form>
-        <div class="py-4 text-center">
-          <h1 class="mt-0">Advent of Code Solver</h1>
-          <p class="mb-0">
-            Solve
-            <a href="https://adventofcode.com/">Advent of Code</a> problems
-            using either Wasm or a <a href="/api/">HTTP API</a>. See also the
-            <a href="https://github.com/fornwall/advent-of-code">
-              GitHub repository</a
-            >
-            and <a href="/times/">benchmarks</a>.
-          </p>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label for="year" class="input-group-text">Year</label>
         </div>
+        <select id="year" accesskey="y" class="form-select">
+          <option value="2020">2020</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+          <option value="2017">2017</option>
+        </select>
+      </div>
 
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <label for="year" class="input-group-text">Year</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="day">Day</label>
+        </div>
+        <select id="day" accesskey="d" class="form-select">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="13">13</option>
+          <option value="14">14</option>
+          <option value="15">15</option>
+          <option value="16">16</option>
+          <option value="17">17</option>
+          <option value="18">18</option>
+          <option value="19">19</option>
+          <option value="20">20</option>
+          <option value="21">21</option>
+          <option value="22">22</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+        </select>
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label for="part" class="input-group-text">Part</label>
+        </div>
+        <select id="part" accesskey="p" class="form-select">
+          <option value="1">One</option>
+          <option value="2">Two</option>
+        </select>
+      </div>
+      <div class="container">
+        <div class="row mb-3">
+          <div class="col p-0">
+            <button id="open-input" type="button" class="btn btn-secondary form-control" accesskey="g">
+              Get Input
+            </button>
           </div>
-          <select id="year" accesskey="y" class="form-select">
-            <option value="2020">2020</option>
-            <option value="2019">2019</option>
-            <option value="2018">2018</option>
-            <option value="2017">2017</option>
-          </select>
-        </div>
-
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <label class="input-group-text" for="day">Day</label>
+          <div class="col pl-2 pr-2">
+            <button id="paste" type="button" class="btn btn-secondary form-control" accesskey="v">
+              Paste
+            </button>
           </div>
-          <select id="day" accesskey="d" class="form-select">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-            <option value="17">17</option>
-            <option value="18">18</option>
-            <option value="19">19</option>
-            <option value="20">20</option>
-            <option value="21">21</option>
-            <option value="22">22</option>
-            <option value="23">23</option>
-            <option value="24">24</option>
-            <option value="25">25</option>
-          </select>
-        </div>
-
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <label for="part" class="input-group-text">Part</label>
-          </div>
-          <select id="part" accesskey="p" class="form-select">
-            <option value="1">One</option>
-            <option value="2">Two</option>
-          </select>
-        </div>
-        <div class="container">
-          <div class="row mb-3">
-            <div class="col p-0">
-              <button
-                id="open-input"
-                type="button"
-                class="btn btn-secondary form-control"
-                accesskey="g"
-              >
-                Get Input
-              </button>
-            </div>
-            <div class="col pl-2 pr-2">
-              <button
-                id="paste"
-                type="button"
-                class="btn btn-secondary form-control"
-                accesskey="v"
-              >
-                Paste
-              </button>
-            </div>
-            <div class="col p-0">
-              <button
-                id="open-playground"
-                type="button"
-                class="btn btn-secondary form-control"
-                accesskey="e"
-              >
-                Playground
-              </button>
-            </div>
+          <div class="col p-0">
+            <button id="open-playground" type="button" class="btn btn-secondary form-control" accesskey="e">
+              Playground
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="input-group mb-3">
-          <div class="input-group-text">
-            <label for="input">Input</label>
-          </div>
-          <textarea
-            id="input"
-            class="form-control"
-            rows="3"
-            required="required"
-            spellcheck="false"
-            accesskey="i"
-            maxlength="100000"
-          ></textarea>
+      <div class="input-group mb-3">
+        <div class="input-group-text">
+          <label for="input">Input</label>
         </div>
+        <textarea id="input" class="form-control" rows="3" required="required" spellcheck="false" accesskey="i"
+          maxlength="100000"></textarea>
+      </div>
 
-        <div class="container">
-          <div class="row mb-3">
-            <div class="col p-0">
-              <button
-                id="run-visualizer"
-                type="button"
-                class="btn btn-primary form-control"
-                accesskey="s"
-                disabled="disabled"
-              >
-                Show
-              </button>
-            </div>
-            <div class="col pl-2 pr-2">
-              <button
-                id="run-api"
-                type="button"
-                class="btn btn-primary form-control"
-                accesskey="a"
-              >
-                <span class="when-idle">
-                  API
-                  <span
-                    id="api-execution-time"
-                    class="badge bg-secondary"
-                  ></span>
+      <div class="container">
+        <div class="row mb-3">
+          <div class="col p-0">
+            <button id="run-visualizer" type="button" class="btn btn-primary form-control" accesskey="s"
+              disabled="disabled">
+              Show
+            </button>
+          </div>
+          <div class="col pl-2 pr-2">
+            <button id="run-api" type="button" class="btn btn-primary form-control" accesskey="a">
+              <span class="when-idle">
+                API
+                <span id="api-execution-time" class="badge bg-secondary"></span>
+              </span>
+              <span class="when-in-progress">
+                <span class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Running...</span>
                 </span>
-                <span class="when-in-progress">
-                  <span class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Running...</span>
-                  </span>
+              </span>
+            </button>
+          </div>
+          <div class="col p-0">
+            <button id="run-wasm" type="button" class="btn btn-primary form-control" accesskey="w">
+              <span class="when-idle">
+                Wasm
+                <span id="wasm-execution-time" class="badge bg-secondary"></span>
+              </span>
+              <span class="when-in-progress">
+                <span class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Running...</span>
                 </span>
-              </button>
-            </div>
-            <div class="col p-0">
-              <button
-                id="run-wasm"
-                type="button"
-                class="btn btn-primary form-control"
-                accesskey="w"
-              >
-                <span class="when-idle">
-                  Wasm
-                  <span
-                    id="wasm-execution-time"
-                    class="badge bg-secondary"
-                  ></span>
-                </span>
-                <span class="when-in-progress">
-                  <span class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Running...</span>
-                  </span>
-                </span>
-              </button>
-            </div>
+              </span>
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="form-group output">
-          <div id="output" class="alert alert-info" role="alert" accesskey="c">
-            The problem answer will be shown here.
-          </div>
+      <div class="form-group output">
+        <div id="output" class="alert alert-info" role="alert" accesskey="c">
+          The problem answer will be shown here.
         </div>
-      </form>
-    </main>
+      </div>
+    </form>
+  </main>
 
-    <canvas
-      style="
+  <canvas style="
         background-color: black;
         display: none;
         position: fixed;
@@ -270,10 +214,9 @@
         top: 0;
         width: 100%;
         height: 100%;
-      "
-      id="canvas"
-    ></canvas>
+      " id="canvas"></canvas>
 
-    <script type="module" src="index.min.js"></script>
-  </body>
+  <script type="module" src="index.min.js"></script>
+</body>
+
 </html>
