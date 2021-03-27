@@ -23,7 +23,7 @@ pub fn part2(input_string: &str) -> Result<String, String> {
         s1.chars()
             .zip(s2.chars())
             .filter_map(|(c1, c2)| if c1 == c2 { Some(c1) } else { None })
-    };
+    }
 
     let input: Vec<&str> = input_string.lines().collect();
 

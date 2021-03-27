@@ -10,6 +10,7 @@ struct Tile2 {
 
 impl Tile2 {
     fn from(input: &str) -> Self {
+        assert_eq!(5, input.len());
         let bytes = input.as_bytes();
         let bits = (0..4).fold(0_u8, |acc, bit_offset| {
             let byte_idx = bit_offset + bit_offset / 2;
@@ -76,6 +77,7 @@ struct Tile3 {
 
 impl Tile3 {
     fn from(input: &str) -> Self {
+        assert_eq!(11, input.len());
         let bytes = input.as_bytes();
         let bits = (0..9).fold(0_u16, |acc, bit_offset| {
             let byte_idx = bit_offset + bit_offset / 3;
@@ -191,13 +193,14 @@ impl fmt::Debug for Tile3 {
 }
 
 /// A 4x4 tile represented as bits.
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 struct Tile4 {
     bits: u16,
 }
 
 impl Tile4 {
     fn from(input: &str) -> Self {
+        assert_eq!(19, input.len());
         let bytes = input.as_bytes();
         let bits = (0..16).fold(0_u16, |acc, bit_offset| {
             let byte_idx = bit_offset + bit_offset / 4;
@@ -293,34 +296,147 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }
 
     let initial_tile = Tile3::from(".#./..#/###");
-    let mut current_3_tiles = vec![initial_tile];
     let mut current_2_tiles: Vec<Tile2> = Vec::new();
+    let mut current_3_tiles = vec![initial_tile];
+    let mut current_4_tiles: Vec<Tile4> = Vec::new();
 
-    for iteration in 0..5 {
-        if iteration % 2 == 0 {
-            current_2_tiles = current_3_tiles
-                .iter()
-                .inspect(|tile| println!("Iteration {} - going from {:?}", iteration, tile))
-                .map(|tile| from_3_to_4.get(tile).unwrap().divided_up())
-                .collect::<Vec<[Tile2; 4]>>()
-                .iter()
-                .inspect(|tile| println!("... to {:?}", tile))
-                .flat_map(|tile| tile.iter().copied())
-                .collect();
-        } else {
-            current_3_tiles = current_2_tiles
-                .iter()
-                .map(|tile| {
-                    let tile_3 = from_2_to_3.get(tile);
+    let num_iterations = input.part_values(5, 18);
+
+    for iteration in 0..num_iterations {
+        match iteration % 3 {
+            0 => {
+                // Map each 3x3 matrix to a 4x4 one:
+                current_4_tiles = current_3_tiles
+                    .iter()
+                    //.inspect(|tile| println!("Iteration {} - going from {:?}", iteration, tile))
+                    .map(|tile| from_3_to_4.get(tile).unwrap())
+                    //.inspect(|tile| println!(" to {:?}", tile))
+                    .copied()
+                    .collect();
+            }
+            1 => {
+                current_2_tiles.clear();
+
+                for tile4 in &current_4_tiles {
+                    // Split up a 4x4 matrix into four 2x2 ones:
+                    let tile2_parts = tile4.divided_up();
+                    // Map each 2x2 matrix to the resulting 3x3 matrix:
+                    let tile3_parts: Vec<Tile3> = tile2_parts
+                        .iter()
+                        .map(|tile| from_2_to_3.get(tile).unwrap())
+                        .copied()
+                        .collect();
+
+                    // Debugging
+                    let initial_one_count: u32 =
+                        tile3_parts.iter().map(|tile| tile.bits.count_ones()).sum();
+                    let initial_size = current_2_tiles.len();
+
+                    // From the four 3x3 matrices, build the resulting nine 2x2 ones:
+                    //
+                    // AAABBB
+                    // AAABBB
+                    // AAABBB
+                    // CCCDDD
+                    // CCCDDD
+                    // CCCDDD
+
+                    // Upper row of 2x2:
+                    current_2_tiles.push(Tile2 {
+                        bits: (tile3_parts[0].bits & 0b11 | (tile3_parts[0].bits & 0b11000) >> 1)
+                            as u8,
+                    });
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[0].bits & 0b100) >> 2)
+                            | ((tile3_parts[1].bits & 0b1) << 1)
+                            | ((tile3_parts[0].bits & 0b100000) >> 3)
+                            | (tile3_parts[1].bits & 0b1000)) as u8,
+                    });
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[1].bits & 0b110) >> 1)
+                            | ((tile3_parts[1].bits & 0b110000) >> 2))
+                            as u8,
+                    });
+
+                    // Middle row of 2x2:
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[0].bits & 0b11000000) >> 6)
+                            | ((tile3_parts[2].bits & 0b11) << 2))
+                            as u8,
+                    });
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[0].bits & 0b100000000) >> 8)
+                            | ((tile3_parts[1].bits & 0b1000000) >> 5)
+                            | (tile3_parts[2].bits & 0b100)
+                            | ((tile3_parts[3].bits & 0b1) << 3))
+                            as u8,
+                    });
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[1].bits & 0b110000000) >> 7)
+                            | ((tile3_parts[3].bits & 0b110) << 1))
+                            as u8,
+                    });
+
+                    // Bottom row of 2x2:
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[2].bits & 0b11000) >> 3)
+                            | ((tile3_parts[2].bits & 0b11000000) >> 4))
+                            as u8,
+                    });
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[2].bits & 0b100000) >> 5)
+                            | ((tile3_parts[3].bits & 0b1000) >> 2)
+                            | ((tile3_parts[2].bits & 0b100000000) >> 6)
+                            | ((tile3_parts[3].bits & 0b1000000) >> 3))
+                            as u8,
+                    });
+                    current_2_tiles.push(Tile2 {
+                        bits: (((tile3_parts[3].bits & 0b110000) >> 4)
+                            | ((tile3_parts[3].bits & 0b110000000) >> 5))
+                            as u8,
+                    });
+
+                    /*
+                    let new_one_count = current_2_tiles
+                        .iter()
+                        .skip(initial_size)
+                        .map(|tile| tile.bits.count_ones())
+                        .sum();
                     println!(
-                        "iteration: {} - going from {:?} to {:?}",
-                        iteration,
-                        tile,
-                        tile_3.unwrap()
+                        "Going from {} ones to {} (should stay same)",
+                        initial_one_count, new_one_count
                     );
-                    *tile_3.unwrap()
-                })
-                .collect();
+                    tile3_parts
+                        .iter()
+                        .for_each(|tile| println!("A 3x3 part: {:?}", tile));
+                    current_2_tiles
+                        .iter()
+                        .for_each(|tile| println!("A 2x2 part: {:?}", tile));
+                    assert_eq!(initial_one_count, new_one_count);
+                     */
+                }
+            }
+            2 => {
+                // Map each 2x2 matrix to a 3x3 one:
+                current_3_tiles = current_2_tiles
+                    .iter()
+                    .map(|tile| {
+                        let tile_3 = from_2_to_3.get(tile);
+                        /*
+                        println!(
+                            "iteration: {} - going from {:?} to {:?}",
+                            iteration,
+                            tile,
+                            tile_3.unwrap()
+                        );
+                         */
+                        *tile_3.unwrap()
+                    })
+                    .collect();
+            }
+            _ => {
+                return Err("Internal error".to_string());
+            }
         }
     }
 
@@ -344,6 +460,11 @@ pub fn tile_tests() {
 
     let flipped_tile = tile.flip();
     assert_eq!(Tile2::from("##/#.").bits, flipped_tile.bits);
+
+    let tile = Tile2::from("##/##");
+    assert_eq!(0b_11_11, tile.bits);
+    assert_eq!(tile.bits, tile.rotate().rotate().rotate().rotate().bits);
+    assert_eq!(tile.bits, tile.flip().flip().bits);
 
     let tile = Tile3::from("##./.#./##.");
     assert_eq!(0b_011_010_011, tile.bits);
@@ -384,6 +505,6 @@ pub fn tests() {
     use crate::{test_part_one, test_part_two};
 
     let real_input = include_str!("day21_input.txt");
-    test_part_one!(real_input => 0);
+    test_part_one!(real_input => 142);
     //test_part_two!(real_input => 0);
 }
