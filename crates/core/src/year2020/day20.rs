@@ -276,8 +276,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut composed_image: HashMap<(u8, u8), Tile> = HashMap::new();
     composed_image.insert(starting_coordinates, a_corner);
 
-    let mut stack = Vec::new();
-    stack.push((starting_coordinates.0, starting_coordinates.1, a_corner));
+    let mut stack = vec![(starting_coordinates.0, starting_coordinates.1, a_corner)];
 
     while let Some((x, y, popped_tile)) = stack.pop() {
         for (edge_idx, &edge) in popped_tile.edges.iter().enumerate() {

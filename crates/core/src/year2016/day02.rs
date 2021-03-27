@@ -1,6 +1,7 @@
 use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
+    #![allow(clippy::match_same_arms)]
     let mut code = String::new();
     let mut current_button = '5';
 

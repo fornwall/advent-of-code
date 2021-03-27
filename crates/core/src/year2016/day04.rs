@@ -57,8 +57,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         if a == '-' {
                             ' '
                         } else {
-                            (((a as u32 - 'a' as u32 + sector_id) % 26_u32) as u8 + 'a' as u8)
-                                as char
+                            (((a as u32 - 'a' as u32 + sector_id) % 26_u32) as u8 + b'a') as char
                         }
                     })
                     .collect::<String>();

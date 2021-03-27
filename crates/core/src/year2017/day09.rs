@@ -1,4 +1,4 @@
-fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
+fn solution(input_string: &str, part1: bool) -> u32 {
     let mut result = 0;
     let mut stack = Vec::new();
     let mut ignore_next = false;
@@ -38,15 +38,15 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
             _ => {}
         }
     }
-    Ok(result)
+    result
 }
 
 pub fn part1(input_string: &str) -> Result<u32, String> {
-    solution(input_string, true)
+    Ok(solution(input_string, true))
 }
 
 pub fn part2(input_string: &str) -> Result<u32, String> {
-    solution(input_string, false)
+    Ok(solution(input_string, false))
 }
 
 #[test]

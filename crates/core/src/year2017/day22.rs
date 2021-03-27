@@ -9,7 +9,7 @@ enum NodeFlag {
     Flagged,
 }
 
-fn turn(direction: (i32, i32), right: bool) -> (i32, i32) {
+const fn turn(direction: (i32, i32), right: bool) -> (i32, i32) {
     if right {
         (-direction.1, direction.0)
     } else {
@@ -17,7 +17,7 @@ fn turn(direction: (i32, i32), right: bool) -> (i32, i32) {
     }
 }
 
-fn reverse(direction: (i32, i32)) -> (i32, i32) {
+const fn reverse(direction: (i32, i32)) -> (i32, i32) {
     (-direction.0, -direction.1)
 }
 

@@ -3,37 +3,37 @@ use std::collections::{HashSet, VecDeque};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 enum Direction {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
+    North,
+    East,
+    South,
+    West,
 }
 
 impl Direction {
     const fn reverse(self) -> Self {
         match self {
-            Self::NORTH => Self::SOUTH,
-            Self::EAST => Self::WEST,
-            Self::SOUTH => Self::NORTH,
-            Self::WEST => Self::EAST,
+            Self::North => Self::South,
+            Self::East => Self::West,
+            Self::South => Self::North,
+            Self::West => Self::East,
         }
     }
 
     const fn as_str(self) -> &'static str {
         match self {
-            Self::NORTH => "north",
-            Self::EAST => "east",
-            Self::SOUTH => "south",
-            Self::WEST => "west",
+            Self::North => "north",
+            Self::East => "east",
+            Self::South => "south",
+            Self::West => "west",
         }
     }
 
     fn from_str(string: &str) -> Option<Self> {
         match string {
-            "north" => Some(Self::NORTH),
-            "east" => Some(Self::EAST),
-            "south" => Some(Self::SOUTH),
-            "west" => Some(Self::WEST),
+            "north" => Some(Self::North),
+            "east" => Some(Self::East),
+            "south" => Some(Self::South),
+            "west" => Some(Self::West),
             _ => None,
         }
     }
@@ -132,7 +132,7 @@ pub fn part1(input_string: &str) -> Result<SolutionType, String> {
     to_visit.push_back((initial_room, Vec::new()));
 
     let mut directions_to_security_checkpoint = Vec::new();
-    let mut direction_to_pressure_sensitive_floor = Direction::NORTH;
+    let mut direction_to_pressure_sensitive_floor = Direction::North;
 
     while let Some((from_room, directions_to_reach_here)) = to_visit.pop_front() {
         for &direction in directions_to_reach_here.iter() {

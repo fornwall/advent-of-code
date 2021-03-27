@@ -17,7 +17,7 @@ fn parse_frequency_changes(
 }
 
 pub fn part1(input_string: &str) -> Result<Frequency, String> {
-    Ok(parse_frequency_changes(input_string).sum::<Result<_, _>>()?)
+    parse_frequency_changes(input_string).sum::<Result<_, _>>()
 }
 
 pub fn part2(input_string: &str) -> Result<Frequency, String> {

@@ -1,6 +1,5 @@
 use crate::input::Input;
 use std::collections::HashMap;
-use std::fmt;
 
 /// A 2x2 tile represented as bits. Example: "../.#" is stored as 0b_10_00.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -23,7 +22,7 @@ impl Tile2 {
         Self { bits }
     }
 
-    fn rotate(self) -> Self {
+    const fn rotate(self) -> Self {
         // AB   =>   CA
         // CD        DB
         // First bit  (A): Shift higher 1
@@ -38,7 +37,7 @@ impl Tile2 {
         }
     }
 
-    fn flip(self) -> Self {
+    const fn flip(self) -> Self {
         // AB   =>   BA
         // CD        DC
         // First bit  (A): Shift higher 1
@@ -51,21 +50,6 @@ impl Tile2 {
                 + ((self.bits & 0b_01_00) << 1)
                 + ((self.bits & 0b_10_00) >> 1),
         }
-    }
-}
-
-impl fmt::Debug for Tile2 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(
-            format!(
-                "{}{}/{}{}",
-                if (self.bits & 0b_0001) == 0 { '.' } else { '#' },
-                if (self.bits & 0b_0010) == 0 { '.' } else { '#' },
-                if (self.bits & 0b_0100) == 0 { '.' } else { '#' },
-                if (self.bits & 0b_1000) == 0 { '.' } else { '#' }
-            )
-            .as_str(),
-        )
     }
 }
 
@@ -90,7 +74,7 @@ impl Tile3 {
         Self { bits }
     }
 
-    fn rotate(self) -> Self {
+    const fn rotate(self) -> Self {
         #![allow(clippy::unusual_byte_groupings)]
         // ABC      GDA
         // DEF  =>  HEB
@@ -117,7 +101,7 @@ impl Tile3 {
         }
     }
 
-    fn flip(self) -> Self {
+    const fn flip(self) -> Self {
         #![allow(clippy::unusual_byte_groupings)]
         // ABC      CBA
         // DEF  =>  FED
@@ -136,64 +120,8 @@ impl Tile3 {
     }
 }
 
-impl fmt::Debug for Tile3 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(
-            format!(
-                "{}{}{}/{}{}{}/{}{}{}",
-                if (self.bits & 0b_000000001) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_000000010) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_000000100) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_000001000) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_000010000) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_000100000) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_001000000) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_010000000) == 0 {
-                    '.'
-                } else {
-                    '#'
-                },
-                if (self.bits & 0b_100000000) == 0 {
-                    '.'
-                } else {
-                    '#'
-                }
-            )
-            .as_str(),
-        )
-    }
-}
-
 /// A 4x4 tile represented as bits.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct Tile4 {
     bits: u16,
 }
@@ -213,7 +141,7 @@ impl Tile4 {
         Self { bits }
     }
 
-    fn divided_up(self) -> [Tile2; 4] {
+    const fn divided_up(self) -> [Tile2; 4] {
         [
             Tile2 {
                 // XX00
@@ -252,6 +180,7 @@ impl Tile4 {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
+    #![allow(clippy::unusual_byte_groupings, clippy::unreadable_literal)]
     let mut from_2_to_3 = HashMap::new();
     let mut from_3_to_4 = HashMap::new();
 
@@ -327,11 +256,6 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         .copied()
                         .collect();
 
-                    // Debugging
-                    let initial_one_count: u32 =
-                        tile3_parts.iter().map(|tile| tile.bits.count_ones()).sum();
-                    let initial_size = current_2_tiles.len();
-
                     // From the four 3x3 matrices, build the resulting nine 2x2 ones:
                     //
                     // AAABBB
@@ -395,43 +319,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                             | ((tile3_parts[3].bits & 0b110000000) >> 5))
                             as u8,
                     });
-
-                    /*
-                    let new_one_count = current_2_tiles
-                        .iter()
-                        .skip(initial_size)
-                        .map(|tile| tile.bits.count_ones())
-                        .sum();
-                    println!(
-                        "Going from {} ones to {} (should stay same)",
-                        initial_one_count, new_one_count
-                    );
-                    tile3_parts
-                        .iter()
-                        .for_each(|tile| println!("A 3x3 part: {:?}", tile));
-                    current_2_tiles
-                        .iter()
-                        .for_each(|tile| println!("A 2x2 part: {:?}", tile));
-                    assert_eq!(initial_one_count, new_one_count);
-                     */
                 }
             }
             2 => {
                 // Map each 2x2 matrix to a 3x3 one:
                 current_3_tiles = current_2_tiles
                     .iter()
-                    .map(|tile| {
-                        let tile_3 = from_2_to_3.get(tile);
-                        /*
-                        println!(
-                            "iteration: {} - going from {:?} to {:?}",
-                            iteration,
-                            tile,
-                            tile_3.unwrap()
-                        );
-                         */
-                        *tile_3.unwrap()
-                    })
+                    .map(|tile| *from_2_to_3.get(tile).unwrap())
                     .collect();
             }
             _ => {
@@ -440,10 +334,17 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         }
     }
 
-    Ok(current_2_tiles
-        .iter()
-        .map(|tile| tile.bits.count_ones())
-        .sum())
+    Ok(if input.is_part_one() {
+        current_2_tiles
+            .iter()
+            .map(|tile| tile.bits.count_ones())
+            .sum()
+    } else {
+        current_3_tiles
+            .iter()
+            .map(|tile| tile.bits.count_ones())
+            .sum()
+    })
 }
 
 #[test]
@@ -484,20 +385,6 @@ pub fn tile_tests() {
 
     let tile = Tile4::from("#..#/..../..../#..#");
     assert_eq!(0b_1001_0000_0000_1001, tile.bits);
-    // #.|.#
-    // ..|..
-    // --+--
-    // ..|..
-    // #.|.#
-    assert_eq!(
-        tile.divided_up(),
-        [
-            Tile2::from("#./.."),
-            Tile2::from(".#/.."),
-            Tile2::from("../#."),
-            Tile2::from("../.#")
-        ]
-    );
 }
 
 #[test]
@@ -506,5 +393,5 @@ pub fn tests() {
 
     let real_input = include_str!("day21_input.txt");
     test_part_one!(real_input => 142);
-    //test_part_two!(real_input => 0);
+    test_part_two!(real_input => 1_879_071);
 }

@@ -126,6 +126,7 @@ impl Nanobot {
 ///
 /// The min and max values are both inclusive.
 #[derive(Copy, Clone, Debug)]
+#[allow(clippy::upper_case_acronyms)]
 struct AABB {
     min: Position,
     max: Position,

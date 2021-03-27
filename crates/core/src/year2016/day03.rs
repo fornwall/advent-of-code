@@ -1,7 +1,7 @@
 use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    fn is_triangle_possible(n1: u16, n2: u16, n3: u16) -> bool {
+    const fn is_triangle_possible(n1: u16, n2: u16, n3: u16) -> bool {
         n1 + n2 > n3 && n1 + n3 > n2 && n2 + n3 > n1
     }
 
@@ -15,9 +15,21 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let on_error = || format!("Line {}: Invalid input", line_idx + 1);
 
         let mut parts = line.split_ascii_whitespace();
-        let n1 = parts.next().ok_or_else(on_error)?.parse::<u16>().unwrap();
-        let n2 = parts.next().ok_or_else(on_error)?.parse::<u16>().unwrap();
-        let n3 = parts.next().ok_or_else(on_error)?.parse::<u16>().unwrap();
+        let n1 = parts
+            .next()
+            .ok_or_else(on_error)?
+            .parse::<u16>()
+            .map_err(|_| on_error())?;
+        let n2 = parts
+            .next()
+            .ok_or_else(on_error)?
+            .parse::<u16>()
+            .map_err(|_| on_error())?;
+        let n3 = parts
+            .next()
+            .ok_or_else(on_error)?
+            .parse::<u16>()
+            .map_err(|_| on_error())?;
 
         if input.is_part_one() {
             if is_triangle_possible(n1, n2, n3) {

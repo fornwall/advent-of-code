@@ -73,11 +73,10 @@ impl Rules {
             remaining_sequence: Vec<RuleId>,
         }
 
-        let mut stack = Vec::new();
-        stack.push(PartialMatch {
+        let mut stack = vec![PartialMatch {
             remaining_input: line.as_bytes(),
             remaining_sequence: vec![0],
-        });
+        }];
 
         while let Some(partial_match) = stack.pop() {
             match &self.rules[partial_match.remaining_sequence[0] as usize] {

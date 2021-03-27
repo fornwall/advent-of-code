@@ -3,10 +3,10 @@ use std::collections::HashMap;
 
 #[derive(Copy, Clone)]
 enum State {
-    RIGHT,
-    DOWN,
-    LEFT,
-    UP,
+    Right,
+    Down,
+    Left,
+    Up,
 }
 
 #[derive(Copy, Clone)]
@@ -27,7 +27,7 @@ impl Square {
             current: Self {
                 x: 0,
                 y: 0,
-                state: State::RIGHT,
+                state: State::Right,
             },
         }
     }
@@ -44,28 +44,28 @@ impl Iterator for SquareIterator {
         let orig = self.current;
         let mut result = self.current;
         match result.state {
-            State::UP => {
+            State::Up => {
                 result.y += 1;
                 if result.on_corner() {
-                    result.state = State::LEFT;
+                    result.state = State::Left;
                 }
             }
-            State::RIGHT => {
+            State::Right => {
                 if result.y == 0 || (result.on_corner() && result.x > 0) {
-                    result.state = State::UP;
+                    result.state = State::Up;
                 }
                 result.x += 1;
             }
-            State::DOWN => {
+            State::Down => {
                 result.y -= 1;
                 if result.on_corner() {
-                    result.state = State::RIGHT;
+                    result.state = State::Right;
                 }
             }
-            State::LEFT => {
+            State::Left => {
                 result.x -= 1;
                 if result.on_corner() {
-                    result.state = State::DOWN
+                    result.state = State::Down
                 }
             }
         }
