@@ -25,7 +25,7 @@ jobs:
       run: |
         rustup component add clippy rustfmt --toolchain nightly-2020-12-16
         make NIGHTLY=1 check
-      if: matrix.rust == 'nightly-2020-12-16'
+      if: matrix.rust == 'nightly-2021-03-20'
       continue-on-error: true
 
   test-python:
