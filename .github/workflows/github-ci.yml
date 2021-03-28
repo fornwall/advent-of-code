@@ -394,7 +394,7 @@ jobs:
     - uses: actions/setup-python@v2
     - uses: hecrj/setup-rust-action@v1
       with:
-        rust-version: nightly-
+        rust-version: nightly-2021-03-20
     - uses: actions/setup-node@v1
       with:
         node-version: '12.x'
