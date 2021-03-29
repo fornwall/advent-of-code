@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable, nightly-2021-03-20]
+        rust: [stable, nightly-2021-03-01]
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
@@ -23,9 +23,9 @@ jobs:
       if: matrix.rust == 'stable'
     - name: Test and check (nightly)
       run: |
-        rustup component add clippy rustfmt --toolchain nightly-2021-03-20
+        rustup component add clippy rustfmt --toolchain nightly-2021-03-01
         make NIGHTLY=1 check
-      if: matrix.rust == 'nightly-2021-03-20'
+      if: matrix.rust == 'nightly-2021-03-01'
       continue-on-error: true
 
   test-python:
@@ -394,7 +394,7 @@ jobs:
     - uses: actions/setup-python@v2
     - uses: hecrj/setup-rust-action@v1
       with:
-        rust-version: nightly-2021-03-20
+        rust-version: nightly-2021-03-01
     - uses: actions/setup-node@v1
       with:
         node-version: '12.x'
@@ -455,7 +455,7 @@ jobs:
       uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
       with:
-        rust-version: nightly-2021-03-20
+        rust-version: nightly-2021-03-01
     - name: Fuzz with libfuzzer
       run: timeout 1800s make fuzz-libfuzzer
       continue-on-error: true
@@ -494,11 +494,11 @@ jobs:
 
     - uses: hecrj/setup-rust-action@v1
       with:
-        rust-version: nightly-2021-03-20
+        rust-version: nightly-2021-03-01
 
     - name: Generate code coverage
       # What about -all-features and --workspace?
-      run: cargo +nightly-2021-03-20 tarpaulin --verbose --timeout 120 --out Xml
+      run: cargo +nightly-2021-03-01 tarpaulin --verbose --timeout 120 --out Xml
       working-directory: crates/core
 
     - name: Upload to codecov.io

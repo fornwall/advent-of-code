@@ -1,4 +1,4 @@
-NIGHTLY_DATE = 2021-03-20 # Update versions in .github/workflows as well.
+NIGHTLY_DATE = 2021-03-01 # Update versions in .github/workflows as well.
 NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 
 CARGO_COMMAND = cargo
@@ -37,7 +37,7 @@ WASM_PACK_COMMAND = wasm-pack \
 	build $(wasm_pack_profile) \
 	--target no-modules \
 	--out-dir site
-WASM_PACK_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory" \
+WASM_PACK_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" \
 	rustup run $(NIGHTLY_TOOLCHAIN) \
 	wasm-pack build \
 	$(wasm_pack_profile) \
