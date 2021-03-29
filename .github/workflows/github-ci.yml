@@ -246,7 +246,7 @@ jobs:
       run: |
         make install-wasm-pack
         npm -g config set user root
-        npm config set unsafe-perm true
+        npm -g config set unsafe-perm true
         sudo npm install -g @cloudflare/wrangler
         cd crates/wasm
         wrangler publish
