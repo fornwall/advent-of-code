@@ -65,7 +65,7 @@ site-pack:
 	cd crates/wasm && \
 		$(WASM_PACK_COMMAND) && \
 		cd site && \
-		webpack
+		webpack --mode=production
 
 site-pack-visualization:
 	cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)
