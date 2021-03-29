@@ -245,6 +245,7 @@ jobs:
         CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       run: |
         make install-wasm-pack
+        npm -g config set user root
         sudo npm install -g @cloudflare/wrangler
         cd crates/wasm
         wrangler publish
