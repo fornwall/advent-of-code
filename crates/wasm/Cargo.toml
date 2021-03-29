@@ -30,4 +30,4 @@ syn = "=1.0.65"
 # is fixed with ""--enable-mutable-globals".
 # But without "--no-validation" the build using nightly for the
 # visualisation fails with "Fatal: module features do not match specified features"
-wasm-opt = ["-O3", "--no-validation", "--enable-mutable-globals"]
+wasm-opt = ["-O3", "--no-validation"]
