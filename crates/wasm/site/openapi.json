@@ -27,10 +27,6 @@
     {
       "url": "https://aoc.fornwall.net",
       "description": "Netlify Function"
-    },
-    {
-      "url": "http://localhost:8080",
-      "description": "Local development server"
     }
   ],
   "paths": {
