@@ -231,7 +231,7 @@ jobs:
         args: "deploy"
 
   deploy-cloudflare-worker:
-    # needs: bump-version
+    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
