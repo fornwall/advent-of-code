@@ -231,7 +231,7 @@ jobs:
         args: "deploy"
 
   deploy-cloudflare-worker:
-    needs: bump-version
+    # needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -245,9 +245,9 @@ jobs:
         CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       run: |
         make install-wasm-pack
-        sudo npm install -g --unsafe-perm=true --allow-root @cloudflare/wrangler
         cd crates/wasm
-        wrangler publish
+        npm install @cloudflare/wrangler
+        npx wrangler publish
 
   release-npm-packages:
     needs: bump-version
