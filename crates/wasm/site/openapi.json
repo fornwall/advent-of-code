@@ -48,9 +48,9 @@
             "description": "Year of the problem to solve",
             "schema": {
               "type": "integer",
-              "minimum": 2017,
-              "maximum": 2019,
-              "enum": [2019, 2018, 2017]
+              "minimum": 2015,
+              "maximum": 2020,
+              "enum": [2020, 2019, 2018, 2017, 2016, 2015]
             }
           },
           {
