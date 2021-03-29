@@ -1,5 +1,5 @@
 use advent_of_code::solve;
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion, SamplingMode};
 use std::fs::read_to_string;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
@@ -26,6 +26,7 @@ criterion_group! {
     config = Criterion::default()
         .sample_size(20)
         .warm_up_time(std::time::Duration::new(1, 0))
+        .nresamples(10_000)
         .measurement_time(std::time::Duration::new(3, 0));
     targets = criterion_benchmark
 }
