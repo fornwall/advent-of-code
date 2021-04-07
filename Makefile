@@ -92,6 +92,7 @@ serve-api:
 	cd crates/server && cargo run
 
 node-package:
+	which wasm-opt
 	wasm-opt --version
 	cd crates/wasm && ./build-package.sh
 
