@@ -103,6 +103,8 @@ test-python:
 	cd crates/python && ./run-tests.sh
 
 install-wasm-pack:
+	# See https://github.com/rustwasm/wasm-pack/issues/782 for need of updated wasm-opt:
+	npm install wasm-opt -g
 	rustup target add wasm32-unknown-unknown
 	curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
 		sh /tmp/setup-wasm-pack.sh
