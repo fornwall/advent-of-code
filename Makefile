@@ -92,8 +92,6 @@ serve-api:
 	cd crates/server && cargo run
 
 node-package:
-	which wasm-opt
-	wasm-opt --version
 	cd crates/wasm && ./build-package.sh
 
 npm-publish: node-package
@@ -103,11 +101,11 @@ test-python:
 	cd crates/python && ./run-tests.sh
 
 install-wasm-pack:
-	# See https://github.com/rustwasm/wasm-pack/issues/782 for need of updated wasm-opt:
-	npm install wasm-opt -g
 	rustup target add wasm32-unknown-unknown
-	curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
-		sh /tmp/setup-wasm-pack.sh
+	# See https://github.com/rustwasm/wasm-pack/issues/782 for why we use master version:
+	# curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
+	# sh /tmp/setup-wasm-pack.sh
+	cargo install --git https://github.com/rustwasm/wasm-pack wasm-pack
 
 fuzz-afl:
 	cargo install afl
