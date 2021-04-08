@@ -22,8 +22,6 @@ advent-of-code-painter = { path = "../painter", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
 wasm-bindgen = "*"
 js-sys = "*"
-# https://github.com/rustwasm/wasm-bindgen/issues/2508 for pinning syn:
-syn = "=1.0.65"
 
 [package.metadata.wasm-pack.profile.release]
 # https://github.com/rustwasm/wasm-pack/issues/886
