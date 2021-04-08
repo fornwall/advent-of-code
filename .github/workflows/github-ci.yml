@@ -504,7 +504,7 @@ jobs:
 
     - name: Generate code coverage
       # What about -all-features and --workspace?
-      run: cargo +nightly-2021-03-01 tarpaulin --verbose --timeout 240 --out Xml
+      run: cargo +nightly-2021-03-01 tarpaulin --verbose --timeout 480 --out Xml
       working-directory: crates/core
 
     - name: Upload to codecov.io
