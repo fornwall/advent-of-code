@@ -33,9 +33,6 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     if line[idx + 1] == b'x' {
                         encoded_size += 4;
                         idx += 4;
-                    } else if line[idx + 1] == b'\\' {
-                        encoded_size += 3;
-                        idx += 2;
                     } else {
                         encoded_size += 3;
                         idx += 2;
