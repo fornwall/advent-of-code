@@ -56,12 +56,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
     - name: Install wasm-opt
-      run: |
-        brew install binaryen
-        #curl -L -O https://github.com/WebAssembly/binaryen/releases/download/version_100/binaryen-version_100-x86_64-linux.tar.gz
-        #tar xf binaryen-version_100-x86_64-linux.tar.gz
-        #echo $PATH
-        #mv binaryen-version_100/bin/wasm-opt /usr/bin/wasm-opt
+      run: brew install binaryen
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
     - name: Test with Node ${{ matrix.node-version }}
@@ -271,6 +266,8 @@ jobs:
       run: pip install bump2version
     - name: Bump version
       run: bump2version patch
+    - name: Install wasm-opt
+      run: brew install binaryen
     - name: Publish npm packages
       run: |
         make install-wasm-bindgen
@@ -505,7 +502,7 @@ jobs:
 
     - name: Generate code coverage
       # What about -all-features and --workspace?
-      run: cargo +nightly-2021-03-01 tarpaulin --verbose --timeout 120 --out Xml
+      run: cargo +nightly-2021-03-01 tarpaulin --verbose --timeout 240 --out Xml
       working-directory: crates/core
 
     - name: Upload to codecov.io

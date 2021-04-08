@@ -2,34 +2,19 @@ use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     fn is_nice_part_1(string: &&str) -> bool {
-        let mut vowel_count = 0;
-        let mut twice_in_a_row = false;
-        let mut contains_forbidden = false;
-        let mut last_char = ' ';
-
-        for c in string.chars() {
-            if "aeiou".contains(c) {
-                vowel_count += 1;
-            }
-
-            if c == last_char {
-                twice_in_a_row = true;
-            }
-
-            // "It does not contain the strings ab, cd, pq, or xy,
-            // even if they are part of one of the other requirements":
-            if (last_char == 'a' && c == 'b')
-                || (last_char == 'c' && c == 'd')
-                || (last_char == 'p' && c == 'q')
-                || (last_char == 'x' && c == 'y')
-            {
-                contains_forbidden = true;
-            }
-
-            last_char = c;
+        if string.contains("ab")
+            || string.contains("cd")
+            || string.contains("pq")
+            || string.contains("xy")
+        {
+            return false;
         }
 
-        !contains_forbidden && vowel_count >= 3 && twice_in_a_row
+        string.chars().filter(|&c| "aeiou".contains(c)).count() >= 3
+            && string
+                .as_bytes()
+                .windows(2)
+                .any(|window| window[0] == window[1])
     }
 
     fn is_nice_part_2(string: &&str) -> bool {
