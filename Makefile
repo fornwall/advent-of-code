@@ -29,19 +29,19 @@ else ifneq ($(NIGHTLY),1)
 endif
 
 ifeq ($(WASM_RELEASE),1)
-  wasm_pack_profile = --release
+  WASM_BUILD_PROFILE = --release
 else
-  wasm_pack_profile = --dev
+  WASM_BUILD_PROFILE = --dev
 endif
-WASM_PACK_COMMAND = cargo build --release --target wasm32-unknown-unknown && \
+WASM_BUILD_COMMAND = cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
 	rm -Rf site/generated && \
 	wasm-bindgen --target no-modules --out-dir site/generated ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm && \
 	cd site/generated && \
 	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
 	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
 	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
-WASM_PACK_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" \
-	rustup run $(NIGHTLY_TOOLCHAIN) cargo build --release --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
+WASM_BUILD_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" \
+	rustup run $(NIGHTLY_TOOLCHAIN) cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
 	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
 	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
@@ -66,12 +66,12 @@ site-downloads:
 
 site-pack:
 	cd crates/wasm && \
-		$(WASM_PACK_COMMAND) && \
+		$(WASM_BUILD_COMMAND) && \
 		cd .. && \
 		webpack --mode=production
 
 site-pack-visualization:
-	cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)
+	cd crates/wasm && $(WASM_BUILD_COMMAND_VISUALIZER)
 
 wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
@@ -80,10 +80,10 @@ run-devserver:
 	cd crates/wasm/site && NODE_ENV=development webpack serve
 
 watch-and-build-wasm:
-	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND)'
+	cargo watch -s 'cd crates/wasm && $(WASM_BUILD_COMMAND)'
 
 watch-and-build-wasm-visualization:
-	cargo watch -s 'cd crates/wasm && $(WASM_PACK_COMMAND_VISUALIZER)'
+	cargo watch -s 'cd crates/wasm && $(WASM_BUILD_COMMAND_VISUALIZER)'
 
 serve-site:
 	make -j run-devserver watch-and-build-wasm
