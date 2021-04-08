@@ -104,7 +104,6 @@ test-python:
 	cd crates/python && ./run-tests.sh
 
 install-wasm-bindgen:
-	npm install -g wasm-opt
 	rustup target add wasm32-unknown-unknown
 	cargo install wasm-bindgen-cli
 

@@ -55,6 +55,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
+    - name: Install wasm-opt
+      run: |
+        curl -L -O https://github.com/WebAssembly/binaryen/releases/download/version_100/binaryen-version_100-x86_64-linux.tar.gz
+        tar xf binaryen-version_100-x86_64-linux.tar.gz
+        echo $PATH
+        mv binaryen-version_100/bin/wasm-opt /usr/bin/wasm-opt
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
     - name: Test with Node ${{ matrix.node-version }}
