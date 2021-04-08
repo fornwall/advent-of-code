@@ -55,8 +55,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
-    - name: Install wasm-pack
-      run: make install-wasm-pack
+    - name: Install wasm-bindgen
+      run: make install-wasm-bindgen
     - name: Test with Node ${{ matrix.node-version }}
       run: make node-package
 
@@ -244,7 +244,7 @@ jobs:
       env:
         CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       run: |
-        make install-wasm-pack
+        make install-wasm-bindgen
         cd crates/wasm
         npm install @cloudflare/wrangler
         npx wrangler publish
@@ -266,7 +266,7 @@ jobs:
       run: bump2version patch
     - name: Publish npm packages
       run: |
-        make install-wasm-pack
+        make install-wasm-bindgen
         . ${HOME}/.cargo/env
         make npm-publish
       env:
@@ -402,7 +402,7 @@ jobs:
     - name: Install wasm-pack and nightly
       run: |
         make install-nightly
-        make install-wasm-pack
+        make install-wasm-bindgen
     - name: Install the Netlify CLI
       run: npm install netlify-cli -g
     - name: Download new gist-mapping.json

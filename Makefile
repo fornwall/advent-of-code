@@ -33,17 +33,20 @@ ifeq ($(WASM_RELEASE),1)
 else
   wasm_pack_profile = --dev
 endif
-WASM_PACK_COMMAND = wasm-pack \
-	build $(wasm_pack_profile) \
-	--target no-modules \
-	--out-dir site
+WASM_PACK_COMMAND = cargo build --release --target wasm32-unknown-unknown && \
+	rm -Rf site/generated && \
+	wasm-bindgen --target no-modules --out-dir site/generated ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm && \
+	cd site/generated && \
+	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
+	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
+	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
 WASM_PACK_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" \
-	rustup run $(NIGHTLY_TOOLCHAIN) \
-	wasm-pack build \
-	$(wasm_pack_profile) \
-	--target no-modules \
-	--out-dir site/show \
-	-- --features visualization -Z build-std=std,panic_abort
+	rustup run $(NIGHTLY_TOOLCHAIN) cargo build --release --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
+	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm && \
+	cd site/show/generated && \
+	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
+	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
+	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
 
 check:
 	$(CARGO_COMMAND) fmt --all
@@ -64,7 +67,7 @@ site-downloads:
 site-pack:
 	cd crates/wasm && \
 		$(WASM_PACK_COMMAND) && \
-		cd site && \
+		cd .. && \
 		webpack --mode=production
 
 site-pack-visualization:
@@ -100,12 +103,10 @@ npm-publish: node-package
 test-python:
 	cd crates/python && ./run-tests.sh
 
-install-wasm-pack:
+install-wasm-bindgen:
+	npm install -g wasm-opt
 	rustup target add wasm32-unknown-unknown
-	# See https://github.com/rustwasm/wasm-pack/issues/782 for why we use master version:
-	# curl -sSf -o /tmp/setup-wasm-pack.sh https://rustwasm.github.io/wasm-pack/installer/init.sh && \
-	# sh /tmp/setup-wasm-pack.sh
-	cargo install --git https://github.com/rustwasm/wasm-pack wasm-pack
+	cargo install wasm-bindgen-cli
 
 fuzz-afl:
 	cargo install afl
@@ -139,5 +140,5 @@ netlify:
 		cd .. && \
 		netlify deploy --prod
 
-.PHONY: check install-cargo-deps bench site-downloads site-pack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-pack fuzz-afl netlify
+.PHONY: check install-cargo-deps bench site-downloads site-pack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-bindgen fuzz-afl netlify
 

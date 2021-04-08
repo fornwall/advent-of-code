@@ -1,5 +1,5 @@
 "use strict";
-self.importScripts("/advent_of_code_wasm.js");
+self.importScripts("/generated/advent_of_code_wasm.js");
 
 self.onmessage = async (message) => {
   const { year, day, part, input, wasm } = message.data;
@@ -44,7 +44,7 @@ self.onmessage = async (message) => {
 
 self.wasmReadyPromise = (async () => {
   try {
-    await wasm_bindgen("/advent_of_code_wasm_bg.wasm");
+    await wasm_bindgen("/generated/advent_of_code_wasm_bg.wasm");
     self.wasmWorking = true;
   } catch (e) {
     console.warn("WebAssembly not working", e);

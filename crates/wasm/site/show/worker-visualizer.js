@@ -1,5 +1,5 @@
 "use strict";
-self.importScripts("advent_of_code_wasm.js");
+self.importScripts("generated/advent_of_code_wasm.js");
 
 self.onmessage = async (message) => {
   try {
@@ -28,7 +28,7 @@ self.onmessage = async (message) => {
 
 self.wasmReadyPromise = (async () => {
   try {
-    return await wasm_bindgen("advent_of_code_wasm_bg.wasm");
+    return await wasm_bindgen("generated/advent_of_code_wasm_bg.wasm");
   } catch (e) {
     throw new Error("WebAssembly not working - " + e.message);
   }

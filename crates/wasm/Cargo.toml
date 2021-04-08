@@ -22,10 +22,3 @@ advent-of-code-painter = { path = "../painter", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
 wasm-bindgen = "*"
 js-sys = "*"
-
-[package.metadata.wasm-pack.profile.release]
-# https://github.com/rustwasm/wasm-pack/issues/886
-# is fixed with ""--enable-mutable-globals".
-# But without "--no-validation" the build using nightly for the
-# visualisation fails with "Fatal: module features do not match specified features"
-wasm-opt = ["-O3", "--no-validation"]
