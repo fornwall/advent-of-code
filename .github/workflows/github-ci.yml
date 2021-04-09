@@ -160,8 +160,7 @@ jobs:
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
-        docker build --tag ${IMAGE} crates/core
-        docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
+        docker build --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
         docker push ${DOCKER_IMAGE_NAME}
 
   publish-and-deploy-http-server:
