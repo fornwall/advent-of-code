@@ -139,7 +139,6 @@ pub fn part2(input_string: &str) -> Result<String, String> {
                 }
             }
             start_of_current_char_x = x + 1;
-            // println!("###\n{}\n####", this_char_string);
             result.push(
                 recognize(&this_char_string)
                     .ok_or(format!("Unrecognized character: {}", this_char_string))?,
