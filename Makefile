@@ -30,8 +30,6 @@ endif
 
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
-else
-  WASM_BUILD_PROFILE = --dev
 endif
 WASM_BUILD_COMMAND = cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
 	rm -Rf site/generated && \
