@@ -1,14 +1,47 @@
+use crate::common::permutation::all_permutations;
 use crate::Input;
+use std::collections::{HashMap, HashSet};
 
-pub fn solve(_input: &mut Input) -> Result<u32, String> {
-    Err("Not yet implemented".to_string())
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let mut places = HashSet::new();
+    let mut distances = HashMap::new();
+    for line in input.text.lines() {
+        // "Faerun to Tristram = 58"
+        let parts = line.split(' ').collect::<Vec<_>>();
+        let from = parts[0];
+        let to = parts[2];
+        let distance = parts[4].parse::<u32>().map_err(|_| "Invalid input")?;
+
+        places.insert(from);
+        places.insert(to);
+        distances.insert((from, to), distance);
+        distances.insert((to, from), distance);
+    }
+
+    let mut best_distance = input.part_values(u32::MAX, u32::MIN);
+    let mut places = places.into_iter().collect::<Vec<_>>();
+
+    all_permutations(&mut places, &mut |ordering| {
+        let mut this_distance = 0;
+        for pair in ordering.windows(2) {
+            this_distance += distances.get(&(pair[0], pair[1])).unwrap();
+        }
+        best_distance = if input.is_part_one() {
+            std::cmp::min(best_distance, this_distance)
+        } else {
+            std::cmp::max(best_distance, this_distance)
+        };
+        Ok(())
+    })?;
+
+    Ok(best_distance)
 }
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one_error, test_part_two_error};
+    use crate::{test_part_one, test_part_two};
 
     let real_input = include_str!("day09_input.txt");
-    test_part_one_error!(real_input => "Not yet implemented".to_string());
-    test_part_two_error!(real_input => "Not yet implemented".to_string());
+    test_part_one!(real_input => 207);
+    test_part_two!(real_input => 804);
 }

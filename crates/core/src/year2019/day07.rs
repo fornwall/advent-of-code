@@ -1,5 +1,5 @@
 use super::int_code::{Program, Word};
-use super::permutation::all_permutations;
+use crate::common::permutation::all_permutations;
 use crate::input::Input;
 use std::cell::RefCell;
 
