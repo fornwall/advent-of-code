@@ -18,7 +18,7 @@ fn read_string(s: &str) -> String {
     }
 
     result.push_str(&num_digits.to_string());
-    result.push_str(&last_digit.unwrap_or(0).to_string());
+    result.push_str(&last_digit.unwrap_or('0').to_string());
 
     result
 }
