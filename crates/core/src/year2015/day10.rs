@@ -41,6 +41,6 @@ pub fn tests() {
     assert_eq!(read_string("1211"), "111221");
 
     let real_input = include_str!("day10_input.txt");
-    test_part_one!(real_input => 252594);
-    test_part_two!(real_input => 3579328);
+    test_part_one!(real_input => 252_594);
+    test_part_two!(real_input => 3_579_328);
 }
