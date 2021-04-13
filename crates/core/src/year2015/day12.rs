@@ -2,11 +2,11 @@ use crate::Input;
 use std::collections::HashMap;
 
 #[derive(Eq, PartialEq, Debug)]
-enum JsonValue {
-    String(String),
+enum JsonValue<'a> {
+    String(&'a [u8]),
     Number(i32),
-    Array(Vec<JsonValue>),
-    Object(HashMap<String, JsonValue>),
+    Array(Vec<JsonValue<'a>>),
+    Object(HashMap<&'a [u8], JsonValue<'a>>),
     Comma,
     Colon,
     EndOfArray,
@@ -14,7 +14,7 @@ enum JsonValue {
     EndOfInput,
 }
 
-fn parse(input: &[u8], current_idx: &mut usize) -> JsonValue {
+fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> JsonValue<'a> {
     let next_char = input[*current_idx];
     if *current_idx == input.len() {
         return JsonValue::EndOfInput;
@@ -64,13 +64,14 @@ fn parse(input: &[u8], current_idx: &mut usize) -> JsonValue {
         b']' => JsonValue::EndOfArray,
         b',' => JsonValue::Comma,
         b'"' => {
+            let start_idx = *current_idx;
             let mut string = String::new();
             let mut idx = *current_idx;
             loop {
                 let read_char = input[idx];
                 if read_char == b'"' {
                     *current_idx = idx + 1;
-                    return JsonValue::String(string);
+                    return JsonValue::String(&input[start_idx..idx]);
                 } else {
                     string.push(read_char as char);
                 }
@@ -111,7 +112,7 @@ fn sum_json_value(value: &JsonValue, part2: bool) -> i32 {
             if part2
                 && map
                     .values()
-                    .any(|value| value == &JsonValue::String("red".to_string()))
+                    .any(|value| value == &JsonValue::String(b"red"))
             {
                 0
             } else {
@@ -136,29 +137,26 @@ pub fn test_parse() {
 
     current_idx = 0;
     assert_eq!(
-        JsonValue::String("1234".to_string()),
+        JsonValue::String(b"1234"),
         parse(b"\"1234\"", &mut current_idx)
     );
 
     current_idx = 0;
     assert_eq!(
-        JsonValue::Array(vec![
-            JsonValue::Number(123),
-            JsonValue::String("abc".to_string())
-        ]),
+        JsonValue::Array(vec![JsonValue::Number(123), JsonValue::String(b"abc")]),
         parse(b"[123,\"abc\"]", &mut current_idx)
     );
 
     current_idx = 0;
     let mut expected_map = HashMap::new();
-    expected_map.insert("key1".to_string(), JsonValue::Number(123));
-    expected_map.insert("key2".to_string(), JsonValue::String("abc".to_string()));
+    let key1 = b"key1";
+    let key2 = b"key2";
+    let key3 = b"key3";
+    expected_map.insert(&key1[..], JsonValue::Number(123));
+    expected_map.insert(&key2[..], JsonValue::String(b"abc"));
     expected_map.insert(
-        "key3".to_string(),
-        JsonValue::Array(vec![
-            JsonValue::Number(-345),
-            JsonValue::String("abc".to_string()),
-        ]),
+        &key3[..],
+        JsonValue::Array(vec![JsonValue::Number(-345), JsonValue::String(b"abc")]),
     );
     assert_eq!(
         JsonValue::Object(expected_map),
