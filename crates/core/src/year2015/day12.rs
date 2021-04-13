@@ -64,19 +64,14 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> JsonValue<'a> {
         b']' => JsonValue::EndOfArray,
         b',' => JsonValue::Comma,
         b'"' => {
-            let start_idx = *current_idx;
-            let mut string = String::new();
-            let mut idx = *current_idx;
-            loop {
-                let read_char = input[idx];
+            for (idx, &read_char) in input.iter().enumerate().skip(*current_idx) {
                 if read_char == b'"' {
+                    let start_idx = *current_idx;
                     *current_idx = idx + 1;
                     return JsonValue::String(&input[start_idx..idx]);
-                } else {
-                    string.push(read_char as char);
                 }
-                idx += 1;
             }
+            panic!("No end of string");
         }
         b'0'..=b'9' | b'-' => {
             let mut string = String::new();
