@@ -40,52 +40,57 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut hash_cache = Vec::new();
     for i in 0..1000 {
         let content_to_hash = format!("{}{}", salt, i);
-        let bytes_to_hash = content_to_hash.as_bytes();
-        hasher.update(bytes_to_hash);
+        hasher.update(content_to_hash.as_bytes());
         if input.is_part_two() {
             for _ in 0..2016 {
-                hasher.update(bytes_to_hash);
+                hasher.finalize_into_reset(&mut hash);
+                let hash_str = to_hash_chars(&hash)
+                    .iter()
+                    .map(|&b| if b <= 9 { b'0' + b } else { b'a' + (b - 10) })
+                    .collect::<Vec<_>>();
+                hasher.update(&hash_str);
             }
         }
         hasher.finalize_into_reset(&mut hash);
-        hash_cache.push(hash.clone());
+        hash_cache.push(hash);
     }
 
     let mut valid_key_count = 0;
     let mut index = 0;
     loop {
-        let content_to_hash = format!("{}{}", salt, index);
-        let bytes_to_hash = content_to_hash.as_bytes();
-        hasher.update(bytes_to_hash);
-        if input.is_part_two() {
-            for _ in 0..2016 {
-                hasher.update(bytes_to_hash);
-            }
-        }
-        hasher.finalize_into_reset(&mut hash);
-
-        if let Some(triplet_value) = first_triplet(&hash) {
-            'five_in_a_row: for next_index in (index + 1)..=(index + 1000) {
-                let content_to_hash = format!("{}{}", salt, next_index);
-                let bytes_to_hash = content_to_hash.as_bytes();
-                hasher.update(bytes_to_hash);
-                if input.is_part_two() {
-                    for _ in 0..2016 {
-                        hasher.update(bytes_to_hash);
-                    }
+        let current_hash = hash_cache[index % 1000];
+        hash_cache[index % 1000] = {
+            let content_to_hash = format!("{}{}", salt, index + 1000);
+            hasher.update(content_to_hash.as_bytes());
+            if input.is_part_two() {
+                for _ in 0..2016 {
+                    hasher.finalize_into_reset(&mut hash);
+                    let hash_str = to_hash_chars(&hash)
+                        .iter()
+                        .map(|&b| if b <= 9 { b'0' + b } else { b'a' + (b - 10) })
+                        .collect::<Vec<_>>();
+                    hasher.update(&hash_str);
                 }
-                hasher.finalize_into_reset(&mut hash);
-                if contains_five_in_a_row(&hash, triplet_value) {
-                    valid_key_count += 1;
-                    if valid_key_count == 64 {
-                        return Ok(index);
-                    } else {
-                        break 'five_in_a_row;
-                    }
+            }
+            hasher.finalize_into_reset(&mut hash);
+            hash
+        };
+
+        if let Some(triplet_value) = first_triplet(&current_hash) {
+            if hash_cache
+                .iter()
+                .any(|hash| contains_five_in_a_row(hash, triplet_value))
+            {
+                valid_key_count += 1;
+                if valid_key_count == 64 {
+                    return Ok(index as u32);
                 }
             }
         }
 
+        if index > 100_000 {
+            break;
+        }
         index += 1;
     }
 
@@ -96,10 +101,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
 
-    test_part_one!("abc" => 22728);
-    //test_part_two!("abc" => 22551);
-
     let real_input = include_str!("day14_input.txt");
     test_part_one!(real_input => 15168);
-    //test_part_two!(real_input => 0);
+    test_part_two!(real_input => 20864);
 }
