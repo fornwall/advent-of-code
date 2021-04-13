@@ -17,8 +17,6 @@ fn to_hash_chars(hash: &[u8]) -> [u8; 32] {
 
 fn first_triplet(hash: &[u8]) -> Option<u8> {
     let hash_chars = to_hash_chars(hash);
-    //println!("hash: {:?}", hash);
-    //println!("hash chars: {:?}", hash_chars);
     hash_chars
         .windows(3)
         .find(|w| w[0] == w[1] && w[1] == w[2])
@@ -38,6 +36,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut hasher = Md5::new();
     let mut hash = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let mut hash_cache = Vec::new();
+
     for i in 0..1000 {
         let content_to_hash = format!("{}{}", salt, i);
         hasher.update(content_to_hash.as_bytes());
