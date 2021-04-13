@@ -9,7 +9,7 @@ struct Ingredient {
     calories: i32,
 }
 
-fn calculate_recipe(ingredients: &[Ingredient], teaspoons: &[i32], part2: bool) -> i32 {
+fn score_recipe(ingredients: &[Ingredient], teaspoons: &[i32], part2: bool) -> i32 {
     let mut capacity = 0;
     let mut durability = 0;
     let mut flavour = 0;
@@ -35,6 +35,25 @@ fn calculate_recipe(ingredients: &[Ingredient], teaspoons: &[i32], part2: bool) 
     }
 
     capacity * durability * flavour * texture
+}
+
+fn highest_score(
+    ingredients: &[Ingredient],
+    teaspoons: &mut [i32],
+    index: usize,
+    part2: bool,
+) -> i32 {
+    if index == teaspoons.len() {
+        return score_recipe(ingredients, teaspoons, part2);
+    }
+    let earlier_sum = teaspoons.iter().take(index).sum::<i32>();
+    let mut max_score = 0;
+    for i in 0..=(100 - earlier_sum) {
+        teaspoons[index] = i;
+        let score = highest_score(ingredients, teaspoons, index + 1, part2);
+        max_score = std::cmp::max(max_score, score);
+    }
+    max_score
 }
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
@@ -68,30 +87,22 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
     let mut teaspoons = vec![0; ingredients.len()];
 
-    let mut max_score = 0;
-    for i1 in 0..=100 {
-        teaspoons[0] = i1;
-
-        for i2 in 0..=100 - i1 {
-            teaspoons[1] = i2;
-
-            for i3 in 0..=100 - (i1 + i2) {
-                teaspoons[2] = i3;
-
-                teaspoons[3] = 100 - (i1 + i2 + i3);
-
-                let score = calculate_recipe(&ingredients, &teaspoons, input.is_part_two());
-                max_score = std::cmp::max(max_score, score);
-            }
-        }
-    }
-
-    Ok(max_score)
+    Ok(highest_score(
+        &ingredients,
+        &mut teaspoons,
+        0,
+        input.is_part_two(),
+    ))
 }
 
 #[test]
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
+
+    let example = "Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
+Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3";
+    test_part_one!(example => 62_842_880);
+    test_part_two!(example => 57_600_000);
 
     let real_input = include_str!("day15_input.txt");
     test_part_one!(real_input => 18_965_440);
