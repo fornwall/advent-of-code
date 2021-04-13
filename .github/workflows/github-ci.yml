@@ -161,7 +161,7 @@ jobs:
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
         docker build --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
-        docker push ${DOCKER_IMAGE_NAME}
+        docker push --all-tags ${DOCKER_IMAGE_NAME}
 
   publish-and-deploy-http-server:
     needs: bump-version
@@ -186,9 +186,8 @@ jobs:
         cd crates/http-server
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
-        docker build --tag ${IMAGE} .
-        docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
-        docker push ${DOCKER_IMAGE_NAME}
+        docker build --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest .
+        docker push --all-tags ${DOCKER_IMAGE_NAME}
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
       env:
@@ -220,9 +219,8 @@ jobs:
         cd crates/grpc-server
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
-        docker build --tag ${IMAGE} .
-        docker tag ${IMAGE} ${DOCKER_IMAGE_NAME}:latest
-        docker push ${DOCKER_IMAGE_NAME}
+        docker build --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest .
+        docker push --all-tags ${DOCKER_IMAGE_NAME}
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
       env:
