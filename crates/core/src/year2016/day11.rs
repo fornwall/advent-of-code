@@ -63,13 +63,11 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         Floor::default(),
     ];
 
-    // See
-    // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/db1zbu0
     for (floor_idx, line) in input.text.lines().enumerate() {
-        // The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.
+        // "The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.
         // The second floor contains a hydrogen generator.
         // The third floor contains a lithium generator.
-        // The fourth floor contains nothing relevant.
+        // The fourth floor contains nothing relevant."
         let words = line.split(' ').collect::<Vec<_>>();
         for (word_idx, &word) in words.iter().enumerate() {
             let (isotope_name, microchip) = if word.starts_with("microchip") {
