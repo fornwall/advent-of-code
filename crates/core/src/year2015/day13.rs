@@ -2,7 +2,6 @@ use crate::common::permutation::all_permutations;
 use crate::Input;
 use std::collections::HashMap;
 
-// TODO: Put generic version (on value type) in common?
 struct IdAssigner {
     id_map: HashMap<String, usize>,
 }
@@ -36,19 +35,16 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
         let person_id = id_assigner.id_of(person_name);
         let other_id = id_assigner.id_of(other_name);
-        /*
-        println!(
-            "person={}, other={}, pid={}, oid={}",
-            person_name, other_name, person_id, other_id
-        );
-         */
+
         while person_id >= happiness_changes.len() {
             happiness_changes.push(Vec::new());
         }
+
         if other_id != happiness_changes[person_id].len() {
             // This person
             happiness_changes[person_id].push(0);
         }
+
         happiness_changes[person_id].push(happiness_change);
     }
 
