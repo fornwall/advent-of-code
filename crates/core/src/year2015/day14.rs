@@ -57,19 +57,11 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
         }
     }
 
-    if input.is_part_one() {
-        Ok(reindeers
-            .iter()
-            .map(|deer| deer.distance)
-            .max()
-            .unwrap_or_default())
-    } else {
-        Ok(reindeers
-            .iter()
-            .map(|deer| deer.points)
-            .max()
-            .unwrap_or_default())
-    }
+    Ok(reindeers
+        .iter()
+        .map(|deer| input.part_values(deer.distance, deer.points))
+        .max()
+        .unwrap_or_default())
 }
 
 #[test]
