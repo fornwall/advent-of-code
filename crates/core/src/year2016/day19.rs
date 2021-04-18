@@ -18,6 +18,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             }
         }
     } else {
+        // TODO: From https://pastebin.com/Zm7tLbAe, understand
+        // TODO: Use a common divide_rounding_up() function?
         let mut v1: VecDeque<u32> = (1..(n + 1) / 2 + 1).collect();
         let mut v2: VecDeque<u32> = ((n + 1) / 2 + 1..(n + 1)).collect();
         loop {
