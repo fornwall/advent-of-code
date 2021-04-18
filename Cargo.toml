@@ -10,3 +10,6 @@ codegen-units = 1
 [profile.bench]
 lto = true
 codegen-units = 1
+
+[profile.dev]
+debug = false
