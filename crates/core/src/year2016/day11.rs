@@ -1,8 +1,7 @@
 use crate::Input;
 use std::cmp::Ordering;
 use std::cmp::Reverse;
-use std::collections::hash_map::Entry;
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 #[derive(Copy, Clone, Eq, PartialOrd, PartialEq, Hash, Ord)]
 enum GeneratorOrMicrochip {
@@ -119,7 +118,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }
 
     let mut to_visit = BinaryHeap::new();
-    let mut cost_of_states = HashMap::new();
+    let mut visited_states = HashSet::new();
 
     let initial_state = State {
         // "When you enter the containment area, you and the elevator will start on the first floor":
@@ -128,7 +127,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     };
 
     to_visit.push(Reverse((0, 0, initial_state.clone())));
-    cost_of_states.insert(initial_state, 0);
+    visited_states.insert(initial_state);
 
     while let Some(Reverse((_, visited_state_cost, visited_state))) = to_visit.pop() {
         if visited_state
@@ -179,20 +178,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         floors: new_floors,
                     };
 
-                    let do_insert = match cost_of_states.entry(new_state.clone()) {
-                        Entry::Vacant(entry) => {
-                            entry.insert(new_cost);
-                            true
-                        }
-                        Entry::Occupied(mut entry) => {
-                            if new_cost < *entry.get() {
-                                entry.insert(new_cost);
-                                true
-                            } else {
-                                false
-                            }
-                        }
-                    };
+                    let do_insert = visited_states.insert(new_state.clone());
                     if do_insert {
                         // Encourage moving things up:
                         let heuristic = new_state.floors[0].content.len() * 60

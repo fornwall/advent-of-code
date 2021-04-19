@@ -1,7 +1,6 @@
 use crate::Input;
 use std::cmp::Reverse;
-use std::collections::hash_map::Entry;
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashSet};
 
 const fn is_wall(x: i32, y: i32, magic_number: i32) -> bool {
     let sum = x * x + 3 * x + 2 * x * y + y + y * y + magic_number;
@@ -17,13 +16,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         .map_err(|e| format!("Invalid magic number: {}", e))?;
 
     let mut to_visit = BinaryHeap::new();
-    let mut cost_of_states = HashMap::new();
+    let mut visited_states = HashSet::new();
 
     let initial_state = (1, 1);
     let mut visit_count = 0;
 
     to_visit.push(Reverse((0, 0, initial_state)));
-    cost_of_states.insert(initial_state, 0);
+    visited_states.insert(initial_state);
 
     while let Some(Reverse((_estimate, visited_state_cost, visited_state))) = to_visit.pop() {
         if input.is_part_one() {
@@ -45,20 +44,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
             let new_cost = visited_state_cost + 1;
 
-            let do_insert = match cost_of_states.entry((new_x, new_y)) {
-                Entry::Vacant(entry) => {
-                    entry.insert(new_cost);
-                    true
-                }
-                Entry::Occupied(mut entry) => {
-                    if new_cost < *entry.get() {
-                        entry.insert(new_cost);
-                        true
-                    } else {
-                        false
-                    }
-                }
-            };
+            let do_insert = visited_states.insert((new_x, new_y));
             if do_insert {
                 let new_estimate = new_cost
                     + if input.is_part_one() {
