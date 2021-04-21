@@ -2,7 +2,7 @@ pub type Word = i32;
 type Register = u8;
 
 #[derive(Copy, Clone, Debug)]
-enum ValueOrRegister {
+pub enum ValueOrRegister {
     Value(Word),
     Register(Register),
 }
@@ -26,7 +26,7 @@ fn parse_register(input: &str) -> Result<Register, String> {
 }
 
 #[derive(Copy, Clone, Debug)]
-enum Instruction {
+pub enum Instruction {
     // cpy x y copies x (either an integer or the value of a register) into register y.
     Copy(ValueOrRegister, Register),
     // inc x increases the value of register x by one.
@@ -39,6 +39,8 @@ enum Instruction {
     Toggle(Register),
     // Instruction that does nothing. Used to implement Toggle.
     Nop,
+    // out x transmits x (either an integer or the value of a register) as the next value for the clock signal.
+    Out(ValueOrRegister),
 }
 
 impl Instruction {
@@ -93,6 +95,10 @@ impl Instruction {
                 let register = parse_register(words[1])?;
                 Ok(Self::Toggle(register))
             }
+            "out" => {
+                let parameter = ValueOrRegister::parse(words[1])?;
+                Ok(Self::Out(parameter))
+            }
             _ => Err("Invalid instruction not starting with cpy, inc, dec or jnz".to_string()),
         }
     }
@@ -102,6 +108,10 @@ impl Instruction {
             Self::Copy(a, b) => Self::Jump(a, ValueOrRegister::Register(b)),
             Self::Increase(a) => Self::Decrease(a),
             Self::Decrease(a) | Self::Toggle(a) => Self::Increase(a),
+            Self::Out(a) => match a {
+                ValueOrRegister::Register(register_value) => Self::Increase(register_value),
+                _ => Self::Nop,
+            },
             Self::Jump(a, b) => match b {
                 ValueOrRegister::Register(register_value) => Self::Copy(a, register_value),
                 _ => Self::Nop,
@@ -114,7 +124,7 @@ impl Instruction {
 pub struct Computer {
     // The assembunny code you've extracted operates on four registers (a, b, c, and d) that start at 0 and can hold any integer
     pub(crate) registers: [Word; 4],
-    instructions: Vec<Instruction>,
+    pub(crate) instructions: Vec<Instruction>,
 }
 
 impl Computer {
@@ -160,6 +170,7 @@ impl Computer {
                     }
                 }
                 Instruction::Nop => {}
+                Instruction::Out(_a) => {}
             }
 
             current_instruction += 1;
