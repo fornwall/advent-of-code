@@ -17,11 +17,6 @@ fn parse_vector(input: &str) -> Option<(i32, i32, i32)> {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let mut best_acceleration = i32::MAX;
-    let mut best_speed = i32::MAX;
-    let mut best_position = i32::MAX;
-    let mut best_particle_idx = 0;
-
     let mut particles = Vec::new();
 
     for (line_idx, line) in input.text.lines().enumerate() {
@@ -35,37 +30,18 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             parse_vector(parts.next().ok_or_else(on_error)?).ok_or_else(on_error)?;
 
         particles.push((position_part, speed_part, acceleration_part));
-
-        let this_acceleration =
-            acceleration_part.0.abs() + acceleration_part.1.abs() + acceleration_part.2.abs();
-        let this_speed = speed_part.0.abs() + speed_part.1.abs() + speed_part.2.abs();
-        let this_position = position_part.0.abs() + position_part.1.abs() + position_part.2.abs();
-        if this_acceleration < best_acceleration
-            || (this_acceleration == best_acceleration && this_speed < best_speed)
-            || (this_acceleration == best_acceleration
-                && this_speed == best_speed
-                && this_position < best_position)
-        {
-            best_particle_idx = line_idx as u32;
-            best_acceleration = this_acceleration;
-            best_speed = this_speed;
-            best_position = this_position;
-        }
-    }
-
-    if input.is_part_one() {
-        return Ok(best_particle_idx);
     }
 
     for _ in 0..500 {
         particles = particles
             .iter()
             .filter_map(|particle| {
-                if particles
-                    .iter()
-                    .filter(|other_particle| other_particle.0 == particle.0)
-                    .count()
-                    > 1
+                if input.is_part_two()
+                    && particles
+                        .iter()
+                        .filter(|other_particle| other_particle.0 == particle.0)
+                        .count()
+                        > 1
                 {
                     None
                 } else {
@@ -86,7 +62,22 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             .collect();
     }
 
-    Ok(particles.len() as u32)
+    if input.is_part_one() {
+        Ok(particles
+            .iter()
+            .enumerate()
+            .fold((0, i32::MAX), |acc, (idx, particle)| {
+                let dist = particle.0 .0.abs() + particle.0 .1.abs() + particle.0 .2.abs();
+                if dist < acc.1 {
+                    (idx, dist)
+                } else {
+                    acc
+                }
+            })
+            .0 as u32)
+    } else {
+        Ok(particles.len() as u32)
+    }
 }
 
 #[test]
