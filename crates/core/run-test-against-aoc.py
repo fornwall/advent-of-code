@@ -26,7 +26,7 @@ if "AOC_YEAR" in os.environ:
     else:
         years = [int(years_string)]
 else:
-    years = [2018, 2019]
+    years = [2015, 2016, 2017, 2018, 2019, 2020]
 
 if "AOC_DAY" in os.environ:
     days_string = os.environ["AOC_DAY"]
@@ -43,12 +43,13 @@ if "AOC_PART" in os.environ:
 else:
     parts = range(1, 3)
 
-for session in SESSIONS:
-    session_cookie = session["cookie"]
-    session_description = session["description"]
-    user = User(session_cookie)
-    for year in years:
-        for day in days:
+for year in years:
+    for day in days:
+        for session in SESSIONS:
+            session_cookie = session["cookie"]
+            session_description = session["description"]
+            user = User(session_cookie)
+
             print(f"# Year {year}, Day {day} - {session_description}")
             puzzle = Puzzle(year=year, day=day, user=user)
             input_data = puzzle.input_data
