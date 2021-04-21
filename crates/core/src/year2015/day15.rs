@@ -10,6 +10,10 @@ struct Ingredient {
 }
 
 fn score_recipe(ingredients: &[Ingredient], teaspoons: &[i32], part2: bool) -> i32 {
+    if teaspoons.iter().sum::<i32>() != 100 {
+        return 0;
+    }
+
     let mut capacity = 0;
     let mut durability = 0;
     let mut flavour = 0;
@@ -46,9 +50,9 @@ fn highest_score(
     if index == teaspoons.len() {
         return score_recipe(ingredients, teaspoons, part2);
     }
-    let earlier_sum = teaspoons.iter().take(index).sum::<i32>();
+    let spoons_used_so_far = teaspoons.iter().take(index).sum::<i32>();
     let mut max_score = 0;
-    for i in 0..=(100 - earlier_sum) {
+    for i in 0..=(100 - spoons_used_so_far) {
         teaspoons[index] = i;
         let score = highest_score(ingredients, teaspoons, index + 1, part2);
         max_score = std::cmp::max(max_score, score);
