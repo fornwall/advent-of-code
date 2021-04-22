@@ -1,5 +1,5 @@
-use super::character_recognition::recognize;
 use super::int_code::{Program, Word};
+use crate::common::character_recognition::recognize;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -114,36 +114,24 @@ pub fn part2(input_string: &str) -> Result<String, String> {
     });
 
     let mut result = String::new();
-    let mut start_of_current_char_x = min_x;
-    for x in min_x..=max_x {
-        let mut empty_column = true;
-        for y in min_y..=max_y {
-            if let Some(&Color::White) = painted.get(&(x, y)) {
-                empty_column = false;
+    for x in (min_x..=max_x).step_by(5) {
+        let mut this_char_string = String::new();
+        for y in (min_y..=max_y).rev() {
+            for char_x in x..(x + 5) {
+                this_char_string.push(if let Some(&Color::White) = painted.get(&(char_x, y)) {
+                    '█'
+                } else {
+                    ' '
+                });
+            }
+            if y != min_y {
+                this_char_string.push('\n');
             }
         }
-
-        if empty_column || x == max_x {
-            let mut this_char_string = String::new();
-            for y in (min_y..=max_y).rev() {
-                let end_index = if empty_column { x } else { x + 1 };
-                for char_x in start_of_current_char_x..end_index {
-                    this_char_string.push(if let Some(&Color::White) = painted.get(&(char_x, y)) {
-                        '█'
-                    } else {
-                        ' '
-                    });
-                }
-                if y != min_y {
-                    this_char_string.push('\n');
-                }
-            }
-            start_of_current_char_x = x + 1;
-            result.push(
-                recognize(&this_char_string)
-                    .ok_or(format!("Unrecognized character: {}", this_char_string))?,
-            );
-        }
+        result.push(
+            recognize(&this_char_string)
+                .ok_or(format!("Unrecognized character: {}", this_char_string))?,
+        );
     }
 
     Ok(result)

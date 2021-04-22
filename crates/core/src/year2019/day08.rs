@@ -1,4 +1,4 @@
-use super::character_recognition::recognize;
+use crate::common::character_recognition::recognize;
 use std::str;
 
 const PIXELS_WIDE: u32 = 25;
@@ -47,48 +47,24 @@ pub fn part2(input_string: &str) -> Result<String, String> {
         });
 
     let mut result = String::new();
-    let mut start_of_current_char_x = 0;
-    for x in 0..PIXELS_WIDE {
-        let mut empty_column = true;
+    for x in (0..PIXELS_WIDE).step_by(5) {
+        let mut this_char_string = String::new();
         for y in 0..PIXELS_TALL {
-            if image[(x + PIXELS_WIDE * y) as usize] == b'1' {
-                empty_column = false;
-            }
-        }
-
-        // 'Y' is rendered with width 5, so might not be followed by empty column:
-        let y_detected = (x - start_of_current_char_x) == 5
-            && image[start_of_current_char_x as usize] == b'1'
-            && image[(start_of_current_char_x + 1) as usize] != b'1'
-            && image[(start_of_current_char_x + 2) as usize] != b'1'
-            && image[(start_of_current_char_x + 3) as usize] != b'1'
-            && image[(start_of_current_char_x + 4) as usize] == b'1';
-
-        if empty_column || y_detected || x == PIXELS_WIDE - 1 {
-            let mut this_char_string = String::new();
-            for y in 0..PIXELS_TALL {
-                let end_index = x + if x == PIXELS_WIDE - 1 && !empty_column {
-                    1
+            for char_x in x..(x + 5) {
+                this_char_string.push(if image[(char_x + PIXELS_WIDE * y) as usize] == b'1' {
+                    '█'
                 } else {
-                    0
-                };
-                for char_x in start_of_current_char_x..end_index {
-                    this_char_string.push(if image[(char_x + PIXELS_WIDE * y) as usize] == b'1' {
-                        '█'
-                    } else {
-                        ' '
-                    });
-                }
-                if y != PIXELS_TALL - 1 {
-                    this_char_string.push('\n');
-                }
+                    ' '
+                });
             }
-            start_of_current_char_x = x + if y_detected { 0 } else { 1 };
-            result.push(
-                recognize(&this_char_string)
-                    .ok_or(format!("Unrecognized character: {}", this_char_string))?,
-            );
+            if y != PIXELS_TALL - 1 {
+                this_char_string.push('\n');
+            }
         }
+        result.push(
+            recognize(&this_char_string)
+                .ok_or(format!("Unrecognized character: {}", this_char_string))?,
+        );
     }
     Ok(result)
 }

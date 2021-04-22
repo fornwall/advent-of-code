@@ -1,3 +1,4 @@
+use crate::common::character_recognition::recognize;
 use crate::Input;
 
 struct Screen {
@@ -102,45 +103,18 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                         },
                     );
                 }
-                this_char_string.push('\n');
+                if y != Screen::HEIGHT - 1 {
+                    this_char_string.push('\n');
+                }
             }
 
-            if let Some(c) = recognize(&this_char_string) {
-                code_on_screen.push(c);
-            }
+            code_on_screen.push(
+                recognize(&this_char_string).ok_or_else(|| {
+                    format!("Failed to recognize character: {}", this_char_string)
+                })?,
+            );
         }
         Ok(code_on_screen)
-    }
-}
-
-fn recognize(input: &str) -> Option<char> {
-    match input {
-        " ██  \n█  █ \n█  █ \n████ \n█  █ \n█  █ \n" => Some('A'),
-        "███  \n█  █ \n███  \n█  █ \n█  █ \n███  \n" => Some('B'),
-        " ██  \n█  █ \n█    \n█    \n█  █ \n ██  \n" => Some('C'),
-        "████ \n█    \n███  \n█    \n█    \n████ \n" => Some('E'),
-        "████ \n█    \n███  \n█    \n█    \n█    \n" => Some('F'),
-        " ██  \n█  █ \n█    \n█ ██ \n█  █ \n ███ \n" => Some('G'),
-        "█  █ \n█  █ \n████ \n█  █ \n█  █ \n█  █ \n" => Some('H'),
-        " ███ \n  █  \n  █  \n  █  \n  █  \n ███ \n" => Some('I'),
-        "  ██ \n   █ \n   █ \n   █ \n█  █ \n ██  \n" => Some('J'),
-        "█  █ \n█ █  \n██   \n█ █  \n█ █  \n█  █ \n" => Some('K'),
-        "█    \n█    \n█    \n█    \n█    \n████ \n" => Some('L'),
-        " ██  \n█  █ \n█  █ \n█  █ \n█  █ \n ██  \n" => Some('O'),
-        "███  \n█  █ \n█  █ \n███  \n█    \n█    \n" => Some('P'),
-        "███  \n█  █ \n█  █ \n███  \n█ █  \n█  █ \n" => Some('R'),
-        " ███ \n█    \n█    \n ██  \n   █ \n███  \n" => Some('S'),
-        "█  █ \n█  █ \n█  █ \n█  █ \n█  █ \n ██  \n" => Some('U'),
-        "█   █\n█   █\n █ █ \n  █  \n  █  \n  █  \n" => Some('Y'),
-        "████ \n   █ \n  █  \n █   \n█    \n████ \n" => Some('Z'),
-        _ => {
-            let output = input.replace('\n', "\\n");
-            println!(
-                "Unrecognized string:\n{}\n\nAdd clause:\n\"{}\" => Some('?'),",
-                input, output
-            );
-            None
-        }
     }
 }
 

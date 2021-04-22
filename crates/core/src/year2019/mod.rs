@@ -1,4 +1,3 @@
-pub mod character_recognition;
 pub mod day01;
 pub mod day02;
 pub mod day03;
