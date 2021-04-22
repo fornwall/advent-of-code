@@ -22,10 +22,26 @@ struct Spell {
 struct State {
     spent_mana: u32,
     mana_left: u32,
-    player_turn: bool,
     boss_hit_points: u8,
     player_hit_points: u8,
     effects_remaining_turns: [u8; 3],
+}
+
+fn process_effects(state: &mut State, effects: &[Effect]) -> Option<u8> {
+    let mut effective_armor = 0;
+    for (effect_idx, effect) in effects.iter().enumerate() {
+        if state.effects_remaining_turns[effect_idx] > 0 {
+            if effect.damage >= state.boss_hit_points {
+                return None;
+            }
+
+            effective_armor += effect.armor;
+            state.mana_left += u32::from(effect.mana);
+            state.boss_hit_points -= effect.damage;
+            state.effects_remaining_turns[effect_idx] -= 1;
+        }
+    }
+    Some(effective_armor)
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -106,71 +122,57 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         spent_mana: 0,
         mana_left: 500,
         player_hit_points: 50,
-        player_turn: true,
         effects_remaining_turns: [0, 0, 0],
         boss_hit_points,
     }));
 
     while let Some(Reverse(state)) = to_visit.pop() {
         let mut new_state = state.clone();
-        let was_player_turn = new_state.player_turn;
-        new_state.player_turn = !state.player_turn;
 
-        if input.is_part_two() && was_player_turn {
-            if new_state.player_hit_points == 1 {
+        if input.is_part_two() {
+            new_state.player_hit_points -= 1;
+            if new_state.player_hit_points == 0 {
                 continue;
             }
-            new_state.player_hit_points -= 1;
         }
 
-        let mut effective_armor = 0;
-        for (effect_idx, effect) in effects.iter().enumerate() {
-            if new_state.effects_remaining_turns[effect_idx] > 0 {
-                effective_armor += effect.armor;
+        if process_effects(&mut new_state, &effects).is_none() {
+            return Ok(new_state.spent_mana);
+        };
 
-                new_state.mana_left += u32::from(effect.mana);
+        for spell in spells.iter() {
+            let mut state_after_spell = new_state.clone();
 
-                if effect.damage >= new_state.boss_hit_points {
-                    return Ok(new_state.spent_mana);
-                }
-                new_state.boss_hit_points -= effect.damage;
-
-                new_state.effects_remaining_turns[effect_idx] -= 1;
+            if u32::from(spell.mana_cost) > state_after_spell.mana_left {
+                continue;
             }
-        }
+            state_after_spell.mana_left -= u32::from(spell.mana_cost);
+            state_after_spell.spent_mana += u32::from(spell.mana_cost);
 
-        if was_player_turn {
-            for spell in spells.iter() {
-                let mut state_after_spell = new_state.clone();
-
-                if u32::from(spell.mana_cost) > state_after_spell.mana_left {
+            if let Some(effect_idx) = spell.effect_idx {
+                if state_after_spell.effects_remaining_turns[effect_idx] > 0 {
                     continue;
+                } else {
+                    state_after_spell.effects_remaining_turns[effect_idx] =
+                        effects[effect_idx].turns;
                 }
-                state_after_spell.mana_left -= u32::from(spell.mana_cost);
-                state_after_spell.spent_mana += u32::from(spell.mana_cost);
-
-                if let Some(effect_idx) = spell.effect_idx {
-                    if state_after_spell.effects_remaining_turns[effect_idx] > 0 {
-                        continue;
-                    } else {
-                        state_after_spell.effects_remaining_turns[effect_idx] =
-                            effects[effect_idx].turns;
-                    }
-                }
-
-                state_after_spell.player_hit_points += spell.heals;
-                if state_after_spell.boss_hit_points <= spell.damage {
-                    return Ok(state_after_spell.spent_mana);
-                }
-                state_after_spell.boss_hit_points -= spell.damage;
-
-                to_visit.push(Reverse(state_after_spell));
             }
-        } else {
-            let damage_on_player = std::cmp::max(1, boss_damage - effective_armor);
-            if damage_on_player < new_state.player_hit_points {
-                new_state.player_hit_points -= damage_on_player;
-                to_visit.push(Reverse(new_state));
+
+            state_after_spell.player_hit_points += spell.heals;
+            if state_after_spell.boss_hit_points <= spell.damage {
+                return Ok(state_after_spell.spent_mana);
+            }
+            state_after_spell.boss_hit_points -= spell.damage;
+
+            // Boss turn
+            if let Some(effective_armor) = process_effects(&mut state_after_spell, &effects) {
+                let damage_on_player = std::cmp::max(1, boss_damage - effective_armor);
+                if damage_on_player < state_after_spell.player_hit_points {
+                    state_after_spell.player_hit_points -= damage_on_player;
+                    to_visit.push(Reverse(state_after_spell));
+                }
+            } else {
+                return Ok(state_after_spell.spent_mana);
             }
         }
     }
