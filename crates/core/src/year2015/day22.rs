@@ -15,7 +15,7 @@ struct Spell {
     mana_cost: u8,
     damage: u8,
     heals: u8,
-    effect: Option<usize>,
+    effect_idx: Option<usize>,
 }
 
 #[derive(Eq, PartialEq, Clone, Debug, PartialOrd, Ord)]
@@ -25,7 +25,6 @@ struct State {
     player_turn: bool,
     boss_hit_points: u8,
     player_hit_points: u8,
-    boss_damage: u8,
     effects_remaining_turns: [u8; 3],
 }
 
@@ -70,35 +69,35 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             mana_cost: 53,
             damage: 4,
             heals: 0,
-            effect: None,
+            effect_idx: None,
         },
         Spell {
             // Drain
             mana_cost: 73,
             damage: 2,
             heals: 2,
-            effect: None,
+            effect_idx: None,
         },
         Spell {
             // Shield
             mana_cost: 113,
             damage: 0,
             heals: 0,
-            effect: Some(0),
+            effect_idx: Some(0),
         },
         Spell {
             // Poison
             mana_cost: 173,
             damage: 0,
             heals: 0,
-            effect: Some(1),
+            effect_idx: Some(1),
         },
         Spell {
             // Recharge
             mana_cost: 229,
             damage: 0,
             heals: 0,
-            effect: Some(2),
+            effect_idx: Some(2),
         },
     ];
 
@@ -109,7 +108,6 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         player_hit_points: 50,
         player_turn: true,
         effects_remaining_turns: [0, 0, 0],
-        boss_damage,
         boss_hit_points,
     }));
 
@@ -151,7 +149,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 state_after_spell.mana_left -= u32::from(spell.mana_cost);
                 state_after_spell.spent_mana += u32::from(spell.mana_cost);
 
-                if let Some(effect_idx) = spell.effect {
+                if let Some(effect_idx) = spell.effect_idx {
                     if state_after_spell.effects_remaining_turns[effect_idx] > 0 {
                         continue;
                     } else {
@@ -169,13 +167,11 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 to_visit.push(Reverse(state_after_spell));
             }
         } else {
-            let damage_on_player = std::cmp::max(1, state.boss_damage - effective_armor);
-            if damage_on_player >= new_state.player_hit_points {
-                // Player is dead - abort.
-                continue;
+            let damage_on_player = std::cmp::max(1, boss_damage - effective_armor);
+            if damage_on_player < new_state.player_hit_points {
+                new_state.player_hit_points -= damage_on_player;
+                to_visit.push(Reverse(new_state));
             }
-            new_state.player_hit_points -= damage_on_player;
-            to_visit.push(Reverse(new_state));
         }
     }
 
