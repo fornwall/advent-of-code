@@ -2,6 +2,7 @@ use crate::Input;
 use std::cmp::Ordering;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::hash::{Hash, Hasher};
 
 #[derive(Copy, Clone, Eq, PartialOrd, PartialEq, Hash, Ord)]
 enum GeneratorOrMicrochip {
@@ -32,13 +33,74 @@ impl Floor {
                 .collect(),
         }
     }
+
+    fn is_valid(&self) -> bool {
+        let contains_generator = self
+            .content
+            .iter()
+            .any(|item| matches!(item, GeneratorOrMicrochip::Generator(_)));
+
+        if contains_generator {
+            let contains_unshielded_microchip = self.content.iter().any(|&item| {
+                if let GeneratorOrMicrochip::Microchip(value) = item {
+                    // Check if unshielded:
+                    !self
+                        .content
+                        .iter()
+                        .any(|&item| item == GeneratorOrMicrochip::Generator(value))
+                } else {
+                    false
+                }
+            });
+            if contains_unshielded_microchip {
+                return false;
+            }
+        }
+
+        true
+    }
 }
 
-#[derive(Eq, PartialEq, Hash, Clone)]
+#[derive(Clone)]
 struct State {
     current_floor: i8,
     floors: [Floor; 4],
 }
+
+impl State {
+    fn pairs(&self) -> Vec<(usize, usize)> {
+        let mut result = Vec::new();
+        for (floor_idx, floor) in self.floors.iter().enumerate() {
+            for item in floor.content.iter() {
+                if let GeneratorOrMicrochip::Microchip(value) = item {
+                    let matching_generator = GeneratorOrMicrochip::Generator(*value);
+                    for (match_floor_idx, match_floor) in self.floors.iter().enumerate() {
+                        if match_floor.content.contains(&matching_generator) {
+                            result.push((floor_idx, match_floor_idx));
+                        }
+                    }
+                }
+            }
+        }
+        result.sort_unstable();
+        result
+    }
+}
+
+impl Hash for State {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        self.current_floor.hash(hasher);
+        self.pairs().hash(hasher);
+    }
+}
+
+impl PartialEq for State {
+    fn eq(&self, other: &Self) -> bool {
+        self.current_floor == other.current_floor && self.pairs() == other.pairs()
+    }
+}
+
+impl Eq for State {}
 
 impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -145,6 +207,16 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             if !(0..=3).contains(&new_floor) {
                 continue;
             }
+            if *direction == -1
+                && visited_state
+                    .floors
+                    .iter()
+                    .take(visited_state.current_floor as usize)
+                    .all(|floor| floor.content.is_empty())
+            {
+                // Do not bring anything down if every floor beneath current is empty.
+                continue;
+            }
 
             for (moved_idx, &first_moved_thing) in visited_state.floors
                 [visited_state.current_floor as usize]
@@ -172,6 +244,10 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                             new_floors[new_floor as usize].with_item_added(second_moved_thing);
                     }
 
+                    if !new_floors.iter().all(Floor::is_valid) {
+                        continue;
+                    }
+
                     let new_cost = visited_state_cost + 1;
                     let new_state = State {
                         current_floor: new_floor,
@@ -181,9 +257,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     let do_insert = visited_states.insert(new_state.clone());
                     if do_insert {
                         // Encourage moving things up:
-                        let heuristic = new_state.floors[0].content.len() * 60
-                            + new_state.floors[1].content.len() * 40
-                            + new_state.floors[2].content.len() * 20;
+                        let heuristic = (new_state.floors[0].content.len() * 3) / 2
+                            + new_state.floors[1].content.len()
+                            + new_state.floors[2].content.len() / 2;
                         to_visit.push(Reverse((new_cost + heuristic as u32, new_cost, new_state)));
                     }
                 }
@@ -197,6 +273,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 #[test]
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
+
+    let example_input = "The first floor contains a promethium generator and a promethium-compatible microchip.
+The second floor contains a cobalt generator, a curium generator, a ruthenium generator, and a plutonium generator.
+The third floor contains a cobalt-compatible microchip, a curium-compatible microchip, a ruthenium-compatible microchip, and a plutonium-compatible microchip.
+The fourth floor contains nothing relevant.";
+    test_part_one!(example_input => 33);
+    test_part_two!(example_input => 57);
 
     let real_input = include_str!("day11_input.txt");
     test_part_one!(real_input => 37);
