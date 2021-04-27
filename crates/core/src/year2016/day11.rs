@@ -10,54 +10,39 @@ enum GeneratorOrMicrochip {
     Microchip(u8),
 }
 
-#[derive(Clone, Default, Eq, PartialEq, Hash)]
+#[derive(Clone, Default, Eq, PartialEq, Hash, Copy)]
 struct Floor {
-    content: Vec<GeneratorOrMicrochip>,
+    generators: u8,
+    microchips: u8,
 }
 
 impl Floor {
-    fn with_item_added(&self, to_add: GeneratorOrMicrochip) -> Self {
-        let mut copy = self.clone();
-        copy.content.push(to_add);
-        copy.content.sort();
-        copy
-    }
-
-    fn with_item_removed(&self, to_remove: GeneratorOrMicrochip) -> Self {
-        Self {
-            content: self
-                .content
-                .iter()
-                .filter(|&&item| item != to_remove)
-                .copied()
-                .collect(),
-        }
-    }
-
-    fn is_valid(&self) -> bool {
-        let contains_generator = self
-            .content
-            .iter()
-            .any(|item| matches!(item, GeneratorOrMicrochip::Generator(_)));
-
-        if contains_generator {
-            let contains_unshielded_microchip = self.content.iter().any(|&item| {
-                if let GeneratorOrMicrochip::Microchip(value) = item {
-                    // Check if unshielded:
-                    !self
-                        .content
-                        .iter()
-                        .any(|&item| item == GeneratorOrMicrochip::Generator(value))
-                } else {
-                    false
-                }
-            });
-            if contains_unshielded_microchip {
-                return false;
+    fn remove_item(&mut self, to_add: GeneratorOrMicrochip) {
+        match to_add {
+            GeneratorOrMicrochip::Microchip(isotope_id) => {
+                self.microchips |= 1 << isotope_id;
             }
+            GeneratorOrMicrochip::Generator(isotope_id) => self.generators |= 1 << isotope_id,
         }
+    }
 
-        true
+    fn add_item(&mut self, to_remove: GeneratorOrMicrochip) {
+        match to_remove {
+            GeneratorOrMicrochip::Microchip(value) => {
+                self.microchips &= !(1 << value);
+            }
+            GeneratorOrMicrochip::Generator(value) => self.generators &= !(1 << value),
+        }
+    }
+
+    const fn is_valid(self) -> bool {
+        let contains_generator = self.generators != 0;
+        let contains_unshielded_microchip = self.microchips & self.generators != self.microchips;
+        !(contains_generator && contains_unshielded_microchip)
+    }
+
+    const fn count_items(self) -> u32 {
+        self.generators.count_ones() + self.microchips.count_ones()
     }
 }
 
@@ -71,11 +56,11 @@ impl State {
     fn pairs(&self) -> Vec<(usize, usize)> {
         let mut result = Vec::new();
         for (floor_idx, floor) in self.floors.iter().enumerate() {
-            for item in floor.content.iter() {
-                if let GeneratorOrMicrochip::Microchip(value) = item {
-                    let matching_generator = GeneratorOrMicrochip::Generator(*value);
+            for offset in 0..8 {
+                let bit_mask = 1 << offset;
+                if floor.microchips & bit_mask != 0 {
                     for (match_floor_idx, match_floor) in self.floors.iter().enumerate() {
-                        if match_floor.content.contains(&matching_generator) {
+                        if match_floor.generators & bit_mask != 0 {
                             result.push((floor_idx, match_floor_idx));
                         }
                     }
@@ -114,7 +99,7 @@ impl PartialOrd for State {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+fn parse_input(input: &str, part2: bool) -> Result<[Floor; 4], String> {
     let mut name_to_id = HashMap::new();
     let mut current_id = 0_u8;
     let mut initial_floors = [
@@ -124,7 +109,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         Floor::default(),
     ];
 
-    for (floor_idx, line) in input.text.lines().enumerate() {
+    for (floor_idx, line) in input.lines().enumerate() {
         // "The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.
         // The second floor contains a hydrogen generator.
         // The third floor contains a lithium generator.
@@ -147,38 +132,35 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 .entry(isotope_name.to_string())
                 .or_insert_with(|| {
                     current_id += 1;
-                    current_id
+                    current_id - 1
                 });
+            if isotope_id == 6 {
+                return Err("Too many items - max supported is 5".to_string());
+            }
+            let bit_mask = 1 << isotope_id;
 
-            initial_floors[floor_idx].content.push(if microchip {
-                GeneratorOrMicrochip::Microchip(isotope_id)
+            if microchip {
+                initial_floors[floor_idx].microchips |= bit_mask;
             } else {
-                GeneratorOrMicrochip::Generator(isotope_id)
-            });
+                initial_floors[floor_idx].generators |= bit_mask;
+            }
         }
     }
 
-    if input.is_part_two() {
+    if part2 {
         let elerium_id = current_id + 1;
         let dilithium_id = current_id + 2;
-        initial_floors[0]
-            .content
-            .push(GeneratorOrMicrochip::Microchip(elerium_id));
-        initial_floors[0]
-            .content
-            .push(GeneratorOrMicrochip::Generator(elerium_id));
-        initial_floors[0]
-            .content
-            .push(GeneratorOrMicrochip::Microchip(dilithium_id));
-        initial_floors[0]
-            .content
-            .push(GeneratorOrMicrochip::Generator(dilithium_id));
+        initial_floors[0].microchips |= 1 << elerium_id;
+        initial_floors[0].generators |= 1 << elerium_id;
+        initial_floors[0].microchips |= 1 << dilithium_id;
+        initial_floors[0].generators |= 1 << dilithium_id;
     }
 
-    for floor in initial_floors.iter_mut() {
-        floor.content.sort();
-    }
+    Ok(initial_floors)
+}
 
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let initial_floors = parse_input(input.text, input.is_part_two())?;
     let mut to_visit = BinaryHeap::new();
     let mut visited_states = HashSet::new();
 
@@ -196,7 +178,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             .floors
             .iter()
             .take(3)
-            .all(|floor| floor.content.is_empty())
+            .all(|floor| floor.count_items() == 0)
         {
             // If floor 0-3 is empty we're done.
             return Ok(visited_state_cost);
@@ -212,55 +194,91 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     .floors
                     .iter()
                     .take(visited_state.current_floor as usize)
-                    .all(|floor| floor.content.is_empty())
+                    .all(|floor| floor.count_items() == 0)
             {
                 // Do not bring anything down if every floor beneath current is empty.
                 continue;
             }
 
-            for (moved_idx, &first_moved_thing) in visited_state.floors
-                [visited_state.current_floor as usize]
-                .content
-                .iter()
-                .enumerate()
-            {
-                for &second_moved_thing in
-                    visited_state.floors[visited_state.current_floor as usize].content[moved_idx..]
-                        .iter()
-                {
-                    let mut new_floors = visited_state.floors.clone();
-
-                    new_floors[visited_state.current_floor as usize] = new_floors
-                        [visited_state.current_floor as usize]
-                        .with_item_removed(first_moved_thing);
-                    new_floors[new_floor as usize] =
-                        new_floors[new_floor as usize].with_item_added(first_moved_thing);
-
-                    if second_moved_thing != first_moved_thing {
-                        new_floors[visited_state.current_floor as usize] = new_floors
-                            [visited_state.current_floor as usize]
-                            .with_item_removed(second_moved_thing);
-                        new_floors[new_floor as usize] =
-                            new_floors[new_floor as usize].with_item_added(second_moved_thing);
-                    }
-
-                    if !new_floors.iter().all(Floor::is_valid) {
+            let current_floor = visited_state.floors[visited_state.current_floor as usize];
+            for &first_moved_is_chip in &[true, false] {
+                for first_offset in 0..8 {
+                    let contains_first_item = if first_moved_is_chip {
+                        current_floor.microchips
+                    } else {
+                        current_floor.generators
+                    } & (1 << first_offset)
+                        != 0;
+                    if !contains_first_item {
                         continue;
                     }
 
-                    let new_cost = visited_state_cost + 1;
-                    let new_state = State {
-                        current_floor: new_floor,
-                        floors: new_floors,
-                    };
+                    for &second_moved_is_chip in if first_moved_is_chip {
+                        [true, false].iter()
+                    } else {
+                        [false].iter()
+                    } {
+                        for second_offset in 0..=(if first_moved_is_chip == second_moved_is_chip {
+                            first_offset
+                        } else {
+                            7
+                        }) {
+                            let contains_second_item = if second_moved_is_chip {
+                                current_floor.microchips
+                            } else {
+                                current_floor.generators
+                            } & (1 << second_offset)
+                                != 0;
+                            if !contains_second_item {
+                                continue;
+                            }
 
-                    let do_insert = visited_states.insert(new_state.clone());
-                    if do_insert {
-                        // Encourage moving things up:
-                        let heuristic = (new_state.floors[0].content.len() * 3) / 2
-                            + new_state.floors[1].content.len()
-                            + new_state.floors[2].content.len() / 2;
-                        to_visit.push(Reverse((new_cost + heuristic as u32, new_cost, new_state)));
+                            let mut new_floors = visited_state.floors;
+
+                            let first_moved_thing = if first_moved_is_chip {
+                                GeneratorOrMicrochip::Microchip(first_offset)
+                            } else {
+                                GeneratorOrMicrochip::Generator(first_offset)
+                            };
+                            let second_moved_thing = if second_moved_is_chip {
+                                GeneratorOrMicrochip::Microchip(second_offset)
+                            } else {
+                                GeneratorOrMicrochip::Generator(second_offset)
+                            };
+
+                            new_floors[visited_state.current_floor as usize]
+                                .add_item(first_moved_thing);
+                            new_floors[new_floor as usize].remove_item(first_moved_thing);
+
+                            if second_moved_thing != first_moved_thing {
+                                new_floors[visited_state.current_floor as usize]
+                                    .add_item(second_moved_thing);
+                                new_floors[new_floor as usize].remove_item(second_moved_thing);
+                            }
+
+                            if !new_floors.iter().all(|&floor| floor.is_valid()) {
+                                continue;
+                            }
+
+                            let new_cost = visited_state_cost + 1;
+                            let new_state = State {
+                                current_floor: new_floor,
+                                floors: new_floors,
+                            };
+
+                            let do_insert = visited_states.insert(new_state.clone());
+                            if do_insert {
+                                // Encourage moving things up:
+                                let heuristic = (new_state.floors[0].count_items() * 3) / 2
+                                    + new_state.floors[1].count_items()
+                                    + new_state.floors[2].count_items() / 2;
+                                to_visit.push(Reverse((
+                                    new_cost + heuristic as u32,
+                                    new_cost,
+                                    new_state,
+                                )));
+                            }
+                        }
                     }
                 }
             }
