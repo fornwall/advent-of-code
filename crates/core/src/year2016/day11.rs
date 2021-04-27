@@ -4,12 +4,6 @@ use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 
-#[derive(Copy, Clone, Eq, PartialOrd, PartialEq, Hash, Ord)]
-enum GeneratorOrMicrochip {
-    Generator(u8),
-    Microchip(u8),
-}
-
 #[derive(Clone, Default, Eq, PartialEq, Hash, Copy)]
 struct Floor {
     generators: u8,
@@ -17,21 +11,21 @@ struct Floor {
 }
 
 impl Floor {
-    fn remove_item(&mut self, to_add: GeneratorOrMicrochip) {
-        match to_add {
-            GeneratorOrMicrochip::Microchip(isotope_id) => {
-                self.microchips |= 1 << isotope_id;
-            }
-            GeneratorOrMicrochip::Generator(isotope_id) => self.generators |= 1 << isotope_id,
+    fn add_item(&mut self, chip: bool, isotope_id: u8) {
+        let bit_mask = 1 << isotope_id;
+        if chip {
+            self.microchips |= bit_mask;
+        } else {
+            self.generators |= bit_mask;
         }
     }
 
-    fn add_item(&mut self, to_remove: GeneratorOrMicrochip) {
-        match to_remove {
-            GeneratorOrMicrochip::Microchip(value) => {
-                self.microchips &= !(1 << value);
-            }
-            GeneratorOrMicrochip::Generator(value) => self.generators &= !(1 << value),
+    fn remove_item(&mut self, chip: bool, isotope_id: u8) {
+        let bit_mask = !(1 << isotope_id);
+        if chip {
+            self.microchips &= bit_mask;
+        } else {
+            self.generators &= bit_mask;
         }
     }
 
@@ -46,7 +40,7 @@ impl Floor {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Eq)]
 struct State {
     current_floor: i8,
     floors: [Floor; 4],
@@ -84,8 +78,6 @@ impl PartialEq for State {
         self.current_floor == other.current_floor && self.pairs() == other.pairs()
     }
 }
-
-impl Eq for State {}
 
 impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -150,10 +142,10 @@ fn parse_input(input: &str, part2: bool) -> Result<[Floor; 4], String> {
     if part2 {
         let elerium_id = current_id + 1;
         let dilithium_id = current_id + 2;
-        initial_floors[0].microchips |= 1 << elerium_id;
-        initial_floors[0].generators |= 1 << elerium_id;
-        initial_floors[0].microchips |= 1 << dilithium_id;
-        initial_floors[0].generators |= 1 << dilithium_id;
+        initial_floors[0].add_item(true, elerium_id);
+        initial_floors[0].add_item(false, elerium_id);
+        initial_floors[0].add_item(true, dilithium_id);
+        initial_floors[0].add_item(false, dilithium_id);
     }
 
     Ok(initial_floors)
@@ -235,25 +227,18 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
                             let mut new_floors = visited_state.floors;
 
-                            let first_moved_thing = if first_moved_is_chip {
-                                GeneratorOrMicrochip::Microchip(first_offset)
-                            } else {
-                                GeneratorOrMicrochip::Generator(first_offset)
-                            };
-                            let second_moved_thing = if second_moved_is_chip {
-                                GeneratorOrMicrochip::Microchip(second_offset)
-                            } else {
-                                GeneratorOrMicrochip::Generator(second_offset)
-                            };
-
                             new_floors[visited_state.current_floor as usize]
-                                .add_item(first_moved_thing);
-                            new_floors[new_floor as usize].remove_item(first_moved_thing);
+                                .remove_item(first_moved_is_chip, first_offset);
+                            new_floors[new_floor as usize]
+                                .add_item(first_moved_is_chip, first_offset);
 
-                            if second_moved_thing != first_moved_thing {
+                            if (first_moved_is_chip, first_offset)
+                                != (second_moved_is_chip, second_offset)
+                            {
                                 new_floors[visited_state.current_floor as usize]
-                                    .add_item(second_moved_thing);
-                                new_floors[new_floor as usize].remove_item(second_moved_thing);
+                                    .remove_item(second_moved_is_chip, second_offset);
+                                new_floors[new_floor as usize]
+                                    .add_item(second_moved_is_chip, second_offset);
                             }
 
                             if !new_floors.iter().all(|&floor| floor.is_valid()) {
