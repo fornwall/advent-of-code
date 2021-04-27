@@ -448,7 +448,7 @@ jobs:
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v2
       with:
-        path: ./crates/fuzzing-afl/target/fuzz-findings/crashes
+        path: ./crates/fuzzing-afl/target/fuzz-findings/default/crashes
         name: fuzzing-crashes-afl
 
   fuzz-libfuzzer:
