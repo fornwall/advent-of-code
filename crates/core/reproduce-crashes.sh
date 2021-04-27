@@ -3,7 +3,7 @@ set -u
 
 INPUT=$1
 
-for year in {2017..2020}; do
+for year in {2015..2020}; do
   for day in {1..25}; do
     for part in 1 2; do
       COMMAND="tail -c +4 \"$INPUT\" | RUST_BACKTRACE=1 cargo run -q $year $day $part"
