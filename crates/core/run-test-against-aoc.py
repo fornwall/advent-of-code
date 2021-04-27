@@ -43,11 +43,19 @@ if "AOC_PART" in os.environ:
 else:
     parts = range(1, 3)
 
+if "AOC_ACCOUNT" in os.environ:
+    account = os.environ["AOC_ACCOUNT"]
+else:
+    account = "*"
+
 for year in years:
     for day in days:
         for session in SESSIONS:
             session_cookie = session["cookie"]
             session_description = session["description"]
+            if not (account == "*" or account == session_description):
+                continue
+
             user = User(session_cookie)
 
             print(f"# Year {year}, Day {day} - {session_description}")
