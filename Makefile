@@ -112,7 +112,7 @@ fuzz-afl:
 		rm -Rf target/fuzz-findings && \
 		mkdir -p target/fuzz-findings && \
 		cargo afl fuzz -i testcase-dir -o target/fuzz-findings target/debug/advent-of-code-fuzzing-afl && \
-		./process-files-for-upload.sh target/fuzz-findings/crashes
+		./process-files-for-upload.sh target/fuzz-findings/default/crashes
 
 fuzz-hfuzz:
 	cargo install honggfuzz
