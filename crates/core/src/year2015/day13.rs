@@ -26,6 +26,10 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
     for line in input.text.lines() {
         // "Alice would lose 79 happiness units by sitting next to Carol."
         let words = line.split(' ').collect::<Vec<_>>();
+        if words.len() != 11 {
+            return Err("Invalid line not consisting of 11 words".to_string());
+        }
+
         let person_name = words[0];
         let happiness_change = words[3]
             .parse::<i32>()

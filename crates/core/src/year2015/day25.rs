@@ -2,6 +2,10 @@ use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let words = input.text.split(' ').collect::<Vec<_>>();
+    if words.len() != 19 {
+        return Err("Invalid input - not 19 words".to_string());
+    }
+
     let wanted_row = words[16][0..(words[16].len() - 1)]
         .parse::<u32>()
         .map_err(|_| "Invalid input")?;

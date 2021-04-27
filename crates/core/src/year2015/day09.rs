@@ -8,6 +8,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     for line in input.text.lines() {
         // "Faerun to Tristram = 58"
         let parts = line.split(' ').collect::<Vec<_>>();
+        if parts.len() != 5 {
+            return Err("Invalid input - line not having 5 words".to_string());
+        }
         let from = parts[0];
         let to = parts[2];
         let distance = parts[4].parse::<u32>().map_err(|_| "Invalid input")?;

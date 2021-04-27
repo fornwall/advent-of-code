@@ -66,6 +66,10 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
     let mut ingredients = Vec::new();
     for line in input.text.lines() {
         let words = line.split(' ').collect::<Vec<_>>();
+        if words.len() != 11 {
+            return Err("Invalid line not consisting of 11 words".to_string());
+        }
+
         let capacity = words[2][0..words[2].len() - 1]
             .parse::<i32>()
             .map_err(error_mapper)?;

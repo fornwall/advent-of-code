@@ -57,7 +57,7 @@ fn parse(data: &str, programs: &[u8]) -> Result<(Vec<u8>, HashMap<u8, u8>), Stri
                 }
             }
         } else {
-            panic!();
+            return Err("Invalid dance move not starting with s, x or p".to_string());
         }
     }
 

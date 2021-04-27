@@ -14,35 +14,37 @@ enum JsonValue<'a> {
     EndOfInput,
 }
 
-fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> JsonValue<'a> {
+fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> Result<JsonValue<'a>, String> {
     let next_char = input[*current_idx];
     if *current_idx == input.len() {
-        return JsonValue::EndOfInput;
+        return Ok(JsonValue::EndOfInput);
     }
     *current_idx += 1;
 
-    match next_char {
+    Ok(match next_char {
         b'{' => {
             let mut object_map = HashMap::new();
             loop {
-                let mut next_key = parse(input, current_idx);
+                let mut next_key = parse(input, current_idx)?;
                 if next_key == JsonValue::Comma {
-                    next_key = parse(input, current_idx);
+                    next_key = parse(input, current_idx)?;
                 }
 
                 if JsonValue::EndOfObject == next_key {
-                    return JsonValue::Object(object_map);
+                    break JsonValue::Object(object_map);
                 } else if let JsonValue::String(key) = next_key {
-                    let next_colon = parse(input, current_idx);
-                    assert!(next_colon == JsonValue::Colon);
+                    let next_colon = parse(input, current_idx)?;
+                    if next_colon != JsonValue::Colon {
+                        return Err("Invalid input - key not followed by colon".to_string());
+                    }
 
-                    let next_value = parse(input, current_idx);
+                    let next_value = parse(input, current_idx)?;
                     object_map.insert(key, next_value);
                 } else {
-                    panic!(
+                    return Err(format!(
                         "Not key or colon in object: {:?} (index={})",
                         next_key, *current_idx
-                    );
+                    ));
                 }
             }
         }
@@ -51,9 +53,9 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> JsonValue<'a> {
         b'[' => {
             let mut array = Vec::new();
             loop {
-                let next_value = parse(input, current_idx);
+                let next_value = parse(input, current_idx)?;
                 if JsonValue::EndOfArray == next_value {
-                    return JsonValue::Array(array);
+                    break JsonValue::Array(array);
                 } else if JsonValue::Comma == next_value {
                     // Ignore
                 } else {
@@ -68,10 +70,10 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> JsonValue<'a> {
                 if read_char == b'"' {
                     let start_idx = *current_idx;
                     *current_idx = idx + 1;
-                    return JsonValue::String(&input[start_idx..idx]);
+                    return Ok(JsonValue::String(&input[start_idx..idx]));
                 }
             }
-            panic!("No end of string");
+            return Err("Invalid input - no end of string".to_string());
         }
         b'0'..=b'9' | b'-' => {
             let mut string = String::new();
@@ -85,18 +87,18 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> JsonValue<'a> {
                 } else {
                     *current_idx = idx;
                     let number = string.parse::<i32>().unwrap_or_default();
-                    return JsonValue::Number(number);
+                    break JsonValue::Number(number);
                 }
                 idx += 1;
             }
         }
         _ => {
-            panic!(
+            return Err(format!(
                 "Invalid char: '{}' at index={}",
                 next_char as char, *current_idx
-            );
+            ));
         }
-    }
+    })
 }
 
 fn sum_json_value(value: &JsonValue, part2: bool) -> i32 {
@@ -120,7 +122,7 @@ fn sum_json_value(value: &JsonValue, part2: bool) -> i32 {
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
     let mut current_idx = 0_usize;
-    let json_value = parse(input.text.as_bytes(), &mut current_idx);
+    let json_value = parse(input.text.as_bytes(), &mut current_idx)?;
     let sum = sum_json_value(&json_value, input.is_part_two());
     Ok(sum)
 }
@@ -128,17 +130,23 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 #[test]
 pub fn test_parse() {
     let mut current_idx = 0_usize;
-    assert_eq!(JsonValue::Number(1234), parse(b"1234", &mut current_idx));
+    assert_eq!(
+        Ok(JsonValue::Number(1234)),
+        parse(b"1234", &mut current_idx)
+    );
 
     current_idx = 0;
     assert_eq!(
-        JsonValue::String(b"1234"),
+        Ok(JsonValue::String(b"1234")),
         parse(b"\"1234\"", &mut current_idx)
     );
 
     current_idx = 0;
     assert_eq!(
-        JsonValue::Array(vec![JsonValue::Number(123), JsonValue::String(b"abc")]),
+        Ok(JsonValue::Array(vec![
+            JsonValue::Number(123),
+            JsonValue::String(b"abc")
+        ])),
         parse(b"[123,\"abc\"]", &mut current_idx)
     );
 
@@ -154,7 +162,7 @@ pub fn test_parse() {
         JsonValue::Array(vec![JsonValue::Number(-345), JsonValue::String(b"abc")]),
     );
     assert_eq!(
-        JsonValue::Object(expected_map),
+        Ok(JsonValue::Object(expected_map)),
         parse(
             b"{\"key1\":123,\"key2\":\"abc\",\"key3\":[-345,\"abc\"]}",
             &mut current_idx

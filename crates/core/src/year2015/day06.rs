@@ -11,7 +11,13 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     let mut grid = [0_u8; 1_000_000];
     for line in input.text.lines() {
         let words = line.split(' ').collect::<Vec<&str>>();
-        let (from, to) = if words[0] == "toggle" {
+        let is_toggle = words[0] == "toggle";
+        let expected_word_count = if is_toggle { 4 } else { 5 };
+        if words.len() != expected_word_count {
+            return Err("Invalid input".to_string());
+        }
+
+        let (from, to) = if is_toggle {
             (words[1], words[3])
         } else {
             (words[2], words[4])
