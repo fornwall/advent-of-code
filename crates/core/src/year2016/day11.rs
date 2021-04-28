@@ -47,15 +47,18 @@ struct State {
 }
 
 impl State {
-    fn pairs(&self) -> Vec<(usize, usize)> {
-        let mut result = Vec::new();
+    fn pairs(&self) -> usize {
+        let mut result = 0;
+        let mut current_idx = 0;
         for (floor_idx, floor) in self.floors.iter().enumerate() {
             for offset in 0..8 {
                 let bit_mask = 1 << offset;
                 if floor.microchips & bit_mask != 0 {
                     for (match_floor_idx, match_floor) in self.floors.iter().enumerate() {
                         if match_floor.generators & bit_mask != 0 {
-                            result.push((floor_idx, match_floor_idx));
+                            result |=
+                                (floor_idx << current_idx) + (match_floor_idx << (current_idx + 2));
+                            current_idx += 4;
                         }
                     }
                 }
@@ -126,7 +129,7 @@ fn parse_input(input: &str, part2: bool) -> Result<[Floor; 4], String> {
                     current_id - 1
                 });
             if isotope_id == 6 {
-                return Err("Too many items - max supported is 5".to_string());
+                return Err("Too many isotopes - max supported is 5".to_string());
             }
             let bit_mask = 1 << isotope_id;
 
