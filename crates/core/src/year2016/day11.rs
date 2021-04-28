@@ -61,7 +61,6 @@ impl State {
                 }
             }
         }
-        result.sort_unstable();
         result
     }
 }
