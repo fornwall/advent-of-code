@@ -30,7 +30,8 @@ fn main() -> Result<(), String> {
             input.as_ref(),
             #[cfg(feature = "visualization")]
             Box::new(MockPainter {}),
-        )?;
+        )
+        .unwrap_or_else(|error| format!("Error: {}", error));
         println!("{}", solution);
     } else {
         usage();
