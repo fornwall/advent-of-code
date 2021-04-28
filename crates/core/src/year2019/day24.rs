@@ -40,7 +40,10 @@ impl Grid {
     }
 
     fn parse(input: &str) -> Result<Self, String> {
-        if input.chars().filter(|&c| c == '#' || c == '.').count() != 25 {
+        if input.chars().filter(|&c| c == '#' || c == '.').count() != 25
+            || input.chars().any(|c| !matches!(c, '#' | '.' | '\n'))
+            || input.lines().count() != 5
+        {
             return Err("Invalid input - expected 5x5 grid of '#' and '.'".to_string());
         }
         Ok(Self {
