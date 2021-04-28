@@ -23,7 +23,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }
 
     if input.is_part_one() {
-        return Ok(circular_buffer[current_position as usize + 2]);
+        return Ok(circular_buffer[(current_position as usize + 2) % circular_buffer.len()]);
     }
 
     current_position = 0;
