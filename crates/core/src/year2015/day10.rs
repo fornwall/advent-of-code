@@ -24,11 +24,14 @@ fn read_string(s: &str) -> String {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
+    if input.text.len() >= 16 {
+        return Err("Too long input - max length is 16".to_string());
+    }
+
     let mut s = input.text.to_string();
     for _ in 0..input.part_values(40, 50) {
         s = read_string(&s);
     }
-
     Ok(s.len() as u32)
 }
 
