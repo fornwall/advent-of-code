@@ -1,5 +1,14 @@
-fn solution(input_string: &str, index_offset_computer: fn(usize) -> usize) -> Result<u32, String> {
-    let digits: Vec<u32> = input_string
+use crate::input::Input;
+
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let index_offset_computer = if input.is_part_one() {
+        |_| 1
+    } else {
+        |len| len / 2
+    };
+
+    let digits: Vec<u32> = input
+        .text
         .chars()
         .map(|c| c.to_digit(10).ok_or("Invalid input - not all digits"))
         .collect::<Result<_, _>>()?;
@@ -19,29 +28,22 @@ fn solution(input_string: &str, index_offset_computer: fn(usize) -> usize) -> Re
         .sum())
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    solution(input_string, |_| 1)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    solution(input_string, |len| len / 2)
-}
-
 #[test]
-fn test_part1() {
-    assert_eq!(Ok(3), part1("1122"));
-    assert_eq!(Ok(4), part1("1111"));
-    assert_eq!(Ok(0), part1("1234"));
-    assert_eq!(Ok(9), part1("91212129"));
-    assert_eq!(Ok(1029), part1(include_str!("day01_input.txt")));
-}
+fn test() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(6), part2("1212"));
-    assert_eq!(Ok(0), part2("1221"));
-    assert_eq!(Ok(4), part2("123425"));
-    assert_eq!(Ok(12), part2("123123"));
-    assert_eq!(Ok(4), part2("12131415"));
-    assert_eq!(Ok(1220), part2(include_str!("day01_input.txt")));
+    test_part_one!("1122" => 3);
+    test_part_one!("1111" => 4);
+    test_part_one!("1234" => 0);
+    test_part_one!("91212129" => 9);
+
+    test_part_two!("1212" => 6);
+    test_part_two!("1221" => 0);
+    test_part_two!("123425" => 4);
+    test_part_two!("123123" => 12);
+    test_part_two!("12131415" => 4);
+
+    let input = include_str!("day01_input.txt");
+    test_part_one!(input => 1029);
+    test_part_two!(input => 1220);
 }
