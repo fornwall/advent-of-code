@@ -45,8 +45,8 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                 next_state: words[68].bytes().next().ok_or_else(on_error)? - b'A',
             };
             states.push(State {
-                if_one_action,
                 if_zero_action,
+                if_one_action,
             });
         }
     }

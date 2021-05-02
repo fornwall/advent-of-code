@@ -115,7 +115,7 @@ impl Vector {
     }
 }
 
-impl ops::AddAssign<Vector> for Vector {
+impl ops::AddAssign<Self> for Vector {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;

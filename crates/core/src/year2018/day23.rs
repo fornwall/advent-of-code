@@ -59,7 +59,7 @@ impl std::ops::Add<(i32, i32, i32)> for Position {
     }
 }
 
-impl std::ops::Add<Position> for Position {
+impl std::ops::Add<Self> for Position {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -67,7 +67,7 @@ impl std::ops::Add<Position> for Position {
     }
 }
 
-impl std::ops::Sub<Position> for Position {
+impl std::ops::Sub<Self> for Position {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
