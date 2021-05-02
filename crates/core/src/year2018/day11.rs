@@ -61,6 +61,11 @@ fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     let serial_number = input_string
         .parse::<GridValue>()
         .map_err(|error| format!("Invalid input: {}", error.to_string()))?;
+
+    if serial_number >= 10_000 {
+        return Err("Too big serial number - max is 10,000".to_string());
+    }
+
     let table = SummedAreaTable::new(serial_number);
 
     let mut optimal_power: GridValue = 0;
