@@ -1,3 +1,10 @@
+const baselineJsonPromise = (async () => {
+    const baselineResponse = await fetch(
+      "https://aoc.fornwall.net/new-baseline.json"
+    );
+    return await baselineResponse.json();
+})();
+
 async function updatePage() {
   const currentYear =
     new URLSearchParams(window.location.hash.substring(1)).get("year") ||
@@ -7,10 +14,7 @@ async function updatePage() {
     "h1"
   ).textContent = `Advent of Code ${currentYear} execution times`;
 
-  const baselineResponse = await fetch(
-    "https://aoc.fornwall.net/new-baseline.json"
-  );
-  const baselineJson = await baselineResponse.json();
+  const baselineJson = await baselineJsonPromise;
   const benchmarks = Object.entries(baselineJson["benchmarks"]);
   const extractMeanTime = (info) =>
     info["criterion_estimates_v1"]["mean"]["point_estimate"];
