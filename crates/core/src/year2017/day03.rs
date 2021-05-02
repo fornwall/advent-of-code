@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::cmp::max;
 use std::collections::HashMap;
 
@@ -87,43 +88,41 @@ fn parse(input_string: &str) -> Result<usize, String> {
         })
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let input_square = parse(input_string)?;
-    Square::iter()
-        .nth(input_square - 1)
-        .map(|walker| walker.x.abs() + walker.y.abs())
-        .ok_or_else(|| "No solution found".to_string())
-}
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let puzzle_input = parse(input.text)?;
+    if input.is_part_one() {
+        Square::iter()
+            .nth(puzzle_input - 1)
+            .map(|walker| (walker.x.abs() + walker.y.abs()) as usize)
+            .ok_or_else(|| "No solution found".to_string())
+    } else {
+        let mut square_values = HashMap::new();
+        square_values.insert((0, 0), 1);
 
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    let puzzle_input = parse(input_string)?;
-
-    let mut square_values = HashMap::new();
-    square_values.insert((0, 0), 1);
-
-    Square::iter()
-        .map(|walker| {
-            let new_square_value = (-1..=1)
-                .flat_map(move |dx| (-1..=1).map(move |dy| (dx, dy)))
-                .map(|(dx, dy)| (walker.x + dx, walker.y + dy))
-                .filter_map(|neighbor_square| square_values.get(&neighbor_square))
-                .sum();
-            square_values.insert((walker.x, walker.y), new_square_value);
-            new_square_value
-        })
-        .find(|&new_square_value| new_square_value > puzzle_input)
-        .ok_or_else(|| "No solution found".to_string())
-}
-
-#[test]
-fn test_part1() {
-    assert_eq!(Ok(3), part1("12"));
-    assert_eq!(Ok(2), part1("23"));
-    assert_eq!(Ok(31), part1("1024"));
-    assert_eq!(Ok(480), part1(include_str!("day03_input.txt")));
+        Square::iter()
+            .map(|walker| {
+                let new_square_value = (-1..=1)
+                    .flat_map(move |dx| (-1..=1).map(move |dy| (dx, dy)))
+                    .map(|(dx, dy)| (walker.x + dx, walker.y + dy))
+                    .filter_map(|neighbor_square| square_values.get(&neighbor_square))
+                    .sum();
+                square_values.insert((walker.x, walker.y), new_square_value);
+                new_square_value
+            })
+            .find(|&new_square_value| new_square_value > puzzle_input)
+            .ok_or_else(|| "No solution found".to_string())
+    }
 }
 
 #[test]
-fn test_part2() {
-    assert_eq!(Ok(349_975), part2(include_str!("day03_input.txt")));
+fn test() {
+    use crate::{test_part_one, test_part_two};
+    test_part_one!("12" => 3);
+    test_part_one!("23" => 2);
+    test_part_one!("1024" => 31);
+    test_part_one!("1024" => 31);
+
+    let input = include_str!("day03_input.txt");
+    test_part_one!(input => 480);
+    test_part_two!(input => 349_975);
 }
