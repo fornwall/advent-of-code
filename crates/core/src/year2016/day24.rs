@@ -21,7 +21,7 @@ impl Grid {
                 data[y * cols + x] = match c {
                     b'#' => false,
                     b'.' => true,
-                    b'0'..=b'8' => {
+                    b'0'..=b'7' => {
                         locations[(c - b'0') as usize] = (x, y);
                         true
                     }
