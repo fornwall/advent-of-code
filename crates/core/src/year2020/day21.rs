@@ -74,17 +74,14 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     let mut identified_products = allergen_to_possible_ingredients
         .iter()
-        .map(|possibilities| -> Result<usize, String> {
-            Ok(if possibilities.len() == 1 {
-                *possibilities
-                    .iter()
-                    .next()
-                    .ok_or_else(|| "Internal error".to_string())?
+        .filter_map(|possibilities| {
+            if possibilities.len() == 1 {
+                possibilities.iter().next().copied()
             } else {
-                0
-            })
+                None
+            }
         })
-        .collect::<Result<Vec<usize>, _>>()?;
+        .collect::<Vec<usize>>();
 
     while let Some(product_id) = identified_products.pop() {
         for possibilities in allergen_to_possible_ingredients.iter_mut() {
@@ -140,6 +137,10 @@ sqjhc fvjkl (contains soy)
 sqjhc mxmxvkd sbzzf (contains fish)";
     test_part_one!(example => "5".to_string());
     test_part_two!(example => "mxmxvkd,sqjhc,fvjkl".to_string());
+
+    let other_input = include_str!("day21_input_other.txt");
+    test_part_one!(other_input => "2724".to_string());
+    test_part_two!(other_input => "xlxknk,cskbmx,cjdmk,bmhn,jrmr,tzxcmr,fmgxh,fxzh".to_string());
 
     let real_input = include_str!("day21_input.txt");
     test_part_one!(real_input => "2317".to_string());
