@@ -28,19 +28,21 @@ else ifneq ($(NIGHTLY),1)
   CLIPPY_PARAMS += -D warnings
 endif
 
+WASM_DIR = debug
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
+  WASM_DIR = release
 endif
 WASM_BUILD_COMMAND = cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
 	rm -Rf site/generated && \
-	wasm-bindgen --target no-modules --out-dir site/generated ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm && \
+	wasm-bindgen --target no-modules --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/generated && \
 	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
 	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
 	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
 WASM_BUILD_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" \
 	rustup run $(NIGHTLY_TOOLCHAIN) cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
-	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm && \
+	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
 	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
 	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
