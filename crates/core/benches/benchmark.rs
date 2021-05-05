@@ -11,7 +11,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
             let input_path = format!("src/year{}/day{:02}_input.txt", year, day);
             let input = read_to_string(input_path).unwrap();
 
-            for part in 1..=2 {
+            for part in 1..=(if day == 25 { 1 } else { 2 }) {
                 let benchmark_name = format!("{}_{:02}_{}", year, day, part);
                 c.bench_function(&benchmark_name, |b| {
                     b.iter(|| solve(year, day, part, &input));
