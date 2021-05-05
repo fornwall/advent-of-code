@@ -26,3 +26,6 @@ __pycache__/
 *.egg-info/
 
 flamegraph*.svg
+
+favicon.ico
+*.min.js
