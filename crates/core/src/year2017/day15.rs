@@ -18,7 +18,9 @@ impl Iterator for Generator {
             let g = (prod & 0x7fff_ffff) + (prod >> 31);
             self.value = if g >> 31 == 0 { g } else { g - 0x7fff_ffff };
 
-            if self.value % self.only_multiples_of == 0 {
+            // Speedier version of modulo here:
+            // if self.value % self.only_multiples_of == 0 {
+            if self.value & (self.only_multiples_of - 1) == 0 {
                 return Some(self.value);
             }
         }
