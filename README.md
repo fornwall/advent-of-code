@@ -6,9 +6,9 @@ Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust. Consi
 - [crates/core](crates/core): The solutions themselves and a command-line tool on top of them.
 - [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [Tonic](https://docs.rs/tonic).
 - [crates/http-server](crates/http-server): Server with a HTTP API using [warp](https://github.com/seanmonstar/warp).
-- [crates/fuzzing-afl](crates/fuzzing-afl): Fuzzing of the solutions using [afl](https://lcamtuf.coredump.cx/afl/).
-- [crates/fuzzing-hfuzz](crates/fuzzing-hfuzz): Fuzzing of the solutions using [hongfuzz](https://honggfuzz.dev/).
-- [crates/fuzzing-libfuzzer](crates/fuzzing-libfuzzer): Fuzzing of the solutions using [libFuzzer](https://llvm.org/docs/LibFuzzer.html).
+- [crates/fuzzing-afl](crates/fuzzing-afl): Fuzzing using [afl](https://lcamtuf.coredump.cx/afl/).
+- [crates/fuzzing-hfuzz](crates/fuzzing-hfuzz): Fuzzing using [hongfuzz](https://honggfuzz.dev/).
+- [crates/fuzzing-libfuzzer](crates/fuzzing-libfuzzer): Fuzzing using [libFuzzer](https://llvm.org/docs/LibFuzzer.html).
 - [crates/python](crates/python): A python library wrapping the solutions using [PyO3](https://pyo3.rs/).
 - [crates/wasm](crates/wasm): The solutions built as WebAssembly using [wasm-bindgen](https://rustwasm.github.io/docs/wasm-bindgen/).
   - Published to a static site at [https://aoc.fornwall.net](https://aoc.fornwall.net).
