@@ -15,7 +15,11 @@ fn parse_player_cards(input: &str) -> Option<VecDeque<u8>> {
         .ok()
 }
 
-fn play_recursive(player_1_cards: &mut VecDeque<u8>, player_2_cards: &mut VecDeque<u8>) -> Winner {
+fn play(
+    player_1_cards: &mut VecDeque<u8>,
+    player_2_cards: &mut VecDeque<u8>,
+    recurse: bool,
+) -> Winner {
     #![allow(clippy::unwrap_used)]
     let mut seen_1 = HashSet::new();
     let mut seen_2 = HashSet::new();
@@ -32,7 +36,10 @@ fn play_recursive(player_1_cards: &mut VecDeque<u8>, player_2_cards: &mut VecDeq
         let c1 = player_1_cards.pop_front().unwrap();
         let c2 = player_2_cards.pop_front().unwrap();
 
-        let winner = if player_1_cards.len() >= c1 as usize && player_2_cards.len() >= c2 as usize {
+        let winner = if recurse
+            && player_1_cards.len() >= c1 as usize
+            && player_2_cards.len() >= c2 as usize
+        {
             let mut p1_subgame_cards = player_1_cards
                 .iter()
                 .take(c1 as usize)
@@ -43,7 +50,17 @@ fn play_recursive(player_1_cards: &mut VecDeque<u8>, player_2_cards: &mut VecDeq
                 .take(c2 as usize)
                 .copied()
                 .collect::<VecDeque<u8>>();
-            play_recursive(&mut p1_subgame_cards, &mut p2_subgame_cards)
+
+            if p1_subgame_cards.iter().max().unwrap() > p2_subgame_cards.iter().max().unwrap() {
+                // If player 1 holds the highest card, he will win since since that highest card
+                // will be too big to recurse on (in N cards, the smallest highest card is N, so after
+                // drawing that card there can at most be N-1 cards remaining, so that card will win).
+                // Due to the "if previous round had same cards player 1 wins" rule we cannot do
+                // the same for player 2, since he may loose due to that rule.
+                Winner::Player1
+            } else {
+                play(&mut p1_subgame_cards, &mut p2_subgame_cards, true)
+            }
         } else if c1 > c2 {
             Winner::Player1
         } else {
@@ -64,7 +81,6 @@ fn play_recursive(player_1_cards: &mut VecDeque<u8>, player_2_cards: &mut VecDeq
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
-    #![allow(clippy::unwrap_used)]
     let on_error = || "Invalid input".to_string();
 
     let mut parts = input.text.splitn(2, "\n\n");
@@ -73,26 +89,11 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut player_2_cards =
         parse_player_cards(parts.next().ok_or_else(on_error)?).ok_or_else(on_error)?;
 
-    let winner = if input.is_part_one() {
-        while !player_1_cards.is_empty() && !player_2_cards.is_empty() {
-            let c1 = player_1_cards.pop_front().unwrap();
-            let c2 = player_2_cards.pop_front().unwrap();
-            if c1 > c2 {
-                player_1_cards.push_back(c1);
-                player_1_cards.push_back(c2);
-            } else {
-                player_2_cards.push_back(c2);
-                player_2_cards.push_back(c1);
-            }
-        }
-        if player_1_cards.is_empty() {
-            Winner::Player2
-        } else {
-            Winner::Player1
-        }
-    } else {
-        play_recursive(&mut player_1_cards, &mut player_2_cards)
-    };
+    let winner = play(
+        &mut player_1_cards,
+        &mut player_2_cards,
+        input.is_part_two(),
+    );
 
     let winner_cards = match winner {
         Winner::Player1 => player_1_cards,
