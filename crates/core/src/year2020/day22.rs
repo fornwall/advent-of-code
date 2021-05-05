@@ -25,7 +25,9 @@ fn play(
     let mut seen_2 = HashSet::new();
 
     loop {
-        if !(seen_1.insert(player_1_cards.clone()) && seen_2.insert(player_2_cards.clone())) {
+        if recurse
+            && !(seen_1.insert(player_1_cards.clone()) && seen_2.insert(player_2_cards.clone()))
+        {
             return Winner::Player1;
         } else if player_1_cards.is_empty() {
             return Winner::Player2;
