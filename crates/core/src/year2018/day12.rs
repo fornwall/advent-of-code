@@ -28,15 +28,14 @@ impl Tunnel {
 
         lines.next(); // Skip empty line
         for line in lines {
-            let parts: Vec<&str> = line.split(" => ").collect();
-            if parts.len() != 2 {
-                return Err("Invalid input".to_string());
-            }
-            let from_bytes: Vec<u8> = parts[0].bytes().collect();
+            let (part1, part2) = line
+                .split_once(" => ")
+                .ok_or_else(|| "Invalid input".to_string())?;
+            let from_bytes: Vec<u8> = part1.bytes().collect();
             if from_bytes.len() != 5 {
                 return Err("Invalid input".to_string());
             }
-            let result = parts[1] == "#";
+            let result = part2 == "#";
             let from = (
                 from_bytes[0] == b'#',
                 from_bytes[1] == b'#',

@@ -186,17 +186,9 @@ fn solve_with_bit_mask<T: BitMask + Copy + Clone>(
             commands.push(Command::PopBitMask);
             bit_mask_stack.push(T::parse(bit_mask_str));
         } else if let Some(remainder) = line.strip_prefix("mem[") {
-            let mut parts = remainder.split("] = ");
-            let address = parts
-                .next()
-                .ok_or_else(on_error)?
-                .parse::<u64>()
-                .map_err(|_| on_error())?;
-            let value = parts
-                .next()
-                .ok_or_else(on_error)?
-                .parse::<u64>()
-                .map_err(|_| on_error())?;
+            let (part1, part2) = remainder.split_once("] = ").ok_or_else(on_error)?;
+            let address = part1.parse::<u64>().map_err(|_| on_error())?;
+            let value = part2.parse::<u64>().map_err(|_| on_error())?;
             commands.push(Command::Set(address, value));
         } else {
             return Err(on_error());

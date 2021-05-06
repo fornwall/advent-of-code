@@ -58,28 +58,25 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut screen = Screen::new();
     for line in input.text.lines() {
         if let Some(after) = line.strip_prefix("rect ") {
-            let parts = after.split('x').collect::<Vec<_>>();
-            if parts.len() != 2 {
-                return Err("Invalid input".to_string());
-            }
-            let width = parts[0].parse::<usize>().map_err(|_| "Invalid input")?;
-            let height = parts[1].parse::<usize>().map_err(|_| "Invalid input")?;
+            let (part1, part2) = after
+                .split_once('x')
+                .ok_or_else(|| "Invalid input".to_string())?;
+            let width = part1.parse::<usize>().map_err(|_| "Invalid input")?;
+            let height = part2.parse::<usize>().map_err(|_| "Invalid input")?;
             screen.turn_on_rect(width, height);
         } else if let Some(after) = line.strip_prefix("rotate row y=") {
-            let parts = after.split(" by ").collect::<Vec<_>>();
-            if parts.len() != 2 {
-                return Err("Invalid input".to_string());
-            }
-            let row_to_rotate = parts[0].parse::<usize>().map_err(|_| "Invalid input")?;
-            let rotation_amount = parts[1].parse::<usize>().map_err(|_| "Invalid input")?;
+            let (part1, part2) = after
+                .split_once(" by ")
+                .ok_or_else(|| "invalid input".to_string())?;
+            let row_to_rotate = part1.parse::<usize>().map_err(|_| "Invalid input")?;
+            let rotation_amount = part2.parse::<usize>().map_err(|_| "Invalid input")?;
             screen.rotate_row(row_to_rotate, rotation_amount);
         } else if let Some(after) = line.strip_prefix("rotate column x=") {
-            let parts = after.split(" by ").collect::<Vec<_>>();
-            if parts.len() != 2 {
-                return Err("Invalid input".to_string());
-            }
-            let col_to_rotate = parts[0].parse::<usize>().map_err(|_| "Invalid input")?;
-            let rotation_amount = parts[1].parse::<usize>().map_err(|_| "Invalid input")?;
+            let (part1, part2) = after
+                .split_once(" by ")
+                .ok_or_else(|| "invalid input".to_string())?;
+            let col_to_rotate = part1.parse::<usize>().map_err(|_| "Invalid input")?;
+            let rotation_amount = part2.parse::<usize>().map_err(|_| "Invalid input")?;
             screen.rotate_col(col_to_rotate, rotation_amount);
         } else {
             return Err("Invalid line".to_string());

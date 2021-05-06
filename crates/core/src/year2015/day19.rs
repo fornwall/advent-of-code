@@ -8,12 +8,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     for line in input.text.lines() {
         if line.is_empty() {
             // Blank line before last.
-        } else if line.contains(" => ") {
-            let parts = line.split(" => ").collect::<Vec<_>>();
-            mappings
-                .entry(parts[0])
-                .or_insert_with(Vec::new)
-                .push(parts[1]);
+        } else if let Some((part1, part2)) = line.split_once(" => ") {
+            mappings.entry(part1).or_insert_with(Vec::new).push(part2);
         } else {
             molecule = line.to_string();
         }

@@ -39,34 +39,24 @@ impl Reactions {
             let error = || format!("Invalid input line {}", line_index + 1);
 
             // Example: "12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ".
-            let parts: Vec<&str> = line.split("=>").collect();
-            if parts.len() != 2 {
-                return Err(error());
-            }
+            let (from, to) = line.split_once("=>").ok_or_else(error)?;
 
             let mut required_chemicals = Vec::new();
-            for amount_and_name in parts[0].split(',') {
-                let parts: Vec<&str> = amount_and_name.split_whitespace().collect();
-                if parts.len() != 2 {
-                    return Err(error());
-                }
+            for amount_and_name in from.split(',') {
+                let (amount, name) = amount_and_name.trim().split_once(' ').ok_or_else(error)?;
 
-                let required_amount = parts[0].parse::<ChemicalAmount>().map_err(|_| error())?;
-                let required_id = id_assigner.id_of(parts[1].trim().to_string());
+                let required_amount = amount.parse::<ChemicalAmount>().map_err(|_| error())?;
+                let required_id = id_assigner.id_of(name.trim().to_string());
                 if required_chemicals.len() <= required_id {
                     required_chemicals.resize(required_id + 1, 0);
                 }
                 required_chemicals[required_id] = required_amount;
             }
 
-            let to_parts: Vec<&str> = parts[1].split_whitespace().collect();
-            if to_parts.len() != 2 {
-                return Err(error());
-            }
-            let produced_chemical_amount = to_parts[0]
-                .parse::<ChemicalAmount>()
-                .map_err(|_| format!("Invalid line {}: {}", line_index + 1, line))?;
-            let produced_chemical_name = to_parts[1].trim().to_string();
+            let (amount_str, name) = to.trim().split_once(' ').ok_or_else(error)?;
+            let produced_chemical_amount =
+                amount_str.parse::<ChemicalAmount>().map_err(|_| error())?;
+            let produced_chemical_name = name.trim().to_string();
             let produced_chemical_id = id_assigner.id_of(produced_chemical_name);
 
             if reactions.len() <= produced_chemical_id {
