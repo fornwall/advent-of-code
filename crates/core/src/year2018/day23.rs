@@ -42,6 +42,7 @@ impl std::ops::Index<usize> for Position {
     type Output = i32;
 
     fn index(&self, i: usize) -> &i32 {
+        #![allow(clippy::panic)]
         match i {
             0 => &self.x,
             1 => &self.y,
@@ -77,6 +78,7 @@ impl std::ops::Sub<Self> for Position {
 
 impl std::ops::IndexMut<usize> for Position {
     fn index_mut(&mut self, i: usize) -> &mut i32 {
+        #![allow(clippy::panic)]
         match i {
             0 => &mut self.x,
             1 => &mut self.y,

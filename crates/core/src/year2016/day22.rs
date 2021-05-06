@@ -18,7 +18,7 @@ fn dist(
     mut grid: Vec<bool>,
     start: (u8, u8),
     destination: (u8, u8),
-) -> usize {
+) -> Result<usize, String> {
     let mut queue = VecDeque::new();
     queue.push_back((0, start));
 
@@ -29,7 +29,7 @@ fn dist(
         if grid[grid_idx] {
             continue;
         } else if position == destination {
-            return path_length;
+            return Ok(path_length);
         }
 
         grid[grid_idx] = true;
@@ -48,7 +48,10 @@ fn dist(
         }
     }
 
-    panic!("No path found from {:?} to {:?}", start, destination);
+    Err(format!(
+        "No path found from {:?} to {:?}",
+        start, destination
+    ))
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -114,8 +117,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             .ok_or("No empty node")?
             .position;
         let payload_pos = (dimensions.0 - 1, 0);
-        let dist_to_payload = dist(dimensions, grid.clone(), empty_pos, payload_pos);
-        let dist_to_home = dist(dimensions, grid, (payload_pos.0 - 1, payload_pos.1), (0, 0));
+        let dist_to_payload = dist(dimensions, grid.clone(), empty_pos, payload_pos)?;
+        let dist_to_home = dist(dimensions, grid, (payload_pos.0 - 1, payload_pos.1), (0, 0))?;
         Ok((dist_to_payload + 5 * dist_to_home) as u32)
     }
 }

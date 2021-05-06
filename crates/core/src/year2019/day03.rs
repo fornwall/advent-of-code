@@ -360,11 +360,11 @@ pub fn tests_line_segment() {
         start_step: 10,
         incoming_direction: false,
     };
-    if let Some(intersection) = l1.intersection_with(l2) {
+    let possible_intersection = l1.intersection_with(l2);
+    assert!(possible_intersection.is_some());
+    if let Some(intersection) = possible_intersection {
         assert_eq!(Vector { x: 3, y: 0 }, intersection.point);
         assert_eq!(99 + 3 + 10 + 4, intersection.combined_steps);
-    } else {
-        panic!("Incorrect");
     }
 }
 

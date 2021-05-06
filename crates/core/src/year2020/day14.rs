@@ -93,8 +93,8 @@ impl BitMask for BitMaskV2 {
             }
         }
         Self {
-            floating_bitmask,
             ones,
+            floating_bitmask,
         }
     }
 

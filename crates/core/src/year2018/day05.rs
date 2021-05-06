@@ -1,6 +1,6 @@
 type PolymerUnit = u8;
 
-fn destroys_each_other(a: PolymerUnit, b: PolymerUnit) -> bool {
+const fn destroys_each_other(a: PolymerUnit, b: PolymerUnit) -> bool {
     a.eq_ignore_ascii_case(&b) && a != b
 }
 

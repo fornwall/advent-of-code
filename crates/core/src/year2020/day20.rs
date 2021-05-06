@@ -137,7 +137,7 @@ impl Tile {
         y: u8,
         composed_image: &HashMap<(u8, u8), Self>,
         composed_image_width: u8,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let mut current = *self;
 
         for _flip in 0..=1 {
@@ -173,14 +173,14 @@ impl Tile {
                         }
                     }
                     if possible {
-                        return current;
+                        return Ok(current);
                     }
                 }
                 current = current.rotate_clockwise();
             }
             current = current.flip_horizontal();
         }
-        panic!("transform_to_match not found");
+        Err("transform_to_match not found".to_string())
     }
 
     fn rotate_clockwise(&self) -> Self {
@@ -307,7 +307,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                     new_y,
                     &composed_image,
                     composed_image_tile_width,
-                );
+                )?;
 
                 composed_image.insert((new_x, new_y), transformed_tile);
 
@@ -321,10 +321,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             0 => (sideway, offset),
             1 => (offset, sideway),
             2 => (sideway, composed_image_pixel_width - 1 - offset),
-            3 => (composed_image_pixel_width - 1 - offset, sideway),
-            _ => {
-                panic!("Invalid direction");
-            }
+            _ => (composed_image_pixel_width - 1 - offset, sideway),
         };
 
         let tile_x = pixel_x / 8;
