@@ -116,13 +116,6 @@ jobs:
           name: wheels
           path: ./crates/python/wheelhouse/*.whl
 
-  build-docker-image:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build docker image
-      run: docker build --tag throwaway crates/core
-
   bump-version:
     needs: [test-rust, test-python, test-wasm, build-docker-image, build-python-wheels]
     if: github.ref == 'refs/heads/master'
@@ -152,10 +145,11 @@ jobs:
       run: git push
 
   release-core-docker-image:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - run: cargo install cross
     - uses: actions/setup-python@v2
     - name: Install bump2version
       run: pip install bump2version
@@ -167,10 +161,16 @@ jobs:
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
       run: |
+        cross build --release --target aarch64-unknown-linux-musl
+        cross build --release --target x86_64-unknown-linux-musl
+        strip -s target/*-unknown-linux-musl/release/advent-of-code
         NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
-        docker build --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
+        cp target/x86_64-unknown-linux-musl/release/advent-of-code advent-of-code
+        docker build --platform amd64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
+        cp target/aarch64-unknown-linux-musl/release/advent-of-code advent-of-code
+        docker build --platform aarch64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
         docker push --all-tags ${DOCKER_IMAGE_NAME}
 
   publish-and-deploy-http-server:
