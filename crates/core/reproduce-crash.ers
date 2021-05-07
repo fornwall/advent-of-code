@@ -1,0 +1,24 @@
+#!/usr/bin/env rust-script
+
+use std::io::Write;
+
+let file_path = std::env::args().nth(1).ok_or("No argument")?;
+let data = std::fs::read(&file_path).map_err(|error| format!("Could not open '{}': {}", file_path, error))?;
+
+let year = 2015 + u16::from(data[0] % 6);
+let day = 1 + data[1] % 25;
+let part = 1 + data[2] % 2;
+println!("tail -c +4 \"{}\" | cargo run {} {} {}", file_path, year, day, part);
+
+let mut child = std::process::Command::new("cargo")
+        .env("RUST_BACKTRACE", "1")
+        .args(&["run", &year.to_string(), &day.to_string(), &part.to_string()])
+        .stdin(std::process::Stdio::piped())
+        .spawn()?;
+
+child.stdin
+        .as_mut()
+        .unwrap()
+        .write_all(&data[3..])?;
+
+let _ = child.wait()?;
