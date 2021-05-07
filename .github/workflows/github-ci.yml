@@ -158,6 +158,7 @@ jobs:
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Build and push docker image
+      working-directory: crates/core
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
       run: |
@@ -168,9 +169,9 @@ jobs:
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
         cp target/x86_64-unknown-linux-musl/release/advent-of-code advent-of-code
-        docker build --platform amd64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
+        docker build --platform amd64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest .
         cp target/aarch64-unknown-linux-musl/release/advent-of-code advent-of-code
-        docker build --platform aarch64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest crates/core
+        docker build --platform aarch64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest .
         docker push --all-tags ${DOCKER_IMAGE_NAME}
 
   publish-and-deploy-http-server:
