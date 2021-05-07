@@ -6,7 +6,7 @@ pub struct Registers {
     pub values: [u64; 6],
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct Instruction {
     opcode: Opcode,
     pub a: u64,
@@ -217,7 +217,7 @@ impl Program {
     }
 }
 
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Opcode {
     Addr, // (add register) stores into register C the result of adding register A and register B
     Addi, // (add immediate) stores into register C the result of adding register A and value B.

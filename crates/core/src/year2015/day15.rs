@@ -1,6 +1,5 @@
 use crate::Input;
 
-#[derive(Debug)]
 struct Ingredient {
     capacity: i32,
     durability: i32,

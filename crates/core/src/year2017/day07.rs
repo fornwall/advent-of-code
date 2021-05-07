@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 type ProgramId = usize;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct Program<'a> {
     id: ProgramId,
     name: &'a str,

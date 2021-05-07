@@ -2,7 +2,7 @@ use crate::Input;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-#[derive(Default, Eq, PartialEq, Hash, Clone, Debug)]
+#[derive(Default, Eq, PartialEq, Hash, Clone)]
 struct Effect {
     turns: u8,
     armor: u8,
@@ -10,7 +10,6 @@ struct Effect {
     mana: u8,
 }
 
-#[derive(Debug)]
 struct Spell {
     mana_cost: u8,
     damage: u8,
@@ -18,7 +17,7 @@ struct Spell {
     effect_idx: Option<usize>,
 }
 
-#[derive(Eq, PartialEq, Clone, Debug, PartialOrd, Ord)]
+#[derive(Eq, PartialEq, Clone, PartialOrd, Ord)]
 struct State {
     spent_mana: u32,
     mana_left: u32,

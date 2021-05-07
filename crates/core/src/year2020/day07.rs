@@ -3,7 +3,6 @@ use std::collections::{HashMap, HashSet};
 
 const MAX_DEPTH: u32 = 100;
 
-#[derive(Debug)]
 struct BagEntry<'a> {
     amount: u32,
     bag_type: &'a str,

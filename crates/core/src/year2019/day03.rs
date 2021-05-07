@@ -2,7 +2,7 @@ use crate::input::Input;
 use std::cmp;
 use std::ops;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone)]
 struct Vector {
     x: i32,
     y: i32,
@@ -363,7 +363,8 @@ pub fn tests_line_segment() {
     let possible_intersection = l1.intersection_with(l2);
     assert!(possible_intersection.is_some());
     if let Some(intersection) = possible_intersection {
-        assert_eq!(Vector { x: 3, y: 0 }, intersection.point);
+        assert_eq!(3, intersection.point.x);
+        assert_eq!(0, intersection.point.y);
         assert_eq!(99 + 3 + 10 + 4, intersection.combined_steps);
     }
 }

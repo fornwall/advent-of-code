@@ -1,7 +1,7 @@
 pub type Word = i32;
 type Register = u8;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub enum ValueOrRegister {
     Value(Word),
     Register(Register),
@@ -25,7 +25,7 @@ fn parse_register(input: &str) -> Result<Register, String> {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub enum Instruction {
     // cpy x y copies x (either an integer or the value of a register) into register y.
     Copy(ValueOrRegister, Register),

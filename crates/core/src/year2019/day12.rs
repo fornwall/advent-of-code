@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct Moons {
     positions: [[i32; 3]; 4],
     velocities: [[i32; 3]; 4],

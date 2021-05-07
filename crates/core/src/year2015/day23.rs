@@ -1,6 +1,6 @@
 use crate::Input;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 enum Instruction {
     Half(u8),
     Triple(u8),
@@ -10,7 +10,6 @@ enum Instruction {
     JumpIfOne(u8, i16),
 }
 
-#[derive(Debug)]
 struct Computer {
     registers: [u32; 2],
     instructions: Vec<Instruction>,

@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -88,7 +89,6 @@ impl std::ops::IndexMut<usize> for Position {
     }
 }
 
-#[derive(Debug)]
 struct Nanobot {
     pos: Position,
     radius: i32,
@@ -127,7 +127,7 @@ impl Nanobot {
 /// An axis-aligned bounding box (AABB).
 ///
 /// The min and max values are both inclusive.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 #[allow(clippy::upper_case_acronyms)]
 struct AABB {
     min: Position,
@@ -276,21 +276,21 @@ impl Octree {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let bots = Nanobot::parse(input_string)?;
-    let strongest_bot = bots
-        .iter()
-        .max_by(|x, y| x.radius.cmp(&y.radius))
-        .ok_or("No robot specified")?;
-    Ok(bots
-        .iter()
-        .filter(|&bot| strongest_bot.is_bot_within_range(bot))
-        .count())
-}
-
 // https://www.forrestthewoods.com/blog/solving-advent-of-code-in-under-a-second/
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let bots = Nanobot::parse(input_string)?;
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let bots = Nanobot::parse(input.text)?;
+
+    if input.is_part_one() {
+        let strongest_bot = bots
+            .iter()
+            .max_by(|x, y| x.radius.cmp(&y.radius))
+            .ok_or("No robot specified")?;
+        return Ok(bots
+            .iter()
+            .filter(|&bot| strongest_bot.is_bot_within_range(bot))
+            .count() as i32);
+    }
+
     let mut octree = Octree::new(&bots);
     let origin = Position::new(0, 0, 0);
     let mut best_leaf: Option<Rc<RefCell<OctreeNode>>> = None;
@@ -366,10 +366,10 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(7),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "pos=<0,0,0>, r=4
 pos=<1,0,0>, r=1
 pos=<4,0,0>, r=3
@@ -378,26 +378,19 @@ pos=<0,5,0>, r=3
 pos=<0,0,3>, r=1
 pos=<1,1,1>, r=1
 pos=<1,1,2>, r=1
-pos=<1,3,1>, r=1"
-        )
+pos=<1,3,1>, r=1" => 7
     );
 
-    assert_eq!(Ok(270), part1(include_str!("day23_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(36),
-        part2(
+    test_part_two!(
             "pos=<10,12,12>, r=2
 pos=<12,14,12>, r=2
 pos=<16,12,12>, r=4
 pos=<14,14,14>, r=6
 pos=<50,50,50>, r=200
-pos=<10,10,10>, r=5"
-        )
+pos=<10,10,10>, r=5" => 36
     );
 
-    assert_eq!(Ok(106_323_091), part2(include_str!("day23_input.txt")));
+    let input = include_str!("day23_input.txt");
+    test_part_one!(input => 270);
+    test_part_two!(input => 106_323_091);
 }

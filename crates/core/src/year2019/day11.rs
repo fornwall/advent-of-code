@@ -2,7 +2,7 @@ use super::int_code::{Program, Word};
 use crate::common::character_recognition::recognize;
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 enum Color {
     Black = 0,
     White = 1,

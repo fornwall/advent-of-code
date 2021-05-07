@@ -5,7 +5,7 @@ use std::ops::RangeInclusive;
 
 type CoordinateComponent = i8;
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Hash, Eq, PartialEq)]
 struct Coordinate {
     x: CoordinateComponent,
     y: CoordinateComponent,

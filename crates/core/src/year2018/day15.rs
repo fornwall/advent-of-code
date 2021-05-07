@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::env;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 enum MapCell {
     Wall,
     Open,

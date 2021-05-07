@@ -15,7 +15,7 @@ enum TrackPiece {
     Intersection,
 }
 
-#[derive(Hash, Eq, PartialEq, Debug, Copy, Clone, Ord, PartialOrd)]
+#[derive(Hash, Eq, PartialEq, Copy, Clone, Ord, PartialOrd)]
 struct Vector {
     y: i32,
     x: i32,

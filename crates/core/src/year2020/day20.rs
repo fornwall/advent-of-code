@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 struct Edge {
     /// Bitmask where '#' is set bit, '.' is unset. Only 10 first bits used.
     bitmask: u16,
@@ -21,7 +21,7 @@ impl Edge {
 
 type TileId = u16;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 struct Tile {
     id: TileId,
     /// Indexed by 0,1,3,4 = Top,Right,Bottom,Left.

@@ -5,7 +5,7 @@ struct Registers {
     values: [u16; 4],
 }
 
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
+#[derive(Copy, Clone, Hash, Eq, PartialEq)]
 enum Opcode {
     Addr, // (add register) stores into register C the result of adding register A and register B
     Addi, // (add immediate) stores into register C the result of adding register A and value B.
