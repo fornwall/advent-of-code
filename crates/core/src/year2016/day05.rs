@@ -9,14 +9,16 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     let mut password = input.part_values(Vec::new(), vec![' '; 8]);
     let door_id = input.text.as_bytes();
+    if door_id.len() > 8 {
+        return Err("Too long door id (max length: 8)".to_string());
+    }
 
     let mut hasher = Md5::new();
-    let mut output = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0];
+    let mut output = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     for index in 0..MAX_INDEX {
         hasher.update(door_id);
         hasher.update(index.to_string().as_bytes());
-
         hasher.finalize_into_reset(&mut output);
 
         // Check if hash starts with five zeros without converting it to a string:

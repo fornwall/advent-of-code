@@ -32,7 +32,11 @@ fn contains_five_in_a_row(hash: &[u8], desired_char: u8) -> bool {
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let salt = input.text;
+    if salt.len() > 8 {
+        return Err("Too long salt (max length: 8)".to_string());
+    }
 
+    let mut salt_hasher = Md5::new();
     let mut hasher = Md5::new();
     let mut hash = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let mut hash_cache = Vec::new();

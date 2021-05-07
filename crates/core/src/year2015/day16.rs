@@ -15,10 +15,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     desired.insert("perfumes", 1);
 
     'outer: for (line_idx, line) in input.text.lines().enumerate() {
+        let error = || format!("Line {}: Invalid format", line_idx + 1);
         let words = line.split(' ').collect::<Vec<_>>();
+        if words.len() % 2 != 0 {
+            return Err(error());
+        }
 
         for name_idx in (2..words.len()).step_by(2) {
-            let attribute_name = words[name_idx].strip_suffix(':').unwrap_or(words[name_idx]);
+            let attribute_name = words[name_idx].strip_suffix(':').ok_or_else(error)?;
             let attribute_value = words[name_idx + 1]
                 .strip_suffix(',')
                 .unwrap_or(words[name_idx + 1])

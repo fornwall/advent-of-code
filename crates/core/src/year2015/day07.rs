@@ -27,28 +27,29 @@ impl<'a> Gate<'a> {
     }
 }
 
-fn output_of(num_or_wire: &str, gates: &mut HashMap<&str, Gate>) -> SignalValue {
+fn output_of(num_or_wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<SignalValue> {
     num_or_wire
         .parse::<SignalValue>()
-        .unwrap_or_else(|_| find_output(num_or_wire, gates))
+        .ok()
+        .or_else(|| find_output(num_or_wire, gates))
 }
 
-fn find_output(wire: &str, gates: &mut HashMap<&str, Gate>) -> SignalValue {
-    let gate = gates.get(wire).unwrap();
+fn find_output(wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<SignalValue> {
+    let gate = gates.get(wire)?;
     match gate.computed_value {
-        Some(value) => value,
+        Some(value) => Some(value),
         None => {
             let signal_value = match gate.operation {
-                Operation::Assign(value) => output_of(value, gates),
-                Operation::Not(value) => !output_of(value, gates),
-                Operation::And(lhs, rhs) => output_of(lhs, gates) & output_of(rhs, gates),
-                Operation::Or(lhs, rhs) => output_of(lhs, gates) | output_of(rhs, gates),
-                Operation::LeftShift(lhs, rhs) => output_of(lhs, gates) << output_of(rhs, gates),
-                Operation::RightShift(lhs, rhs) => output_of(lhs, gates) >> output_of(rhs, gates),
+                Operation::Assign(value) => output_of(value, gates)?,
+                Operation::Not(value) => !output_of(value, gates)?,
+                Operation::And(lhs, rhs) => output_of(lhs, gates)? & output_of(rhs, gates)?,
+                Operation::Or(lhs, rhs) => output_of(lhs, gates)? | output_of(rhs, gates)?,
+                Operation::LeftShift(lhs, rhs) => output_of(lhs, gates)? << output_of(rhs, gates)?,
+                Operation::RightShift(lhs, rhs) => output_of(lhs, gates)? >> output_of(rhs, gates)?,
             };
 
             gates.get_mut(wire).unwrap().computed_value = Some(signal_value);
-            signal_value
+            Some(signal_value)
         }
     }
 }
@@ -99,7 +100,7 @@ pub fn solve(input: &mut Input) -> Result<SignalValue, String> {
         }
     }
 
-    let value_of_a = find_output("a", &mut gates);
+    let value_of_a = find_output("a", &mut gates).ok_or_else(|| "Invalid input".to_string())?;
     if input.is_part_one() {
         Ok(value_of_a)
     } else {
@@ -108,7 +109,7 @@ pub fn solve(input: &mut Input) -> Result<SignalValue, String> {
             value.computed_value = None;
         }
         gates.insert("b", Gate::new(Operation::Assign(value_of_a_str.as_str())));
-        Ok(find_output("a", &mut gates))
+        find_output("a", &mut gates).ok_or_else(|| "Invalid input".to_string())
     }
 }
 
