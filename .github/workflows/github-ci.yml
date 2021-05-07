@@ -164,11 +164,11 @@ jobs:
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code
       run: |
+        NEW_VERSION=`cd ../.. && bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
         strip -s target/x86_64-unknown-linux-musl/release/advent-of-code
         aarch64-linux-gnu-strip -s target/aarch64-unknown-linux-musl/release/advent-of-code
-        NEW_VERSION=`bump2version patch --dry-run --list | grep new_version | cut -d = -f 2`
         IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
         cp target/x86_64-unknown-linux-musl/release/advent-of-code advent-of-code
