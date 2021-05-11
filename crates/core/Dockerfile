@@ -1,3 +1,4 @@
 FROM scratch
 ARG TARGETPLATFORM
-COPY advent-of-code target/$TARGETPLATFORM/advent-of-code
+COPY target/$TARGETPLATFORM/advent-of-code /advent-of-code
+ENTRYPOINT ["/advent-of-code"]
