@@ -153,6 +153,10 @@ jobs:
     - uses: actions/setup-python@v2
     - name: Install bump2version
       run: pip install bump2version
+    - name: Install docker buildx
+      uses: crazy-max/ghaction-docker-buildx@v1
+      with:
+        version: latest
     - name: Login to docker hub
       run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
       env:
@@ -169,13 +173,12 @@ jobs:
         cross build --release --target x86_64-unknown-linux-musl
         strip -s target/x86_64-unknown-linux-musl/release/advent-of-code
         aarch64-linux-gnu-strip -s target/aarch64-unknown-linux-musl/release/advent-of-code
-        IMAGE=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
-        echo "Version: $NEW_VERSION - about to build and push ${IMAGE}"
-        cp target/x86_64-unknown-linux-musl/release/advent-of-code advent-of-code
-        docker build --platform amd64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest .
-        cp target/aarch64-unknown-linux-musl/release/advent-of-code advent-of-code
-        docker build --platform aarch64 --tag ${IMAGE} --tag ${DOCKER_IMAGE_NAME}:latest .
-        docker push --all-tags ${DOCKER_IMAGE_NAME}
+        IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
+        IMAGE_WITH_LATEST=${DOCKER_IMAGE_NAME}:latest
+        mkdir -p target/linux/{arm64,amd64}
+        cp target/x86_64-unknown-linux-musl/release/advent-of-code target/linux/amd64/advent-of-code
+        cp target/aarch64-unknown-linux-musl/release/advent-of-code target/linux/arm64/advent-of-code
+        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
 
   publish-and-deploy-http-server:
     needs: bump-version

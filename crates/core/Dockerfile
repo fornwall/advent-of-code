@@ -1,3 +1,3 @@
 FROM scratch
-COPY advent-of-code /advent-of-code
-ENTRYPOINT ["/advent-of-code"]
+ARG TARGETPLATFORM
+COPY advent-of-code target/$TARGETPLATFORM/advent-of-code
