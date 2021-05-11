@@ -145,6 +145,7 @@ jobs:
       run: git push
 
   release-core-docker-image:
+    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
