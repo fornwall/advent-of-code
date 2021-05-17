@@ -1,7 +1,5 @@
+use crate::common::md5::Context;
 use crate::Input;
-use md5::digest::generic_array::arr;
-use md5::digest::FixedOutput;
-use md5::{Digest, Md5};
 
 fn to_hash_chars(hash: &[u8]) -> [u8; 32] {
     let mut hash_chars = [0_u8; 32];
@@ -36,24 +34,24 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         return Err("Too long salt (max length: 8)".to_string());
     }
 
-    let mut hasher = Md5::new();
-    let mut hash = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let mut hash_cache = Vec::new();
 
     for i in 0..1000 {
         let content_to_hash = format!("{}{}", salt, i);
-        hasher.update(content_to_hash.as_bytes());
+        let mut hasher = Context::new();
+        hasher.consume(content_to_hash.as_bytes());
         if input.is_part_two() {
             for _ in 0..2016 {
-                hasher.finalize_into_reset(&mut hash);
+                let hash: [u8; 16] = hasher.compute().into();
                 let hash_str = to_hash_chars(&hash)
                     .iter()
                     .map(|&b| if b <= 9 { b'0' + b } else { b'a' + (b - 10) })
                     .collect::<Vec<_>>();
-                hasher.update(&hash_str);
+                hasher = Context::new();
+                hasher.consume(&hash_str);
             }
         }
-        hasher.finalize_into_reset(&mut hash);
+        let hash: [u8; 16] = hasher.compute().into();
         hash_cache.push(hash);
     }
 
@@ -63,18 +61,20 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let current_hash = hash_cache[index % 1000];
         hash_cache[index % 1000] = {
             let content_to_hash = format!("{}{}", salt, index + 1000);
-            hasher.update(content_to_hash.as_bytes());
+            let mut hasher = Context::new();
+            hasher.consume(content_to_hash.as_bytes());
             if input.is_part_two() {
                 for _ in 0..2016 {
-                    hasher.finalize_into_reset(&mut hash);
+                    let hash: [u8; 16] = hasher.compute().into();
+                    hasher = Context::new();
                     let hash_str = to_hash_chars(&hash)
                         .iter()
                         .map(|&b| if b <= 9 { b'0' + b } else { b'a' + (b - 10) })
                         .collect::<Vec<_>>();
-                    hasher.update(&hash_str);
+                    hasher.consume(&hash_str);
                 }
             }
-            hasher.finalize_into_reset(&mut hash);
+            let hash: [u8; 16] = hasher.compute().into();
             hash
         };
 
