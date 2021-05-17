@@ -4,6 +4,8 @@ use warp::Filter;
 
 #[tokio::main]
 async fn main() {
+    #![allow(clippy::unwrap_used)]
+
     let port = 8080;
 
     let cors = warp::cors()

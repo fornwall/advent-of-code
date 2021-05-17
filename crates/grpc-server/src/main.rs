@@ -54,22 +54,13 @@ impl Solver for SolverImpl {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    #![allow(clippy::unwrap_used)]
+
     let addr = "0.0.0.0:50051".parse()?;
     let solver = SolverImpl::default();
 
-    // let cert = include_str!("../server.pem");
-    // let key = include_str!("../server.key");
-    // let id = tonic::transport::Identity::from_pem(cert.as_bytes(), key.as_bytes());
-    // let s = include_str!("../my_ca.pem");
-    // let ca = tonic::transport::Certificate::from_pem(s.as_bytes());
-    // let _tls = tonic::transport::ServerTlsConfig::new()
-    // .identity(id)
-    // .client_ca_root(ca);
-
     println!("Server listening on {}", addr);
     Server::builder()
-        // .tls_config(tls)
-        // .unwrap()
         .add_service(SolverServer::new(solver))
         .serve(addr)
         .await?;
