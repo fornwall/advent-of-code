@@ -62,10 +62,10 @@ pub fn solve(
         return Err("Empty input".to_string());
     } else if !input_string.is_ascii() {
         return Err("Non-ASCII input".to_string());
-    } else if !matches!(day, 0..=25) {
-        return Err(format!("Invalid day: {} - must be 1-25", day));
+    } else if !matches!(day, 1..=25) {
+        return Err(format!("Invalid day {} - must be 1-25", day));
     } else if !matches!(part, 1 | 2) {
-        return Err(format!("Invalid part: {} - must be 1-2", part));
+        return Err(format!("Invalid part {} - must be 1-2", part));
     }
 
     let mut input = Input {
