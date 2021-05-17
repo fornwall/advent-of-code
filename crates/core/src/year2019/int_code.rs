@@ -70,12 +70,12 @@ impl Program {
 
     pub fn run_for_output(&mut self) -> Result<Vec<Word>, String> {
         self.run_until_halt_or_input(1_000_000_000)?;
-        Ok(std::mem::replace(&mut self.output_values, Vec::new()))
+        Ok(std::mem::take(&mut self.output_values))
     }
 
     pub fn run_for_output_limited(&mut self, max_instructions: u32) -> Result<Vec<Word>, String> {
         self.run_until_halt_or_input(max_instructions)?;
-        Ok(std::mem::replace(&mut self.output_values, Vec::new()))
+        Ok(std::mem::take(&mut self.output_values))
     }
 
     pub fn input(&mut self, input_value: Word) {

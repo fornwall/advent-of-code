@@ -3,14 +3,15 @@ use crate::input::Input;
 // Parse input in the format "A=<211,-141,-45>".
 fn parse_vector(input: &str) -> Option<(i32, i32, i32)> {
     if input.len() > 3 {
-        if let Some(stripped_of_prefix) = input[2..].strip_prefix("<") {
-            if let Some(stripped) = stripped_of_prefix.strip_suffix('>') {
-                let mut number_parts = stripped.split(',');
-                let x = number_parts.next()?.parse::<i16>().ok()?;
-                let y = number_parts.next()?.parse::<i16>().ok()?;
-                let z = number_parts.next()?.parse::<i16>().ok()?;
-                return Some((i32::from(x), i32::from(y), i32::from(z)));
-            }
+        if let Some(stripped) = input[2..]
+            .strip_prefix('<')
+            .and_then(|s| s.strip_suffix('>'))
+        {
+            let mut number_parts = stripped.split(',');
+            let x = number_parts.next()?.parse::<i16>().ok()?;
+            let y = number_parts.next()?.parse::<i16>().ok()?;
+            let z = number_parts.next()?.parse::<i16>().ok()?;
+            return Some((i32::from(x), i32::from(y), i32::from(z)));
         }
     }
     None
