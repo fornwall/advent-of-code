@@ -1,6 +1,8 @@
 use super::day10::solve as knot_hash;
 use super::disjoint_set::DisjointSet;
 use crate::input::{Input, Part};
+#[cfg(feature = "visualization")]
+use crate::painter::MockPainter;
 use std::collections::BTreeMap;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -23,7 +25,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             text: &hash_input,
             part: Part::Two,
             #[cfg(feature = "visualization")]
-            painter: input.painter,
+            painter: Box::new(MockPainter {}),
         })?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
