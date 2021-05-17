@@ -1,10 +1,12 @@
-fn solution(input_string: &str, part1: bool) -> u32 {
+use crate::input::Input;
+
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut result = 0;
     let mut stack = Vec::new();
     let mut ignore_next = false;
     let mut inside_garbage = false;
 
-    for char in input_string.bytes() {
+    for char in input.text.bytes() {
         if ignore_next {
             ignore_next = false;
             continue;
@@ -15,7 +17,7 @@ fn solution(input_string: &str, part1: bool) -> u32 {
                 inside_garbage = true;
             }
             (false, b'{') => {
-                if part1 {
+                if input.is_part_one() {
                     let this_score = 1 + stack.last().unwrap_or(&0);
                     stack.push(this_score);
                     result += this_score;
@@ -31,30 +33,20 @@ fn solution(input_string: &str, part1: bool) -> u32 {
                 inside_garbage = false;
             }
             (true, _) => {
-                if !part1 {
+                if input.is_part_two() {
                     result += 1;
                 }
             }
             _ => {}
         }
     }
-    result
-}
-
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    Ok(solution(input_string, true))
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    Ok(solution(input_string, false))
+    Ok(result)
 }
 
 #[test]
-fn test_part1() {
-    assert_eq!(Ok(11089), part1(include_str!("day09_input.txt")));
-}
-
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(5288), part2(include_str!("day09_input.txt")));
+fn test() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day09_input.txt");
+    test_part_one!(real_input => 11089);
+    test_part_two!(real_input => 5288);
 }

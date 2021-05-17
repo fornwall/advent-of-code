@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
 type ProgramId = usize;
@@ -94,9 +95,15 @@ impl<'a> ProgramTree<'a> {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<String, String> {
-    let tree = ProgramTree::parse(input_string)?;
-    Ok(tree.nodes[tree.root_node].name.to_string())
+pub fn solve(input: &mut Input) -> Result<String, String> {
+    let tree = ProgramTree::parse(input.text)?;
+    if input.is_part_one() {
+        Ok(tree.nodes[tree.root_node].name.to_string())
+    } else {
+        fixup_weight(tree.root_node, &tree)
+            .map(|value| value.to_string())
+            .ok_or_else(|| "No solution found".to_string())
+    }
 }
 
 fn fixup_weight(program_id: ProgramId, tree: &ProgramTree) -> Option<u32> {
@@ -138,20 +145,10 @@ fn fixup_weight(program_id: ProgramId, tree: &ProgramTree) -> Option<u32> {
     None
 }
 
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    let tree = ProgramTree::parse(input_string)?;
-    fixup_weight(tree.root_node, &tree).ok_or_else(|| "No solution found".to_string())
-}
-
 #[test]
-fn test_part1() {
-    assert_eq!(
-        Ok("veboyvy".to_string()),
-        part1(include_str!("day07_input.txt"))
-    );
-}
-
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(749), part2(include_str!("day07_input.txt")));
+fn test() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day07_input.txt");
+    test_part_one!(real_input => "veboyvy".to_string());
+    test_part_two!(real_input => "749".to_string());
 }

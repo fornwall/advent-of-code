@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::collections::HashSet;
 
 type Frequency = i32;
@@ -16,47 +17,46 @@ fn parse_frequency_changes(
     })
 }
 
-pub fn part1(input_string: &str) -> Result<Frequency, String> {
-    parse_frequency_changes(input_string).sum::<Result<_, _>>()
-}
-
-pub fn part2(input_string: &str) -> Result<Frequency, String> {
+pub fn solve(input: &mut Input) -> Result<Frequency, String> {
     const MAX_ITERATIONS: usize = 1_000_000;
+    let change_iterator = parse_frequency_changes(input.text);
 
-    let mut frequency: Frequency = 0;
-    let mut seen_frequencies = HashSet::new();
+    if input.is_part_one() {
+        change_iterator.sum::<Result<_, _>>()
+    } else {
+        let mut frequency: Frequency = 0;
+        let mut seen_frequencies = HashSet::new();
 
-    for change in parse_frequency_changes(input_string)
-        .cycle()
-        .take(MAX_ITERATIONS)
-    {
-        if seen_frequencies.insert(frequency) {
-            frequency = frequency.checked_add(change?).ok_or("Too high frequency")?;
-        } else {
-            return Ok(frequency);
+        for change in change_iterator.cycle().take(MAX_ITERATIONS) {
+            if seen_frequencies.insert(frequency) {
+                frequency = frequency.checked_add(change?).ok_or("Too high frequency")?;
+            } else {
+                return Ok(frequency);
+            }
         }
+
+        Err(format!(
+            "Frequency not repeated after {} iterations",
+            MAX_ITERATIONS
+        ))
     }
-
-    Err(format!(
-        "Frequency not repeated after {} iterations",
-        MAX_ITERATIONS
-    ))
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(Ok(3), part1("+1\n-2\n+3\n+1"));
-    assert_eq!(Ok(3), part1("+1\n+1\n+1"));
-    assert_eq!(Ok(0), part1("+1\n+1\n-2"));
-    assert_eq!(Ok(-6), part1("-1\n-2\n-3"));
-    assert_eq!(Ok(477), part1(include_str!("day01_input.txt")));
-}
+pub fn test() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(0), part2("+1\n-1"));
-    assert_eq!(Ok(10), part2("+3\n+3\n+4\n-2\n-4"));
-    assert_eq!(Ok(5), part2("-6\n+3\n+8\n+5\n-6"));
-    assert_eq!(Ok(14), part2("+7\n+7\n-2\n-7\n-4"));
-    assert_eq!(Ok(390), part2(include_str!("day01_input.txt")));
+    test_part_one!("+1\n-2\n+3\n+1" => 3);
+    test_part_one!("+1\n+1\n+1" => 3);
+    test_part_one!("+1\n+1\n-2" => 0);
+    test_part_one!("-1\n-2\n-3" => -6);
+
+    test_part_two!("+1\n-1" => 0);
+    test_part_two!("+3\n+3\n+4\n-2\n-4" => 10);
+    test_part_two!("-6\n+3\n+8\n+5\n-6" => 5);
+    test_part_two!("+7\n+7\n-2\n-7\n-4" => 14);
+
+    let real_input = include_str!("day01_input.txt");
+    test_part_one!(real_input => 477);
+    test_part_two!(real_input => 390);
 }

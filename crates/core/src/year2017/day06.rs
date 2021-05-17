@@ -1,10 +1,12 @@
+use crate::input::Input;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
-fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     const MAX_ITERATIONS: u32 = 1_000_000;
 
-    let mut memory_banks: Vec<u32> = input_string
+    let mut memory_banks: Vec<u32> = input
+        .text
         .split_ascii_whitespace()
         .enumerate()
         .map(|(index, word)| {
@@ -23,7 +25,7 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     for current_step in 0..MAX_ITERATIONS {
         match seen_before.entry(memory_banks.clone()) {
             Entry::Occupied(value) => {
-                return Ok(current_step - if part1 { 0_u32 } else { *value.get() });
+                return Ok(current_step - input.part_values(0_u32, *value.get()));
             }
             Entry::Vacant(entry) => {
                 entry.insert(current_step);
@@ -55,24 +57,14 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     Err(format!("Aborting after {} iterations", MAX_ITERATIONS))
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    solution(input_string, false)
-}
-
 #[test]
 fn test_part1() {
-    assert_eq!(Ok(12841), part1(include_str!("day06_input.txt")));
-    assert_eq!(
-        Err("Invalid input at word 3: invalid digit found in string".to_string()),
-        part1("12 12 hi")
+    use crate::{test_part_one, test_part_one_error, test_part_two};
+    let real_input = include_str!("day06_input.txt");
+    test_part_one!(real_input => 12841);
+    test_part_two!(real_input => 8038);
+    test_part_one_error!(
+        "12 12 hi" =>
+        "Invalid input at word 3: invalid digit found in string".to_string()
     );
-}
-
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(8038), part2(include_str!("day06_input.txt")));
 }

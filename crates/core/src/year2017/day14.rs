@@ -1,6 +1,6 @@
-use super::day10::part2 as knot_hash;
+use super::day10::solve as knot_hash;
 use super::disjoint_set::DisjointSet;
-use crate::input::Input;
+use crate::input::{Input, Part};
 use std::collections::BTreeMap;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -19,7 +19,10 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
     for row in 0..=127 {
         let hash_input = format!("{}-{}", input.text, row);
-        let hash = knot_hash(&hash_input)?;
+        let hash = knot_hash(&mut Input {
+            text: &hash_input,
+            part: Part::Two,
+        })?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
             for bit in 0..4 {

@@ -1,5 +1,16 @@
-fn solution(input_string: &str, jump_change_computer: fn(i32) -> i32) -> Result<u32, String> {
-    let mut jumps: Vec<i32> = input_string
+use crate::input::Input;
+
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let jump_change_computer = |offset| {
+        if input.is_part_one() || offset < 3 {
+            1
+        } else {
+            -1
+        }
+    };
+
+    let mut jumps: Vec<i32> = input
+        .text
         .lines()
         .enumerate()
         .map(|(line_index, line)| {
@@ -25,20 +36,10 @@ fn solution(input_string: &str, jump_change_computer: fn(i32) -> i32) -> Result<
     Err("No solution found".to_string())
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    solution(input_string, |_| 1)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    solution(input_string, |offset| if offset >= 3 { -1 } else { 1 })
-}
-
 #[test]
-fn test_part1() {
-    assert_eq!(Ok(374_269), part1(include_str!("day05_input.txt")));
-}
-
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(27_720_699), part2(include_str!("day05_input.txt")));
+fn test() {
+    use crate::{test_part_one, test_part_two};
+    let real_input = include_str!("day05_input.txt");
+    test_part_one!(real_input => 374_269);
+    test_part_two!(real_input => 27_720_699);
 }
