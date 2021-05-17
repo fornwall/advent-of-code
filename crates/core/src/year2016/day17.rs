@@ -1,7 +1,5 @@
+use crate::common::md5::Context;
 use crate::Input;
-use md5::digest::generic_array::arr;
-use md5::digest::FixedOutput;
-use md5::{Digest, Md5};
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
 
@@ -13,11 +11,10 @@ struct State {
 }
 
 fn check_doors(passcode: &[u8], path_so_far: &[u8]) -> [bool; 4] {
-    let mut hasher = Md5::new();
-    let mut output = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0];
-    hasher.update(passcode);
-    hasher.update(path_so_far);
-    hasher.finalize_into_reset(&mut output);
+    let mut hasher = Context::new();
+    hasher.consume(passcode);
+    hasher.consume(path_so_far);
+    let output: [u8; 16] = hasher.compute().into();
     //"Only the first four characters of the hash are used; they represent, respectively,
     // the doors up, down, left, and right from your current position.
     // Any b, c, d, e, or f means that the corresponding door is open; any other character

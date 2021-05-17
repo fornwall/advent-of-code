@@ -1,7 +1,5 @@
+use crate::common::md5::Context;
 use crate::Input;
-use md5::digest::generic_array::arr;
-use md5::digest::FixedOutput;
-use md5::{Digest, Md5};
 use std::iter::FromIterator;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
@@ -13,13 +11,11 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         return Err("Too long door id (max length: 8)".to_string());
     }
 
-    let mut hasher = Md5::new();
-    let mut output = arr![u8; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
     for index in 0..MAX_INDEX {
-        hasher.update(door_id);
-        hasher.update(index.to_string().as_bytes());
-        hasher.finalize_into_reset(&mut output);
+        let mut hasher = Context::new();
+        hasher.consume(door_id);
+        hasher.consume(index.to_string().as_bytes());
+        let output: [u8; 16] = hasher.compute().into();
 
         // Check if hash starts with five zeros without converting it to a string:
         if output[..2] == [0, 0] && output[2] <= 0x0F {
