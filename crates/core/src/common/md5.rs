@@ -1,13 +1,6 @@
 //! NOTE: Inlined (and slightly modified) from https://github.com/stainless-steel/md5
 //! The [MD5] hash function.
 //!
-//! ## Example
-//!
-//! ```
-//! let digest = md5::compute(b"abcdefghijklmnopqrstuvwxyz");
-//! assert_eq!(format!("{:x}", digest), "c3fcd3d76192e4007dfb496cca67e13b");
-//! ```
-//!
 //! ## Security Warning
 //!
 //! The package is provided for the purposes of interoperability with protocols
