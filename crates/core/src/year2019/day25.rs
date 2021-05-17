@@ -1,4 +1,5 @@
 use super::int_code::Program;
+use crate::input::Input;
 use std::collections::{HashSet, VecDeque};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
@@ -113,8 +114,8 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
     })
 }
 
-pub fn part1(input_string: &str) -> Result<SolutionType, String> {
-    let mut program = Program::parse(input_string)?;
+pub fn solve(input: &mut Input) -> Result<SolutionType, String> {
+    let mut program = Program::parse(input.text)?;
     let initial_room = parse_output(&mut program)?;
 
     let mut blacklisted_items = HashSet::new();
@@ -214,12 +215,11 @@ pub fn part1(input_string: &str) -> Result<SolutionType, String> {
     Err("No solution found".to_string())
 }
 
-pub fn part2(_input_string: &str) -> Result<String, String> {
-    Ok(String::from(""))
-}
-
 #[test]
-pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day25_input.txt")), Ok(319_815_680));
-    assert_eq!(part1(include_str!("day25_input_2.txt")), Ok(2_424_308_736));
+pub fn test() {
+    use crate::test_part_one;
+    let input = include_str!("day25_input.txt");
+    test_part_one!(input => 319_815_680);
+    let input = include_str!("day25_input_2.txt");
+    test_part_one!(input => 2_424_308_736);
 }

@@ -1,8 +1,9 @@
 use super::int_code::{Program, Word};
+use crate::input::Input;
 use std::collections::VecDeque;
 
-pub fn run_simulation(input_string: &str, part1: bool) -> Result<Word, String> {
-    let program = Program::parse(input_string)?;
+pub fn solve(input: &mut Input) -> Result<Word, String> {
+    let program = Program::parse(input.text)?;
     let mut programs = vec![program; 50];
     let mut input_queues = vec![VecDeque::<(Word, Word)>::new(); 50];
 
@@ -33,7 +34,7 @@ pub fn run_simulation(input_string: &str, part1: bool) -> Result<Word, String> {
                 let (destination_address, packet) = (chunk[0], (chunk[1], chunk[2]));
 
                 if destination_address == 255 {
-                    if part1 {
+                    if input.is_part_one() {
                         return Ok(packet.1);
                     } else {
                         last_packet_to_nat = packet;
@@ -59,20 +60,10 @@ pub fn run_simulation(input_string: &str, part1: bool) -> Result<Word, String> {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<Word, String> {
-    run_simulation(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<Word, String> {
-    run_simulation(input_string, false)
-}
-
 #[test]
-pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day23_input.txt")), Ok(16549));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(part2(include_str!("day23_input.txt")), Ok(11462));
+pub fn test() {
+    use crate::{test_part_one, test_part_two};
+    let input = include_str!("day23_input.txt");
+    test_part_one!(input => 16549);
+    test_part_two!(input => 11462);
 }
