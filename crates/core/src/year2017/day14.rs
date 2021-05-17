@@ -22,6 +22,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let hash = knot_hash(&mut Input {
             text: &hash_input,
             part: Part::Two,
+            #[cfg(feature = "visualization")]
+            painter: input.painter,
         })?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
