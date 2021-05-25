@@ -40,6 +40,7 @@ impl Direction {
     }
 }
 
+#[derive(Clone, Copy)]
 enum Command<'a> {
     Move(Direction),
     Take(&'a str),

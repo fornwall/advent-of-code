@@ -28,7 +28,8 @@ fn dist(
 
         if grid[grid_idx] {
             continue;
-        } else if position == destination {
+        }
+        if position == destination {
             return Ok(path_length);
         }
 

@@ -19,7 +19,7 @@ pub fn solve(
     year: &JsValue,
     day: &JsValue,
     part: &JsValue,
-    input: String,
+    input: &str,
 ) -> Result<String, JsValue> {
     #[cfg(feature = "console-panic-hook")]
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
@@ -34,7 +34,7 @@ pub fn solve(
         &year,
         &day,
         &part,
-        &input,
+        input,
         #[cfg(feature = "visualization")]
         painter,
     )

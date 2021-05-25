@@ -6,7 +6,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::cargo \
 	-W clippy::cast_lossless \
 	-W clippy::expect_used \
-	-W clippy::filter_map \
+	-W clippy::manual_filter_map \
 	-W clippy::if_not_else \
 	-W clippy::items_after_statements \
 	-W clippy::linkedlist \
@@ -14,6 +14,8 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::nursery \
 	-W clippy::option_if_let_else \
 	-W clippy::redundant_closure_for_method_calls \
+	-W clippy::needless_continue \
+	-W clippy::needless_pass_by_value \
 	-W clippy::similar_names \
 	-W clippy::trivially_copy_pass_by_ref \
 	-W clippy::unreadable-literal \
