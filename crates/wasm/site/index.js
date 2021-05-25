@@ -52,7 +52,6 @@ function showMessage(message, isError, wasm, executionTime) {
 }
 
 function execute(wasm) {
-  console.log("executing");
   partElement.setCustomValidity(
     dayElement.value == 25 && partElement.value == 2
       ? "Day 25 has no second part."
@@ -70,7 +69,6 @@ function execute(wasm) {
       partElement.value,
       inputElement.value,
     ];
-    console.log("sending message to worker");
     worker.postMessage({ year, day, part, input, wasm });
   }
 }
