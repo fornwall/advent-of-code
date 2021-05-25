@@ -1,68 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>Advent of Code execution times</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.4/plotly.min.js"
+      integrity="sha512-odxyOOOwpEgYQnS+TzF/P33O+DfGNGqyh89pJ/u2addhMw9ZIef3M8aw/otYSgsPxLdZi3HQhlI9IiX3H5SxpA=="
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      h1,
+      .years {
+        text-align: center;
+      }
+    </style>
+  </head>
 
-<head>
-  <title>Advent of Code execution times</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.4/plotly.min.js"
-    integrity="sha512-odxyOOOwpEgYQnS+TzF/P33O+DfGNGqyh89pJ/u2addhMw9ZIef3M8aw/otYSgsPxLdZi3HQhlI9IiX3H5SxpA=="
-    crossorigin="anonymous"></script>
-  <style>
-    h1,
-    .years {
-      text-align: center;
-    }
-  </style>
-</head>
+  <body>
+    <div class="years">
+      <a href="#year=2015">2015</a> - <a href="#year=2016">2016</a> -
+      <a href="#year=2017">2017</a> - <a href="#year=2018">2018</a> -
+      <a href="#year=2019">2019</a> - <a href="#year=2020">2020</a>
+    </div>
 
-<body>
-  <div class="years">
-    <a href="#year=2015">2015</a> - <a href="#year=2016">2016</a> -
-    <a href="#year=2017">2017</a> - <a href="#year=2018">2018</a> -
-    <a href="#year=2019">2019</a> - <a href="#year=2020">2020</a>
-  </div>
+    <h1>Advent of Code .... execution times</h1>
 
-  <h1>Advent of Code .... execution times</h1>
+    <div id="firstPlot" style="width: 100%; height: 450px"></div>
 
-  <div id="firstPlot" style="width: 100%; height: 450px"></div>
+    <div id="secondPlot" style="width: 100%; height: 450px"></div>
 
-  <div id="secondPlot" style="width: 100%; height: 450px"></div>
+    <ul>
+      <li>
+        Execution times shown are for Advent of Code solutions in the
+        <a href="https://github.com/fornwall/advent-of-code"
+          >github.com/fornwall/advent-of-code</a
+        >
+        repository.
+      </li>
+      <li>
+        Mean times from a
+        <a href="https://bheisler.github.io/criterion.rs/book/index.html"
+          >Criterion.rs</a
+        >
+        benchmark (<a
+          href="https://github.com/fornwall/advent-of-code/blob/master/crates/core/benches/benchmark.rs"
+          >source</a
+        >) are listed.
+      </li>
+      <li>
+        The benchmark is run inside GitHub CI, so times vary across runs due to
+        jitter in that environment.
+      </li>
+      <li>
+        The times do not include file reading, but do include string parsing.
+        The timed function has the signature
+        <code>solve(year, day, part, input_string) -> String</code>.
+      </li>
+      <li>
+        Each part is run independently - part 1 is run separately from part 2,
+        so the latter does not reuse parsed data or computations from the
+        former.
+      </li>
+      <li>
+        The latest stable version of the Rust compiler is used, with
+        <code>lto=true</code>, <code>codegen-units=1</code> and no unsafe code.
+      </li>
+      <li>See <a href="https://aoc.fornwall.net">aoc.fornwall.net</a>.</li>
+    </ul>
 
-  <ul>
-    <li>
-      Execution times shown are for Advent of Code solutions in the
-      <a href="https://github.com/fornwall/advent-of-code">github.com/fornwall/advent-of-code</a>
-      repository.
-    </li>
-    <li>
-      Mean times from a
-      <a href="https://bheisler.github.io/criterion.rs/book/index.html">Criterion.rs</a>
-      benchmark (<a
-        href="https://github.com/fornwall/advent-of-code/blob/master/crates/core/benches/benchmark.rs">source</a>) are
-      listed.
-    </li>
-    <li>
-      The benchmark is run inside GitHub CI, so times vary across runs due to
-      jitter in that environment.
-    </li>
-    <li>
-      The times do not include file reading, but do include string parsing.
-      The timed function has the signature
-      <code>solve(year, day, part, input_string) -> String</code>.
-    </li>
-    <li>
-      Each part is run independently - part 1 is run separately from part 2,
-      so the latter does not reuse parsed data or computations from the
-      former.
-    </li>
-    <li>
-      The latest stable version of the Rust compiler is used, with
-      <code>lto=true</code>, <code>codegen-units=1</code> and no unsafe code.
-    </li>
-    <li>See <a href="https://aoc.fornwall.net">aoc.fornwall.net</a>.</li>
-  </ul>
-
-  <script src="index.js"></script>
-</body>
-
+    <script src="index.js"></script>
+  </body>
 </html>
