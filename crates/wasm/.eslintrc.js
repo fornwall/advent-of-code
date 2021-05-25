@@ -11,5 +11,5 @@ module.exports = {
     "require-jsdoc": 0,
     "max-len": ["error", { code: 140 }],
   },
-  extends: ["google", "prettier"],
+  extends: ["prettier"],
 };
