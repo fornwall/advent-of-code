@@ -11,7 +11,7 @@ edition = "2018"
 
 [dependencies]
 advent-of-code = { path = "../../core" }
-libfuzzer-sys = "0.3"
+libfuzzer-sys = "*"
 
 [package.metadata]
 cargo-fuzz = true
