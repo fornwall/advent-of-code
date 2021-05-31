@@ -15,10 +15,10 @@ enum JsonValue<'a> {
 }
 
 fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> Result<JsonValue<'a>, String> {
-    let next_char = input[*current_idx];
     if *current_idx == input.len() {
         return Ok(JsonValue::EndOfInput);
     }
+    let next_char = input[*current_idx];
     *current_idx += 1;
 
     Ok(match next_char {
@@ -35,7 +35,7 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> Result<JsonValue<'a>, 
                 } else if let JsonValue::String(key) = next_key {
                     let next_colon = parse(input, current_idx)?;
                     if next_colon != JsonValue::Colon {
-                        return Err("Invalid input - key not followed by colon".to_string());
+                        return Err("Invalid JSON - key not followed by colon".to_string());
                     }
 
                     let next_value = parse(input, current_idx)?;
@@ -56,6 +56,8 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> Result<JsonValue<'a>, 
                 let next_value = parse(input, current_idx)?;
                 if JsonValue::EndOfArray == next_value {
                     break JsonValue::Array(array);
+                } else if JsonValue::EndOfInput == next_value {
+                    return Err("Invalid JSON".to_string());
                 } else if JsonValue::Comma == next_value {
                     // Ignore
                 } else {

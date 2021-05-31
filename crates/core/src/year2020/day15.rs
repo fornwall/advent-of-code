@@ -8,7 +8,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut next_number = 0;
     let mut turn = 0;
 
-    for (idx, starting_number) in input
+    for (idx, parsed_starting_number) in input
         .text
         .split(',')
         .map(|s| {
@@ -17,7 +17,11 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         })
         .enumerate()
     {
-        next_number = starting_number?;
+        let starting_number = parsed_starting_number?;
+        if starting_number > target_turn {
+            return Err(format!("Too high starting number: {}", starting_number));
+        }
+        next_number = starting_number;
         value_to_turn[next_number as usize] = (idx + 1) as u32;
         turn += 1;
     }
