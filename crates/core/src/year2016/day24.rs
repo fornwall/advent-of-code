@@ -13,7 +13,7 @@ impl Grid {
     fn parse(input: &str) -> Result<Self, String> {
         let rows = input.lines().count();
         let cols = input.lines().next().ok_or("Empty input")?.len();
-        let mut locations = vec![(0, 0); 8];
+        let mut locations = Vec::new();
         let mut data = vec![true; rows * cols];
 
         for (y, line) in input.lines().enumerate() {
@@ -25,7 +25,14 @@ impl Grid {
                     b'#' => false,
                     b'.' => true,
                     b'0'..=b'7' => {
-                        locations[(c - b'0') as usize] = (x, y);
+                        if x == 0 || y == 0 || x + 1 == cols || y + 1 == rows {
+                            return Err("Number at edge".into());
+                        }
+                        let number = (c - b'0') as usize;
+                        if number >= locations.len() {
+                            locations.resize(number + 1, (0, 0));
+                        }
+                        locations[number] = (x, y);
                         true
                     }
                     _ => {
@@ -51,8 +58,8 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     let grid = Grid::parse(input.text)?;
     let mut distances: HashMap<(usize, usize), usize> = HashMap::new();
 
-    for from in 0..8 {
-        'toloop: for to in 0..8 {
+    for from in 0..grid.locations.len() {
+        'toloop: for to in 0..grid.locations.len() {
             if to <= from {
                 continue;
             }
@@ -60,7 +67,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             let starting_location = grid.locations[from];
             let target_location = grid.locations[to];
             if starting_location == (0, 0) || target_location == (0, 0) {
-                return Err("Not all digits 0-7 in grid".into());
+                return Err("Not all digits in grid".into());
             }
 
             let mut visited = HashSet::new();
@@ -97,7 +104,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         }
     }
 
-    let mut initial_order = [1_usize, 2, 3, 4, 5, 6, 7];
+    let mut initial_order = (1..grid.locations.len()).collect::<Vec<usize>>();
     let mut answer = usize::MAX;
     all_permutations(
         &mut initial_order,
@@ -126,6 +133,8 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 #[test]
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
+
+    test_part_one!("###########\n#0.1.....2#\n#.#######.#\n#4.......3#\n###########" => 14);
 
     let real_input = include_str!("day24_input.txt");
     test_part_one!(real_input => 412);

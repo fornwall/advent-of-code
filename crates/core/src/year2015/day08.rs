@@ -33,6 +33,9 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             while idx < line.len() {
                 encoded_size += 1;
                 if line[idx] == b'\\' {
+                    if idx + 1 == line.len() {
+                        return Err("Invalid input".to_string());
+                    }
                     if line[idx + 1] == b'x' {
                         encoded_size += 4;
                         idx += 4;

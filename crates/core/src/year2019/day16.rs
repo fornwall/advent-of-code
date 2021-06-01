@@ -51,7 +51,8 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             .map_err(|_| "Invalid input".to_string())?;
 
         let times_to_repeat = 10000;
-        let end_sequence_length = input.text.len() * times_to_repeat - offset as usize;
+        let message_length = input.text.len() * times_to_repeat;
+        let end_sequence_length = message_length.checked_sub(offset).ok_or("Too big offset")?;
 
         let mut end_sequence: Vec<i32> = digits
             .into_iter()

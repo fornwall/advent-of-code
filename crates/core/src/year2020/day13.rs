@@ -76,6 +76,9 @@ fn chinese_remainder(remainders: &[i128], divisors: &[i128]) -> Option<i128> {
     // Start by multiplying all divisors together, to facilitate obtaining
     // other_divisors_multiplied in the loop below:
     let all_divisors_multiplied = divisors.iter().product::<i128>();
+    if all_divisors_multiplied == 0 {
+        return None;
+    }
 
     // Consider T split into a sum:
     //   T = value[0] + value[1] + ...
@@ -118,8 +121,8 @@ pub fn solve(input: &mut Input) -> Result<i128, String> {
                 None
             } else {
                 match entry.parse::<u32>() {
-                    Ok(value) => Some(Ok((offset, value))),
-                    Err(error) => Some(Err(format!("Line 2: Invalid entry - {}", error))),
+                    Ok(value) if value > 0 => Some(Ok((offset, value))),
+                    _ => Some(Err("Line 2: Invalid entry".to_string())),
                 }
             }
         })

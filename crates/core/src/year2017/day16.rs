@@ -70,6 +70,13 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut rounds = input.part_values(1, 1_000_000_000);
     let (mut moves, mut substitutions) = parse(input.text, &programs)?;
 
+    if substitutions
+        .iter()
+        .any(|(_key, value)| !substitutions.contains_key(value))
+    {
+        return Err("Invalid input".into());
+    }
+
     while rounds > 0 {
         if rounds % 2 == 1 {
             // Apply the current 2^n dance:

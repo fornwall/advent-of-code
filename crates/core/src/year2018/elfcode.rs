@@ -61,14 +61,17 @@ impl Program {
         let first_line = lines.next().ok_or("Empty input")?;
 
         if first_line.len() < 5 {
-            return Err("Invalid input".to_string());
+            return Err("Invalid first line of elfcode".to_string());
         }
-        let error = |_| "Invalid input";
+        let error = |_| "Invalid elfcode instruction";
         let instruction_pointer_index = (&first_line[4..]).parse::<u8>().map_err(error)?;
 
         let mut instructions = Vec::new();
         for line in lines {
             let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() != 4 {
+                return Err("Invalid elfcode - not four words for instruction".into());
+            }
             let opcode = opcode_from_str(parts[0])?;
             let a = parts[1].parse::<u64>().map_err(error)?;
             let b = parts[2].parse::<u64>().map_err(error)?;

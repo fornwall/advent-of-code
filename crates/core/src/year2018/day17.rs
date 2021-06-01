@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::cmp::{max, min};
 #[cfg(feature = "debug-output")]
 use std::env;
@@ -32,7 +33,7 @@ impl Grid {
 
         for line in input_string.lines() {
             let mut parts: Vec<&str> = line.split(", ").collect();
-            if parts.len() != 2 {
+            if parts.len() != 2 || parts[0].len() < 3 || parts[1].len() < 3 {
                 return Err("Invalid input".to_string());
             }
             parts.sort_unstable();
@@ -228,34 +229,30 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::from(input_string)?;
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let mut grid = Grid::from(input.text)?;
     #[cfg(feature = "debug-output")]
     grid.print("Initial");
-    grid.pour_water();
-    #[cfg(feature = "debug-output")]
-    grid.print("After pouring");
-    Ok(grid.count_water())
-}
 
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::from(input_string)?;
-    #[cfg(feature = "debug-output")]
-    grid.print("Initial");
     grid.pour_water();
     #[cfg(feature = "debug-output")]
     grid.print("After pouring");
-    grid.dry_up();
-    #[cfg(feature = "debug-output")]
-    grid.print("After drying up");
-    Ok(grid.count_drained_water())
+
+    if input.is_part_one() {
+        Ok(grid.count_water())
+    } else {
+        grid.dry_up();
+        #[cfg(feature = "debug-output")]
+        grid.print("After drying up");
+        Ok(grid.count_drained_water())
+    }
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(57),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "x=495, y=2..7
 y=7, x=495..501
 x=501, y=3..7
@@ -264,17 +261,10 @@ x=506, y=1..2
 x=498, y=10..13
 x=504, y=10..13
 y=13, x=498..504"
-        )
+        => 57
     );
 
-    assert_eq!(Ok(31949), part1(include_str!("day17_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(29),
-        part2(
+    test_part_two!(
             "x=495, y=2..7
 y=7, x=495..501
 x=501, y=3..7
@@ -283,8 +273,10 @@ x=506, y=1..2
 x=498, y=10..13
 x=504, y=10..13
 y=13, x=498..504"
-        )
+        => 29
     );
 
-    assert_eq!(Ok(26384), part2(include_str!("day17_input.txt")));
+    let input = include_str!("day17_input.txt");
+    test_part_one!(input => 31949);
+    test_part_two!(input => 26384);
 }

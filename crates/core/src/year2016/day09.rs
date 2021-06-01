@@ -17,6 +17,9 @@ fn uncompressed_size(text: &[u8], recursive: bool) -> Result<u64, String> {
                 let parts = inside_parenthesis
                     .split(|&c| c == b'x')
                     .collect::<Vec<&[u8]>>();
+                if parts.len() != 2 {
+                    return Err("Invalid input".into());
+                }
                 let chars_to_take = std::str::from_utf8(parts[0])
                     .map_err(error_mapper_uf8)?
                     .parse::<u64>()

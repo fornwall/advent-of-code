@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet, VecDeque};
 
@@ -16,14 +17,17 @@ impl Maze {
         if x < 0 || y < 0 {
             return b' ';
         }
-        self.array[(x as usize) + self.cols * (y as usize)]
+        *self
+            .array
+            .get((x as usize) + self.cols * (y as usize))
+            .unwrap_or(&b' ')
     }
 
     fn set_tile(&mut self, x: usize, y: usize, tile: u8) {
         self.array[x + self.cols * y] = tile;
     }
 
-    fn parse(input: &str) -> Result<Self, String> {
+    fn parse(input: &str, part1: bool) -> Result<Self, String> {
         let rows = input.lines().count();
         let cols = input
             .lines()
@@ -54,7 +58,7 @@ impl Maze {
         let mut portal_name_to_location: HashMap<String, (i32, i32)> = HashMap::new();
 
         let mut on_tile = |x: i32, y: i32, x_direction| {
-            let tile = if x as usize == cols || y as usize == rows {
+            let tile = if x as usize >= cols || y as usize >= rows {
                 b' '
             } else {
                 maze.tile_at(x, y)
@@ -89,7 +93,9 @@ impl Maze {
 
                     match portal_name_to_location.entry(current_string.clone()) {
                         Entry::Occupied(other_location) => {
-                            let level_difference = if current_location.0 == 2
+                            let level_difference = if part1 {
+                                0
+                            } else if current_location.0 == 2
                                 || current_location.0 == (cols - 3) as i32
                                 || current_location.1 == 2
                                 || current_location.1 == (rows - 3) as i32
@@ -134,42 +140,8 @@ impl Maze {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let maze = Maze::parse(input_string)?;
-
-    let mut to_visit = VecDeque::new();
-    let mut visited = HashSet::new();
-    to_visit.push_back((maze.start_location, 0));
-    visited.insert(maze.start_location);
-
-    while let Some((visiting, distance)) = to_visit.pop_front() {
-        let new_distance = distance + 1;
-
-        for new_location in DIRECTIONS
-            .iter()
-            .map(|&(dx, dy)| (visiting.0 + dx, visiting.1 + dy))
-            .chain(
-                if let Some(&(new_location, _)) = maze.portals.get(&visiting) {
-                    Some(new_location).into_iter()
-                } else {
-                    None.into_iter()
-                },
-            )
-        {
-            if maze.tile_at(new_location.0, new_location.1) == b'.' && visited.insert(new_location)
-            {
-                if new_location == maze.end_location {
-                    return Ok(new_distance);
-                }
-                to_visit.push_back((new_location, new_distance));
-            }
-        }
-    }
-    Err("No path found".to_string())
-}
-
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let maze = Maze::parse(input_string)?;
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let maze = Maze::parse(input.text, input.is_part_one())?;
 
     let mut to_visit = VecDeque::new();
     let mut visited = HashSet::new();
@@ -208,14 +180,17 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day20_example.txt")), Ok(23));
-    assert_eq!(part1(include_str!("day20_input.txt")), Ok(580));
-    assert_eq!(part1(include_str!("day20_input_ray.txt")), Ok(552));
-}
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn tests_part2() {
-    assert_eq!(part2(include_str!("day20_input.txt")), Ok(6362));
-    assert_eq!(part2(include_str!("day20_input_ray.txt")), Ok(6492));
+    let example = include_str!("day20_example.txt");
+    test_part_one!(example => 23);
+
+    let input = include_str!("day20_input.txt");
+    test_part_one!(input => 580);
+    test_part_two!(input => 6362);
+
+    let other_input = include_str!("day20_input_ray.txt");
+    test_part_one!(other_input => 552);
+    test_part_two!(other_input => 6492);
 }

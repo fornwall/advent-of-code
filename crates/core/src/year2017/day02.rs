@@ -10,8 +10,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     } else {
         |row: &[u32]| {
             for (x_index, x) in row.iter().enumerate() {
-                for (y_index, y) in row.iter().enumerate() {
-                    if x_index != y_index && x % y == 0 {
+                for (y_index, &y) in row.iter().enumerate() {
+                    if x_index != y_index && y != 0 && x % y == 0 {
                         return x / y;
                     }
                 }
