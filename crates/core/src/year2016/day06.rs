@@ -2,7 +2,7 @@ use crate::Input;
 use std::collections::HashMap;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
-    let mut counts: [HashMap<u8, u8>; 8] = [
+    let mut counts: [HashMap<u8, u32>; 8] = [
         HashMap::new(),
         HashMap::new(),
         HashMap::new(),
@@ -15,7 +15,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     for line in input.text.lines() {
         for (index, c) in line.bytes().take(counts.len()).enumerate() {
-            let count: &mut HashMap<u8, u8> = &mut counts[index];
+            let count: &mut HashMap<u8, u32> = &mut counts[index];
             *count.entry(c).or_insert(0) += 1;
         }
     }

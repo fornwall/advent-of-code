@@ -18,7 +18,9 @@ impl Map {
             .collect();
 
         if grid.len() != cols * rows {
-            return Err("Not all rows have equal length".to_string());
+            return Err("Not all rows have equal length".into());
+        } else if rows <= 2 || cols <= 2 {
+            return Err("Too small grid".into());
         }
 
         Ok(Self { rows, cols, grid })

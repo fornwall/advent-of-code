@@ -2,7 +2,7 @@ use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let words = input.text.split(' ').collect::<Vec<_>>();
-    if words.len() != 19 {
+    if words.len() != 19 || words.iter().any(|s| s.is_empty()) {
         return Err("Invalid input - not 19 words".to_string());
     }
 

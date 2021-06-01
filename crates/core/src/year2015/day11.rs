@@ -28,8 +28,8 @@ fn is_valid(password: &[u8]) -> bool {
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let bytes = input.text.as_bytes();
-    if bytes.len() != 8 {
-        return Err("Current password is not of length 8".to_string());
+    if bytes.len() != 8 || bytes.iter().any(|b| !b.is_ascii_lowercase()) {
+        return Err("Invalid current password (not 8 lower ASCII characters)".to_string());
     }
 
     let mut current_password = [0_u8; 8];

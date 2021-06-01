@@ -1,6 +1,5 @@
 use std::collections::hash_map::{DefaultHasher, Entry};
 use std::collections::HashMap;
-use std::env;
 use std::hash::{Hash, Hasher};
 use std::mem::swap;
 
@@ -12,24 +11,32 @@ struct Grid {
 }
 
 impl Grid {
-    fn parse(input_string: &str) -> Self {
+    fn parse(input_string: &str) -> Result<Self, String> {
         let mut height = 0;
         let mut width = 0;
         let mut cells = Vec::new();
-        for line in input_string.lines() {
+        for (line_idx, line) in input_string.lines().enumerate() {
+            let new_width = line.len();
+            if line_idx == 0 {
+                width = new_width;
+            } else if new_width != width {
+                return Err("Not all lines have equal length".into());
+            }
             line.chars().for_each(|c| cells.push(c as u8));
-            width = line.len();
             height += 1;
         }
 
-        let next_gen_cells = vec![0; height * width];
+        if width == 0 {
+            return Err("Empty input".into());
+        }
 
-        Self {
+        let next_gen_cells = vec![0; height * width];
+        Ok(Self {
             width,
             height,
             cells,
             next_gen_cells,
-        }
+        })
     }
 
     fn count_around(&self, x: usize, y: usize, needle: u8) -> u8 {
@@ -95,35 +102,18 @@ impl Grid {
         self.cells.iter().fold(0, |n, c| n + (*c == b'|') as usize)
             * self.cells.iter().fold(0, |n, c| n + (*c == b'#') as usize)
     }
-
-    fn print(&self) {
-        if env::var("ADVENT_DEBUG").is_err() {
-            return;
-        }
-        for y in 0..self.height {
-            for x in 0..self.width {
-                print!("{}", self.cells[self.width * y + x] as char);
-            }
-            println!();
-        }
-        println!();
-    }
 }
 
 pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::parse(input_string);
-    grid.print();
+    let mut grid = Grid::parse(input_string)?;
     for _ in 0..10 {
         grid.advance_minute()?;
-        grid.print();
     }
     Ok(grid.resource_value())
 }
 
 pub fn part2(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::parse(input_string);
-    grid.print();
-
+    let mut grid = Grid::parse(input_string)?;
     let mut seen = HashMap::new();
 
     for i in 1..1_000_000_000 {

@@ -4,7 +4,7 @@ use crate::input::Input;
 use core::cmp::Ordering::{Equal, Greater, Less};
 
 fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u32> {
-    if sorted_sequence.is_empty() {
+    if sorted_sequence.is_empty() || sorted_sequence.len() < 2 {
         return None;
     }
 
@@ -60,7 +60,10 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         expenses
             .iter()
             .enumerate()
-            .find_map(|(left_index, left_value)| {
+            .find_map(|(left_index, &left_value)| {
+                if left_value > DESIRED_SUM {
+                    return None;
+                }
                 let desired_sub_sum = DESIRED_SUM - left_value;
                 subsequence_summing_to(&expenses[(left_index + 1)..], desired_sub_sum)
                     .map(|value| value * left_value)

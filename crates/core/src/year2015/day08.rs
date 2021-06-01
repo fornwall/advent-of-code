@@ -6,7 +6,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         let num_chars = line.len();
 
         // Strip leading and trailing quotes.
-        if !(line.starts_with('"') && line.ends_with('"')) {
+        if !(line.starts_with('"') && line.ends_with('"') && line.len() >= 2) {
             return Err("Invalid input - not surrounded by quotes".to_string());
         }
         let line = &line[1..line.len() - 1].as_bytes();

@@ -19,10 +19,13 @@ struct Grid {
 }
 
 impl Grid {
-    fn parse(input: &str) -> Self {
+    fn parse(input: &str) -> Result<Self, String> {
         let mut occupied_coordinates = HashSet::with_capacity(2000);
 
         for (row, line) in input.lines().enumerate() {
+            if line.len() > 8 || row > 7 {
+                return Err("Bigger than 8x8 input".into());
+            }
             for (col, b) in line.bytes().enumerate() {
                 if b == b'#' {
                     occupied_coordinates.insert(Coordinate {
@@ -35,10 +38,10 @@ impl Grid {
             }
         }
 
-        Self {
+        Ok(Self {
             occupied_coordinates,
             active_neighbors_count: HashMap::with_capacity(25000),
-        }
+        })
     }
 
     fn cycle(&mut self, w_range: &RangeInclusive<CoordinateComponent>) {
@@ -97,7 +100,7 @@ impl Grid {
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
-    let mut grid = Grid::parse(input.text);
+    let mut grid = Grid::parse(input.text)?;
     let w_range = input.part_values(0..=0, -1..=1);
 
     for _ in 0..6 {

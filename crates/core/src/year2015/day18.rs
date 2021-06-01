@@ -49,17 +49,20 @@ impl Grid {
         }
     }
 
-    fn parse(input: &str, stuck_corners: bool) -> Self {
+    fn parse(input: &str, stuck_corners: bool) -> Result<Self, String> {
         let mut data = [false; 10_000];
         for (y, line) in input.lines().enumerate() {
             for (x, char) in line.chars().enumerate() {
+                if y >= 100 || x >= 100 {
+                    return Err("Invalid grid (not 100x100)".into());
+                }
                 data[x + y * 100] = char == '#';
             }
         }
-        Self {
+        Ok(Self {
             data,
             stuck_corners,
-        }
+        })
     }
 
     fn count_lights(&self) -> u32 {
@@ -68,7 +71,7 @@ impl Grid {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let mut grid = Grid::parse(input.text, input.is_part_two());
+    let mut grid = Grid::parse(input.text, input.is_part_two())?;
     for _step in 0..100 {
         grid = grid.evolve();
     }

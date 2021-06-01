@@ -110,12 +110,12 @@ fn parse_input(input: &str, part2: bool) -> Result<[Floor; 4], String> {
         // The fourth floor contains nothing relevant."
         let words = line.split(' ').collect::<Vec<_>>();
         for (word_idx, &word) in words.iter().enumerate() {
-            let (isotope_name, microchip) = if word.starts_with("microchip") {
+            let (isotope_name, microchip) = if word_idx > 0 && word.starts_with("microchip") {
                 let isotope_name = words[word_idx - 1]
                     .strip_suffix("-compatible")
                     .ok_or("Invalid syntax - not $ISOTYPE-compatible before 'microchip'")?;
                 (isotope_name, true)
-            } else if word.starts_with("generator") {
+            } else if word_idx > 0 && word.starts_with("generator") {
                 let isotope_name = words[word_idx - 1];
                 (isotope_name, false)
             } else {

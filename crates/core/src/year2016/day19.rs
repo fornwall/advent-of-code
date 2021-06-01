@@ -2,10 +2,12 @@ use crate::Input;
 use std::collections::VecDeque;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let n = input
-        .text
-        .parse::<u32>()
-        .map_err(|e| format!("Invalid number of elves: {}", e))?;
+    let n = u32::from(
+        input
+            .text
+            .parse::<std::num::NonZeroU32>()
+            .map_err(|e| format!("Invalid number of elves: {}", e))?,
+    );
 
     // See https://www.youtube.com/watch?v=uCsD3ZGzMgE:
     if input.is_part_one() {

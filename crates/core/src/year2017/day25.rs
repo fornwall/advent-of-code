@@ -51,6 +51,10 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         }
     }
 
+    if states.is_empty() {
+        return Err(on_error());
+    }
+
     let mut current_state = 0;
     let mut current_position = 0_i32;
 

@@ -9,6 +9,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         }
         let from = parts[0].parse::<u32>().map_err(|_| "Invalid input")?;
         let to = parts[1].parse::<u32>().map_err(|_| "Invalid input")?;
+        if from > to {
+            return Err("Invalid interval with from > to".into());
+        }
         intervals.push((from, to));
     }
 

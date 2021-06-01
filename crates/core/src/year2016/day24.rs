@@ -17,6 +17,9 @@ impl Grid {
         let mut data = vec![true; rows * cols];
 
         for (y, line) in input.lines().enumerate() {
+            if line.len() != cols {
+                return Err("Not all rows have equal length".into());
+            }
             for (x, &c) in line.as_bytes().iter().enumerate() {
                 data[y * cols + x] = match c {
                     b'#' => false,
@@ -56,6 +59,9 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
             let starting_location = grid.locations[from];
             let target_location = grid.locations[to];
+            if starting_location == (0, 0) || target_location == (0, 0) {
+                return Err("Not all digits 0-7 in grid".into());
+            }
 
             let mut visited = HashSet::new();
             let mut to_visit = BinaryHeap::new();

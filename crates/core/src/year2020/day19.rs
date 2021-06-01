@@ -73,6 +73,10 @@ impl Rules {
             remaining_sequence: Vec<RuleId>,
         }
 
+        if line.is_empty() {
+            return false;
+        }
+
         let mut stack = vec![PartialMatch {
             remaining_input: line.as_bytes(),
             remaining_sequence: vec![0],
