@@ -14,6 +14,12 @@ fn main() -> Result<(), String> {
     };
 
     let args: Vec<String> = env::args().collect();
+
+    if args.iter().any(|s| s == "-v" || s == "--version") {
+        println!(env!("CARGO_PKG_VERSION"));
+        return Ok(());
+    }
+
     if args.len() == 4 {
         let year = &args[1];
         let day = &args[2];
