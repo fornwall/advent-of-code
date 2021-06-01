@@ -12,43 +12,34 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         let line = &line[1..line.len() - 1].as_bytes();
 
         let mut idx = 0;
-
-        if input.is_part_one() {
-            let mut memory_size = 0;
-            while idx < line.len() {
-                memory_size += 1;
-                if line[idx] == b'\\' {
-                    if line[idx + 1] == b'x' {
-                        idx += 4;
-                    } else {
-                        idx += 2;
-                    }
-                } else {
-                    idx += 1;
+        // In part 2, 6 is for starting and trailing quote:
+        let mut encoded_size = input.part_values(0, 6);
+        while idx < line.len() {
+            encoded_size += 1;
+            if line[idx] == b'\\' {
+                if idx + 1 == line.len() {
+                    return Err("Invalid input".to_string());
                 }
-            }
-            result += num_chars - memory_size;
-        } else {
-            let mut encoded_size = 6; // For starting and trailing quote.
-            while idx < line.len() {
-                encoded_size += 1;
-                if line[idx] == b'\\' {
-                    if idx + 1 == line.len() {
-                        return Err("Invalid input".to_string());
-                    }
-                    if line[idx + 1] == b'x' {
+                if line[idx + 1] == b'x' {
+                    if input.is_part_two() {
                         encoded_size += 4;
-                        idx += 4;
-                    } else {
-                        encoded_size += 3;
-                        idx += 2;
                     }
+                    idx += 4;
                 } else {
-                    idx += 1;
+                    if input.is_part_two() {
+                        encoded_size += 3;
+                    }
+                    idx += 2;
                 }
+            } else {
+                idx += 1;
             }
-            result += encoded_size - num_chars;
         }
+        result += if input.is_part_one() {
+            num_chars - encoded_size
+        } else {
+            encoded_size - num_chars
+        };
     }
 
     Ok(result)

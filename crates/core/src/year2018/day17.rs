@@ -64,11 +64,14 @@ impl Grid {
             cells[y as usize * width + x as usize] = b'#';
         }
 
-        let water_x = 500 - x_range.0;
+        let water_x = 500;
+        if !(x_range.0..x_range.1).contains(&water_x) {
+            return Err("Spring outside scanned area".into());
+        }
+        let water_x_relative = water_x - x_range.0;
         // Place water on top (may exist above as well coming from the spring, but ignore as that's
         // above the minimum y value).
-        let water_y = 0;
-        cells[(water_y * width + water_x as usize) as usize] = b'|';
+        cells[water_x_relative as usize] = b'|';
 
         Ok(Self {
             cells,

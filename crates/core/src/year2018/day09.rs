@@ -1,4 +1,6 @@
+use crate::input::Input;
 use std::collections::VecDeque;
+use std::num::NonZeroU32;
 
 type MarbleValue = u32;
 
@@ -41,18 +43,23 @@ impl MarbleCircle {
     }
 }
 
-fn solve(input_string: &str, last_marble_multiplier: u32) -> Result<u32, String> {
-    let parts: Vec<&str> = input_string.split_whitespace().collect();
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let last_marble_multiplier = input.part_values(1, 100);
+    let parts: Vec<&str> = input.text.split_whitespace().collect();
     if parts.len() != 8 {
         return Err("Invalid input".to_string());
     }
-    let num_players = parts[0].parse::<u32>().map_err(|_| "Invalid input")?;
+    let num_players = u32::from(
+        parts[0]
+            .parse::<NonZeroU32>()
+            .map_err(|_| "Invalid input")?,
+    );
     let last_marble_points = parts[6]
         .parse::<MarbleValue>()
         .map_err(|_| "Invalid input")?;
     let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.
 
-    let mut player_scores = vec![0; num_players as usize];
+    let mut player_scores = vec![0_u32; num_players as usize];
     let mut marbles = MarbleCircle::new(num_marbles);
 
     // "First, the marble numbered 0 is placed in the circle."
@@ -76,7 +83,9 @@ fn solve(input_string: &str, last_marble_multiplier: u32) -> Result<u32, String>
 
             // "First, the current player keeps the marble they would have placed, adding it to their score":
             let player_number = marble_number % num_players;
-            player_scores[player_number as usize] += marble_number;
+            player_scores[player_number as usize] = player_scores[player_number as usize]
+                .checked_add(marble_number)
+                .ok_or("Aborting after too high score")?;
 
             // "In addition, the marble 7 marbles counter-clockwise
             // from the current marble is removed from the circle and also added to the current player's
@@ -97,42 +106,28 @@ fn solve(input_string: &str, last_marble_multiplier: u32) -> Result<u32, String>
         .map(|value| *value)
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    solve(input_string, 1)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    solve(input_string, 100)
-}
-
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok(32), part1("9 players; last marble is worth 25 points"));
-    assert_eq!(
-        Ok(8317),
-        part1("10 players; last marble is worth 1618 points")
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!("9 players; last marble is worth 25 points" => 32);
+    test_part_one!(
+            "10 players; last marble is worth 1618 points" => 8317
     );
-    assert_eq!(
-        Ok(146_373),
-        part1("13 players; last marble is worth 7999 points")
+    test_part_one!(
+        "13 players; last marble is worth 7999 points" => 146_373
     );
-    assert_eq!(
-        Ok(2764),
-        part1("17 players; last marble is worth 1104 points")
+    test_part_one!(
+            "17 players; last marble is worth 1104 points"=>2764
     );
-    assert_eq!(
-        Ok(54718),
-        part1("21 players; last marble is worth 6111 points")
+    test_part_one!(
+            "21 players; last marble is worth 6111 points" => 54718
     );
-    assert_eq!(
-        Ok(37305),
-        part1("30 players; last marble is worth 5807 points")
+    test_part_one!(
+            "30 players; last marble is worth 5807 points" => 37305
     );
 
-    assert_eq!(Ok(423_717), part1(include_str!("day09_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(3_553_108_197), part2(include_str!("day09_input.txt")));
+    let input = include_str!("day09_input.txt");
+    test_part_one!(input => 423_717);
+    test_part_two!(input => 3_553_108_197);
 }

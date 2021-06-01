@@ -1,3 +1,5 @@
+use crate::input::Input;
+
 struct Fabric {
     num_claims: Vec<u32>,
 }
@@ -10,10 +12,12 @@ struct Claim {
     height: u32,
 }
 
+const SQUARE_WIDTH: u32 = 1000;
+
 impl Fabric {
     fn from_claims(claims: &[Claim]) -> Self {
         let mut result = Self {
-            num_claims: vec![0; 1_000_000],
+            num_claims: vec![0; SQUARE_WIDTH as usize * SQUARE_WIDTH as usize],
         };
         claims.iter().for_each(|claim| result.add_claim(claim));
         result
@@ -28,8 +32,8 @@ impl Fabric {
         }
     }
 
-    fn inches_claimed_multiple(&self) -> usize {
-        self.num_claims.iter().filter(|&&c| c > 1).count()
+    fn inches_claimed_multiple(&self) -> u32 {
+        self.num_claims.iter().filter(|&&c| c > 1).count() as u32
     }
 
     fn is_claimed_once(&self, claim: &Claim) -> bool {
@@ -64,59 +68,56 @@ fn parse_input(input_string: &str) -> Result<Vec<Claim>, String> {
             if parts.len() != 5 {
                 return Err(error_message());
             }
-            Ok(Claim {
+            let claim = Claim {
                 id: parts[0],
                 x: parts[1],
                 y: parts[2],
                 width: parts[3],
                 height: parts[4],
-            })
+            };
+            if claim.x + claim.width >= SQUARE_WIDTH || claim.y + claim.height >= SQUARE_WIDTH {
+                return Err(format!(
+                    "Claim outside {} by {} square",
+                    SQUARE_WIDTH, SQUARE_WIDTH
+                ));
+            }
+            Ok(claim)
         })
         .collect()
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let claims = parse_input(input_string)?;
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let claims = parse_input(input.text)?;
     let fabric = Fabric::from_claims(&claims);
 
-    Ok(fabric.inches_claimed_multiple())
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    let claims = parse_input(input_string)?;
-    let fabric = Fabric::from_claims(&claims);
-
-    let claim_without_overlap = claims
-        .iter()
-        .find(|claim| fabric.is_claimed_once(claim))
-        .ok_or("No claim without overlap found")?;
-    Ok(claim_without_overlap.id)
+    if input.is_part_one() {
+        Ok(fabric.inches_claimed_multiple())
+    } else {
+        let claim_without_overlap = claims
+            .iter()
+            .find(|claim| fabric.is_claimed_once(claim))
+            .ok_or("No claim without overlap found")?;
+        Ok(claim_without_overlap.id)
+    }
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(4),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+    test_part_one!(
+            "#1 @ 1,3: 4x4
+#2 @ 3,1: 4x4
+#3 @ 5,5: 2x2" => 4
+    );
+
+    test_part_two!(
             "#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2"
-        )
+        => 3
     );
 
-    assert_eq!(Ok(104_126), part1(include_str!("day03_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(3),
-        part2(
-            "#1 @ 1,3: 4x4
-#2 @ 3,1: 4x4
-#3 @ 5,5: 2x2"
-        )
-    );
-
-    assert_eq!(Ok(695), part2(include_str!("day03_input.txt")));
+    let input = include_str!("day03_input.txt");
+    test_part_one!(input => 104_126);
+    test_part_two!(input => 695);
 }

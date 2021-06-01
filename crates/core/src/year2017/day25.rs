@@ -37,12 +37,22 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             let if_zero_action = Action {
                 write_one: words[17] == "1.\n",
                 move_direction: if words[27] == "right.\n" { 1 } else { -1 },
-                next_state: words[35].bytes().next().ok_or_else(on_error)? - b'A',
+                next_state: words[35]
+                    .bytes()
+                    .next()
+                    .ok_or_else(on_error)?
+                    .checked_sub(b'A')
+                    .ok_or_else(on_error)?,
             };
             let if_one_action = Action {
                 write_one: words[50] == "1.\n",
                 move_direction: if words[60] == "right.\n" { 1 } else { -1 },
-                next_state: words[68].bytes().next().ok_or_else(on_error)? - b'A',
+                next_state: words[68]
+                    .bytes()
+                    .next()
+                    .ok_or_else(on_error)?
+                    .checked_sub(b'A')
+                    .ok_or_else(on_error)?,
             };
             states.push(State {
                 if_zero_action,
@@ -81,6 +91,30 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 #[test]
 pub fn tests() {
     use crate::test_part_one;
+
+    let example = "Begin in state A.
+Perform a diagnostic checksum after 6 steps.
+
+In state A:
+  If the current value is 0:
+    - Write the value 1.
+    - Move one slot to the right.
+    - Continue with state B.
+  If the current value is 1:
+    - Write the value 0.
+    - Move one slot to the left.
+    - Continue with state B.
+
+In state B:
+  If the current value is 0:
+    - Write the value 1.
+    - Move one slot to the left.
+    - Continue with state A.
+  If the current value is 1:
+    - Write the value 1.
+    - Move one slot to the right.
+    - Continue with state A.";
+    test_part_one!(example => 3);
 
     let real_input = include_str!("day25_input.txt");
     test_part_one!(real_input => 633);
