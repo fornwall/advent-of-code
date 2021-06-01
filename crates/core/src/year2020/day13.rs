@@ -138,7 +138,7 @@ pub fn solve(input: &mut Input) -> Result<i128, String> {
             .map(|(_offset, bus_id)| (bus_id, (bus_id - not_until % bus_id) % bus_id))
             .min_by(|&a, &b| a.1.cmp(&b.1))
             .ok_or("No bus ID:s")?;
-        Ok(i128::from(bus_id * wait_time))
+        Ok(i128::from(*bus_id) * i128::from(wait_time))
     } else {
         // Searching for a time T such that, for every bus_ids[i]:
         //

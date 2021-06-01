@@ -16,12 +16,20 @@ fn parse(data: &str, programs: &[u8]) -> Result<(Vec<u8>, HashMap<u8, u8>), Stri
             // "Spin, written sX, makes X programs move from the end to the
             // front, but maintain their order otherwise. (For example, s3
             // on abcde produces cdeab)."
-            let arg_1 = args
-                .next()
-                .ok_or("Spin not followed by argument")?
-                .parse::<u8>()
-                .map_err(|e| format!("Unable to parse Spin argument: {}", e))?;
-            moves.rotate_right(arg_1 as usize);
+            let arg_1 = usize::from(
+                args.next()
+                    .ok_or("Spin not followed by argument")?
+                    .parse::<u8>()
+                    .map_err(|e| format!("Unable to parse Spin argument: {}", e))?,
+            );
+            if arg_1 > moves.len() {
+                return Err(format!(
+                    "Too big spin amount {} for {} moves",
+                    arg_1,
+                    moves.len()
+                ));
+            }
+            moves.rotate_right(arg_1);
         } else if dance_move.starts_with('x') {
             // "Exchange, written xA/B, makes the programs at positions A and B swap places."
             let arg_1 = args
