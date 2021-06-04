@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::collections::VecDeque;
 use std::env;
 
@@ -35,6 +36,7 @@ impl Board {
         let mut goblins_alive = 0;
         let mut cells = Vec::new();
         let mut height = 0;
+
         for line in input_string.lines() {
             height += 1;
             if width as usize != line.len() {
@@ -293,25 +295,10 @@ impl Board {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut board = Board::parse(input_string, 3)?;
-    board.print();
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let mut attack_strength = input.part_values(3, 4);
     loop {
-        board.perform_round();
-        board.print();
-        if let Some(outcome) = board.calculate_outcome() {
-            return Ok(outcome);
-        }
-        if board.round > 500 {
-            return Err("No solution found".to_string());
-        }
-    }
-}
-
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let mut attack_strength = 4;
-    loop {
-        let mut board = Board::parse(input_string, attack_strength)?;
+        let mut board = Board::parse(input.text, attack_strength)?;
         board.print();
         loop {
             if board.round > 500 {
@@ -319,7 +306,7 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
             }
             board.perform_round();
             board.print();
-            if board.elf_died {
+            if input.is_part_two() && board.elf_died {
                 break;
             } else if let Some(outcome) = board.calculate_outcome() {
                 return Ok(outcome);
@@ -331,62 +318,50 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(27730),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "#######
 #.G...#
 #...EG#
 #.#.#G#
 #..G#E#
 #.....#
-#######"
-        )
+#######" => 27730
     );
 
-    assert_eq!(
-        Ok(36334),
-        part1(
+    test_part_one!(
             "#######
 #G..#E#
 #E#E.E#
 #G.##.#
 #...#E#
 #...E.#
-#######"
-        )
+#######" => 36334
     );
 
-    assert_eq!(
-        Ok(39514),
-        part1(
+    test_part_one!(
             "#######
 #E..EG#
 #.#G.E#
 #E.##E#
 #G..#.#
 #..E#.#
-#######"
-        )
+#######" => 39514
     );
 
-    assert_eq!(
-        Ok(27755),
-        part1(
+    test_part_one!(
             "#######
 #E.G#.#
 #.#G..#
 #G.#.G#
 #G..#.#
 #...E.#
-#######"
-        )
+#######"=> 27755
     );
 
-    assert_eq!(
-        Ok(28944),
-        part1(
+    test_part_one!(
             "#######
 #.E...#
 #.#..G#
@@ -394,12 +369,10 @@ fn tests_part1() {
 #E#G#G#
 #...#G#
 #######"
-        )
+        =>28944
     );
 
-    assert_eq!(
-        Ok(18740),
-        part1(
+    test_part_one!(
             "#########
 #G......#
 #.E.#...#
@@ -409,39 +382,31 @@ fn tests_part1() {
 #.G...G.#
 #.....G.#
 #########"
-        )
+        =>18740
     );
 
-    assert_eq!(Ok(207_059), part1(include_str!("day15_input.txt")));
-}
+    let input = include_str!("day15_input.txt");
+    test_part_one!(input => 207_059);
 
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(4988),
-        part2(
+    test_part_two!(
             "#######
 #.G...#
 #...EG#
 #.#.#G#
 #..G#E#
 #.....#
-#######"
-        )
+#######" =>4988
     );
 
-    assert_eq!(
-        Ok(31284),
-        part2(
+    test_part_two!(
             "#######
 #E..EG#
 #.#G.E#
 #E.##E#
 #G..#.#
 #..E#.#
-#######"
-        )
+#######" =>31284
     );
 
-    assert_eq!(Ok(49120), part2(include_str!("day15_input.txt")));
+    test_part_two!(input => 49120);
 }
