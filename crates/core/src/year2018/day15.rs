@@ -1,6 +1,5 @@
 use crate::input::Input;
 use std::collections::VecDeque;
-use std::env;
 
 #[derive(Copy, Clone)]
 enum MapCell {
@@ -18,7 +17,7 @@ struct Board {
     height: u32,
     cells: Vec<MapCell>,
     visited: Vec<bool>,
-    round: i32,
+    round: u16,
     full_round: bool,
     elves_alive: i32,
     elf_died: bool,
@@ -66,7 +65,7 @@ impl Board {
             }
         }
 
-        Ok(Self {
+        let mut board = Self {
             width,
             height,
             cells,
@@ -77,7 +76,24 @@ impl Board {
             elf_died: false,
             goblins_alive,
             elf_attack_power,
-        })
+        };
+
+        for x in 0..width {
+            if !matches!(board.at(x, 0), MapCell::Wall)
+                || !matches!(board.at(x, height - 1), MapCell::Wall)
+            {
+                return Err("Map does not have a wall at edges".into());
+            }
+        }
+        for y in 0..height {
+            if !matches!(board.at(0, y), MapCell::Wall)
+                || !matches!(board.at(width - 1, y), MapCell::Wall)
+            {
+                return Err("Map does not have a wall at edges".into());
+            }
+        }
+
+        Ok(board)
     }
 
     fn at(&mut self, x: u32, y: u32) -> &mut MapCell {
@@ -101,7 +117,7 @@ impl Board {
             }
         });
         let round_for_score = self.round - if self.full_round { 0 } else { 1 };
-        Some(hit_point_sum * round_for_score)
+        Some(hit_point_sum * i32::from(round_for_score))
     }
 
     fn perform_round(&mut self) {
@@ -252,60 +268,23 @@ impl Board {
             Some((found[0].3, found[0].4))
         }
     }
-
-    fn print(&mut self) {
-        if env::var("ADVENT_DEBUG").is_err() {
-            return;
-        }
-
-        println!("Round {}", self.round);
-        for y in 0..self.height {
-            for x in 0..self.width {
-                let cell = self.at(x, y);
-                let c = match *cell {
-                    MapCell::Open => ".",
-                    MapCell::Wall => "#",
-                    MapCell::Unit { elf: false, .. } => "G",
-                    MapCell::Unit { elf: true, .. } => "E",
-                };
-                print!("{}", c);
-            }
-            print!("   ");
-            for x in 0..self.width {
-                let cell = self.at(x, y);
-                if let MapCell::Unit {
-                    hit_points,
-                    elf: true,
-                    ..
-                } = cell
-                {
-                    print!("E({}), ", hit_points);
-                } else if let MapCell::Unit {
-                    hit_points,
-                    elf: false,
-                    ..
-                } = cell
-                {
-                    print!("G({}), ", hit_points);
-                }
-            }
-            println!();
-        }
-        println!();
-    }
 }
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
+    const MAX_ROUNDS: u16 = 500;
+
     let mut attack_strength = input.part_values(3, 4);
+
     loop {
         let mut board = Board::parse(input.text, attack_strength)?;
-        board.print();
+
         loop {
-            if board.round > 500 {
-                return Err("No solution found".to_string());
+            if board.round > MAX_ROUNDS {
+                return Err(format!("No solution found in {} rounds", MAX_ROUNDS));
             }
+
             board.perform_round();
-            board.print();
+
             if input.is_part_two() && board.elf_died {
                 break;
             } else if let Some(outcome) = board.calculate_outcome() {
@@ -319,7 +298,10 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::{test_part_one, test_part_one_error, test_part_two};
+
+    test_part_one_error!("GE" => "No line in input");
+    test_part_one_error!("GE\n" => "Map does not have a wall at edges");
 
     test_part_one!(
             "#######

@@ -1,3 +1,5 @@
+use crate::input::Input;
+
 fn make_ascii_titlecase(s: &mut str) -> &str {
     if let Some(r) = s.get_mut(0..1) {
         r.make_ascii_uppercase();
@@ -29,41 +31,38 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
     Ok(parts.iter().sum())
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    sum_required_fuel(input_string, |mass| mass / 3 - 2)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    fn required_fuel(mass: u32) -> u32 {
-        match (mass / 3).checked_sub(2) {
-            Some(fuel) => fuel + required_fuel(fuel),
-            None => 0,
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    if input.is_part_one() {
+        sum_required_fuel(input.text, |mass| mass / 3 - 2)
+    } else {
+        fn required_fuel(mass: u32) -> u32 {
+            match (mass / 3).checked_sub(2) {
+                Some(fuel) => fuel + required_fuel(fuel),
+                None => 0,
+            }
         }
+        sum_required_fuel(input.text, required_fuel)
     }
-
-    sum_required_fuel(input_string, required_fuel)
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(Ok(2), part1("12"));
-    assert_eq!(Ok(2), part1("14"));
-    assert_eq!(Ok(654), part1("1969"));
-    assert_eq!(Ok(33583), part1("100756"));
+pub fn tests() {
+    use crate::{test_part_one, test_part_one_error, test_part_two};
 
-    assert_eq!(Ok(3_262_358), part1(include_str!("day01_input.txt")));
+    test_part_one!("12" => 2);
+    test_part_one!("14" => 2);
+    test_part_one!("1969" => 654);
+    test_part_one!("100756" => 33583);
 
-    assert_eq!(
-        Some("Line 1: Cannot parse integer from empty string".to_string()),
-        part1("\n").err()
+    let input = include_str!("day01_input.txt");
+    test_part_one!(input => 3_262_358);
+    test_part_one_error!(
+        "\n" => "Line 1: Cannot parse integer from empty string"
     );
-}
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(2), part2("14"));
-    assert_eq!(Ok(966), part2("1969"));
-    assert_eq!(Ok(50346), part2("100756"));
+    test_part_two!("14" => 2);
+    test_part_two!("1969" => 966);
+    test_part_two!("100756" => 50346);
 
-    assert_eq!(Ok(4_890_696), part2(include_str!("day01_input.txt")));
+    test_part_two!(input => 4_890_696);
 }
