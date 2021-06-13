@@ -127,14 +127,14 @@ impl Program {
                 let parameter1 = self.parameter_value(instruction, 1);
                 let parameter2 = self.parameter_value(instruction, 2);
                 let output_location = self.output_location(instruction, 3)?;
-                self.write_memory(
-                    output_location as usize,
-                    if opcode == 1 {
-                        parameter1 + parameter2
-                    } else {
-                        parameter1 * parameter2
-                    },
-                );
+                let value = if opcode == 1 {
+                    parameter1.checked_add(parameter2)
+                } else {
+                    parameter1.checked_mul(parameter2)
+                }
+                .ok_or("Overflow in program")?;
+
+                self.write_memory(output_location as usize, value);
                 self.instruction_pointer += 4;
             }
             3 => {
