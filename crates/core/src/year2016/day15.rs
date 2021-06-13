@@ -22,7 +22,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             let positions = words[3].parse::<u32>().map_err(error_mapper)?;
             let initial_position = words[11]
                 .strip_suffix('.')
-                .ok_or("Line not ending with period".to_string())?
+                .ok_or_else(|| "Line not ending with period".to_string())?
                 .parse::<u32>()
                 .map_err(error_mapper)?;
             Ok(Disc {
