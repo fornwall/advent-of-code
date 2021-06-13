@@ -16,11 +16,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
             let words = line.split(' ').collect::<Vec<_>>();
             if words.len() != 12 {
-                return Err("Invalid input - line not containing 19 words".to_string());
+                return Err("Line not containing 19 words".to_string());
             }
 
             let positions = words[3].parse::<u32>().map_err(error_mapper)?;
-            let initial_position = words[11][..words[11].len() - 1]
+            let initial_position = words[11]
+                .strip_suffix('.')
+                .ok_or("Line not ending with period".to_string())?
                 .parse::<u32>()
                 .map_err(error_mapper)?;
             Ok(Disc {

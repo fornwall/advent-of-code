@@ -27,7 +27,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     all_permutations(&mut places, &mut |ordering| {
         let mut this_distance = 0;
         for pair in ordering.windows(2) {
-            this_distance += distances.get(&(pair[0], pair[1])).unwrap();
+            this_distance += distances
+                .get(&(pair[0], pair[1]))
+                .ok_or("Distances between every pair of locations not specified".to_string())?
         }
         best_distance = if input.is_part_one() {
             std::cmp::min(best_distance, this_distance)
@@ -43,6 +45,12 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 #[test]
 pub fn tests() {
     use crate::{test_part_one, test_part_two};
+
+    let example_input = "London to Dublin = 464
+London to Belfast = 518
+Dublin to Belfast = 141";
+    test_part_one!(example_input => 605);
+    test_part_two!(example_input => 982);
 
     let real_input = include_str!("day09_input.txt");
     test_part_one!(real_input => 207);

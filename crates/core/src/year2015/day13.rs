@@ -29,13 +29,16 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
         if words.len() != 11 {
             return Err("Invalid line not consisting of 11 words".to_string());
         }
+        dbg!(&words);
 
         let person_name = words[0];
         let happiness_change = words[3]
             .parse::<i32>()
             .map_err(|_| "Invalid happiness change")?
             * if words[2] == "gain" { 1 } else { -1 };
-        let other_name = &words[10][..words[10].len() - 1];
+        let other_name = &words[10]
+            .strip_suffix('.')
+            .ok_or("Line not ending with a period".to_string())?;
 
         let person_id = id_assigner.id_of(person_name);
         let other_id = id_assigner.id_of(other_name);

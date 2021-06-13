@@ -91,6 +91,10 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut player_2_cards =
         parse_player_cards(parts.next().ok_or_else(on_error)?).ok_or_else(on_error)?;
 
+    if player_1_cards.len() != player_2_cards.len() {
+        return Err(on_error());
+    }
+
     let winner = play(
         &mut player_1_cards,
         &mut player_2_cards,
