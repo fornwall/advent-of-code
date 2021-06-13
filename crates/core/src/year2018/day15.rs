@@ -65,6 +65,10 @@ impl Board {
             }
         }
 
+        if width == 0 || height == 0 {
+            return Err("Empty input".into());
+        }
+
         let mut board = Self {
             width,
             height,
