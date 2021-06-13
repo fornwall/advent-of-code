@@ -1,4 +1,4 @@
-NIGHTLY_DATE = 2021-05-09 # Update versions in .github/workflows as well.
+NIGHTLY_DATE = 2021-06-12 # Update versions in .github/workflows as well.
 NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 
 CARGO_COMMAND = cargo
