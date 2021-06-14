@@ -61,17 +61,19 @@ impl Grid {
         let error_message = |_| "Invalid grid format";
         let lines: Vec<&str> = input_string.lines().collect();
         if lines.len() != 2 {
-            return Err("Invalid input - expecting 2 lines".to_string());
+            return Err("Not two lines".to_string());
         } else if lines[0].len() < 8 {
-            return Err("Invalid input - first line is too short".to_string());
+            return Err("First line is too short".to_string());
         } else if lines[1].len() < 9 {
-            return Err("Invalid input - second line is too short".to_string());
+            return Err("Second line is too short".to_string());
         }
         let depth = lines[0][7..].parse::<usize>().map_err(error_message)?;
 
-        let parts: Vec<&str> = lines[1][8..].split(',').collect();
-        let target_x = parts[0].parse::<Coordinate>().map_err(error_message)?;
-        let target_y = parts[1].parse::<Coordinate>().map_err(error_message)?;
+        let (target_x, target_y) = lines[1][8..]
+            .split_once(',')
+            .ok_or_else(|| "Target is not two comma-separated coordinates".to_string())?;
+        let target_x = target_x.parse::<Coordinate>().map_err(error_message)?;
+        let target_y = target_y.parse::<Coordinate>().map_err(error_message)?;
 
         Ok(Self {
             cache: HashMap::new(),

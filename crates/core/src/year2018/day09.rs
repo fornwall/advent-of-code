@@ -49,14 +49,27 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     if parts.len() != 8 {
         return Err("Invalid input".to_string());
     }
+
     let num_players = u32::from(
         parts[0]
             .parse::<NonZeroU32>()
             .map_err(|_| "Invalid input")?,
     );
+    let max_players = 999;
+    if num_players > max_players {
+        return Err(format!("Too many players (max: {})", max_players));
+    }
+
     let last_marble_points = parts[6]
         .parse::<MarbleValue>()
         .map_err(|_| "Invalid input")?;
+    let max_last_marble_points = 100_000;
+    if last_marble_points > max_last_marble_points {
+        return Err(format!(
+            "Too high last marble value (max: {})",
+            max_last_marble_points
+        ));
+    }
     let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.
 
     let mut player_scores = vec![0_u32; num_players as usize];
