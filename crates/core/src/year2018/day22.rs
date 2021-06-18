@@ -184,9 +184,9 @@ pub fn part2(input_string: &str) -> Result<i32, String> {
             ));
         }
 
-        for (nx, ny) in [(0, -1), (-1, 0), (1, 0), (0, 1)].iter() {
-            let new_x = visiting_x + *nx;
-            let new_y = visiting_y + *ny;
+        for (nx, ny) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+            let new_x = visiting_x + nx;
+            let new_y = visiting_y + ny;
             if new_x < 0 || new_y < 0 {
                 continue;
             }

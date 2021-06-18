@@ -144,8 +144,8 @@ impl Board {
         let mut lowest_hit_points = std::i32::MAX;
         let mut target_position = (0, 0);
 
-        for (dx, dy) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)].iter() {
-            let (target_x, target_y) = (x as i32 + *dx, y as i32 + *dy);
+        for (dx, dy) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)] {
+            let (target_x, target_y) = (x as i32 + dx, y as i32 + dy);
             if let MapCell::Unit {
                 hit_points, elf, ..
             } = self.at(target_x as u32, target_y as u32)
@@ -228,9 +228,9 @@ impl Board {
                 break;
             }
 
-            for (nx, ny) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)].iter() {
-                let x = (visiting_x as i32 + *nx) as u32;
-                let y = (visiting_y as i32 + *ny) as u32;
+            for (nx, ny) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)] {
+                let x = (visiting_x as i32 + nx) as u32;
+                let y = (visiting_y as i32 + ny) as u32;
 
                 match self.at(x, y) {
                     MapCell::Unit { elf, .. } if *elf == elf_target => {
