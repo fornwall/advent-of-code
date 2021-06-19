@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::collections::HashMap;
 
 enum EntryType {
@@ -43,8 +44,8 @@ fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
         .collect()
 }
 
-fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
-    let entries = parse_input(input_string)?;
+pub fn solve(input: &mut Input) -> Result<u32, String> {
+    let entries = parse_input(input.text)?;
 
     let mut sleepers = HashMap::new();
     let mut current_guard = 0;
@@ -63,7 +64,7 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
         }
     }
 
-    if part1 {
+    if input.is_part_one() {
         let (&most_sleepy_guard, sleep_record) = sleepers
             .iter()
             .max_by_key(|(_key, value)| value.iter().sum::<i32>())
@@ -96,18 +97,11 @@ fn solution(input_string: &str, part1: bool) -> Result<u32, String> {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    solution(input_string, false)
-}
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(240),
-        part1(
+fn test() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
 [1518-11-01 00:25] wakes up
@@ -125,17 +119,13 @@ fn tests_part1() {
 [1518-11-05 00:03] Guard #99 begins shift
 [1518-11-05 00:45] falls asleep
 [1518-11-05 00:55] wakes up"
-        )
+    => 240
     );
 
-    assert_eq!(Ok(84834), part1(include_str!("day04_input.txt")));
-}
+    let input = include_str!("day04_input.txt");
+    test_part_one!(input => 84834);
 
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(4455),
-        part2(
+    test_part_two!(
             "[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
 [1518-11-01 00:25] wakes up
@@ -153,8 +143,8 @@ fn tests_part2() {
 [1518-11-05 00:03] Guard #99 begins shift
 [1518-11-05 00:45] falls asleep
 [1518-11-05 00:55] wakes up"
-        )
+        =>4455
     );
 
-    assert_eq!(Ok(53427), part2(include_str!("day04_input.txt")));
+    test_part_two!(input => 53427);
 }

@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -31,8 +32,8 @@ fn parse_input(input_string: &str) -> Result<Vec<Point>, String> {
         .collect::<Result<Vec<Point>, String>>()
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let points = parse_input(input_string)?;
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let points = parse_input(input.text)?;
 
     let (left, top, right, bottom) = points.iter().fold(
         (std::i32::MAX, std::i32::MAX, std::i32::MIN, std::i32::MIN),
@@ -46,98 +47,77 @@ pub fn part1(input_string: &str) -> Result<i32, String> {
         },
     );
 
-    let mut id_to_count = HashMap::new();
-    let mut point_ids_with_infinite_area = HashSet::new();
+    if input.is_part_one() {
+        let mut id_to_count = HashMap::new();
+        let mut point_ids_with_infinite_area = HashSet::new();
 
-    for y in top..=bottom {
-        for x in left..=right {
-            let mut closest_distance = std::i32::MAX;
-            let mut closest_point_id = -1;
+        for y in top..=bottom {
+            for x in left..=right {
+                let mut closest_distance = std::i32::MAX;
+                let mut closest_point_id = -1;
 
-            for point in points.iter() {
-                let distance = (x - point.x).abs() + (y - point.y).abs();
+                for point in points.iter() {
+                    let distance = (x - point.x).abs() + (y - point.y).abs();
 
-                match distance.cmp(&closest_distance) {
-                    Ordering::Greater => {}
-                    Ordering::Less => {
-                        closest_distance = distance;
-                        closest_point_id = point.id;
-                    }
-                    Ordering::Equal => {
-                        closest_point_id = -1;
-                    }
-                };
-            }
+                    match distance.cmp(&closest_distance) {
+                        Ordering::Greater => {}
+                        Ordering::Less => {
+                            closest_distance = distance;
+                            closest_point_id = point.id;
+                        }
+                        Ordering::Equal => {
+                            closest_point_id = -1;
+                        }
+                    };
+                }
 
-            if x == left || x == right || y == top || y == bottom {
-                // These points have infinite area, so do not count them:
-                point_ids_with_infinite_area.insert(closest_point_id);
-                id_to_count.remove(&closest_point_id);
-            } else if !point_ids_with_infinite_area.contains(&closest_point_id) {
-                *id_to_count.entry(closest_point_id).or_insert(0) += 1;
-            }
-        }
-    }
-
-    let max = id_to_count
-        .iter()
-        .max_by_key(|(_, &value)| value)
-        .ok_or("No solution found")?;
-    Ok(*max.1)
-}
-
-pub fn part2_param(input_string: &str, max_distance_exclusive: i32) -> Result<i32, String> {
-    let points = parse_input(input_string)?;
-
-    let (left, top, right, bottom) = points.iter().fold(
-        (std::i32::MAX, std::i32::MAX, std::i32::MIN, std::i32::MIN),
-        |(left, top, right, bottom), point| {
-            (
-                cmp::min(left, point.x),
-                cmp::min(top, point.y),
-                cmp::max(right, point.x),
-                cmp::max(bottom, point.y),
-            )
-        },
-    );
-
-    let mut sum: i32 = 0;
-
-    for y in top..=bottom {
-        for x in left..=right {
-            let total_distance = points.iter().fold(0, |acc, point| {
-                acc + (x - point.x).abs() + (y - point.y).abs()
-            });
-            if total_distance < max_distance_exclusive {
-                sum += 1;
+                if x == left || x == right || y == top || y == bottom {
+                    // These points have infinite area, so do not count them:
+                    point_ids_with_infinite_area.insert(closest_point_id);
+                    id_to_count.remove(&closest_point_id);
+                } else if !point_ids_with_infinite_area.contains(&closest_point_id) {
+                    *id_to_count.entry(closest_point_id).or_insert(0) += 1;
+                }
             }
         }
+
+        let max = id_to_count
+            .iter()
+            .max_by_key(|(_, &value)| value)
+            .ok_or("No solution found")?;
+        Ok(*max.1)
+    } else {
+        let mut sum: i32 = 0;
+
+        for y in top..=bottom {
+            for x in left..=right {
+                let total_distance = points.iter().fold(0, |acc, point| {
+                    acc + (x - point.x).abs() + (y - point.y).abs()
+                });
+                if total_distance < 10000 {
+                    sum += 1;
+                }
+            }
+        }
+
+        Ok(sum)
     }
-
-    Ok(sum)
-}
-
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    part2_param(input_string, 10000)
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(17),
-        part1(
+fn test() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "1, 1
 1, 6
 8, 3
 3, 4
 5, 5
-8, 9"
-        )
+8, 9" => 17
     );
 
-    assert_eq!(
-        Ok(1876),
-        part1(
+    test_part_one!(
             "0, 0
 0, 100
 1, 50
@@ -146,27 +126,10 @@ fn tests_part1() {
 80, 80
 100, 0
 100, 50
-100, 100"
-        )
+100, 100" => 1876
     );
 
-    assert_eq!(Ok(5333), part1(include_str!("day06_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(16),
-        part2_param(
-            "1, 1
-1, 6
-8, 3
-3, 4
-5, 5
-8, 9",
-            32
-        )
-    );
-
-    assert_eq!(Ok(35334), part2(include_str!("day06_input.txt")));
+    let input = include_str!("day06_input.txt");
+    test_part_one!(input => 5333);
+    test_part_two!(input => 35334);
 }

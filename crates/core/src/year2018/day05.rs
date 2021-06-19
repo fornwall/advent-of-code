@@ -1,14 +1,16 @@
+use crate::input::Input;
+
 type PolymerUnit = u8;
 
 const fn destroys_each_other(a: PolymerUnit, b: PolymerUnit) -> bool {
     a.eq_ignore_ascii_case(&b) && a != b
 }
 
-fn solution(input: &str, part1: bool) -> Result<usize, String> {
-    let input_polymer = input.as_bytes();
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let input_polymer = input.text.as_bytes();
     let mut new_polymer = Vec::<PolymerUnit>::with_capacity(input_polymer.len());
 
-    let candidates_for_removal = if part1 { 0..1 } else { b'a'..b'z' };
+    let candidates_for_removal = input.part_values(0..1, b'a'..b'z');
 
     candidates_for_removal
         .map(|to_remove_lower| {
@@ -36,27 +38,18 @@ fn solution(input: &str, part1: bool) -> Result<usize, String> {
         .ok_or_else(|| "Internal error".to_string())
 }
 
-pub fn part1(input: &str) -> Result<usize, String> {
-    solution(input, true)
-}
-
-pub fn part2(input: &str) -> Result<usize, String> {
-    solution(input, false)
-}
-
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok(0), part1("aA"));
-    assert_eq!(Ok(0), part1("abBA"));
-    assert_eq!(Ok(4), part1("abAB"));
-    assert_eq!(Ok(6), part1("aabAAB"));
+fn test() {
+    use crate::{test_part_one, test_part_two};
 
-    assert_eq!(Ok(11252), part1(include_str!("day05_input.txt")));
-}
+    test_part_one!("aA"=>0);
+    test_part_one!("abBA" => 0);
+    test_part_one!("abAB" => 4);
+    test_part_one!("aabAAB" => 6);
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(4), part2("dabAcCaCBAcCcaDA"));
+    test_part_two!("dabAcCaCBAcCcaDA" => 4);
 
-    assert_eq!(Ok(6118), part2(include_str!("day05_input.txt")));
+    let input = include_str!("day05_input.txt");
+    test_part_one!(input => 11252);
+    test_part_two!(input => 6118);
 }
