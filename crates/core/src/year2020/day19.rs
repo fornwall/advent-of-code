@@ -56,9 +56,7 @@ impl Rules {
     }
 
     fn add_line(&mut self, rule_line: &str) -> Result<(), ()> {
-        let mut rule_line_parts = rule_line.split(": ");
-        let rule_idx_str = rule_line_parts.next().ok_or(())?;
-        let pattern_str = rule_line_parts.next().ok_or(())?;
+        let (rule_idx_str, pattern_str) = rule_line.rsplit_once(": ").ok_or(())?;
 
         let rule_idx = rule_idx_str.parse::<RuleId>().map_err(|_| ())?;
         let pattern = Rule::parse(pattern_str)?;
@@ -125,9 +123,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let on_error = || "Invalid input".to_string();
     let map_error = |_| on_error();
 
-    let mut input_parts = input.text.split("\n\n");
-    let rules_str = input_parts.next().ok_or_else(on_error)?;
-    let messages_str = input_parts.next().ok_or_else(on_error)?;
+    let (rules_str, messages_str) = input.text.split_once("\n\n").ok_or_else(on_error)?;
 
     let mut rules = Rules::parse(rules_str).map_err(map_error)?;
 

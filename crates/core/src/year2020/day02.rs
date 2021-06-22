@@ -11,9 +11,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             )
         };
 
-        let mut line_parts = line.split(": ");
-        let password_policy_str = line_parts.next().ok_or_else(on_error)?;
-        let password = line_parts.next().ok_or_else(on_error)?;
+        let (password_policy_str, password) = line.split_once(": ").ok_or_else(on_error)?;
 
         let mut policy_parts = password_policy_str.split(' ');
         let mut occurrences_parts = policy_parts.next().ok_or_else(on_error)?.split('-');

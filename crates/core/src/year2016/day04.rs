@@ -9,24 +9,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
         let mut char_frequency = HashMap::new();
 
-        let mut parts = line.rsplitn(2, '-');
-        let sector_id_and_checksum = parts.next().ok_or_else(on_error)?;
-        let room_name = parts.next().ok_or_else(on_error)?;
+        let (room_name, sector_id_and_checksum) = line.rsplit_once('-').ok_or_else(on_error)?;
         for c in room_name.chars().filter(|&c| c != '-') {
             *char_frequency.entry(c).or_insert(0) += 1;
         }
 
-        let mut sector_id_and_checksum = sector_id_and_checksum.split('[');
-        let sector_id = sector_id_and_checksum
-            .next()
-            .ok_or_else(on_error)?
-            .parse::<u32>()
-            .map_err(|_| on_error())?;
-
-        let checksum = sector_id_and_checksum
-            .next()
-            .ok_or_else(on_error)?
-            .strip_suffix(']')
+        let (sector_id, checksum) = sector_id_and_checksum
+            .split_once('[')
+            .and_then(|(id, checksum)| Some((id.parse::<u32>().ok()?, checksum.strip_suffix(']')?)))
             .ok_or_else(on_error)?;
 
         let mut sorted_by_frequency = room_name
@@ -53,12 +43,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             if input.is_part_two() {
                 let decrypted_name = room_name
                     .chars()
-                    .map(|a| {
-                        if a == '-' {
-                            ' '
-                        } else {
-                            (((a as u32 - 'a' as u32 + sector_id) % 26_u32) as u8 + b'a') as char
-                        }
+                    .map(|a| match a {
+                        '-' => ' ',
+                        _ => (((a as u32 - 'a' as u32 + sector_id) % 26_u32) as u8 + b'a') as char,
                     })
                     .collect::<String>();
                 if decrypted_name == "northpole object storage" {

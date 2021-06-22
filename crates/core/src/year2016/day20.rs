@@ -3,12 +3,10 @@ use crate::Input;
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut intervals = Vec::new();
     for line in input.text.lines() {
-        let parts = line.split('-').collect::<Vec<_>>();
-        if parts.len() != 2 {
-            return Err("Invalid input".to_string());
-        }
-        let from = parts[0].parse::<u32>().map_err(|_| "Invalid input")?;
-        let to = parts[1].parse::<u32>().map_err(|_| "Invalid input")?;
+        let (from, to) = line
+            .split_once('-')
+            .and_then(|(from, to)| Some((from.parse::<u32>().ok()?, to.parse::<u32>().ok()?)))
+            .ok_or("Invalid input")?;
         if from > to {
             return Err("Invalid interval with from > to".into());
         }

@@ -1,11 +1,10 @@
-use crate::Input;
+use crate::{Input, Part};
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     fn parse_tuple(tuple: &str) -> Option<(u16, u16)> {
-        let mut parts = tuple.split(',');
-        let first = parts.next()?.parse::<u16>().ok()?;
-        let second = parts.next()?.parse::<u16>().ok()?;
-        Some((first, second))
+        tuple.split_once(',').and_then(|(first, second)| {
+            Some((first.parse::<u16>().ok()?, second.parse::<u16>().ok()?))
+        })
     }
 
     let mut grid = [0_u8; 1_000_000];
@@ -29,32 +28,19 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         for x in from_x..=to_x {
             for y in from_y..=to_y {
                 let index = x as usize + y as usize * 1000;
-                grid[index] = match words[1] {
-                    "on" => {
-                        if input.is_part_one() {
+                grid[index] = match (words[1], input.part) {
+                    ("on", Part::One) => 1,
+                    ("on", Part::Two) => grid[index] + 1,
+                    ("off", Part::One) => 0,
+                    ("off", Part::Two) => grid[index] - if grid[index] == 0 { 0 } else { 1 },
+                    (_, Part::One) => {
+                        if grid[index] == 0 {
                             1
                         } else {
-                            grid[index] + 1
-                        }
-                    }
-                    "off" => {
-                        if input.is_part_one() {
                             0
-                        } else {
-                            grid[index] - if grid[index] == 0 { 0 } else { 1 }
                         }
                     }
-                    _ => {
-                        if input.is_part_one() {
-                            if grid[index] == 0 {
-                                1
-                            } else {
-                                0
-                            }
-                        } else {
-                            grid[index] + 2
-                        }
-                    }
+                    (_, Part::Two) => grid[index] + 2,
                 };
             }
         }

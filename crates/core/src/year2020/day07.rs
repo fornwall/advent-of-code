@@ -67,15 +67,12 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);
 
-        let mut parts = line.split(" bags contain ");
-        let from_bag = parts.next().ok_or_else(on_error)?;
+        let (from_bag, to_parts) = line
+            .strip_suffix('.')
+            .and_then(|line| line.split_once(" bags contain "))
+            .ok_or_else(on_error)?;
 
         let mut children_entries = Vec::new();
-        let to_parts = parts
-            .next()
-            .ok_or_else(on_error)?
-            .strip_suffix('.')
-            .ok_or_else(on_error)?;
 
         for to_part in to_parts.split(", ") {
             let mut amount_and_bag_type = to_part.splitn(2, ' ');
