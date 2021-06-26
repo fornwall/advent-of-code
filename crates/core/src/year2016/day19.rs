@@ -9,16 +9,12 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             .map_err(|e| format!("Invalid number of elves: {}", e))?,
     );
 
-    // See https://www.youtube.com/watch?v=uCsD3ZGzMgE:
     if input.is_part_one() {
-        for bit_offset in (0..32).rev() {
-            let bit = 1 << bit_offset;
-            if bit & n > 0 {
-                let with_msb_cleared = n & !bit;
-                let with_lsb_added = (with_msb_cleared << 1) | 1;
-                return Ok(with_lsb_added);
-            }
-        }
+        // See "The Josephus Problem - Numberphile": https://www.youtube.com/watch?v=uCsD3ZGzMgE
+        let most_significant_bit = 1 << (u32::BITS - n.leading_zeros() - 1);
+        let with_msb_cleared = n & !most_significant_bit;
+        let with_lsb_added = (with_msb_cleared << 1) | 1;
+        Ok(with_lsb_added)
     } else {
         // TODO: From https://pastebin.com/Zm7tLbAe, understand
         // TODO: Use a common divide_rounding_up() function?
@@ -37,8 +33,6 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             v2.push_back(v1.pop_front().ok_or("Internal error: Empty v1")?);
         }
     }
-
-    Err("No solution for zero".to_string())
 }
 
 #[test]
