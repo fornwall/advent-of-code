@@ -1,3 +1,4 @@
+use crate::input::Input;
 use std::cmp::{max, min};
 use std::collections::HashSet;
 
@@ -8,16 +9,9 @@ struct Point {
     y_speed: i32,
 }
 
-pub fn part1(input_string: &str) -> Result<String, String> {
-    Ok(find_letters(input_string)?.0)
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
-    Ok(find_letters(input_string)?.1)
-}
-
-pub fn find_letters(input_string: &str) -> Result<(String, u32), String> {
-    let mut points: Vec<Point> = input_string
+pub fn solve(input: &mut Input) -> Result<String, String> {
+    let mut points: Vec<Point> = input
+        .text
         .lines()
         .enumerate()
         .map(|(line_index, line)| {
@@ -62,6 +56,10 @@ pub fn find_letters(input_string: &str) -> Result<(String, u32), String> {
         seconds += 1;
     }
 
+    if input.is_part_one() {
+        return Ok(seconds.to_string());
+    }
+
     let mut occupied = HashSet::new();
     let mut borders = (std::i32::MAX, std::i32::MIN, std::i32::MIN, std::i32::MAX);
     for point in &mut points {
@@ -86,7 +84,7 @@ pub fn find_letters(input_string: &str) -> Result<(String, u32), String> {
     }
 
     let identified_chars = identify_chars(&result)?;
-    Ok((identified_chars, seconds))
+    Ok(identified_chars)
 }
 
 fn identify_char(input: &str) -> Result<char, String> {
@@ -136,14 +134,10 @@ fn identify_chars(input: &str) -> Result<String, String> {
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        part1(include_str!("day10_input.txt")),
-        Ok("HKJFAKAF".to_string()),
-    );
-}
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(10888), part2(include_str!("day10_input.txt")));
+    let input = include_str!("day10_input.txt");
+    test_part_one!(input => "10888".to_string());
+    test_part_two!(input => "HKJFAKAF".to_string());
 }

@@ -1,14 +1,16 @@
+use crate::input::Input;
 type InputNumber = u8;
 
-fn solution(input_string: &str, part1: bool) -> Result<usize, String> {
-    let data = input_string
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let data = input
+        .text
         .split_whitespace()
         .map(|word| {
             word.parse::<InputNumber>()
                 .map_err(|error| format!("Invalid input: {}", error.to_string()))
         })
         .collect::<Result<Vec<InputNumber>, _>>()?;
-    Ok(evaluate_node(&data, 0, part1)?.1)
+    Ok(evaluate_node(&data, 0, input.is_part_one())?.1)
 }
 
 fn evaluate_node(
@@ -57,22 +59,14 @@ fn evaluate_node(
     Ok((offset_after_current, node_value as usize))
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    solution(input_string, false)
-}
-
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok(138), part1("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"));
-    assert_eq!(Ok(47112), part1(include_str!("day08_input.txt")));
-}
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(66), part2("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"));
-    assert_eq!(Ok(28237), part2(include_str!("day08_input.txt")));
+    test_part_one!("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2" => 138);
+    test_part_two!("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2" => 66);
+
+    let input = include_str!("day08_input.txt");
+    test_part_one!(input => 47112);
+    test_part_two!(input => 28237);
 }
