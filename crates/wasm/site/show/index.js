@@ -333,7 +333,8 @@ function restoreContextState(ctx, state) {
 }
 
 setTimeout(async () => {
-  const devicePixelContentBoxSupported = await isDevicePixelContentBoxSupported();
+  const devicePixelContentBoxSupported =
+    await isDevicePixelContentBoxSupported();
   const observerOptions = devicePixelContentBoxSupported
     ? { box: ["device-pixel-content-box"] }
     : {};
