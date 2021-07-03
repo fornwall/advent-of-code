@@ -1,3 +1,5 @@
+use crate::Input;
+
 #[derive(Copy, Clone, PartialEq)]
 enum AttackType {
     Bludgeoning,
@@ -22,6 +24,7 @@ impl AttackType {
     }
 }
 
+#[derive(Clone)]
 struct ArmyGroup {
     id: i32,
     units: i32,
@@ -233,47 +236,48 @@ fn execute_battle(mut groups: Vec<ArmyGroup>) -> Vec<ArmyGroup> {
     groups
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let groups = execute_battle(ArmyGroup::parse(input_string)?);
-    let result = groups.iter().fold(0, |acc, g| acc + g.units);
-    Ok(result)
-}
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let initial_groups = ArmyGroup::parse(input.text)?;
 
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let mut boost = 1;
-    loop {
-        let mut groups = ArmyGroup::parse(input_string)?;
-        for g in groups.iter_mut() {
-            if g.immune_system {
-                g.attack_damage += boost;
+    if input.is_part_one() {
+        let groups = execute_battle(initial_groups);
+        let result = groups.iter().fold(0, |acc, g| acc + g.units);
+        Ok(result)
+    } else {
+        let mut boost = 1;
+        loop {
+            let mut groups = initial_groups.clone();
+            for g in groups.iter_mut() {
+                if g.immune_system {
+                    g.attack_damage += boost;
+                }
             }
+
+            let groups = execute_battle(groups);
+
+            if groups.iter().all(|g| g.immune_system) {
+                let result = groups.iter().fold(0, |acc, g| acc + g.units);
+                return Ok(result);
+            }
+
+            boost += 1;
         }
-
-        let groups = execute_battle(groups);
-
-        if groups.iter().all(|g| g.immune_system) {
-            let result = groups.iter().fold(0, |acc, g| acc + g.units);
-            return Ok(result);
-        }
-
-        boost += 1;
     }
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok(5216), part1("Immune System:
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!("Immune System:
 17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2
 989 units each with 1274 hit points (immune to fire; weak to bludgeoning, slashing) with an attack that does 25 slashing damage at initiative 3
 
 Infection:
 801 units each with 4706 hit points (weak to radiation) with an attack that does 116 bludgeoning damage at initiative 1
-4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4"));
+4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4" => 5216);
 
-    assert_eq!(Ok(26914), part1(include_str!("day24_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(862), part2(include_str!("day24_input.txt")));
+    let input = include_str!("day24_input.txt");
+    test_part_one!(input => 26914);
+    test_part_two!(input => 862);
 }

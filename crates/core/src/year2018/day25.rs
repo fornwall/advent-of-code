@@ -1,5 +1,8 @@
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut points: Vec<(i32, i32, i32, i32, usize)> = input_string
+use crate::Input;
+
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let mut points: Vec<(i32, i32, i32, i32, usize)> = input
+        .text
         .lines()
         .enumerate()
         .map(|(i, line)| {
@@ -41,29 +44,18 @@ pub fn part1(input_string: &str) -> Result<usize, String> {
     Ok(points.len())
 }
 
-pub fn part2(_input_string: &str) -> Result<String, String> {
-    Ok("".to_string())
-}
-
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(2),
-        part1(
-            "0,0,0,0
+fn tests() {
+    use crate::test_part_one;
+    test_part_one!("0,0,0,0
 3,0,0,0
 0,3,0,0
 0,0,3,0
 0,0,0,3
 0,0,0,6
 9,0,0,0
-12,0,0,0"
-        )
-    );
-    assert_eq!(
-        Ok(4),
-        part1(
-            "-1,2,2,0
+12,0,0,0" => 2);
+    test_part_one!("-1,2,2,0
 0,0,2,-2
 0,0,0,-2
 -1,2,0,0
@@ -72,13 +64,8 @@ fn tests_part1() {
 -1,3,2,2
 -1,0,-1,0
 0,2,1,-2
-3,0,0,0"
-        )
-    );
-    assert_eq!(
-        Ok(3),
-        part1(
-            "1,-1,0,1
+3,0,0,0" => 4);
+    test_part_one!("1,-1,0,1
 2,0,-1,0
 3,2,-1,0
 0,0,3,1
@@ -87,13 +74,8 @@ fn tests_part1() {
 -2,2,0,0
 2,-2,0,-1
 1,-1,0,-1
-3,2,0,2"
-        )
-    );
-    assert_eq!(
-        Ok(8),
-        part1(
-            "1,-1,-1,-2
+3,2,0,2" => 3);
+    test_part_one!("1,-1,-1,-2
 -2,-2,0,1
 0,2,1,3
 -2,3,-2,1
@@ -102,9 +84,8 @@ fn tests_part1() {
 0,-2,-1,0
 -2,2,3,-1
 1,2,2,0
--1,-2,0,-2"
-        )
-    );
+-1,-2,0,-2" => 8);
 
-    assert_eq!(Ok(399), part1(include_str!("day25_input.txt")));
+    let input = include_str!("day25_input.txt");
+    test_part_one!(input => 399);
 }

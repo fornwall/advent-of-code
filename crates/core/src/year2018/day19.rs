@@ -1,12 +1,12 @@
 use super::elfcode::Program;
+use crate::Input;
 
-pub fn part1(input_string: &str) -> Result<u64, String> {
-    let mut program = Program::parse(input_string)?;
-    program.execute_until_halt(10_000_000)
-}
+pub fn solve(input: &mut Input) -> Result<u64, String> {
+    let mut program = Program::parse(input.text)?;
 
-pub fn part2(input_string: &str) -> Result<u64, String> {
-    let mut program = Program::parse(input_string)?;
+    if input.is_part_one() {
+        return program.execute_until_halt(10_000_000);
+    }
 
     program.registers.values[0] = 1;
 
@@ -44,10 +44,10 @@ pub fn part2(input_string: &str) -> Result<u64, String> {
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(7),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "#ip 0
 seti 5 0 1
 seti 6 0 2
@@ -55,14 +55,9 @@ addi 0 1 0
 addr 1 2 3
 setr 1 0 0
 seti 8 0 4
-seti 9 0 5"
-        )
-    );
+seti 9 0 5" => 7);
 
-    assert_eq!(Ok(978), part1(include_str!("day19_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(10_996_992), part2(include_str!("day19_input.txt")));
+    let input = include_str!("day19_input.txt");
+    test_part_one!(input => 978);
+    test_part_two!(input => 10_996_992);
 }

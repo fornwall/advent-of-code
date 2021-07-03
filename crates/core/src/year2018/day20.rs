@@ -1,3 +1,4 @@
+use crate::Input;
 use std::cmp::max;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -116,38 +117,31 @@ where
     Ok(())
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut highest_cost = 0;
-    visit_rooms(input_string, |cost| {
-        highest_cost = max(highest_cost, cost);
-    })?;
-    Ok(highest_cost)
-}
-
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let mut room_count = 0;
-    visit_rooms(input_string, |cost| {
-        if cost >= 1000 {
-            room_count += 1;
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let mut result = 0;
+    visit_rooms(input.text, |cost| {
+        if input.is_part_one() {
+            result = max(result, cost);
+        } else if cost >= 1000 {
+            result += 1;
         }
     })?;
-    Ok(room_count)
+    Ok(result)
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok(3), part1("^WNE$"));
-    assert_eq!(Ok(10), part1("^ENWWW(NEEE|SSE(EE|N))$"));
-    assert_eq!(Ok(18), part1("^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$"));
-    assert_eq!(Ok(8), part1("^(SSS|EEESSSWWW)ENNES$"));
-    assert_eq!(Ok(4), part1("^(E|SSEENNW)S$"));
-    assert_eq!(Ok(2), part1("^(E|SEN)$"));
-    assert_eq!(Ok(15), part1("^NNNNN(EEEEE|NNN)NNNNN$"));
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-    assert_eq!(Ok(3151), part1(include_str!("day20_input.txt")));
-}
+    test_part_one!("^WNE$" => 3);
+    test_part_one!("^ENWWW(NEEE|SSE(EE|N))$" => 10);
+    test_part_one!("^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$" => 18);
+    test_part_one!("^(SSS|EEESSSWWW)ENNES$" => 8);
+    test_part_one!("^(E|SSEENNW)S$" => 4);
+    test_part_one!("^(E|SEN)$" => 2);
+    test_part_one!("^NNNNN(EEEEE|NNN)NNNNN$" => 15);
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(8784), part2(include_str!("day20_input.txt")));
+    let input = include_str!("day20_input.txt");
+    test_part_one!(input => 3151);
+    test_part_two!(input => 8784);
 }

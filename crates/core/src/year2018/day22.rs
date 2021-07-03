@@ -1,3 +1,4 @@
+use crate::Input;
 use std::collections::hash_map::Entry;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
@@ -126,114 +127,99 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::parse(input_string)?;
-    let mut sum = 0;
-    for y in 0..=grid.target_y {
-        for x in 0..=grid.target_x {
-            sum += grid.risk_level(x, y);
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let mut grid = Grid::parse(input.text)?;
+    if input.is_part_one() {
+        let mut sum = 0;
+        for y in 0..=grid.target_y {
+            for x in 0..=grid.target_x {
+                sum += grid.risk_level(x, y) as i32;
+            }
         }
-    }
-    Ok(sum)
-}
+        Ok(sum)
+    } else {
+        let mut to_visit = BinaryHeap::new();
+        let mut visited = HashSet::new();
 
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    let mut grid = Grid::parse(input_string)?;
-    let mut to_visit = BinaryHeap::new();
-    let mut visited = HashSet::new();
+        // (-(cost+heuristic), -cost, x, y, equipment)
+        to_visit.push((0, 0, 0_i16, 0_i16, Equipment::Torch));
 
-    // (-(cost+heuristic), -cost, x, y, equipment)
-    to_visit.push((0, 0, 0_i16, 0_i16, Equipment::Torch));
+        let heuristic = |x: Coordinate, y: Coordinate, equipment, g: &Grid| -> i32 {
+            ((x - g.target_x).abs()
+                + (y - g.target_y).abs()
+                + if equipment == Equipment::Torch { 0 } else { 7 })
+            .into()
+        };
 
-    let heuristic = |x: Coordinate, y: Coordinate, equipment, g: &Grid| -> i32 {
-        ((x - g.target_x).abs()
-            + (y - g.target_y).abs()
-            + if equipment == Equipment::Torch { 0 } else { 7 })
-        .into()
-    };
+        while let Some(visiting) = to_visit.pop() {
+            let cost = -visiting.1;
+            let visiting_x = visiting.2;
+            let visiting_y = visiting.3;
+            let equipment = visiting.4;
 
-    while let Some(visiting) = to_visit.pop() {
-        let cost = -visiting.1;
-        let visiting_x = visiting.2;
-        let visiting_y = visiting.3;
-        let equipment = visiting.4;
-
-        if !visited.insert((visiting_x, visiting_y, equipment)) {
-            continue;
-        }
-
-        if visiting_x == grid.target_x
-            && visiting_y == grid.target_y
-            && equipment == Equipment::Torch
-        {
-            return Ok(cost);
-        }
-
-        let region_type_visiting = grid.region_type(visiting_x, visiting_y)?;
-
-        let other_equipment = other_equipment(region_type_visiting, equipment)?;
-        if !visited.contains(&(visiting_y, visiting_y, other_equipment)) {
-            let new_cost = cost + 7;
-            let new_heuristic = heuristic(visiting_x, visiting_y, other_equipment, &grid);
-            to_visit.push((
-                -(new_cost + new_heuristic),
-                -new_cost,
-                visiting_x,
-                visiting_y,
-                other_equipment,
-            ));
-        }
-
-        for (nx, ny) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
-            let new_x = visiting_x + nx;
-            let new_y = visiting_y + ny;
-            if new_x < 0 || new_y < 0 {
+            if !visited.insert((visiting_x, visiting_y, equipment)) {
                 continue;
             }
 
-            let region_type_new = grid.region_type(new_x, new_y)?;
-            if is_compatible(region_type_new, equipment) {
-                if visited.contains(&(new_x, new_y, equipment)) {
-                    continue;
-                }
-                let new_cost = cost + 1;
-                let new_heuristic = heuristic(new_x, new_y, equipment, &grid);
+            if visiting_x == grid.target_x
+                && visiting_y == grid.target_y
+                && equipment == Equipment::Torch
+            {
+                return Ok(cost);
+            }
+
+            let region_type_visiting = grid.region_type(visiting_x, visiting_y)?;
+
+            let other_equipment = other_equipment(region_type_visiting, equipment)?;
+            if !visited.contains(&(visiting_y, visiting_y, other_equipment)) {
+                let new_cost = cost + 7;
+                let new_heuristic = heuristic(visiting_x, visiting_y, other_equipment, &grid);
                 to_visit.push((
                     -(new_cost + new_heuristic),
                     -new_cost,
-                    new_x,
-                    new_y,
-                    equipment,
+                    visiting_x,
+                    visiting_y,
+                    other_equipment,
                 ));
             }
+
+            for (nx, ny) in [(0, -1), (-1, 0), (1, 0), (0, 1)] {
+                let new_x = visiting_x + nx;
+                let new_y = visiting_y + ny;
+                if new_x < 0 || new_y < 0 {
+                    continue;
+                }
+
+                let region_type_new = grid.region_type(new_x, new_y)?;
+                if is_compatible(region_type_new, equipment) {
+                    if visited.contains(&(new_x, new_y, equipment)) {
+                        continue;
+                    }
+                    let new_cost = cost + 1;
+                    let new_heuristic = heuristic(new_x, new_y, equipment, &grid);
+                    to_visit.push((
+                        -(new_cost + new_heuristic),
+                        -new_cost,
+                        new_x,
+                        new_y,
+                        equipment,
+                    ));
+                }
+            }
         }
+
+        Err("No solution found".to_string())
     }
-
-    Err("No solution found".to_string())
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(114),
-        part1(
-            "depth: 510
-target: 10,10"
-        )
-    );
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-    assert_eq!(Ok(11843), part1(include_str!("day22_input.txt")));
-}
+    test_part_one!("depth: 510\ntarget: 10,10" => 114);
+    test_part_two!("depth: 510\ntarget: 10,10" => 45);
 
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(45),
-        part2(
-            "depth: 510
-target: 10,10"
-        )
-    );
-
-    assert_eq!(Ok(1078), part2(include_str!("day22_input.txt")));
+    let input = include_str!("day22_input.txt");
+    test_part_one!(input => 11843);
+    test_part_two!(input => 1078);
 }
