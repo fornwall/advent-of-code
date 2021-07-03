@@ -1,3 +1,5 @@
+use crate::Input;
+
 fn run_until<F>(condition: F) -> Result<Vec<u8>, String>
 where
     F: Fn(&Vec<u8>) -> bool,
@@ -41,60 +43,59 @@ where
     }
 }
 
-pub fn part1(input_string: &str) -> Result<String, String> {
-    let input_num_recipes = input_string
-        .parse::<u32>()
-        .map_err(|error| format!("Invalid input: {}", error.to_string()))?
-        as usize;
-    let num_recipes_after = 10;
-    let desired_length = input_num_recipes + num_recipes_after;
+pub fn solve(input: &mut Input) -> Result<String, String> {
+    if input.is_part_one() {
+        let input_num_recipes = input
+            .text
+            .parse::<u32>()
+            .map_err(|error| format!("Invalid input: {}", error.to_string()))?
+            as usize;
+        let num_recipes_after = 10;
+        let desired_length = input_num_recipes + num_recipes_after;
 
-    let scores = run_until(|scores| scores.len() >= desired_length)?;
+        let scores = run_until(|scores| scores.len() >= desired_length)?;
 
-    Ok(scores
-        .iter()
-        .skip(input_num_recipes)
-        .take(num_recipes_after)
-        .fold(String::new(), |acc, score| acc + &score.to_string()))
-}
+        Ok(scores
+            .iter()
+            .skip(input_num_recipes)
+            .take(num_recipes_after)
+            .fold(String::new(), |acc, score| acc + &score.to_string()))
+    } else {
+        let input_bytes: Vec<u8> = input
+            .text
+            .chars()
+            .map(|b| {
+                b.to_digit(10)
+                    .map(|b| b as u8)
+                    .ok_or_else(|| "Invalid input".to_string())
+            })
+            .collect::<Result<Vec<_>, String>>()?;
 
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    let input_bytes: Vec<u8> = input_string
-        .chars()
-        .map(|b| {
-            b.to_digit(10)
-                .map(|b| b as u8)
-                .ok_or_else(|| "Invalid input".to_string())
-        })
-        .collect::<Result<Vec<_>, String>>()?;
+        if input_bytes.len() > 20 {
+            return Err("Too long input".to_string());
+        }
 
-    if input_bytes.len() > 20 {
-        return Err("Too long input".to_string());
+        let scores = run_until(|scores| scores.ends_with(&input_bytes))?;
+        Ok((scores.len() - input.text.len()).to_string())
     }
-
-    let scores = run_until(|scores| scores.ends_with(&input_bytes))?;
-    Ok(scores.len() - input_string.len())
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok("5158916779".to_string()), part1("9"));
-    assert_eq!(Ok("0124515891".to_string()), part1("5"));
-    assert_eq!(Ok("9251071085".to_string()), part1("18"));
-    assert_eq!(Ok("5941429882".to_string()), part1("2018"));
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-    assert_eq!(
-        Ok("1150511382".to_string()),
-        part1(include_str!("day14_input.txt"))
-    );
-}
+    test_part_one!("9" => "5158916779".into());
+    test_part_one!("5" => "0124515891".into());
+    test_part_one!("18" => "9251071085".into());
+    test_part_one!("2018" => "5941429882".into());
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(9), part2("51589"));
-    assert_eq!(Ok(5), part2("01245"));
-    assert_eq!(Ok(18), part2("92510"));
-    assert_eq!(Ok(2018), part2("59414"));
+    test_part_two!("51589" => "9".into());
+    test_part_two!("01245" => "5".into());
+    test_part_two!("92510" => "18".into());
+    test_part_two!("59414" => "2018".into());
 
-    assert_eq!(Ok(20_173_656), part2(include_str!("day14_input.txt")));
+    let input = include_str!("day14_input.txt");
+    test_part_one!(
+        input => "1150511382".into());
+    test_part_two!(input => "20_173_656".into());
 }

@@ -1,3 +1,4 @@
+use crate::Input;
 use std::collections::{HashMap, HashSet};
 
 enum TrackPiece {
@@ -245,23 +246,21 @@ impl Track {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<String, String> {
-    let mut track = Track::parse(input_string)?;
-    let crash_position = track.find_crash();
-    Ok(format!("{},{}", crash_position.x, crash_position.y))
-}
-
-pub fn part2(input_string: &str) -> Result<String, String> {
-    let mut track = Track::parse(input_string)?;
-    let remaining_position = track.find_remaining();
-    Ok(format!("{},{}", remaining_position.x, remaining_position.y))
+pub fn solve(input: &mut Input) -> Result<String, String> {
+    let mut track = Track::parse(input.text)?;
+    let position = if input.is_part_one() {
+        track.find_crash()
+    } else {
+        track.find_remaining()
+    };
+    Ok(format!("{},{}", position.x, position.y))
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok("0,3".to_string()),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "|
 v
 |
@@ -269,32 +268,18 @@ v
 |
 ^
 |"
-        )
-    );
+        => "0,3".into());
 
-    assert_eq!(
-        Ok("7,3".to_string()),
-        part1(
+    test_part_one!(
             r#"/->-\
 |   |  /----\
 | /-+--+-\  |
 | | |  | v  |
 \-+-/  \-+--/
   \------/"#
-        )
-    );
+        => "7,3".into());
 
-    assert_eq!(
-        Ok("65,73".to_string()),
-        part1(include_str!("day13_input.txt"))
-    );
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok("6,4".to_string()),
-        part2(
+    test_part_two!(
             r#"/>-<\
 |   |
 | /<+-\
@@ -303,11 +288,11 @@ fn tests_part2() {
   |   ^
   \<->/
 "#
-        )
-    );
+        => "6,4".into());
 
-    assert_eq!(
-        Ok("54,66".to_string()),
-        part2(include_str!("day13_input.txt"))
-    );
+    let input = include_str!("day13_input.txt");
+    test_part_one!(
+        input => "65,73".into());
+    test_part_two!(
+        input => "54,66".into());
 }

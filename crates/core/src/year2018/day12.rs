@@ -1,3 +1,4 @@
+use crate::Input;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 struct Tunnel {
@@ -94,19 +95,18 @@ impl Tunnel {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i64, String> {
-    let mut tunnel = Tunnel::parse(input_string, 20)?;
-    for _ in 0..20 {
-        tunnel.evolve();
-    }
-    Ok(tunnel.score())
-}
-
-pub fn part2(input_string: &str) -> Result<i64, String> {
+pub fn solve(input: &mut Input) -> Result<i64, String> {
     const DESIRED_STALE_SCORE_DIFF: usize = 100;
+    let max_steps = input.part_values(20, 1000);
 
-    let max_steps = 1000;
-    let mut tunnel = Tunnel::parse(input_string, max_steps)?;
+    let mut tunnel = Tunnel::parse(input.text, max_steps)?;
+
+    if input.is_part_one() {
+        for _ in 0..20 {
+            tunnel.evolve();
+        }
+        return Ok(tunnel.score());
+    }
 
     let mut score_diffs = VecDeque::with_capacity(DESIRED_STALE_SCORE_DIFF);
     let mut previous_score = -1;
@@ -133,10 +133,10 @@ pub fn part2(input_string: &str) -> Result<i64, String> {
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(325),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "initial state: #..#.#..##......###...###
 
 ...## => #
@@ -153,15 +153,12 @@ fn tests_part1() {
 ###.. => #
 ###.# => #
 ####. => #"
-        )
+        => 325
     );
-    assert_eq!(Ok(2140), part1(include_str!("day12_input.txt")));
-}
 
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        Ok(1_900_000_000_384),
-        part2(include_str!("day12_input.txt"))
+    let input = include_str!("day12_input.txt");
+    test_part_one!(input => 2140);
+    test_part_two!(
+        input => 1_900_000_000_384
     );
 }

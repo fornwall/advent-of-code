@@ -1,28 +1,10 @@
+use super::elfcode::Opcode;
+use crate::Input;
 use std::collections::HashSet;
 
 #[derive(Copy, Clone, PartialEq)]
 struct Registers {
     values: [u16; 4],
-}
-
-#[derive(Copy, Clone, Hash, Eq, PartialEq)]
-enum Opcode {
-    Addr, // (add register) stores into register C the result of adding register A and register B
-    Addi, // (add immediate) stores into register C the result of adding register A and value B.
-    Mulr, // (multiply register) stores into register C the result of multiplying register A and register B.
-    Muli, // (multiply immediate) stores into register C the result of multiplying register A and value B.
-    Banr, // (bitwise AND register) stores into register C the result of the bitwise AND of register A and register B.
-    Bani, // (bitwise AND immediate) stores into register C the result of the bitwise AND of register A and value B.
-    Borr, // (bitwise OR register) stores into register C the result of the bitwise OR of register A and register B.
-    Bori, // (bitwise OR immediate) stores into register C the result of the bitwise OR of register A and value B.
-    Setr, // (set register) copies the contents of register A into register C. (Input B is ignored.)
-    Seti, // (set immediate) stores value A into register C. (Input B is ignored.)
-    Gtir, // (greater-than immediate/register) sets register C to 1 if value A is greater than register B. Otherwise, register C is set to 0.
-    Gtri, // (greater-than register/immediate) sets register C to 1 if register A is greater than value B. Otherwise, register C is set to 0.
-    Gtrr, // (greater-than register/register) sets register C to 1 if register A is greater than register B. Otherwise, register C is set to 0.
-    Eqir, // (equal immediate/register) sets register C to 1 if value A is equal to register B. Otherwise, register C is set to 0.
-    Eqri, // (equal register/immediate) sets register C to 1 if register A is equal to value B. Otherwise, register C is set to 0.
-    Eqrr, // (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
 }
 
 impl Registers {
@@ -65,12 +47,12 @@ struct Sample {
     registers_after: Registers,
 }
 
-struct Input {
+struct ProblemInput {
     pub samples: Vec<Sample>,
     pub program: Vec<Vec<u16>>,
 }
 
-impl Input {
+impl ProblemInput {
     fn parse(input_string: &str) -> Result<Self, String> {
         let mut samples = Vec::new();
         let mut registers_before = Registers::of(0, 0, 0, 0);
@@ -144,154 +126,130 @@ impl Input {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let input = Input::parse(input_string)?;
-    let mut result = 0;
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    let problem_input = ProblemInput::parse(input.text)?;
 
-    for sample in input.samples {
-        let mut sum = 0;
-        for opcode in [
-            Opcode::Addr,
-            Opcode::Addi,
-            Opcode::Mulr,
-            Opcode::Muli,
-            Opcode::Banr,
-            Opcode::Bani,
-            Opcode::Borr,
-            Opcode::Bori,
-            Opcode::Setr,
-            Opcode::Seti,
-            Opcode::Gtir,
-            Opcode::Gtri,
-            Opcode::Gtrr,
-            Opcode::Eqir,
-            Opcode::Eqri,
-            Opcode::Eqrr,
-        ]
-        .iter()
-        {
-            let mut registers_applied = sample.registers_before;
-            registers_applied.apply(
-                *opcode,
-                sample.instruction[1],
-                sample.instruction[2],
-                sample.instruction[3],
-            );
-            if registers_applied == sample.registers_after {
-                sum += 1;
-            }
-        }
-        if sum >= 3 {
-            result += 1;
-        }
-    }
-    Ok(result)
-}
+    let all_opcodes = [
+        Opcode::Addr,
+        Opcode::Addi,
+        Opcode::Mulr,
+        Opcode::Muli,
+        Opcode::Banr,
+        Opcode::Bani,
+        Opcode::Borr,
+        Opcode::Bori,
+        Opcode::Setr,
+        Opcode::Seti,
+        Opcode::Gtir,
+        Opcode::Gtri,
+        Opcode::Gtrr,
+        Opcode::Eqir,
+        Opcode::Eqri,
+        Opcode::Eqrr,
+    ];
 
-pub fn part2(input_string: &str) -> Result<u16, String> {
-    let input = Input::parse(input_string)?;
+    if input.is_part_one() {
+        let mut result = 0;
 
-    let mut possible_meanings: Vec<HashSet<Opcode>> = Vec::new();
-    for _ in 0..16 {
-        let s: HashSet<Opcode> = [
-            Opcode::Addr,
-            Opcode::Addi,
-            Opcode::Mulr,
-            Opcode::Muli,
-            Opcode::Banr,
-            Opcode::Bani,
-            Opcode::Borr,
-            Opcode::Bori,
-            Opcode::Setr,
-            Opcode::Seti,
-            Opcode::Gtir,
-            Opcode::Gtri,
-            Opcode::Gtrr,
-            Opcode::Eqir,
-            Opcode::Eqri,
-            Opcode::Eqrr,
-        ]
-        .iter()
-        .cloned()
-        .collect();
-        possible_meanings.push(s);
-    }
-
-    for sample in input.samples {
-        let s: &mut HashSet<Opcode> = &mut possible_meanings[sample.instruction[0] as usize];
-
-        s.retain(|opcode| {
-            let mut registers_applied = sample.registers_before;
-            registers_applied.apply(
-                *opcode,
-                sample.instruction[1],
-                sample.instruction[2],
-                sample.instruction[3],
-            );
-            registers_applied == sample.registers_after
-        });
-    }
-
-    let mut assigned_opcodes = HashSet::new();
-    for s in possible_meanings.iter_mut() {
-        if s.len() == 1 {
-            assigned_opcodes.insert(*s.iter().next().ok_or("Internal error - no elements in s")?);
-        }
-    }
-
-    let mut new_assign = Vec::new();
-    while assigned_opcodes.len() != 16 {
-        for new in assigned_opcodes.iter() {
-            for s in possible_meanings.iter_mut() {
-                if s.len() > 1 && s.remove(new) && s.len() == 1 {
-                    new_assign.push(
-                        *s.iter()
-                            .next()
-                            .ok_or("Internal error - no elements in s for new_assign")?,
-                    );
+        for sample in problem_input.samples {
+            let mut sum = 0;
+            for opcode in all_opcodes.iter() {
+                let mut registers_applied = sample.registers_before;
+                registers_applied.apply(
+                    *opcode,
+                    sample.instruction[1],
+                    sample.instruction[2],
+                    sample.instruction[3],
+                );
+                if registers_applied == sample.registers_after {
+                    sum += 1;
                 }
             }
+            if sum >= 3 {
+                result += 1;
+            }
+        }
+        Ok(result)
+    } else {
+        let mut possible_meanings: Vec<HashSet<Opcode>> = Vec::new();
+        for _ in 0..16 {
+            let s: HashSet<Opcode> = all_opcodes.iter().cloned().collect();
+            possible_meanings.push(s);
         }
 
-        for new in new_assign.iter() {
-            assigned_opcodes.insert(*new);
+        for sample in problem_input.samples {
+            let s: &mut HashSet<Opcode> = &mut possible_meanings[sample.instruction[0] as usize];
+
+            s.retain(|opcode| {
+                let mut registers_applied = sample.registers_before;
+                registers_applied.apply(
+                    *opcode,
+                    sample.instruction[1],
+                    sample.instruction[2],
+                    sample.instruction[3],
+                );
+                registers_applied == sample.registers_after
+            });
         }
+
+        let mut assigned_opcodes = HashSet::new();
+        for s in possible_meanings.iter_mut() {
+            if s.len() == 1 {
+                assigned_opcodes
+                    .insert(*s.iter().next().ok_or("Internal error - no elements in s")?);
+            }
+        }
+
+        let mut new_assign = Vec::new();
+        while assigned_opcodes.len() != 16 {
+            for new in assigned_opcodes.iter() {
+                for s in possible_meanings.iter_mut() {
+                    if s.len() > 1 && s.remove(new) && s.len() == 1 {
+                        new_assign.push(
+                            *s.iter()
+                                .next()
+                                .ok_or("Internal error - no elements in s for new_assign")?,
+                        );
+                    }
+                }
+            }
+
+            for new in new_assign.iter() {
+                assigned_opcodes.insert(*new);
+            }
+        }
+
+        let meanings: Vec<Opcode> = possible_meanings
+            .iter()
+            .map(|s| {
+                s.iter()
+                    .next()
+                    .copied()
+                    .ok_or("Internal error - no elements in s for meanings")
+            })
+            .collect::<Result<_, _>>()?;
+
+        let mut regs = Registers::of(0, 0, 0, 0);
+        for instruction in problem_input.program {
+            let opcode = meanings[instruction[0] as usize];
+            regs.apply(opcode, instruction[1], instruction[2], instruction[3]);
+        }
+
+        Ok(i32::from(regs.values[0]))
     }
-
-    let meanings: Vec<Opcode> = possible_meanings
-        .iter()
-        .map(|s| {
-            s.iter()
-                .next()
-                .copied()
-                .ok_or("Internal error - no elements in s for meanings")
-        })
-        .collect::<Result<_, _>>()?;
-
-    let mut regs = Registers::of(0, 0, 0, 0);
-    for instruction in input.program {
-        let opcode = meanings[instruction[0] as usize];
-        regs.apply(opcode, instruction[1], instruction[2], instruction[3]);
-    }
-
-    Ok(regs.values[0])
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(1),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             "Before: [3, 2, 1, 1]
 9 2 1 2
 After:  [3, 2, 2, 1]"
-        )
-    );
+        => 1);
 
-    assert_eq!(Ok(624), part1(include_str!("day16_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(584), part2(include_str!("day16_input.txt")));
+    let input = include_str!("day16_input.txt");
+    test_part_one!(input => 624);
+    test_part_two!(input => 584);
 }

@@ -1,3 +1,4 @@
+use crate::Input;
 use std::collections::hash_map::{DefaultHasher, Entry};
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
@@ -104,47 +105,47 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::parse(input_string)?;
-    for _ in 0..10 {
-        grid.advance_minute()?;
-    }
-    Ok(grid.resource_value())
-}
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let mut grid = Grid::parse(input.text)?;
 
-pub fn part2(input_string: &str) -> Result<usize, String> {
-    let mut grid = Grid::parse(input_string)?;
-    let mut seen = HashMap::new();
+    if input.is_part_one() {
+        for _ in 0..10 {
+            grid.advance_minute()?;
+        }
+        Ok(grid.resource_value())
+    } else {
+        let mut seen = HashMap::new();
 
-    for i in 1..1_000_000_000 {
-        grid.advance_minute()?;
+        for i in 1..1_000_000_000 {
+            grid.advance_minute()?;
 
-        let mut hasher = DefaultHasher::new();
-        grid.cells.hash(&mut hasher);
-        let hash_value = hasher.finish();
+            let mut hasher = DefaultHasher::new();
+            grid.cells.hash(&mut hasher);
+            let hash_value = hasher.finish();
 
-        match seen.entry(hash_value) {
-            Entry::Occupied(entry) => {
-                let cycle_length = i - entry.get();
-                let remaining_hashes = (1_000_000_000 - i) % cycle_length;
-                for _ in 0..remaining_hashes {
-                    grid.advance_minute()?;
+            match seen.entry(hash_value) {
+                Entry::Occupied(entry) => {
+                    let cycle_length = i - entry.get();
+                    let remaining_hashes = (1_000_000_000 - i) % cycle_length;
+                    for _ in 0..remaining_hashes {
+                        grid.advance_minute()?;
+                    }
+                    return Ok(grid.resource_value());
                 }
-                return Ok(grid.resource_value());
-            }
-            Entry::Vacant(entry) => {
-                entry.insert(i);
+                Entry::Vacant(entry) => {
+                    entry.insert(i);
+                }
             }
         }
+        Err("No solution found".to_string())
     }
-    Err("No solution found".to_string())
 }
 
 #[test]
-fn tests_part1() {
-    assert_eq!(
-        Ok(1147),
-        part1(
+fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!(
             ".#.#...|#.
 .....#|##|
 .|..|...#.
@@ -155,13 +156,9 @@ fn tests_part1() {
 ||...#|.#|
 |.||||..|.
 ...#.|..|."
-        )
-    );
+        => 1147);
 
-    assert_eq!(Ok(531_417), part1(include_str!("day18_input.txt")));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok(205_296), part2(include_str!("day18_input.txt")));
+    let input = include_str!("day18_input.txt");
+    test_part_one!(input => 531_417);
+    test_part_two!(input => 205_296);
 }

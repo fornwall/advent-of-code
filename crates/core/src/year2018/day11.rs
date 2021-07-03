@@ -1,3 +1,4 @@
+use crate::Input;
 type GridValue = i32;
 
 /// A summed-area table is a data structure for quickly generating sum of values in a rectangular grid.
@@ -57,8 +58,9 @@ const fn cell_power(x: u32, y: u32, serial_number: GridValue) -> GridValue {
     cell_power - 5
 }
 
-fn solution(input_string: &str, part1: bool) -> Result<String, String> {
-    let serial_number = input_string
+pub fn solve(input: &mut Input) -> Result<String, String> {
+    let serial_number = input
+        .text
         .parse::<GridValue>()
         .map_err(|error| format!("Invalid input: {}", error.to_string()))?;
 
@@ -72,7 +74,7 @@ fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     let mut optimal_square_width = 0;
     let mut optimal_point = (0, 0);
 
-    for square_width in if part1 { 3..=3 } else { 1..=300 } {
+    for square_width in input.part_values(3..=3, 1..=300) {
         for y in 1..=(SummedAreaTable::SIZE - square_width) {
             for x in 1..=(SummedAreaTable::SIZE - square_width) {
                 let square_power = table.square_power(x, y, square_width);
@@ -85,7 +87,7 @@ fn solution(input_string: &str, part1: bool) -> Result<String, String> {
         }
     }
 
-    Ok(if part1 {
+    Ok(if input.is_part_one() {
         format!("{},{}", optimal_point.0, optimal_point.1)
     } else {
         format!(
@@ -95,30 +97,16 @@ fn solution(input_string: &str, part1: bool) -> Result<String, String> {
     })
 }
 
-pub fn part1(input_string: &str) -> Result<String, String> {
-    solution(input_string, true)
-}
-
-pub fn part2(input_string: &str) -> Result<String, String> {
-    solution(input_string, false)
-}
-
 #[test]
-fn tests_part1() {
-    assert_eq!(Ok("33,45".to_string()), part1("18"));
-    assert_eq!(Ok("21,61".to_string()), part1("42"));
-    assert_eq!(
-        Ok("21,68".to_string()),
-        part1(include_str!("day11_input.txt"))
-    );
-}
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn tests_part2() {
-    assert_eq!(Ok("90,269,16".to_string()), part2("18"));
-    assert_eq!(Ok("232,251,12".to_string()), part2("42"));
-    assert_eq!(
-        Ok("90,201,15".to_string()),
-        part2(include_str!("day11_input.txt"))
-    );
+    test_part_one!("18" => "33,45".into());
+    test_part_one!("42" => "21,61".into());
+    test_part_two!("18" => "90,269,16".into());
+    test_part_two!("42" => "232,251,12".into());
+
+    let input = include_str!("day11_input.txt");
+    test_part_one!(input => "21,68".into());
+    test_part_two!(input => "90,201,15".into());
 }
