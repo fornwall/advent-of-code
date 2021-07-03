@@ -265,7 +265,7 @@ fn opcode_from_str(name: &str) -> Result<Opcode, String> {
 }
 
 impl Registers {
-    const fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             values: [0, 0, 0, 0, 0, 0],
         }
@@ -275,7 +275,7 @@ impl Registers {
         self.values[index as usize]
     }
 
-    fn apply(&mut self, opcode: Opcode, a: u64, b: u64, c: u64) {
+    pub(crate) fn apply(&mut self, opcode: Opcode, a: u64, b: u64, c: u64) {
         let c = c as usize;
         self.values[c] = match opcode {
             Opcode::Addr => self.reg(a) + self.reg(b),

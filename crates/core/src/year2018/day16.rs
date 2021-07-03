@@ -1,45 +1,6 @@
-use super::elfcode::Opcode;
+use super::elfcode::{Opcode, Registers};
 use crate::Input;
 use std::collections::HashSet;
-
-#[derive(Copy, Clone, PartialEq)]
-struct Registers {
-    values: [u16; 4],
-}
-
-impl Registers {
-    const fn of(r0: u16, r1: u16, r2: u16, r3: u16) -> Self {
-        Self {
-            values: [r0, r1, r2, r3],
-        }
-    }
-
-    fn reg(&mut self, index: u16) -> u16 {
-        self.values[index as usize]
-    }
-
-    fn apply(&mut self, opcode: Opcode, a: u16, b: u16, c: u16) {
-        let c = c as usize;
-        self.values[c] = match opcode {
-            Opcode::Addr => self.reg(a) + self.reg(b),
-            Opcode::Addi => self.reg(a) + b,
-            Opcode::Mulr => self.reg(a) * self.reg(b),
-            Opcode::Muli => self.reg(a) * b,
-            Opcode::Banr => self.reg(a) & self.reg(b),
-            Opcode::Bani => self.reg(a) & b,
-            Opcode::Borr => self.reg(a) | self.reg(b),
-            Opcode::Bori => self.reg(a) | b,
-            Opcode::Setr => self.reg(a),
-            Opcode::Seti => a,
-            Opcode::Gtir => (a > self.reg(b)) as u16,
-            Opcode::Gtri => (self.reg(a) > b) as u16,
-            Opcode::Gtrr => (self.reg(a) > self.reg(b)) as u16,
-            Opcode::Eqir => (a == self.reg(b)) as u16,
-            Opcode::Eqri => (self.reg(a) == b) as u16,
-            Opcode::Eqrr => (self.reg(a) == self.reg(b)) as u16,
-        }
-    }
-}
 
 struct Sample {
     registers_before: Registers,
@@ -55,7 +16,7 @@ struct ProblemInput {
 impl ProblemInput {
     fn parse(input_string: &str) -> Result<Self, String> {
         let mut samples = Vec::new();
-        let mut registers_before = Registers::of(0, 0, 0, 0);
+        let mut registers_before = Registers::new();
         let mut instruction: Vec<u16> = Vec::new();
         let mut last_blank = true;
         let mut in_program = false;
@@ -97,9 +58,14 @@ impl ProblemInput {
                     .collect::<Result<_, _>>()?;
 
                 if before {
-                    registers_before = Registers::of(parts[0], parts[1], parts[2], parts[3]);
+                    for (i, &value) in parts.iter().enumerate() {
+                        registers_before.values[i] = u64::from(value);
+                    }
                 } else {
-                    let registers_after = Registers::of(parts[0], parts[1], parts[2], parts[3]);
+                    let mut registers_after = Registers::new();
+                    for (i, &value) in parts.iter().enumerate() {
+                        registers_after.values[i] = u64::from(value);
+                    }
                     samples.push(Sample {
                         registers_before,
                         instruction: [
@@ -126,7 +92,7 @@ impl ProblemInput {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &mut Input) -> Result<u64, String> {
     let problem_input = ProblemInput::parse(input.text)?;
 
     let all_opcodes = [
@@ -157,9 +123,9 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
                 let mut registers_applied = sample.registers_before;
                 registers_applied.apply(
                     *opcode,
-                    sample.instruction[1],
-                    sample.instruction[2],
-                    sample.instruction[3],
+                    u64::from(sample.instruction[1]),
+                    u64::from(sample.instruction[2]),
+                    u64::from(sample.instruction[3]),
                 );
                 if registers_applied == sample.registers_after {
                     sum += 1;
@@ -184,9 +150,9 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
                 let mut registers_applied = sample.registers_before;
                 registers_applied.apply(
                     *opcode,
-                    sample.instruction[1],
-                    sample.instruction[2],
-                    sample.instruction[3],
+                    u64::from(sample.instruction[1]),
+                    u64::from(sample.instruction[2]),
+                    u64::from(sample.instruction[3]),
                 );
                 registers_applied == sample.registers_after
             });
@@ -229,13 +195,18 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
             })
             .collect::<Result<_, _>>()?;
 
-        let mut regs = Registers::of(0, 0, 0, 0);
+        let mut regs = Registers::new();
         for instruction in problem_input.program {
             let opcode = meanings[instruction[0] as usize];
-            regs.apply(opcode, instruction[1], instruction[2], instruction[3]);
+            regs.apply(
+                opcode,
+                u64::from(instruction[1]),
+                u64::from(instruction[2]),
+                u64::from(instruction[3]),
+            );
         }
 
-        Ok(i32::from(regs.values[0]))
+        Ok(regs.values[0])
     }
 }
 
