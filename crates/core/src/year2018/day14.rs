@@ -95,7 +95,6 @@ fn tests() {
     test_part_two!("59414" => "2018".into());
 
     let input = include_str!("day14_input.txt");
-    test_part_one!(
-        input => "1150511382".into());
-    test_part_two!(input => "20_173_656".into());
+    test_part_one!(input => "1150511382".into());
+    test_part_two!(input => "20173656".into());
 }

@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
+use crate::Input;
+use std::collections::{HashMap, HashSet, VecDeque};
 
-pub fn part1(string: &str) -> Result<u32, String> {
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     fn checksum(map: &HashMap<&str, Vec<&str>>, name: &str, depth: u32) -> u32 {
         depth
             + map.get(name).map_or(0, |list| {
@@ -12,20 +11,24 @@ pub fn part1(string: &str) -> Result<u32, String> {
             })
     }
 
-    let mut map = HashMap::new();
+    if input.is_part_one() {
+        let mut map = HashMap::new();
 
-    for line in string.lines() {
-        let mut parts = line.split(')');
-        let part = parts.next().ok_or("Invalid input")?;
-        let orbited_by = map.entry(part).or_insert_with(Vec::new);
-        let part = parts.next().ok_or("Invalid input")?;
-        orbited_by.push(part);
+        for line in input.text.lines() {
+            let mut parts = line.split(')');
+            let part = parts.next().ok_or("Invalid input")?;
+            let orbited_by = map.entry(part).or_insert_with(Vec::new);
+            let part = parts.next().ok_or("Invalid input")?;
+            orbited_by.push(part);
+        }
+
+        Ok(checksum(&map, "COM", 0))
+    } else {
+        part2(input.text)
     }
-
-    Ok(checksum(&map, "COM", 0))
 }
 
-pub fn part2(string: &str) -> Result<u32, String> {
+fn part2(string: &str) -> Result<u32, String> {
     let mut map = HashMap::new();
     let mut target: &str = "";
 
@@ -69,10 +72,10 @@ pub fn part2(string: &str) -> Result<u32, String> {
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(
-        part1(
-            "COM)B
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!("COM)B
 B)C
 C)D
 D)E
@@ -82,19 +85,9 @@ G)H
 D)I
 E)J
 J)K
-K)L"
-        ),
-        Ok(42)
-    );
+K)L" => 42);
 
-    assert_eq!(part1(include_str!("day06_input.txt")), Ok(273_985));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        part2(
-            "COM)B
+    test_part_two!("COM)B
 B)C
 C)D
 D)E
@@ -106,10 +99,9 @@ E)J
 J)K
 K)L
 K)YOU
-I)SAN"
-        ),
-        Ok(4)
-    );
+I)SAN" => 4);
 
-    assert_eq!(part2(include_str!("day06_input.txt")), Ok(460));
+    let input = include_str!("day06_input.txt");
+    test_part_one!(input => 273_985);
+    test_part_two!(input => 460);
 }

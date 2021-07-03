@@ -1,3 +1,4 @@
+use crate::Input;
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
@@ -63,17 +64,17 @@ pub fn determine_station(points: &[(usize, usize)]) -> Result<(usize, (usize, us
         .ok_or_else(|| "No points in input".to_string())
 }
 
-pub fn part1(input_string: &str) -> Result<usize, String> {
-    let points = parse_points(input_string)?;
-    Ok(determine_station(&points)?.0)
+pub fn solve(input: &mut Input) -> Result<i64, String> {
+    if input.is_part_one() {
+        let points = parse_points(input.text)?;
+        Ok(determine_station(&points)?.0 as i64)
+    } else {
+        let (x, y) = part2_nth(input.text, 200)?;
+        Ok(x * 100 + y)
+    }
 }
 
-pub fn part2(input_string: &str) -> Result<i64, String> {
-    let (x, y) = part2_nth(input_string, 200)?;
-    Ok(x * 100 + y)
-}
-
-pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
+fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
     let points = parse_points(input_string)?;
     let (_, base_location) = determine_station(&points)?;
 
@@ -135,11 +136,9 @@ pub fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day10_input.txt")), Ok(319));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(part2(include_str!("day10_input.txt")), Ok(517));
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
+    let input = include_str!("day10_input.txt");
+    test_part_one!(input => 319);
+    test_part_two!(input => 517);
 }
