@@ -1,3 +1,5 @@
+use crate::Input;
+
 #[derive(Clone)]
 struct Moons {
     positions: [[i32; 3]; 4],
@@ -91,46 +93,48 @@ pub fn part1_nth(input_string: &str, n: usize) -> Result<u64, String> {
     Ok(moons.total_energy())
 }
 
-pub fn part1(input_string: &str) -> Result<u64, String> {
-    part1_nth(input_string, 1000)
-}
+pub fn solve(input: &mut Input) -> Result<u64, String> {
+    if input.is_part_one() {
+        part1_nth(input.text, 1000)
+    } else {
+        let mut moons = Moons::parse(input.text)?;
+        let initial_moons = moons.clone();
+        let mut cycles: [Option<u64>; 3] = [None; 3];
 
-pub fn part2(input_string: &str) -> Result<u64, String> {
-    let mut moons = Moons::parse(input_string)?;
-    let initial_moons = moons.clone();
-    let mut cycles: [Option<u64>; 3] = [None; 3];
+        let mut step = 0;
+        while cycles.iter().any(Option::is_none) {
+            moons.step();
+            step += 1;
 
-    let mut step = 0;
-    while cycles.iter().any(Option::is_none) {
-        moons.step();
-        step += 1;
-
-        for (i, cycle) in cycles.iter_mut().enumerate() {
-            if cycle.is_none() {
-                let mut same = true;
-                for moon in 0..4 {
-                    if initial_moons.positions[moon][i] != moons.positions[moon][i]
-                        || initial_moons.velocities[moon][i] != moons.velocities[moon][i]
-                    {
-                        same = false;
+            for (i, cycle) in cycles.iter_mut().enumerate() {
+                if cycle.is_none() {
+                    let mut same = true;
+                    for moon in 0..4 {
+                        if initial_moons.positions[moon][i] != moons.positions[moon][i]
+                            || initial_moons.velocities[moon][i] != moons.velocities[moon][i]
+                        {
+                            same = false;
+                        }
                     }
-                }
-                if same {
-                    cycle.replace(step);
+                    if same {
+                        cycle.replace(step);
+                    }
                 }
             }
         }
-    }
 
-    Ok(lcd3(
-        cycles[0].ok_or("Cycles not found")?,
-        cycles[1].ok_or("Cycles not found")?,
-        cycles[2].ok_or("Cycles not found")?,
-    ))
+        Ok(lcd3(
+            cycles[0].ok_or("Cycles not found")?,
+            cycles[1].ok_or("Cycles not found")?,
+            cycles[2].ok_or("Cycles not found")?,
+        ))
+    }
 }
 
 #[test]
-pub fn tests_part1() {
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
+
     assert_eq!(
         part1_nth(
             "<x=-1, y=0, z=2>
@@ -142,13 +146,7 @@ pub fn tests_part1() {
         Ok(179)
     );
 
-    assert_eq!(part1(include_str!("day12_input.txt")), Ok(6220));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        part2(include_str!("day12_input.txt")),
-        Ok(548_525_804_273_976)
-    );
+    let input = include_str!("day12_input.txt");
+    test_part_one!(input => 6220);
+    test_part_two!(input => 548_525_804_273_976);
 }

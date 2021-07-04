@@ -1,3 +1,4 @@
+use crate::Input;
 use std::collections::HashSet;
 use std::slice::Iter;
 
@@ -153,19 +154,20 @@ impl Grid {
     }
 }
 
-pub fn part1(input_string: &str) -> Result<u32, String> {
-    let mut grid = Grid::parse(input_string)?;
-    Ok(grid.advance_until_repeat())
-}
-
-pub fn part2(input_string: &str) -> Result<u32, String> {
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     const MINUTES: usize = 200;
     const MAX_LEVELS: usize = MINUTES * 2;
+
+    let mut grid = Grid::parse(input.text)?;
+
+    if input.is_part_one() {
+        return Ok(grid.advance_until_repeat());
+    }
 
     let mut current_generation = vec![Grid::zeroed(); MAX_LEVELS];
     let mut next_generation = vec![Grid::zeroed(); MAX_LEVELS];
 
-    current_generation[MAX_LEVELS / 2] = Grid::parse(input_string)?;
+    current_generation[MAX_LEVELS / 2] = grid;
 
     for _minute in 0..MINUTES {
         for i in 1..(current_generation.len() - 1) {
@@ -183,11 +185,9 @@ pub fn part2(input_string: &str) -> Result<u32, String> {
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day24_input.txt")), Ok(11_042_850));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(part2(include_str!("day24_input.txt")), Ok(1967));
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
+    let input = include_str!("day24_input.txt");
+    test_part_one!(input => 11_042_850);
+    test_part_two!(input => 1967);
 }

@@ -1,3 +1,4 @@
+use crate::Input;
 use std::collections::HashMap;
 
 type ChemicalId = usize;
@@ -109,54 +110,47 @@ fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> Chemi
     needed[reactions.ore_id]
 }
 
-pub fn part1(input_string: &str) -> Result<ChemicalAmount, String> {
-    let reactions = Reactions::parse(input_string)?;
-    Ok(required_ore(&reactions, 1))
-}
-
-pub fn part2(input_string: &str) -> Result<i64, String> {
+pub fn solve(input: &mut Input) -> Result<ChemicalAmount, String> {
     const AVAILABLE_ORE: i64 = 1_000_000_000_000;
+    let reactions = Reactions::parse(input.text)?;
 
-    let reactions = Reactions::parse(input_string)?;
+    if input.is_part_one() {
+        Ok(required_ore(&reactions, 1))
+    } else {
+        let mut min_produced_fuel = 1;
+        let mut max_produced_fuel = AVAILABLE_ORE;
+        loop {
+            let fuel_to_produce = (max_produced_fuel + min_produced_fuel) / 2;
+            if fuel_to_produce == min_produced_fuel {
+                return Ok(min_produced_fuel);
+            }
 
-    let mut min_produced_fuel = 1;
-    let mut max_produced_fuel = AVAILABLE_ORE;
-    loop {
-        let fuel_to_produce = (max_produced_fuel + min_produced_fuel) / 2;
-        if fuel_to_produce == min_produced_fuel {
-            return Ok(min_produced_fuel);
-        }
+            let ore_amount = required_ore(&reactions, fuel_to_produce);
 
-        let ore_amount = required_ore(&reactions, fuel_to_produce);
-
-        if ore_amount > AVAILABLE_ORE {
-            // Uses too much ore, try less ambitious fuel production.
-            max_produced_fuel = fuel_to_produce;
-        } else {
-            // Within our ore budget, try a higher fuel production.
-            min_produced_fuel = fuel_to_produce;
+            if ore_amount > AVAILABLE_ORE {
+                // Uses too much ore, try less ambitious fuel production.
+                max_produced_fuel = fuel_to_produce;
+            } else {
+                // Within our ore budget, try a higher fuel production.
+                min_produced_fuel = fuel_to_produce;
+            }
         }
     }
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(
-        part1(
-            "9 ORE => 2 A
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
+
+    test_part_one!("9 ORE => 2 A
 8 ORE => 3 B
 7 ORE => 5 C
 3 A, 4 B => 1 AB
 5 B, 7 C => 1 BC
 4 C, 1 A => 1 CA
-2 AB, 3 BC, 4 CA => 1 FUEL"
-        ),
-        Ok(165)
-    );
+2 AB, 3 BC, 4 CA => 1 FUEL" => 165);
 
-    assert_eq!(
-        part1(
-            "157 ORE => 5 NZVS
+    test_part_one!("157 ORE => 5 NZVS
 165 ORE => 6 DCFZ
 44 XJWVT, 5 KHKGT, 1 QDVJ, 29 NZVS, 9 GPVTF, 48 HKGWZ => 1 FUEL
 12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ
@@ -164,19 +158,9 @@ pub fn tests_part1() {
 177 ORE => 5 HKGWZ
 7 DCFZ, 7 PSHF => 2 XJWVT
 165 ORE => 2 GPVTF
-3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
-        ),
-        Ok(13312)
-    );
+3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT" => 13312);
 
-    assert_eq!(part1(include_str!("day14_input.txt")), Ok(1_590_844));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        part2(
-            "157 ORE => 5 NZVS
+    test_part_two!("157 ORE => 5 NZVS
 165 ORE => 6 DCFZ
 44 XJWVT, 5 KHKGT, 1 QDVJ, 29 NZVS, 9 GPVTF, 48 HKGWZ => 1 FUEL
 12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ
@@ -184,10 +168,9 @@ fn tests_part2() {
 177 ORE => 5 HKGWZ
 7 DCFZ, 7 PSHF => 2 XJWVT
 165 ORE => 2 GPVTF
-3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
-        ),
-        Ok(82_892_753)
-    );
+3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT" => 82_892_753);
 
-    assert_eq!(part2(include_str!("day14_input.txt")), Ok(1_184_209));
+    let input = include_str!("day14_input.txt");
+    test_part_one!(input => 1_590_844);
+    test_part_two!(input => 1_184_209);
 }

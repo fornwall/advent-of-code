@@ -1,4 +1,5 @@
 use super::int_code::{Program, Word};
+use crate::Input;
 use std::collections::{HashSet, VecDeque};
 
 const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
@@ -75,50 +76,48 @@ where
     Ok(())
 }
 
-pub fn part1(input_string: &str) -> Result<i32, String> {
-    let mut distance_to_oxygen = -1;
-    search_space_ship(input_string, |_, is_oxygen, distance| {
-        if is_oxygen {
-            distance_to_oxygen = distance;
-        }
-    })?;
-    Ok(distance_to_oxygen)
-}
+pub fn solve(input: &mut Input) -> Result<i32, String> {
+    if input.is_part_one() {
+        let mut distance_to_oxygen = -1;
+        search_space_ship(input.text, |_, is_oxygen, distance| {
+            if is_oxygen {
+                distance_to_oxygen = distance;
+            }
+        })?;
+        Ok(distance_to_oxygen)
+    } else {
+        // Contains (pos_x, pos_y).
+        let mut locations_without_oxygen = HashSet::new();
+        // Contains ((pos_x, pos_y), distance_from_oxygen).
+        let mut to_visit = VecDeque::new();
 
-pub fn part2(input_string: &str) -> Result<i32, String> {
-    // Contains (pos_x, pos_y).
-    let mut locations_without_oxygen = HashSet::new();
-    // Contains ((pos_x, pos_y), distance_from_oxygen).
-    let mut to_visit = VecDeque::new();
+        search_space_ship(input.text, |position, is_oxygen, _| {
+            if is_oxygen {
+                to_visit.push_back((position, 0));
+            } else {
+                locations_without_oxygen.insert(position);
+            }
+        })?;
 
-    search_space_ship(input_string, |position, is_oxygen, _| {
-        if is_oxygen {
-            to_visit.push_back((position, 0));
-        } else {
-            locations_without_oxygen.insert(position);
-        }
-    })?;
-
-    let mut furthest_distance = -1;
-    while let Some((position, distance)) = to_visit.pop_front() {
-        for &direction in DIRECTIONS.iter() {
-            let new_position = (position.0 + direction.0, position.1 + direction.1);
-            if locations_without_oxygen.remove(&new_position) {
-                furthest_distance = distance + 1;
-                to_visit.push_back((new_position, furthest_distance));
+        let mut furthest_distance = -1;
+        while let Some((position, distance)) = to_visit.pop_front() {
+            for &direction in DIRECTIONS.iter() {
+                let new_position = (position.0 + direction.0, position.1 + direction.1);
+                if locations_without_oxygen.remove(&new_position) {
+                    furthest_distance = distance + 1;
+                    to_visit.push_back((new_position, furthest_distance));
+                }
             }
         }
+
+        Ok(furthest_distance)
     }
-
-    Ok(furthest_distance)
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(part1(include_str!("day15_input.txt")), Ok(208));
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(part2(include_str!("day15_input.txt")), Ok(306));
+pub fn tests() {
+    use crate::{test_part_one, test_part_two};
+    let input = include_str!("day15_input.txt");
+    test_part_one!(input => 208);
+    test_part_two!(input => 306);
 }

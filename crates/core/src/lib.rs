@@ -20,13 +20,6 @@ use input::{Input, Part};
 #[cfg(feature = "visualization")]
 use painter::PainterRef;
 
-fn to_stringer<T: ToString>(
-    function: fn(&str) -> Result<T, String>,
-    input: &str,
-) -> Result<String, String> {
-    function(input).map(|value| value.to_string())
-}
-
 fn to_stringer_input<T: ToString>(
     function: fn(&mut Input) -> Result<T, String>,
     input: &mut Input,
@@ -187,26 +180,19 @@ pub fn solve(
         (2019, 9, _) => to_stringer_input(year2019::day09::solve, &mut input),
         (2019, 10, _) => to_stringer_input(year2019::day10::solve, &mut input),
         (2019, 11, _) => to_stringer_input(year2019::day11::solve, &mut input),
-        (2019, 12, 1) => to_stringer(year2019::day12::part1, input_string),
-        (2019, 12, 2) => to_stringer(year2019::day12::part2, input_string),
+        (2019, 12, _) => to_stringer_input(year2019::day12::solve, &mut input),
         (2019, 13, _) => to_stringer_input(year2019::day13::solve, &mut input),
-        (2019, 14, 1) => to_stringer(year2019::day14::part1, input_string),
-        (2019, 14, 2) => to_stringer(year2019::day14::part2, input_string),
-        (2019, 15, 1) => to_stringer(year2019::day15::part1, input_string),
-        (2019, 15, 2) => to_stringer(year2019::day15::part2, input_string),
+        (2019, 14, _) => to_stringer_input(year2019::day14::solve, &mut input),
+        (2019, 15, _) => to_stringer_input(year2019::day15::solve, &mut input),
         (2019, 16, _) => to_stringer_input(year2019::day16::solve, &mut input),
-        (2019, 17, 1) => to_stringer(year2019::day17::part1, input_string),
-        (2019, 17, 2) => to_stringer(year2019::day17::part2, input_string),
+        (2019, 17, _) => to_stringer_input(year2019::day17::solve, &mut input),
         (2019, 18, _) => to_stringer_input(year2019::day18::solve, &mut input),
         (2019, 19, _) => to_stringer_input(year2019::day19::solve, &mut input),
         (2019, 20, _) => to_stringer_input(year2019::day20::solve, &mut input),
-        (2019, 21, 1) => to_stringer(year2019::day21::part1, input_string),
-        (2019, 21, 2) => to_stringer(year2019::day21::part2, input_string),
-        (2019, 22, 1) => to_stringer(year2019::day22::part1, input_string),
-        (2019, 22, 2) => to_stringer(year2019::day22::part2, input_string),
+        (2019, 21, _) => to_stringer_input(year2019::day21::solve, &mut input),
+        (2019, 22, _) => to_stringer_input(year2019::day22::solve, &mut input),
         (2019, 23, _) => to_stringer_input(year2019::day23::solve, &mut input),
-        (2019, 24, 1) => to_stringer(year2019::day24::part1, input_string),
-        (2019, 24, 2) => to_stringer(year2019::day24::part2, input_string),
+        (2019, 24, _) => to_stringer_input(year2019::day24::solve, &mut input),
         (2019, 25, _) => to_stringer_input(year2019::day25::solve, &mut input),
         (2020, 1, _) => to_stringer_input(year2020::day01::solve, &mut input),
         (2020, 2, _) => to_stringer_input(year2020::day02::solve, &mut input),
