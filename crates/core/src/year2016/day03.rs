@@ -1,7 +1,10 @@
 use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    const fn is_triangle_possible(n1: u16, n2: u16, n3: u16) -> bool {
+    fn is_triangle_possible(n1: u16, n2: u16, n3: u16) -> bool {
+        let n1 = u32::from(n1);
+        let n2 = u32::from(n2);
+        let n3 = u32::from(n3);
         n1 + n2 > n3 && n1 + n3 > n2 && n2 + n3 > n1
     }
 
