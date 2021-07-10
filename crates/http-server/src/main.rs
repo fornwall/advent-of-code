@@ -4,7 +4,7 @@ use warp::Filter;
 
 #[tokio::main]
 async fn main() {
-    #![allow(clippy::unwrap_used)]
+    #![allow(clippy::expect_used)]
 
     let port = 8080;
 
