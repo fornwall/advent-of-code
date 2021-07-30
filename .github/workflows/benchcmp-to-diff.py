@@ -70,8 +70,8 @@ print(("@@" + "Benchmark Difference".center(line_width - 2) + "@@").replace(" ",
 
 # Table title:
 title_name = "Name"
-title_new = "Old (μs)"
-title_old = "New (μs)"
+title_new = "New (μs)"
+title_old = "Old (μs)"
 desired_new_len = max_new_time_len + space_between_columns
 desired_old_len = max_old_time_len + space_between_columns
 desired_change_len = len(title_change) + space_between_columns
