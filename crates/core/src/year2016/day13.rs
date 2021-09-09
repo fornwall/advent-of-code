@@ -35,7 +35,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             visit_count += 1;
         }
 
-        for &(diffx, diffy) in &[(-1, 0), (1, 0), (0, -1), (0, 1)] {
+        for (diffx, diffy) in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
             let new_x = visited_state.0 + diffx;
             let new_y = visited_state.1 + diffy;
             if new_x < 0 || new_y < 0 || is_wall(new_x, new_y, magic_number) {

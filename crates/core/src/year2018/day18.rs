@@ -42,8 +42,8 @@ impl Grid {
 
     fn count_around(&self, x: usize, y: usize, needle: u8) -> u8 {
         let mut sum = 0;
-        for &dy in &[-1_i32, 0, 1] {
-            for &dx in &[-1_i32, 0, 1] {
+        for dy in [-1_i32, 0, 1] {
+            for dx in [-1_i32, 0, 1] {
                 if dx == 0 && dy == 0 {
                     continue;
                 }

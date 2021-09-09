@@ -47,7 +47,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             let mut new_black_tiles = black_tiles.clone();
 
             for &black_tile in black_tiles.iter() {
-                for &diff in &[(2, 0), (1, -1), (-1, -1), (-2, 0), (-1, 1), (1, 1)] {
+                for diff in [(2, 0), (1, -1), (-1, -1), (-2, 0), (-1, 1), (1, 1)] {
                     let adjacent_location = (black_tile.0 + diff.0, black_tile.1 + diff.1);
                     *adjacent_blacks_count.entry(adjacent_location).or_insert(0) += 1;
                 }

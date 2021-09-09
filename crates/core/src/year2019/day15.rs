@@ -2,7 +2,7 @@ use super::int_code::{Program, Word};
 use crate::Input;
 use std::collections::{HashSet, VecDeque};
 
-const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
+const DIRECTIONS: [(i32, i32); 4] = [(0, 1), (0, -1), (-1, 0), (1, 0)];
 
 /// The intcode instruction for moving the robot in the specified direction.
 fn instruction_for_direction(direction: (i32, i32)) -> Result<Word, String> {
@@ -39,7 +39,7 @@ where
     on_visit(initial_position, false, 0);
 
     while let Some((position, distance, program)) = to_visit.pop_front() {
-        for &direction in DIRECTIONS.iter() {
+        for direction in DIRECTIONS {
             let new_position = (position.0 + direction.0, position.1 + direction.1);
             if !visited.insert(new_position) {
                 continue;
@@ -101,7 +101,7 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
         let mut furthest_distance = -1;
         while let Some((position, distance)) = to_visit.pop_front() {
-            for &direction in DIRECTIONS.iter() {
+            for direction in DIRECTIONS {
                 let new_position = (position.0 + direction.0, position.1 + direction.1);
                 if locations_without_oxygen.remove(&new_position) {
                     furthest_distance = distance + 1;

@@ -4,7 +4,7 @@ use crate::painter::PainterRef;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
-const DIRECTIONS: &[(i32, i32); 4] = &[(0, 1), (0, -1), (-1, 0), (1, 0)];
+const DIRECTIONS: [(i32, i32); 4] = [(0, 1), (0, -1), (-1, 0), (1, 0)];
 
 #[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
 struct Key {
@@ -154,7 +154,7 @@ pub fn steps_to_gather_all_keys(
         visited_positions.insert(this_key_position);
 
         while let Some((position, needed_keys, steps)) = to_visit.pop_front() {
-            'key_direction_loop: for direction in DIRECTIONS.iter() {
+            'key_direction_loop: for direction in DIRECTIONS {
                 let new_position = (position.0 + direction.0, position.1 + direction.1);
                 if new_position.0 < 0 || new_position.1 < 0 {
                     continue 'key_direction_loop;

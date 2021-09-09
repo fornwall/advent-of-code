@@ -37,7 +37,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
         match map.get(&current_position) {
             Some(b'+') => {
-                for &new_direction in &[(0_i16, 1_i16), (1, 0), (-1, 0), (0, -1)] {
+                for new_direction in [(0_i16, 1_i16), (1, 0), (-1, 0), (0, -1)] {
                     if new_direction == (-direction.0, -direction.1) {
                         // Do not go back.
                     } else {

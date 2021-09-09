@@ -178,12 +178,12 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             return Ok(visited_state_cost);
         }
 
-        for direction in &[-1, 1] {
+        for direction in [-1, 1] {
             let new_floor = visited_state.current_floor + direction;
             if !(0..=3).contains(&new_floor) {
                 continue;
             }
-            if *direction == -1
+            if direction == -1
                 && visited_state
                     .floors
                     .iter()
@@ -195,7 +195,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             }
 
             let current_floor = visited_state.floors[visited_state.current_floor as usize];
-            for &first_moved_is_chip in &[true, false] {
+            for first_moved_is_chip in [true, false] {
                 for first_offset in 0..8 {
                     let contains_first_item = if first_moved_is_chip {
                         current_floor.microchips

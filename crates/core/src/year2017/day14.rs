@@ -60,7 +60,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         for ((x, y), &this_set) in location_to_set_identifier.iter() {
             // Since coordinates are stored in an ordered set we only need to consider
             // neighbors to the right and below:
-            for (dx, dy) in &[(1, 0), (0, 1)] {
+            for (dx, dy) in [(1, 0), (0, 1)] {
                 let next = (x + dx, y + dy);
                 if let Some(&other_set) = location_to_set_identifier.get(&next) {
                     disjoint_set.join(this_set, other_set);
@@ -72,19 +72,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 }
 
 #[test]
-fn test_part1() {
-    assert_eq!(Ok(8108), solve(&mut Input::part_one("flqrgnkx")));
-    assert_eq!(
-        Ok(8222),
-        solve(&mut Input::part_one(include_str!("day14_input.txt")))
-    );
-}
+fn tests() {
+    use crate::{test_part_one, test_part_two};
 
-#[test]
-fn test_part2() {
-    assert_eq!(Ok(1242), solve(&mut Input::part_two("flqrgnkx")));
-    assert_eq!(
-        Ok(1086),
-        solve(&mut Input::part_two(include_str!("day14_input.txt")))
-    );
+    test_part_one!("flqrgnkx" => 8108);
+    test_part_two!("flqrgnkx" => 1242);
+
+    let real_input = include_str!("day14_input.txt");
+    test_part_one!(real_input => 8222);
+    test_part_two!(real_input => 1086);
 }

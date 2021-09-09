@@ -344,8 +344,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     // "#    ##    ##    ###"
     // " #  #  #  #  #  #   "
     let monster_body_len = 20;
-    for &direction in &[0_u8, 1, 2, 3] {
-        for &flip in &[1_i8, -1] {
+    for direction in [0_u8, 1, 2, 3] {
+        for flip in [1_i8, -1] {
             let mut monster_count = 0;
             for offset in 0..(composed_image_pixel_width - monster_body_len + 1) {
                 for sideway in 1..(composed_image_pixel_width - 1) {

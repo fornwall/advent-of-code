@@ -230,7 +230,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             .iter()
             .map(|&i| ((b'A' + i as u8) as char).to_string())
             .collect();
-        for &input in [&main_routine, function_a, function_b, function_c].iter() {
+        for input in [&main_routine, function_a, function_b, function_c] {
             program.input_string(&input.join(","));
             program.input_string("\n");
         }

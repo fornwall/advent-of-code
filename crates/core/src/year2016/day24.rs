@@ -80,7 +80,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     continue 'toloop;
                 }
 
-                for diff in &[(1_i32, 0_i32), (-1, 0), (0, 1), (0, -1)] {
+                for diff in [(1_i32, 0_i32), (-1, 0), (0, 1), (0, -1)] {
                     if diff.0 == -1 && location.0 == 0 || diff.1 == -1 && location.1 == 0 {
                         continue;
                     }
