@@ -12,5 +12,5 @@ edition = "2018"
 
 [dependencies]
 advent-of-code = { path = "../core" }
-tokio = { version = "1", features = ["full"] }
-warp = { version = "0.3", default-features = false }
+tokio = { version = "*", features = ["full"] }
+warp = { version = "*", default-features = false }
