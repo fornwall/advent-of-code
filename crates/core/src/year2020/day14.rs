@@ -2,15 +2,9 @@ use crate::input::Input;
 use std::collections::HashSet;
 use std::hash::{BuildHasherDefault, Hasher};
 
+#[derive(Default)]
 struct CustomHash {
     hash: u64,
-}
-
-impl Default for CustomHash {
-    #[inline]
-    fn default() -> Self {
-        Self { hash: 0 }
-    }
 }
 
 impl Hasher for CustomHash {

@@ -82,7 +82,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 .parse::<u32>()
                 .map_err(|_| on_error())?;
             let bag_type: &str = amount_and_bag_type.next().ok_or_else(on_error)?;
-            let bag_type = bag_type.rsplitn(2, ' ').nth(1).ok_or_else(on_error)?;
+            let (bag_type, _) = bag_type.rsplit_once(' ').ok_or_else(on_error)?;
 
             if input.is_part_one() {
                 child_to_parent

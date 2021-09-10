@@ -206,7 +206,6 @@ impl Board {
             self.put(x, y, MapCell::Open);
             // Attack from new position if possible.
             self.attack(nx, ny, elf_target);
-            return;
         }
     }
 
