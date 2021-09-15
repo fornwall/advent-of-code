@@ -2,19 +2,18 @@
 set -e -u
 
 usage() {
-	echo "usage:\n    ./post-input <where> <year> <day> <part> # reads input from stdin"
+  echo "usage:\n    ./post-input <where> <year> <day> <part> # reads input from stdin"
   echo "where where is one of:"
   echo "- fly"
   echo "- netlify"
   echo "- cloudflare"
   echo "- local"
-	echo "example:\n    ./post-input fly 2019 23 1 < crates/core/src/year2019/day23_input.txt"
-
-	exit 1
+  echo "example:\n    ./post-input fly 2019 23 1 < crates/core/src/year2019/day23_input.txt"
+  exit 1
 }
 
 if [ "$#" != 4 ]; then
-	usage
+  usage
 fi
 
 WHERE=$1
@@ -46,6 +45,6 @@ elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
 fi
 
 curl --fail \
-	-w '\n'\
-	--data-binary @- \
-	"$HOST/solve/$YEAR/$DAY/$PART"
+     -w '\n'\
+     --data-binary @- \
+     "$HOST/solve/$YEAR/$DAY/$PART"
