@@ -2,7 +2,7 @@
 name = "advent-of-code-painter"
 version = "0.1.0"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 js-sys = "*"

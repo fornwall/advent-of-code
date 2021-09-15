@@ -7,7 +7,7 @@ authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 repository = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
 description = "Solutions to Advent of Code written in Rust"
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

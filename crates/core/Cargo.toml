@@ -10,7 +10,7 @@ description = "Solutions to Advent of Code"
 documentation = "https://docs.rs/advent-of-code/2019.12.358/advent_of_code/"
 homepage = "https://github.com/fornwall/advent-of-code"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 
 [[bin]]
 name = "advent-of-code"
