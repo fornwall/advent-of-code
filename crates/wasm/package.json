@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "Project to run eslint",
   "scripts": {
-    "lint": "eslint **/*.js",
+    "check": "eslint . --ext .js && npx prettier --check .",
     "fix": "eslint --fix **/*.js",
-    "format": "npx prettier --write .",
-    "check": "eslint . --ext .js && npx prettier --check ."
+    "format": "npx prettier --write ."
   },
   "author": "",
   "license": "MIT",
