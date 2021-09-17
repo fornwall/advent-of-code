@@ -5,7 +5,6 @@ type ProgramId = usize;
 
 #[derive(Clone)]
 struct Program<'a> {
-    id: ProgramId,
     name: &'a str,
     weight: u32,
     children: Vec<ProgramId>,
@@ -57,7 +56,6 @@ impl<'a> ProgramTree<'a> {
 
             let program_id = nodes.len();
             let program = Program {
-                id: program_id,
                 name,
                 weight,
                 children: Vec::new(),
