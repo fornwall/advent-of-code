@@ -41,9 +41,9 @@ WASM_BUILD_COMMAND = cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-u
 	cd site/generated && \
 	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
 	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
-	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
-WASM_BUILD_COMMAND_VISUALIZER = RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" \
-	rustup run $(NIGHTLY_TOOLCHAIN) cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
+	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
+	cd ../.. && \
+  RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" rustup run $(NIGHTLY_TOOLCHAIN) cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
 	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
 	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
@@ -59,9 +59,6 @@ check:
 install-cargo-deps:
 	cargo install cargo-benchcmp cargo-watch devserver
 
-bench:
-	cargo +$(NIGHTLY_TOOLCHAIN) bench
-
 site-downloads:
 	cd crates/wasm && \
 		curl https://adventofcode.com/favicon.ico > site/favicon.ico
@@ -72,9 +69,6 @@ site-pack:
 		cd .. && \
 		webpack --mode=production
 
-site-pack-visualization:
-	cd crates/wasm && $(WASM_BUILD_COMMAND_VISUALIZER)
-
 wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
@@ -84,17 +78,8 @@ run-devserver:
 watch-and-build-wasm:
 	cargo watch -s 'cd crates/wasm && $(WASM_BUILD_COMMAND)'
 
-watch-and-build-wasm-visualization:
-	cargo watch -s 'cd crates/wasm && $(WASM_BUILD_COMMAND_VISUALIZER)'
-
 serve-site:
 	make -j run-devserver watch-and-build-wasm
-
-serve-site-visualization:
-	make -j run-devserver watch-and-build-wasm-visualization
-
-serve-api:
-	cd crates/server && cargo run
 
 node-package:
 	cd crates/wasm && ./build-package.sh
@@ -133,7 +118,6 @@ install-nightly:
 netlify:
 	npm install -g webpack webpack-cli && \
 		make WASM_RELEASE=1 site-pack && \
-		make WASM_RELEASE=1 site-pack-visualization && \
 		make site-downloads && \
 		make node-package && \
 		cd crates/wasm/functions && \
@@ -141,5 +125,5 @@ netlify:
 		cd .. && \
 		netlify deploy --prod
 
-.PHONY: check install-cargo-deps bench site-downloads site-pack wasm-size run-devserver watch-and-build-wasm serve-site serve-api node-package npm-publish test-python install-wasm-bindgen fuzz-afl netlify
+.PHONY: check install-cargo-deps site-downloads site-pack wasm-size run-devserver watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify
 
