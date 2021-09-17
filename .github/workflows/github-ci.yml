@@ -328,6 +328,16 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
 
+  release-java-package:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - run: cargo install cross
+    - name: Build java package
+      working-directory: crates/java
+      run: ./build-jar.sh
+
   benchmark-current:
     runs-on: ubuntu-latest
     steps:

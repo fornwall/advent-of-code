@@ -1,0 +1,102 @@
+plugins {
+	id 'signing'
+	id "maven-publish"
+	id "java-library"
+}
+
+repositories {
+	mavenCentral()
+}
+
+group = "net.fornwall"
+version = "0.1.0"
+sourceCompatibility = 1.11
+
+dependencies {
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
+	testRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
+}
+
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
+test {
+	// systemProperty "gelf.version", project.version.toString()
+	useJUnitPlatform()
+	afterTest { desc, result ->
+		println "Test ${desc.name} [${desc.className}] result: ${result.resultType}"
+	}
+}
+
+// See https://docs.gradle.org/current/userguide/publishing_maven.html
+// and https://github.com/igr/repo-url-parser/blob/master/build.gradle
+//
+// Setup signing credentials with as described in
+// https://docs.gradle.org/current/userguide/signing_plugin.html
+// with the following gradle properties:
+//    signing.keyId=XXX
+//    signing.password=YYY
+//    signing.secretKeyRingFile=ZZZ
+//
+// Then publish to local (~/.m2/) and remote with:
+//    ./gradlew publishToMavenLocal
+//    ./gradlew -PsonatypeUsername=XXX -PsonatypePassword=YYY publishMavenJavaPublicationToMavenRepository
+//
+// Finally sign in to https://oss.sonatype.org/ to Close and Release as described at
+// https://central.sonatype.org/publish/release/
+ext.admin = hasProperty('sonatypeUsername')
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = 'aoc'
+			from components.java
+			pom {
+				name = 'AdventOfCode'
+				description = 'Advent of Code solver'
+				url = 'https://github.com/fornwall/advent-of-code'
+				licenses {
+					license {
+						name = 'The MIT License'
+						url = 'https://opensource.org/licenses/MIT'
+					}
+				}
+				developers {
+					developer {
+						id = 'fornwall'
+						name = 'Fredrik Fornwall'
+						email = 'fredrik@fornwall.net'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/fornwall/advent-of-code.git'
+					developerConnection = 'scm:git:ssh://git@github.com/fornwall/advent-of-code.git'
+					url = 'http://github.com/fornwall/advent-of-code/'
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+			if (admin) {
+				credentials {
+					username = project.property('sonatypeUsername')
+					password = project.property('sonatypePassword')
+				}
+			}
+		}
+	}
+}
+
+signing {
+	sign publishing.publications.mavenJava
+}
+
+javadoc {
+	if (JavaVersion.current().isJava9Compatible()) {
+		options.addBooleanOption('html5', true)
+	}
+}
+

@@ -1,0 +1,2 @@
+rootProject.name = 'advent-of-code'
+include('lib')
