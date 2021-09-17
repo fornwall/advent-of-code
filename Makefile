@@ -1,4 +1,4 @@
-NIGHTLY_DATE = 2021-09-10 # Update versions in .github/workflows as well.
+NIGHTLY_DATE = 2021-09-17 # Update versions in .github/workflows as well.
 NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 
 CARGO_COMMAND = cargo
@@ -34,21 +34,10 @@ WASM_DIR = debug
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
   WASM_DIR = release
+  WASM_OPT = -O3
+else
+  WASM_OPT = -O0
 endif
-WASM_BUILD_COMMAND = cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
-	rm -Rf site/generated && \
-	wasm-bindgen --target no-modules --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
-	cd site/generated && \
-	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
-	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
-	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
-	cd ../.. && \
-  RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" rustup run $(NIGHTLY_TOOLCHAIN) cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
-	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
-	cd site/show/generated && \
-	wasm-opt -O3 -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
-	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
-	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
 
 check:
 	$(CARGO_COMMAND) fmt --all
@@ -56,30 +45,37 @@ check:
 	$(CARGO_COMMAND) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
 	$(CARGO_COMMAND) test
 
-install-cargo-deps:
-	cargo install cargo-benchcmp cargo-watch devserver
-
-site-downloads:
+site-wasm:
 	cd crates/wasm && \
-		curl https://adventofcode.com/favicon.ico > site/favicon.ico
+	cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
+	rm -Rf site/generated && \
+	wasm-bindgen --target no-modules --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
+	cd site/generated && \
+	wasm-opt $(WASM_OPT) -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
+	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
+	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
+	cd ../.. && \
+	RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" rustup run $(NIGHTLY_TOOLCHAIN) \
+		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
+	wasm-bindgen --target no-modules --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
+	cd site/show/generated && \
+	wasm-opt $(WASM_OPT) -o advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm && \
+	mv advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg-orig.wasm && \
+	mv advent_of_code_wasm_bg.wasm.opt advent_of_code_wasm_bg.wasm
 
-site-pack:
-	cd crates/wasm && \
-		$(WASM_BUILD_COMMAND) && \
-		cd .. && \
-		webpack --mode=production
+site-pack: site-wasm
+	cd crates/wasm/site && webpack --mode=production
 
 wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
-run-devserver:
+--run-devserver:
 	cd crates/wasm/site && NODE_ENV=development webpack serve
 
-watch-and-build-wasm:
-	cargo watch -s 'cd crates/wasm && $(WASM_BUILD_COMMAND)'
+--watch-and-build-wasm:
+	cargo watch -s 'make site-wasm'
 
-serve-site:
-	make -j run-devserver watch-and-build-wasm
+site-serve: --run-devserver --watch-and-build-wasm ;
 
 node-package:
 	cd crates/wasm && ./build-package.sh
@@ -89,10 +85,6 @@ npm-publish: node-package
 
 test-python:
 	cd crates/python && ./run-tests.sh
-
-install-wasm-bindgen:
-	rustup target add wasm32-unknown-unknown
-	cargo install wasm-bindgen-cli
 
 fuzz-afl:
 	cargo install afl
@@ -111,19 +103,26 @@ fuzz-libfuzzer:
 	cargo install cargo-fuzz
 	cd crates/fuzzing-libfuzzer/ && cargo +$(NIGHTLY_TOOLCHAIN) fuzz run fuzz_target
 
+install-cargo-deps:
+	cargo install cargo-benchcmp cargo-watch devserver
+
 install-nightly:
 	rustup toolchain install $(NIGHTLY_TOOLCHAIN) && \
 	rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src
 
+install-wasm-bindgen:
+	rustup target add wasm32-unknown-unknown
+	cargo install wasm-bindgen-cli
+
 netlify:
 	npm install -g webpack webpack-cli && \
 		make WASM_RELEASE=1 site-pack && \
-		make site-downloads && \
+		curl https://adventofcode.com/favicon.ico > crates/wasm/site/favicon.ico
 		make node-package && \
 		cd crates/wasm/functions && \
 		npm install && \
 		cd .. && \
 		netlify deploy --prod
 
-.PHONY: check install-cargo-deps site-downloads site-pack wasm-size run-devserver watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify
+.PHONY: check install-cargo-deps site-wasm site-pack wasm-size --run-devserver --watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify
 
