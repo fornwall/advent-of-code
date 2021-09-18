@@ -9,8 +9,9 @@ Solutions to [Advent of Code](https://adventofcode.com/) problems (all years, 20
 - [crates/fuzzing-afl](crates/fuzzing-afl): Fuzzing using [afl](https://lcamtuf.coredump.cx/afl/).
 - [crates/fuzzing-hfuzz](crates/fuzzing-hfuzz): Fuzzing using [hongfuzz](https://honggfuzz.dev/).
 - [crates/fuzzing-libfuzzer](crates/fuzzing-libfuzzer): Fuzzing using [libFuzzer](https://llvm.org/docs/LibFuzzer.html).
-- [crates/python](crates/python): A python library wrapping the solutions using [PyO3](https://pyo3.rs/).
-- [crates/wasm](crates/wasm): The solutions built as WebAssembly using [wasm-bindgen](https://rustwasm.github.io/docs/wasm-bindgen/).
+- [crates/java](crates/java): Java library using [JNI](https://github.com/jni-rs/jni-rs).
+- [crates/python](crates/python): Python library wrapping the solutions using [PyO3](https://pyo3.rs/).
+- [crates/wasm](crates/wasm): WebAssembly build using [wasm-bindgen](https://rustwasm.github.io/docs/wasm-bindgen/).
   - Published to a static site at [https://aoc.fornwall.net](https://aoc.fornwall.net).
   - Published as a Node.js package.
   - Deployed to [Cloudflare Workers](https://workers.cloudflare.com/).
