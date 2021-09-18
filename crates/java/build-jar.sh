@@ -17,7 +17,7 @@ if [ "$UNAME" = "Darwin" ]; then
   cp ../../target/$BUILD_TYPE/libadvent_of_code_java.dylib java-src/src/main/resources/libadvent_of_code_java_x86.dylib
 
   # See xcodebuild -showsdks
-  SDK=macosx11.3
+  SDK=macosx11.1
   SDKROOT=$(xcrun -sdk $SDK --show-sdk-path) \
     MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $SDK --show-sdk-platform-version) \
     cargo $BUILD_COMMAND --target=aarch64-apple-darwin

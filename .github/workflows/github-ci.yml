@@ -338,6 +338,8 @@ jobs:
         xcode-version: latest-stable
     - name: List sdks
       run: xcodebuild -showsdks
+    - name: Install aarch64-apple-darwin rust target
+      run: rustup target add aarch64-apple-darwin
     - name: Build java package
       working-directory: crates/java
       run: ./build-jar.sh
