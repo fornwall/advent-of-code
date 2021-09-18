@@ -329,7 +329,7 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
 
-  release-java-package:
+  build-jni-libraries:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -356,6 +356,10 @@ jobs:
     - name: Build java package
       working-directory: crates/java
       run: ./build-jar.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: jnilibs
+        path: ./crates/java/java-src/src/main/resources/*
 
   benchmark-current:
     runs-on: ubuntu-latest
