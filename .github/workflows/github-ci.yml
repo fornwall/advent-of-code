@@ -100,6 +100,7 @@ jobs:
           perl -p -i -e 's/..\/core/core/' Cargo.toml && mv ../core .
           export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
           export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
+          if [ `uname` = Darwin ]; then export CIBW_ARCHS_MACOS="x86_64 arm64"; fi
           python -m cibuildwheel --output-dir wheelhouse
       - name: Build wheels on Windows
         if: runner.os == 'Windows'
