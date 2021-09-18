@@ -329,29 +329,28 @@ jobs:
         password: ${{ secrets.PYPI_API_TOKEN }}
 
   release-java-package:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
+      if: runner.os == 'macOS'
     - name: List sdks
       run: xcodebuild -showsdks
-    - name: Install docker # Taken from https://github.com/actions/virtual-environments/issues/1143#issuecomment-652264388
-      run: |
-        mkdir -p ~/.docker/machine/cache
-        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
-        brew install docker docker-machine
-        docker-machine create --driver virtualbox default
-        docker-machine env default
+      if: runner.os == 'macOS'
     - run: cargo install cross
+      if: runner.os == 'Linux'
     - name: Install aarch64-apple-darwin rust target
       run: rustup target add aarch64-apple-darwin
+      if: runner.os == 'macOS'
     - name: Build java package
       working-directory: crates/java
-      run: |
-        eval "$(docker-machine env default)" && ./build-jar.sh
+      run: ./build-jar.sh
 
   benchmark-current:
     runs-on: ubuntu-latest

@@ -4,7 +4,7 @@ set -e -u
 rm -Rf java-src/src/main/resources
 mkdir -p java-src/src/main/resources
 
-BUILD_TYPE=debug
+BUILD_TYPE=release
 if [ "$BUILD_TYPE" = "debug" ]; then
     BUILD_COMMAND="build"
 else
@@ -22,14 +22,9 @@ if [ "$UNAME" = "Darwin" ]; then
     MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $SDK --show-sdk-platform-version) \
     cargo $BUILD_COMMAND --target=aarch64-apple-darwin
   cp ../../target/aarch64-apple-darwin/$BUILD_TYPE/libadvent_of_code_java.dylib java-src/src/main/resources/libadvent_of_code_java_aarch64.dylib
-
-
+else
   (cd ../.. && cross $BUILD_COMMAND --target x86_64-pc-windows-gnu --package advent-of-code-java && cp target/x86_64-pc-windows-gnu/$BUILD_TYPE/advent_of_code_java.dll crates/java/java-src/src/main/resources/)
   (cd ../.. && cross $BUILD_COMMAND --target x86_64-unknown-linux-gnu --package advent-of-code-java && cp target/x86_64-unknown-linux-gnu/$BUILD_TYPE/libadvent_of_code_java.so crates/java/java-src/src/main/resources/)
-else
-  cargo build
-  LIBNAME=libadvent_of_code_java.so
-  cp ../../target/debug/$LIBNAME java-src/src/main/resources
 fi
 
 # cross build --target x86_64-pc-windows-gnu --package advent-of-code-java
