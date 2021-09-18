@@ -333,6 +333,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+    - run: cargo install cross
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
