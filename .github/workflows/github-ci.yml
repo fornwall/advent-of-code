@@ -333,17 +333,25 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
-    - run: cargo install cross
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
     - name: List sdks
       run: xcodebuild -showsdks
+    - name: Install docker # Taken from https://github.com/actions/virtual-environments/issues/1143#issuecomment-652264388
+      run: |
+        mkdir -p ~/.docker/machine/cache
+        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
+        brew install docker docker-machine
+        docker-machine create --driver virtualbox default
+        docker-machine env default
+    - run: cargo install cross
     - name: Install aarch64-apple-darwin rust target
       run: rustup target add aarch64-apple-darwin
     - name: Build java package
       working-directory: crates/java
-      run: ./build-jar.sh
+      run: |
+        eval "$(docker-machine env default)" && ./build-jar.sh
 
   benchmark-current:
     runs-on: ubuntu-latest
