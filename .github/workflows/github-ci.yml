@@ -330,10 +330,10 @@ jobs:
         password: ${{ secrets.PYPI_API_TOKEN }}
 
   build-jni-libraries:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
@@ -353,13 +353,36 @@ jobs:
     - name: Install aarch64-apple-darwin rust target
       run: rustup target add aarch64-apple-darwin
       if: runner.os == 'macOS'
-    - name: Build java package
+    - name: Build JNI libraries package
       working-directory: crates/java
-      run: ./build-jar.sh
+      run: ./build-jni-libs.sh
     - uses: actions/upload-artifact@v2
       with:
         name: jnilibs
         path: ./crates/java/java-src/src/main/resources/*
+
+  build-jar:
+    needs: build-jni-libraries
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+    - name: Download built wheels
+      uses: actions/download-artifact@v2
+      with:
+        name: jnilibs
+        path: crates/java/java-src/src/main/resources/
+    - name: Assemble jar
+      working-directory: crates/java
+      run: ./build-jar.sh
+    - name: Upload jar file
+      uses: actions/upload-artifact@v2
+      with:
+        name: jar
+        path: crates/java/java-src/build/libs/advent-of-code-0.1.0.jar
 
   benchmark-current:
     runs-on: ubuntu-latest

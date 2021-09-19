@@ -100,3 +100,8 @@ javadoc {
 	}
 }
 
+task printBuiltJar {
+    doLast {
+        println jar.archiveFile.get().asFile
+    }
+}

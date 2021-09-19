@@ -1,55 +1,26 @@
 package net.fornwall.aoc;
 
-import java.io.IOException;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Locale;
-
 /**
- * A solver of Advent of Code solutions.
+ * A solver of <a href="https://adventofcode.com">Advent of Code</a> problems.
+ *
+ * Solutions are implemented in Rust and exposed to Java using JNI - see <a href="https://aoc.fornwall.net">https://aoc.fornwall.net</a>
  */
-public class Solver {
+public final class Solver {
 
     static {
-        try {
-            var libraryName = determineLibraryName("advent_of_code_java");
-            var tmpDir = Files.createTempDirectory("advent-of-code-java").toFile();
-            tmpDir.deleteOnExit();
-            var nativeLibTmpFile = new File(tmpDir, libraryName);
-            nativeLibTmpFile.deleteOnExit();
-
-            var url = Solver.class.getResource("/" + libraryName);
-            try (var in = url.openStream()) {
-                Files.copy(in, nativeLibTmpFile.toPath());
-            }
-            System.load(nativeLibTmpFile.getAbsolutePath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static String determineLibraryName(String baseName) {
-        var OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-        if ((OS.contains("mac")) || (OS.contains("darwin"))) {
-            String archExtension;
-            if (System.getProperty("os.arch", "none").equals("aarch64")) {
-                archExtension = "aarch64";
-            } else {
-                archExtension = "x86";
-            }
-            return "lib" + baseName + "_" + archExtension + ".dylib";
-        } else if (OS.contains("win")) {
-            return baseName + ".dll";
-        } else if (OS.contains("nux")) {
-            return "lib" + baseName + ".so";
-        } else {
-            throw new RuntimeException("Unrecognized operating system: '" + OS + "'");
-        }
+        JarNativeLibraryLoader.loadLibraryFromJar("advent_of_code_java");
     }
 
     /**
      * Solve the specified problem with the given input.
+     *
+     * @param year the year of the problem being solved
+     * @param day the day of the problem being solved (1-25)
+     * @param part the part of the problem being solved (1 or 2)
+     * @param input the input text to the problem
+     * @throws SolverException in case of an error happened and the problem could not be solved
+     * @return the answer of the specified problem and input
      */
-    public static native String solve(int year, int day, int part, String input);
+    public static native String solve(int year, int day, int part, String input) throws SolverException;
 
 }
