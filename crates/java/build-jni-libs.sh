@@ -39,6 +39,6 @@ else
       crates/java/java-src/src/main/resources/libadvent_of_code_java_x86_64.so
 
   cross $BUILD_COMMAND --target aarch64-unknown-linux-gnu --package advent-of-code-java
-  cp target/x86_64-unknown-linux-gnu/$AOC_BUILD_TYPE/libadvent_of_code_java.so \
+  cp target/aarch64-unknown-linux-gnu/$AOC_BUILD_TYPE/libadvent_of_code_java.so \
       crates/java/java-src/src/main/resources/libadvent_of_code_java_aarch64.so
 fi
