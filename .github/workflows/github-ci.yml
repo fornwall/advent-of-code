@@ -353,6 +353,9 @@ jobs:
     - name: Install aarch64-apple-darwin rust target
       run: rustup target add aarch64-apple-darwin
       if: runner.os == 'macOS'
+    - name: Install aarch64 strip
+      run: sudo apt-get -y install binutils-aarch64-linux-gnu
+      if: runner.os == 'Linux'
     - name: Build JNI libraries package
       working-directory: crates/java
       run: ./build-jni-libs.sh

@@ -50,7 +50,8 @@ else
 
   echo "# Before stripping:"
   ls -lha crates/java/java-src/src/main/resources/*.so
-  strip crates/java/java-src/src/main/resources/*.so
+  strip crates/java/java-src/src/main/resources/libadvent_of_code_java_x86_64.so
+  aarch64-linux-gnu-strip crates/java/java-src/src/main/resources/libadvent_of_code_java_aarch64.so
   echo "# After stripping:"
   ls -lha crates/java/java-src/src/main/resources/*.so
 fi
