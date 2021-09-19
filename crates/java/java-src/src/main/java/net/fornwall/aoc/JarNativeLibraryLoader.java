@@ -1,8 +1,8 @@
 package net.fornwall.aoc;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 
 class JarNativeLibraryLoader {
@@ -10,19 +10,18 @@ class JarNativeLibraryLoader {
     static void loadLibraryFromJar(String baseName) {
         try {
             var libraryName = determineLibraryName(baseName);
-            var tmpDir = Files.createTempDirectory("java-jni-" + baseName).toFile();
-            tmpDir.deleteOnExit();
-            var nativeLibTmpFile = new File(tmpDir, libraryName);
-            nativeLibTmpFile.deleteOnExit();
+            var tmpFile = Files.createTempFile("java-jni-" + baseName, null).toFile();
+            tmpFile.deleteOnExit();
 
-            var url = Solver.class.getResource("/" + libraryName);
-            if (url == null) {
+            var in= Solver.class.getResourceAsStream("/" + libraryName);
+            if (in == null) {
                 throw new RuntimeException("No library named " + libraryName);
             }
-            try (var in = url.openStream()) {
-                Files.copy(in, nativeLibTmpFile.toPath());
+            try (in) {
+                Files.copy(in, tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-            System.load(nativeLibTmpFile.getAbsolutePath());
+
+            System.load(tmpFile.getAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

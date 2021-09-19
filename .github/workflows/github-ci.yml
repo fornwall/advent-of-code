@@ -383,7 +383,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jar
-        path: crates/java/java-src/build/libs/advent-of-code-0.1.0.jar
+        path: crates/java/java-src/build/libs/*.jar
 
   benchmark-current:
     runs-on: ubuntu-latest

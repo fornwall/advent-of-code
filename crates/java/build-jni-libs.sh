@@ -27,6 +27,12 @@ if [ "$UNAME" = "Darwin" ]; then
     cargo $BUILD_COMMAND --target=aarch64-apple-darwin
   cp ../../target/aarch64-apple-darwin/$AOC_BUILD_TYPE/libadvent_of_code_java.dylib \
       java-src/src/main/resources/libadvent_of_code_java_aarch64.dylib
+
+  echo "# Before stripping:"
+  ls -lha java-src/src/main/resources/*.dylib
+  strip -r -u java-src/src/main/resources/*.dylib
+  echo "# After stripping:"
+  ls -lha java-src/src/main/resources/*.dylib
 else
   cd ../..
 
@@ -41,4 +47,10 @@ else
   cross $BUILD_COMMAND --target aarch64-unknown-linux-gnu --package advent-of-code-java
   cp target/aarch64-unknown-linux-gnu/$AOC_BUILD_TYPE/libadvent_of_code_java.so \
       crates/java/java-src/src/main/resources/libadvent_of_code_java_aarch64.so
+
+  echo "# Before stripping:"
+  ls -lha java-src/src/main/resources/*.so
+  strip java-src/src/main/resources/*.so
+  echo "# After stripping:"
+  ls -lha java-src/src/main/resources/*.so
 fi

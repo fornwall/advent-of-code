@@ -1,7 +1,7 @@
 #![allow(clippy::expect_used)]
 #![allow(clippy::panic)]
 use advent_of_code::solve;
-use jni::objects::{JClass, JObject, JString};
+use jni::objects::{JClass, JString};
 use jni::sys::jstring;
 use jni::JNIEnv;
 
@@ -24,9 +24,9 @@ pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
             .new_string(output)
             .expect("Couldn't create java string!"),
         Err(msg) => {
-            env.throw(("net/fornwall/aoc/SolverException", msg))
+            env.throw_new("net/fornwall/aoc/SolverException", msg)
                 .expect("Unable to throw exception");
-            JObject::null().into()
+            return ::std::ptr::null_mut() as jstring;
         }
     };
 
