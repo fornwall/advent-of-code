@@ -49,8 +49,8 @@ else
       crates/java/java-src/src/main/resources/libadvent_of_code_java_aarch64.so
 
   echo "# Before stripping:"
-  ls -lha java-src/src/main/resources/*.so
-  strip java-src/src/main/resources/*.so
+  ls -lha crates/java/java-src/src/main/resources/*.so
+  strip crates/java/java-src/src/main/resources/*.so
   echo "# After stripping:"
-  ls -lha java-src/src/main/resources/*.so
+  ls -lha crates/java/java-src/src/main/resources/*.so
 fi
