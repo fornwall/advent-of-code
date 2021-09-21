@@ -99,7 +99,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
 #[test]
 fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("18" => "33,45".into());
     test_part_one!("42" => "21,61".into());

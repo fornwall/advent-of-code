@@ -214,7 +214,7 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("depth: 510\ntarget: 10,10" => 114);
     test_part_two!("depth: 510\ntarget: 10,10" => 45);

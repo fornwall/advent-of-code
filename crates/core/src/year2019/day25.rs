@@ -218,7 +218,7 @@ pub fn solve(input: &mut Input) -> Result<SolutionType, String> {
 
 #[test]
 pub fn test() {
-    use crate::test_part_one;
+    use crate::input::test_part_one;
     let input = include_str!("day25_input.txt");
     test_part_one!(input => 319_815_680);
     let input = include_str!("day25_input_2.txt");

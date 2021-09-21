@@ -55,7 +55,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("ugknbfddgicrmopn" => 1);
     test_part_one!("aaa" => 1);

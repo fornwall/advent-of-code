@@ -140,7 +140,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     let example_part_one = "0: 4 1 5
 1: 2 3 | 3 2

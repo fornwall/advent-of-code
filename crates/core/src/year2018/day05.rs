@@ -40,7 +40,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
 #[test]
 fn test() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("aA"=>0);
     test_part_one!("abBA" => 0);

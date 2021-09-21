@@ -1,3 +1,4 @@
+#![allow(clippy::redundant_pub_crate)]
 #[cfg(all(feature = "visualization", test))]
 use crate::painter::MockPainter;
 #[cfg(feature = "visualization")]
@@ -55,30 +56,38 @@ impl<'a> Input<'a> {
     }
 }
 
-#[macro_export]
+#[cfg(test)]
 macro_rules! test_part_one {
     ($input:tt => $expected:expr) => {
         assert_eq!(solve(&mut Input::part_one($input)), Ok($expected));
     };
 }
+#[cfg(test)]
+pub(crate) use test_part_one;
 
-#[macro_export]
+#[cfg(test)]
 macro_rules! test_part_two {
     ($input:tt => $expected:expr) => {
         assert_eq!(solve(&mut Input::part_two($input)), Ok($expected));
     };
 }
+#[cfg(test)]
+pub(crate) use test_part_two;
 
-#[macro_export]
+#[cfg(test)]
 macro_rules! test_part_one_error {
     ($input:tt => $expected:expr) => {
         assert_eq!(Err($expected.into()), solve(&mut Input::part_one($input)));
     };
 }
+#[cfg(test)]
+pub(crate) use test_part_one_error;
 
-#[macro_export]
+#[cfg(test)]
 macro_rules! test_part_two_error {
     ($input:tt => $expected:expr) => {
         assert_eq!(Err($expected.into()), solve(&mut Input::part_two($input)));
     };
 }
+#[cfg(test)]
+pub(crate) use test_part_two_error;

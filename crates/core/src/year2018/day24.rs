@@ -267,7 +267,7 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("Immune System:
 17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2

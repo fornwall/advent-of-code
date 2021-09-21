@@ -121,7 +121,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
 #[test]
 fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("9 players; last marble is worth 25 points" => 32);
     test_part_one!(

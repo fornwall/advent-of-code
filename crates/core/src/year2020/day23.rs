@@ -98,7 +98,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     let example = "389125467";
     test_part_one!(example => "67384529".to_string());

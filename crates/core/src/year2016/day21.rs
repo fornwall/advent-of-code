@@ -97,7 +97,7 @@ fn scramble(input: &str, password: &mut [u8]) -> Result<(), String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     let real_input = include_str!("day21_input.txt");
     test_part_one!(real_input => "gcedfahb".to_string());

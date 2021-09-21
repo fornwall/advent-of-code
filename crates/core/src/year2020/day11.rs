@@ -128,7 +128,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     let example = "L.LL.LL.LL
 LLLLLLL.LL
@@ -150,7 +150,7 @@ L.LLLLL.LL";
 #[cfg(feature = "count-allocations")]
 #[test]
 pub fn limited_memory_allocations() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day11_input.txt");
     let allocations = allocation_counter::count(|| {
         test_part_one!(real_input => 2222);

@@ -46,7 +46,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
 #[test]
 fn tests() {
-    use crate::test_part_one;
+    use crate::input::test_part_one;
     test_part_one!("0,0,0,0
 3,0,0,0
 0,3,0,0

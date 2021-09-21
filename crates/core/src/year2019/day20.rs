@@ -181,7 +181,7 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     let example = include_str!("day20_example.txt");
     test_part_one!(example => 23);

@@ -174,7 +174,7 @@ pub fn test_parse() {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
     test_part_one!("{\"a\":{\"b\":4},\"c\":-1}" => 3);
     test_part_one!("[1,2,3]" => 6);
     test_part_one!("{\"a\":2,\"b\":4}" => 6);

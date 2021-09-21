@@ -90,7 +90,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::test_part_one;
+    use crate::input::test_part_one;
 
     let example = "Begin in state A.
 Perform a diagnostic checksum after 6 steps.

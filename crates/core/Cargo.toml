@@ -15,6 +15,7 @@ edition = "2018"
 [[bin]]
 name = "advent-of-code"
 bench = false
+doc = false
 
 [lib]
 bench = false

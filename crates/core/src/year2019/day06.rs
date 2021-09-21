@@ -73,7 +73,7 @@ fn part2(string: &str) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("COM)B
 B)C

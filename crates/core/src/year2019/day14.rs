@@ -140,7 +140,7 @@ pub fn solve(input: &mut Input) -> Result<ChemicalAmount, String> {
 
 #[test]
 pub fn tests() {
-    use crate::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("9 ORE => 2 A
 8 ORE => 3 B
