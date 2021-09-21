@@ -359,8 +359,8 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     input.text.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
             let replaced_char = match (center_x as i32 - x as i32, center_y as i32 - y as i32) {
-                (0, 0) | (1, 0) | (-1, 0) | (0, 1) | (0, -1) => '#',
-                (1, 1) | (1, -1) | (-1, 1) | (-1, -1) => '@',
+                (0 | 1 | -1, 0) | (0, 1 | -1) => '#',
+                (1 | -1, 1 | -1) => '@',
                 _ => c,
             };
 

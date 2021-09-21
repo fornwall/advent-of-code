@@ -23,12 +23,13 @@ const fn is_compatible(region_type: RegionType, equipment: Equipment) -> bool {
     // In narrow regions, you can use the torch or neither tool. You cannot use the climbing gear (it's too bulky to fit).
     matches!(
         (region_type, equipment),
-        (RegionType::Rocky, Equipment::ClimbingGear)
-            | (RegionType::Rocky, Equipment::Torch)
-            | (RegionType::Wet, Equipment::ClimbingGear)
-            | (RegionType::Wet, Equipment::Neither)
-            | (RegionType::Narrow, Equipment::Torch)
-            | (RegionType::Narrow, Equipment::Neither)
+        (
+            RegionType::Rocky,
+            Equipment::ClimbingGear | Equipment::Torch
+        ) | (
+            RegionType::Wet,
+            Equipment::ClimbingGear | Equipment::Neither
+        ) | (RegionType::Narrow, Equipment::Torch | Equipment::Neither)
     )
 }
 

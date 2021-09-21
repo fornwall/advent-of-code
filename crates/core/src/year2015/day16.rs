@@ -34,8 +34,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 .ok_or("Invalid attribute value")?;
 
             let does_match = match (input.is_part_two(), attribute_name) {
-                (true, "cats") | (true, "trees") => desired_value < attribute_value,
-                (true, "pomeranians") | (true, "goldfish") => desired_value > attribute_value,
+                (true, "cats" | "trees") => desired_value < attribute_value,
+                (true, "pomeranians" | "goldfish") => desired_value > attribute_value,
                 _ => desired_value == attribute_value,
             };
             if !does_match {

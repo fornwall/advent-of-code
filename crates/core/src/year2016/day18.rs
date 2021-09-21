@@ -28,10 +28,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             // - Only its right tile is a trap."
             next_row[i] = matches!(
                 (left_is_trap, center_is_trap, right_is_trap),
-                (true, true, false)
-                    | (false, true, true)
-                    | (true, false, false)
-                    | (false, false, true)
+                (true, true | false, false) | (false, true | false, true)
             );
             if !next_row[i] {
                 safe_count += 1;
