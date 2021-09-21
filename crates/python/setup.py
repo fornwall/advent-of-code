@@ -15,7 +15,7 @@ setup(
     long_description_content_type='text/markdown',
     version="2019.12.366",
     rust_extensions=[
-        RustExtension("advent_of_code", "Cargo.toml", binding=Binding.PyO3)
+        RustExtension("advent_of_code", "Cargo.toml", binding=Binding.PyO3, py_limited_api=True)
     ],
     packages=["cli"],
     entry_points={
