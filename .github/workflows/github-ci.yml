@@ -397,6 +397,7 @@ jobs:
       run: |
         cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
         gpg --list-secret-keys --keyid-format LONG
+        gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg
     - name: Publish to Maven Central
       working-directory: crates/java/java-src
       run: |
