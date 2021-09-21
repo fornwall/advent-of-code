@@ -46,14 +46,14 @@ pub fn solve(
     year: u16,
     day: u8,
     part: u8,
-    input_string: &str,
+    input: &str,
     #[cfg(feature = "visualization")] painter: PainterRef,
 ) -> Result<String, String> {
     #![allow(clippy::let_and_return)]
 
-    if input_string.is_empty() {
+    if input.is_empty() {
         return Err("Empty input".to_string());
-    } else if !input_string.is_ascii() {
+    } else if !input.is_ascii() {
         return Err("Non-ASCII input".to_string());
     } else if !matches!(day, 1..=25) {
         return Err(format!("Invalid day {} - must be 1-25", day));
@@ -63,7 +63,7 @@ pub fn solve(
 
     let mut input = Input {
         part: if part == 1 { Part::One } else { Part::Two },
-        text: input_string,
+        text: input,
         #[cfg(feature = "visualization")]
         painter,
     };
@@ -236,15 +236,15 @@ pub fn solve(
 
 /// A version of [solve](fn.solve.html) that takes strings as arguments and parses them to the required types.
 pub fn solve_raw(
-    year_string: &str,
-    day_string: &str,
-    part_string: &str,
+    year: &str,
+    day: &str,
+    part: &str,
     input: &str,
     #[cfg(feature = "visualization")] painter: PainterRef,
 ) -> Result<String, String> {
-    let year = year_string.parse::<u16>().map_err(|_| "Invalid year")?;
-    let day = day_string.parse::<u8>().map_err(|_| "Invalid day")?;
-    let part = part_string.parse::<u8>().map_err(|_| "Invalid part")?;
+    let year = year.parse::<u16>().map_err(|_| "Invalid year")?;
+    let day = day.parse::<u8>().map_err(|_| "Invalid day")?;
+    let part = part.parse::<u8>().map_err(|_| "Invalid part")?;
     solve(
         year,
         day,
