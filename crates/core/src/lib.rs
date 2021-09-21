@@ -1,10 +1,31 @@
 #![forbid(unsafe_code)]
 /*!
-This crates provides solutions for Advent of Code problems.
+This crates provides solutions for [Advent of Code](https://adventofcode.com/) problems.
+
+# Usage
+
+This crate is [on crates.io](https://crates.io/crates/advent_of_code) and can be
+used by adding `advent_of_code` to your dependencies in your project's `Cargo.toml`.
+
+```toml
+[dependencies]
+advent_of_code = "*"
+```
+
+# Example
+By specifying a year, day and part together with a specific problem input
+a solution can be obtained:
+
+```rust
+use advent_of_code::solve;
+let solution = solve(2019, 1, 1, "14");
+assert_eq!(solution, Ok("2".to_string()));
+```
 */
 #![crate_name = "advent_of_code"]
 
 mod common;
+#[cfg_attr(test, macro_use)]
 mod input;
 mod mod_exp;
 #[cfg(feature = "visualization")]
@@ -36,7 +57,7 @@ fn to_stringer_input<T: ToString>(
 /// * `part` - The part of the problem - either 1 or 2.
 /// * `input` - The input to the problem.
 ///
-/// # Examples
+/// # Example
 /// ```
 /// use advent_of_code::solve;
 /// let solution = solve(2019, 1, 1, "14");

@@ -1,4 +1,4 @@
-//! NOTE: Inlined (and slightly modified) from https://github.com/stainless-steel/md5
+//! NOTE: Inlined (and slightly modified) from <https://github.com/stainless-steel/md5>
 //! The [MD5] hash function.
 //!
 //! ## Security Warning
