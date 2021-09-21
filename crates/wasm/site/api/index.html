@@ -1,53 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Advent of Code API</title>
-    <meta name="description" content="API to solve Advent of Code problems" />
-
-    <!-- https://cdnjs.com/libraries/swagger-ui -->
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.0.0-rc.1/swagger-ui-bundle.js"
-      integrity="sha512-JIvAhHsJ9NqrxF6I40fP7ysy4ycgDIW/cZS8L3TGA5sLsgHnUkN0qQVbtICBob9Po1BYsq5TTShtJdAfAEWLTQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
+      type="module"
+      src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"
     ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.0.0-rc.1/swagger-ui-standalone-preset.min.js"
-      integrity="sha512-iv7NosX2qRIq32zhkidnrvvowRvcGSK+8NnTrl0V1SweOtUxaNO4TNv0h9OJRnssLcoO9iSZBop9ZBNOuqzFvA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.0.0-rc.1/swagger-ui.min.css"
-      integrity="sha512-AxOzCawZoyKRiYxPZSb+uMKcIK+izS518752Lp04hP/fu4YYY49d4cWoqOvhD/wTEYNNWEIx40c9kUiQOE2A1g=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-
-    <style>
-      .info {
-        margin-bottom: 0 !important;
-      }
-    </style>
   </head>
-
   <body>
-    <div id="swagger-ui"></div>
-    <script>
-      const ui = SwaggerUIBundle({
-        url: "/openapi.json",
-        dom_id: "#swagger-ui",
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIBundle.SwaggerUIStandalonePreset,
-        ],
-        defaultModelsExpandDepth: 1,
-        displayRequestDuration: true,
-        docExpansion: "full",
-        deepLinking: true,
-      });
-    </script>
+    <rapi-doc
+      allow-advanced-search="false"
+      allow-authentication="false"
+      allow-search="false"
+      schema-description-expanded="true"
+      allow-schema-description-expand-toggle="false"
+      default-schema-tab="example"
+      render-style="read"
+      schema-style="tree"
+      show-header="false"
+      spec-url="../openapi.json"
+      theme="light"
+    >
+    </rapi-doc>
   </body>
 </html>
