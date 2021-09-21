@@ -19,13 +19,14 @@ fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &'a PyAny) -> String
 
 /// Returns the solution for the specified given problem and input.
 ///
-/// # Arguments
+/// Arguments:
 ///
-/// * `year` - The year of the problem, as in 2018 or 2019.
-/// * `day` - The day of the problem - from 1 to 25.
-/// * `part` - The part of the problem - either 1 or 2.
-/// * `input` - The input to the problem.
+/// year -- The year of the problem, as in 2018 or 2019.
+/// day -- The day of the problem - from 1 to 25.
+/// part -- The part of the problem - either 1 or 2.
+/// input -- The input to the problem.
 #[pyfunction]
+#[pyo3(text_signature = "(year, day, part, input)")]
 pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<String> {
     let year_value = try_to_string::<u16>(year);
     let day_value = try_to_string::<u8>(day);
