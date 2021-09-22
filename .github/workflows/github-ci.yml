@@ -618,6 +618,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - name: Generate code coverage
-        run: npm run check
+      - name: Check js
+        run: npm install && npm run check
         working-directory: crates/wasm

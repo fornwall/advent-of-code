@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Project to run eslint",
   "scripts": {
-    "check": "npx eslint . --ext .js && npx prettier --check .",
+    "check": "eslint . --ext .js && npx prettier --check .",
     "fix": "eslint --fix **/*.js",
     "format": "npx prettier --write ."
   },
