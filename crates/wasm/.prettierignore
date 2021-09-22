@@ -1,2 +1,4 @@
 **/advent_of_code_wasm.js
 **/*.min.js
+**/generated
+**/target

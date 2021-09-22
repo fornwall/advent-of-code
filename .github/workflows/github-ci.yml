@@ -612,3 +612,12 @@ jobs:
         run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
       - name: Check workflow files
         run: ${{ steps.get_actionlint.outputs.executable }} -color
+
+  check-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: Generate code coverage
+          run: npm run check
+          working-directory: crates/wasm
