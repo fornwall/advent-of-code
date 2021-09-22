@@ -84,6 +84,10 @@ nexusPublishing {
     }
 }
 
+compileJava {
+    options.release = 11
+}
+
 signing {
 	sign publishing.publications.mavenJava
 }
