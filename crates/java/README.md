@@ -13,7 +13,7 @@ To add this library as a dependency using Maven, use the following:
 <dependency>
     <groupId>net.fornwall</groupId>
     <artifactId>aoc</artifactId>
-    <version>2019.12.373</version>
+    <version>2019.12.374</version>
 </dependency>
 ```
 
@@ -21,7 +21,7 @@ To add a dependency using Gradle:
 
 ```gradle
 dependencies {
-    implementation 'net.fornwall:aoc:2019.12.373'
+    implementation 'net.fornwall:aoc:2019.12.374'
 }
 ```
 
