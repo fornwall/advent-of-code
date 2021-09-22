@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-java"
-version = "2019.12.368"
+version = "2019.12.369"
 keywords = ["advent-of-code", "java", "jni"]
 categories = ["algorithms", "rust-patterns"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
