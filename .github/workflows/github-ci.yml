@@ -18,8 +18,7 @@ jobs:
       run: rustc --version
     - name: Test and check (stable)
       run: |
-        make check
-        cd crates/core && cargo test --features count-allocations
+        make COUNT_ALLOCATIONS=1 check
       if: matrix.rust == 'stable'
     - name: Test and check (nightly)
       run: |
@@ -392,17 +391,16 @@ jobs:
       with:
         name: jar
         path: crates/java/java-src/build/libs/*.jar
-    - name: Create secring.gpg
-      run: echo "${{ secrets.OSSRH_GPG_SECRING_BASE64 }}" | base64 -d > ~/.gnupg/secring.gpg
     - name: Publish to Maven Central
       working-directory: crates/java/java-src
       run: |
+        echo "${{ secrets.OSSRH_GPG_SECRING_BASE64 }}" | base64 -d > secring.gpg
         gradle --info \
           -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} \
           -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }} \
           -Psigning.keyId=24875D73 \
           -Psigning.password=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} \
-          -Psigning.secretKeyRingFile=${HOME}/.gnupg/secring.gpg \
+          -Psigning.secretKeyRingFile=secring.gpg \
           publishToSonatype \
           closeAndReleaseSonatypeStagingRepository
 
@@ -604,3 +602,12 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         directory: crates/core
+
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download actionlint
+        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+      - name: Check workflow files
+        run: ${{ steps.get_actionlint.outputs.executable }} -color
