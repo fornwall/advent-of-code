@@ -398,7 +398,7 @@ jobs:
         gradle --info \
           -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} \
           -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }} \
-          -Psigning.keyId=24875D73 \
+          -Psigning.keyId=6D8D0AE7 \
           -Psigning.password=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} \
           -Psigning.secretKeyRingFile=secring.gpg \
           publishToSonatype \
