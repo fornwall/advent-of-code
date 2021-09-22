@@ -367,7 +367,7 @@ jobs:
         name: jnilibs
         path: ./crates/java/java-src/src/main/resources/*
 
-  build-jar:
+  publish-to-maven-central:
     needs: [build-jni-libraries, bump-version]
     runs-on: ubuntu-latest
     steps:
@@ -392,12 +392,8 @@ jobs:
       with:
         name: jar
         path: crates/java/java-src/build/libs/*.jar
-    - id: install-secret-key
-      name: Install gpg secret key
-      run: |
-        cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
-        gpg --list-secret-keys --keyid-format LONG
-        gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg
+    - name: Create secring.gpg
+      run: echo "${{ secrets.OSSRH_GPG_SECRING_BASE64 }}" | base64 -d > ~/.gnupg/secring.gpg
     - name: Publish to Maven Central
       working-directory: crates/java/java-src
       run: |
