@@ -383,14 +383,6 @@ jobs:
       with:
         name: jnilibs
         path: crates/java/java-src/src/main/resources/
-    - name: Assemble jar
-      working-directory: crates/java
-      run: ./build-jar.sh
-    - name: Upload jar file
-      uses: actions/upload-artifact@v2
-      with:
-        name: jar
-        path: crates/java/java-src/build/libs/*.jar
     - name: Publish to Maven Central
       working-directory: crates/java/java-src
       run: |
