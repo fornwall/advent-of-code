@@ -16,19 +16,32 @@ pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
 ) -> jstring {
     let input_str: String = env
         .get_string(input)
-        .expect("Couldn't get java string!")
+        .expect("Unable to get input string")
         .into();
 
-    let result = match solve(year as u16, day as u8, part as u8, &input_str) {
-        Ok(output) => env
-            .new_string(output)
-            .expect("Couldn't create java string!"),
-        Err(msg) => {
-            env.throw_new("net/fornwall/aoc/SolverException", msg)
-                .expect("Unable to throw exception");
-            return ::std::ptr::null_mut() as jstring;
-        }
+    let exception_message = match convert_params(year, day, part) {
+        Ok((year, day, part)) => match solve(year, day, part, &input_str) {
+            Ok(output) => {
+                return env
+                    .new_string(output)
+                    .expect("Unable to create output string")
+                    .into_inner();
+            }
+            Err(msg) => msg,
+        },
+        Err(message) => message,
     };
 
-    result.into_inner()
+    env.throw_new("net/fornwall/aoc/SolverException", exception_message)
+        .expect("Unable to throw exception");
+    ::std::ptr::null_mut()
+}
+
+fn convert_params(year: i32, day: i32, part: i32) -> Result<(u16, u8, u8), String> {
+    use std::convert::TryFrom;
+    Ok((
+        u16::try_from(year).map_err(|_| format!("Invalid year: {}", year))?,
+        u8::try_from(day).map_err(|_| format!("Invalid day: {}", day))?,
+        u8::try_from(part).map_err(|_| format!("Invalid part: {}", part))?,
+    ))
 }

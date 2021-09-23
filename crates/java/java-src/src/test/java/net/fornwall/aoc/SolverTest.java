@@ -11,4 +11,10 @@ public class SolverTest {
         Assertions.assertEquals("2", answer);
     }
 
+    @Test
+    void testException() {
+        Assertions.assertThrows(SolverException.class, () -> Solver.solve(2019, -1, 1, "14"));
+        Assertions.assertThrows(SolverException.class, () -> Solver.solve(2019, 1, 1, "hello"));
+    }
+
 }

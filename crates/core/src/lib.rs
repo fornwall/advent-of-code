@@ -41,6 +41,8 @@ use input::{Input, Part};
 #[cfg(feature = "visualization")]
 use painter::PainterRef;
 
+// Never inline to prevent stack size from blowing up in release builds.
+#[inline(never)]
 fn to_stringer_input<T: ToString>(
     function: fn(&mut Input) -> Result<T, String>,
     input: &mut Input,
