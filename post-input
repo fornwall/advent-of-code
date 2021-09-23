@@ -5,8 +5,8 @@ usage() {
   echo "usage:\n    ./post-input <where> <year> <day> <part> # reads input from stdin"
   echo "where where is one of:"
   echo "- fly"
-  echo "- netlify"
   echo "- cloudflare"
+  echo "- netlify"
   echo "- local"
   echo "example:\n    ./post-input fly 2019 23 1 < crates/core/src/year2019/day23_input.txt"
   exit 1
@@ -22,14 +22,14 @@ DAY=$3
 PART=$4
 
 case $WHERE in
-  cloudflare)
-    HOST=https://aoc.fornwall.workers.dev ;;
   fly)
     HOST=https://advent.fly.dev;;
-  local)
-    HOST=http://localhost:8080;;
+  cloudflare)
+    HOST=https://aoc.fornwall.workers.dev;;
   netlify)
     HOST=https://aoc.fornwall.net;;
+  local)
+    HOST=http://localhost:8080;;
   *)
     echo "Unsupported server: $1 - use one of cloudflare/fly/local/netlify"; exit 1;;
 esac
