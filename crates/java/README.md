@@ -2,12 +2,14 @@
 [![javadoc](https://www.javadoc.io/badge/net.fornwall/aoc.svg)](https://www.javadoc.io/doc/net.fornwall/aoc)
 
 # advent-of-code-java
-Solutions to [Advent of Code](https://adventofcode.com/) implemented in Rust and exposed to Java using JNI.
+Solutions to [Advent of Code](https://adventofcode.com/) implemented in Rust and exposed as a Java library using [JNI](https://en.wikipedia.org/wiki/Java_Native_Interface).
 
-# How to use in your project
+See [src/lib.rs](src/lib.rs), which uses the [jni-rs](https://github.com/jni-rs/jni-rs) Rust bindings to JNI to expose the solutions implemented in the [core](../core) crate. This is then used by [Solver.java](java-src/src/main/java/net/fornwall/aoc/Solver.java) and loaded by [JarNativeLibraryLoader](java-src/src/main/java/net/fornwall/aoc/JarNativeLibraryLoader.java).
+
+# How to use
 The Maven group ID is `net.fornwall` and its artifact ID is `aoc`.
 
-To add this library as a dependency using Maven, use the following:
+To add a dependency using Maven:
 
 ```xml
 <dependency>
@@ -25,13 +27,14 @@ dependencies {
 }
 ```
 
-Solutions can then be obtained using `Solver.solve()`:
+Answers can then be computed using [Solver.solve()](https://www.javadoc.io/doc/net.fornwall/aoc/latest/net/fornwall/aoc/Solver.html#solve(int,int,int,java.lang.String)):
 
 ```java
 import net.fornwall.aoc.Solver;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
+
     public static void main(String[] args) throws Exception {
         var year = Integer.parseInt(args[0]);
         var day = Integer.parseInt(args[1]);
@@ -41,5 +44,6 @@ public class Main {
         var answer = Solver.solve(year, day, part, input);
         System.out.println(answer);
     }
+
 }
 ```
