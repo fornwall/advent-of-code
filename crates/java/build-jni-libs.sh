@@ -38,7 +38,7 @@ else
 
   cross $BUILD_COMMAND --target x86_64-pc-windows-gnu --package advent-of-code-java
   cp target/x86_64-pc-windows-gnu/$AOC_BUILD_TYPE/advent_of_code_java.dll \
-      crates/java/java-src/src/main/resources/
+      crates/java/java-src/src/main/resources/advent_of_code_java_x86_64.dll
 
   cross $BUILD_COMMAND --target x86_64-unknown-linux-gnu --package advent-of-code-java
   cp target/x86_64-unknown-linux-gnu/$AOC_BUILD_TYPE/libadvent_of_code_java.so \

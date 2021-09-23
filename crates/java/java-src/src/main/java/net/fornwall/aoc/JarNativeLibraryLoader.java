@@ -13,7 +13,7 @@ class JarNativeLibraryLoader {
             var tmpFile = Files.createTempFile("java-jni-" + baseName, null).toFile();
             tmpFile.deleteOnExit();
 
-            var in= Solver.class.getResourceAsStream("/" + libraryName);
+            var in = Solver.class.getResourceAsStream("/" + libraryName);
             if (in == null) {
                 throw new RuntimeException("No library named " + libraryName);
             }
@@ -30,24 +30,34 @@ class JarNativeLibraryLoader {
     private static String determineLibraryName(String baseName) {
         String prefix, suffix, archExtension;
 
-        var OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-        var isLinux = OS.contains("nux");
-        var isMac = OS.contains("mac") || OS.contains("darwin");
+        var osName = System.getProperty("os.name", "unknown").toLowerCase(Locale.ENGLISH);
+        var isLinux = osName.contains("linux");
+        var isMac = osName.contains("darwin") || osName.contains("os x") || osName.contains("osx");
+        var isWindows = osName.contains("windows");
 
-        if (isLinux || isMac) {
+        if (isLinux) {
             prefix = "lib";
-            suffix = isLinux ? ".so" : ".dylib";
-            if (System.getProperty("os.arch", "none").equals("aarch64")) {
-                archExtension = "_aarch64";
-            } else {
-                archExtension = "_x86_64";
-            }
-        } else if (OS.contains("win")) {
+            suffix = ".so";
+        } else if (isMac) {
+            prefix = "lib";
+            suffix = ".dylib";
+        } else if (isWindows) {
             prefix = "";
-            archExtension = "";
             suffix = ".dll";
         } else {
-            throw new RuntimeException("Unsupported operating system: '" + OS + "'");
+            throw new RuntimeException("Unsupported operating system (os.name): " + osName);
+        }
+
+        var arch = System.getProperty("os.arch", "unknown").toLowerCase(Locale.ENGLISH);
+        var isArm64 = arch.equals("arm-v8") || arch.equals("arm64") || arch.equals("aarch64");
+        var isX86_64 = arch.equals("x86-64") || arch.equals("x86_64") || arch.equals("amd64") || arch.equals("x64");
+
+        if (isX86_64) {
+            archExtension = "_x86_64";
+        } else if (isArm64 && !isWindows) {
+            archExtension = "_aarch64";
+        } else {
+            throw new RuntimeException("Unsupported CPU (os.arch): " + osName);
         }
 
         return prefix + baseName + archExtension + suffix;
