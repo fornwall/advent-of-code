@@ -46,7 +46,7 @@ The [worker/](https://github.com/fornwall/advent-of-code/tree/master/crates/wasm
 
 - Deployment URL: https://aoc.fornwall.workers.dev
 
-It implements the API described at https://aoc.fornwall.net/openapi.json, and that URL can be selected from a [Swagger UI](https://aoc.fornwall.net/api/). Example usage:
+It implements the API described at [https://aoc.fornwall.net/api/](https://aoc.fornwall.net/api/):
 
 ```sh
 $ curl -d 14 https://aoc.fornwall.workers.dev/solve/2019/1/1
@@ -59,7 +59,7 @@ The [functions/](https://github.com/fornwall/advent-of-code/tree/master/crates/w
 
 - Deployment URL: https://aoc.fornwall.workers.dev
 
-It implements the API described at https://aoc.fornwall.net/openapi.json, and that URL can be selected from a [Swagger UI](https://aoc.fornwall.net/api/). Example usage:
+It implements the API described at [https://aoc.fornwall.net/api/](https://aoc.fornwall.net/api/):
 
 ```sh
 $ curl -d 14 https://aoc.fornwall.net/solve/2019/1/1

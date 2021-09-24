@@ -7,8 +7,7 @@ A HTTP server exposing an API to solve [Advent of Code](https://adventofcode.com
 Solutions are implemented in Rust in the [core crate](https://github.com/fornwall/advent-of-code/tree/master/crates/core) and this crate uses the [warp](https://github.com/seanmonstar/warp/) library to expose them over a HTTP API.
 
 - Deployment URL: `https://advent.fly.dev`
-- OpenAPI schema: https://aoc.fornwall.net/openapi.json
-- Swagger UI: https://aoc.fornwall.net/api/
+- API schema: [https://aoc.fornwall.net/api/](https://aoc.fornwall.net/api/)
 
 The HTTP API expects a `POST` to `/solve/$YEAR/$DAY/$PART` with the problem input as post body text. It can be invoked using [curl](https://curl.se/) as shown below:
 
