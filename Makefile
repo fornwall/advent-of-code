@@ -75,7 +75,7 @@ wasm-size: site-pack
 --watch-and-build-wasm:
 	cargo watch -s 'make site-wasm'
 
-site-serve: --run-devserver --watch-and-build-wasm ;
+serve-site: --run-devserver --watch-and-build-wasm ;
 
 node-package:
 	cd crates/wasm && ./build-package.sh
