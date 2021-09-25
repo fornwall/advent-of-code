@@ -192,3 +192,41 @@ document.getElementById("open-playground").addEventListener("click", () => {
     alert("Not available yet!");
   }
 });
+
+window.addEventListener("DOMContentLoaded", () => {
+  const element = document.documentElement;
+  element.draggable = true;
+  element.addEventListener("dragstart", (dragEvent) => {
+    if (dragEvent.target.tagName == "TEXTAREA") {
+      return;
+    }
+    dragEvent.dataTransfer.dropEffect = "copy";
+    dragEvent.dataTransfer.effectAllowed = "copy";
+    dragEvent.dataTransfer.setDragImage(outputElement.parentElement, 0, 0);
+    dragEvent.dataTransfer.setData(
+      "text/plain",
+      outputElement.textContent.trim()
+    );
+  });
+
+  document.documentElement.ondragover = (dragOverEvent) => {
+    dragOverEvent.preventDefault();
+    dragOverEvent.dataTransfer.dropEffect = Array.from(
+      dragOverEvent.dataTransfer.items
+    ).some((item) => item.type.match("^text/plain"))
+      ? "copy"
+      : "none";
+  };
+  document.documentElement.ondrop = async (dropEvent) => {
+    dropEvent.preventDefault();
+    for (const item of dropEvent.dataTransfer.items) {
+      if (item.kind == "string" && item.type.match("^text/plain")) {
+        item.getAsString((s) => (inputElement.value = s));
+      } else if (item.kind == "file" && item.type.match("^text/plain")) {
+        document.getElementById("input").value = (
+          await item.getAsFile().text()
+        ).trim();
+      }
+    }
+  };
+});
