@@ -81,7 +81,7 @@
           }
         ],
         "requestBody": {
-          "description": "Problem input to solve the problem with. Can be found at https://adventofcode.com/${YEAR}/day/${DAY}/input",
+          "description": "Problem input text. Can be found at https://adventofcode.com/${YEAR}/day/${DAY}/input",
           "required": true,
           "content": {
             "text/plain": {
@@ -94,12 +94,12 @@
         },
         "responses": {
           "200": {
-            "description": "Problem solved successfully - the solution is returned as the response body text.",
+            "description": "Problem solved successfully - the answer is returned as the response body text.",
             "content": {
               "text/plain": {
                 "schema": {
                   "type": "string",
-                  "description": "The problem solution for the specified input.",
+                  "description": "The answer for the specified problem.",
                   "example": "2"
                 }
               }
