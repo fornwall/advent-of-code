@@ -159,16 +159,19 @@ document.getElementById("open-input").addEventListener("click", () => {
 });
 
 const savedInterval = { value: null };
-document.getElementById("output").addEventListener("click", (event) => {
+function notifyOutputCopied() {
   if (savedInterval.value) {
     clearTimeout(savedInterval.value);
   }
-  navigator.clipboard.writeText(event.target.textContent);
-  event.target.classList.add("copied");
+  outputElement.classList.add("copied");
   savedInterval.value = setTimeout(
-    () => event.target.classList.remove("copied"),
+    () => outputElement.classList.remove("copied"),
     2000
   );
+}
+document.getElementById("output").addEventListener("click", (event) => {
+  navigator.clipboard.writeText(event.target.textContent);
+  notifyOutputCopied();
 });
 
 clipboardReadMayWork().then((enabled) => {
@@ -177,6 +180,7 @@ clipboardReadMayWork().then((enabled) => {
     pasteButton.addEventListener("click", async () => {
       inputElement.value = await navigator.clipboard.readText();
       storeForm();
+      runWasmElement.dispatchEvent(new Event("click"));
     });
   } else {
     pasteButton.disabled = true;
@@ -202,7 +206,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     dragEvent.dataTransfer.dropEffect = "copy";
     dragEvent.dataTransfer.effectAllowed = "copy";
-    dragEvent.dataTransfer.setDragImage(outputElement.parentElement, 0, 0);
+    dragEvent.dataTransfer.setDragImage(outputElement, 0, 0);
     dragEvent.dataTransfer.setData(
       "text/plain",
       outputElement.textContent.trim()
@@ -229,4 +233,14 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
   };
+
+  document.addEventListener("paste", (event) => {
+    inputElement.value = event.clipboardData.getData("text/plain");
+    runWasmElement.dispatchEvent(new Event("click"));
+  });
+  document.addEventListener("copy", (event) => {
+    event.clipboardData.setData("text/plain", outputElement.textContent.trim());
+    event.preventDefault();
+    notifyOutputCopied();
+  });
 });
