@@ -54,8 +54,8 @@ fn play(
                 .collect::<VecDeque<u8>>();
 
             if p1_subgame_cards.iter().max().unwrap() > p2_subgame_cards.iter().max().unwrap() {
-                // If player 1 holds the highest card, he will win since since that highest card
-                // will be too big to recurse on (in N cards, the smallest highest card is N, so after
+                // If player 1 holds the highest card, he will win since that highest card will
+                // be too big to recurse on (in N cards, the smallest highest card is N, so after
                 // drawing that card there can at most be N-1 cards remaining, so that card will win).
                 // Due to the "if previous round had same cards player 1 wins" rule we cannot do
                 // the same for player 2, since he may loose due to that rule.
