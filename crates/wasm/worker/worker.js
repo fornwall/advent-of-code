@@ -6,7 +6,9 @@ addEventListener("fetch", (event) => {
 
 function badInput(errorMessage) {
   console.error(errorMessage);
-  return new Response(errorMessage, { status: 400 });
+  const response = new Response(errorMessage, { status: 400 });
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  return response;
 }
 
 async function handleRequest(request) {
