@@ -28,7 +28,7 @@ worker.onmessage = (e) => {
 };
 
 function showMessage(message, isError, executionTime) {
-  executionTimeElement.textContent = `${Math.round(executionTime)}`;
+  executionTimeElement.textContent = `${Math.round(executionTime)} ms`;
 
   outputElement.classList.remove("alert-info");
   if (isError) {
@@ -62,6 +62,10 @@ function execute() {
       inputElement.value,
     ];
     worker.postMessage({ year, day, part, input });
+    outputElement.classList.remove("alert-danger");
+    outputElement.classList.remove("alert-success");
+    outputElement.classList.add("alert-info");
+    outputElement.textContent = "The answer is being computed...";
   }
 }
 
