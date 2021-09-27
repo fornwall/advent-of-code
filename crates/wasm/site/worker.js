@@ -66,7 +66,8 @@ self.onmessage = async (message) => {
       });
     })
     .catch((e) => {
-      const message = "Unable to solve:\n\n" + e.errors.map((e) => `• ${e}`).join("\n");
+      const message =
+        "Unable to solve:\n\n" + e.errors.map((e) => `• ${e}`).join("\n");
       postMessage({
         output: message,
         isError: true,
