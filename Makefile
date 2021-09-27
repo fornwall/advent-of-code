@@ -73,7 +73,7 @@ wasm-size: site-pack
 	cd crates/wasm/site && NODE_ENV=development webpack serve
 
 --watch-and-build-wasm:
-	cargo watch -s 'make site-wasm'
+	cargo watch --ignore crates/wasm/site --shell 'make site-wasm'
 
 serve-site: --run-devserver --watch-and-build-wasm ;
 
