@@ -1,45 +1,78 @@
 "use strict";
 self.importScripts("/generated/advent_of_code_wasm.js");
 
-self.onmessage = async (message) => {
-  const { year, day, part, input, wasm } = message.data;
+async function solveApi(host, year, day, part, input) {
+  const startTime = performance.now();
+  const response = await fetch(`https://${host}/solve/${year}/${day}/${part}`, {
+    method: "POST",
+    headers: { "content-type": "text/plain" },
+    body: input,
+  });
+  const responseText = await response.text();
+  const executionTime = performance.now() - startTime;
+  console.log(
+    `API ${year}-${day}-${part} response from ${host}: ${executionTime} ms ${Math.random()}`
+  );
+  return {
+    answer: responseText,
+    isError: !response.ok,
+    executionTime,
+  };
+}
+
+async function solveWasm(year, day, part, input) {
+  await self.wasmReadyPromise;
+
+  if (!self.wasmWorking) {
+    throw new Error("WebAssembly is not working");
+  }
 
   const startTime = performance.now();
-
   try {
-    if (wasm) {
-      await self.wasmReadyPromise;
-
-      if (!self.wasmWorking) {
-        postMessage({ output: "Wasm is not working", isError: true });
-        return;
-      }
-      const output = wasm_bindgen.solve(year, day, part, input);
-      const executionTime = performance.now() - startTime;
-      postMessage({ output, isError: false, wasm, executionTime });
-    } else {
-      const response = await fetch(
-        `https://advent.fly.dev/solve/${year}/${day}/${part}`,
-        {
-          method: "POST",
-          headers: { "content-type": "text/plain" },
-          body: input,
-        }
-      );
-      const responseText = await response.text();
-      const executionTime = performance.now() - startTime;
-      postMessage({
-        output: responseText,
-        isError: !response.ok,
-        wasm,
-        executionTime,
-      });
-    }
+    const answer = wasm_bindgen.solve(year, day, part, input);
+    const executionTime = performance.now() - startTime;
+    console.log(`Wasm ${year}-${day}-${part} solution in: ${executionTime} ms`);
+    return { answer, executionTime, wasm: true };
   } catch (error) {
     console.error(error);
     const executionTime = performance.now() - startTime;
-    postMessage({ output: error.message, isError: true, wasm, executionTime });
+    return {
+      answer: error.message,
+      isError: true,
+      executionTime,
+    };
   }
+}
+
+self.onmessage = async (message) => {
+  const { year, day, part, input } = message.data;
+
+  const apiPromise1 = solveApi("advent.fly.dev", year, day, part, input);
+  const apiPromise2 = solveApi(
+    "aoc.fornwall.workers.dev",
+    year,
+    day,
+    part,
+    input
+  );
+  const apiPromise3 = solveApi("aoc.fornwall.net", year, day, part, input);
+  const wasmPromise = solveWasm(year, day, part, input);
+  Promise.any([apiPromise1, apiPromise2, apiPromise3, wasmPromise])
+    .then((response) => {
+      postMessage({
+        output: response.answer,
+        isError: response.isError,
+        executionTime: response.executionTime,
+      });
+    })
+    .catch((e) => {
+      const message = "Unable to solve:\n\n" + e.errors.map((e) => `• ${e}`).join("\n");
+      postMessage({
+        output: message,
+        isError: true,
+        executionTime: 0,
+      });
+    });
 };
 
 self.wasmReadyPromise = (async () => {

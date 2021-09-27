@@ -8,33 +8,26 @@ const inputElement = document.getElementById("input");
 
 const outputElement = document.getElementById("output");
 
-const apiExecutionTimeElement = document.getElementById("api-execution-time");
-const wasmExecutionTimeElement = document.getElementById("wasm-execution-time");
+const executionTimeElement = document.getElementById("execution-time");
 
-const runWasmElement = document.getElementById("run-wasm");
-const runApiElement = document.getElementById("run-api");
+const runButton = document.getElementById("solve-button");
 const showElement = document.getElementById("run-visualizer");
+const wasmWorking = { value: true };
 
 worker.onmessage = (e) => {
   if ("wasmWorking" in e.data) {
     if (!e.data.wasmWorking) {
-      runWasmElement.disabled = true;
-      runWasmElement.title = "Wasm is not working - check console logs";
-      showElement.disabled = true;
+      wasmWorking.value = false;
     }
   } else {
-    const { isError, output, wasm, executionTime } = e.data;
-    const runButton = wasm ? runWasmElement : runApiElement;
+    const { isError, output, executionTime } = e.data;
     runButton.classList.remove("in-progress");
     runButton.disabled = false;
-    showMessage(output, isError, wasm, executionTime);
+    showMessage(output, isError, executionTime);
   }
 };
 
-function showMessage(message, isError, wasm, executionTime) {
-  const executionTimeElement = wasm
-    ? wasmExecutionTimeElement
-    : apiExecutionTimeElement;
+function showMessage(message, isError, executionTime) {
   executionTimeElement.textContent = `${Math.round(executionTime)}`;
 
   outputElement.classList.remove("alert-info");
@@ -51,7 +44,7 @@ function showMessage(message, isError, wasm, executionTime) {
   outputElement.focus();
 }
 
-function execute(wasm) {
+function execute() {
   partElement.setCustomValidity(
     dayElement.value == 25 && partElement.value == 2
       ? "Day 25 has no second part."
@@ -59,7 +52,6 @@ function execute(wasm) {
   );
 
   if (document.querySelector("form").reportValidity()) {
-    const runButton = wasm ? runWasmElement : runApiElement;
     runButton.disabled = true;
     runButton.classList.add("in-progress");
     outputElement.classList.remove("blink");
@@ -69,13 +61,13 @@ function execute(wasm) {
       partElement.value,
       inputElement.value,
     ];
-    worker.postMessage({ year, day, part, input, wasm });
+    worker.postMessage({ year, day, part, input });
   }
 }
 
 function isVisualisationEnabled() {
   return (
-    !runWasmElement.disabled &&
+    wasmWorking.value &&
     !!gistMapping?.[yearElement.value]?.[dayElement.value]?.["visualization"]
   );
 }
@@ -120,8 +112,7 @@ async function clipboardReadMayWork() {
   }
 }
 
-runApiElement.addEventListener("click", () => execute(false));
-runWasmElement.addEventListener("click", () => execute(true));
+runButton.addEventListener("click", () => execute());
 
 showElement.addEventListener("click", visualize);
 showElement.disabled = !isVisualisationEnabled();
@@ -180,7 +171,7 @@ clipboardReadMayWork().then((enabled) => {
     pasteButton.addEventListener("click", async () => {
       inputElement.value = await navigator.clipboard.readText();
       storeForm();
-      runWasmElement.dispatchEvent(new Event("click"));
+      runButton.dispatchEvent(new Event("click"));
     });
   } else {
     pasteButton.disabled = true;
@@ -236,7 +227,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("paste", (event) => {
     inputElement.value = event.clipboardData.getData("text/plain");
-    runWasmElement.dispatchEvent(new Event("click"));
+    storeForm();
+    runButton.dispatchEvent(new Event("click"));
   });
   document.addEventListener("copy", (event) => {
     event.clipboardData.setData("text/plain", outputElement.textContent.trim());
