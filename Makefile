@@ -5,6 +5,7 @@ CARGO_COMMAND = cargo
 CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::cargo \
 	-W clippy::cast_lossless \
+	-W clippy::dbg_macro \
 	-W clippy::expect_used \
 	-W clippy::manual_filter_map \
 	-W clippy::if_not_else \

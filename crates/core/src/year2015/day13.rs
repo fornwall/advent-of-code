@@ -29,7 +29,6 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
         if words.len() != 11 {
             return Err("Invalid line not consisting of 11 words".to_string());
         }
-        dbg!(&words);
 
         let person_name = words[0];
         let happiness_change = words[3]
