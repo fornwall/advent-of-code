@@ -173,9 +173,7 @@ clipboardReadMayWork().then((enabled) => {
   const pasteButton = document.getElementById("paste");
   if (enabled) {
     pasteButton.addEventListener("click", async () => {
-      inputElement.value = await navigator.clipboard.readText();
-      storeForm();
-      runButton.dispatchEvent(new Event("click"));
+      setInputText(await navigator.clipboard.readText());
     });
   } else {
     pasteButton.disabled = true;
@@ -191,6 +189,12 @@ document.getElementById("open-playground").addEventListener("click", () => {
     alert("Not available yet!");
   }
 });
+
+function setInputText(input) {
+  inputElement.value = input.trim();
+  storeForm();
+  runButton.dispatchEvent(new Event("click"));
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   const element = document.documentElement;
@@ -220,19 +224,15 @@ window.addEventListener("DOMContentLoaded", () => {
     dropEvent.preventDefault();
     for (const item of dropEvent.dataTransfer.items) {
       if (item.kind == "string" && item.type.match("^text/plain")) {
-        item.getAsString((s) => (inputElement.value = s));
+        item.getAsString((s) => setInputText(s));
       } else if (item.kind == "file" && item.type.match("^text/plain")) {
-        document.getElementById("input").value = (
-          await item.getAsFile().text()
-        ).trim();
+        setInputText(await item.getAsFile().text());
       }
     }
   };
 
   document.addEventListener("paste", (event) => {
-    inputElement.value = event.clipboardData.getData("text/plain");
-    storeForm();
-    runButton.dispatchEvent(new Event("click"));
+    setInputText(event.clipboardData.getData("text/plain"));
   });
   document.addEventListener("copy", (event) => {
     event.clipboardData.setData("text/plain", outputElement.textContent.trim());
