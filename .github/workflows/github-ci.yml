@@ -211,9 +211,9 @@ jobs:
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-http-server
       run: |
+        NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
-        NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
         strip -s target/x86_64-unknown-linux-musl/release/advent-of-code-server
@@ -257,9 +257,9 @@ jobs:
       env:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-grpc-server
       run: |
+        NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
         cp -Rf ../core core
         perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
-        NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
         strip -s target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server
