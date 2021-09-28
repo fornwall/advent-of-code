@@ -1,47 +1,123 @@
 import gistMapping from "./gist-mapping.json";
-const worker = new Worker("./worker.js", { name: "solver" });
 
 const yearElement = document.getElementById("year");
 const dayElement = document.getElementById("day");
 const partElement = document.getElementById("part");
 const inputElement = document.getElementById("input");
-
 const outputElement = document.getElementById("output");
-
 const executionTimeElement = document.getElementById("execution-time");
-
 const runButton = document.getElementById("solve-button");
 const showElement = document.getElementById("run-visualizer");
-const wasmWorking = { value: true };
 
-worker.onmessage = (e) => {
+const workers = {
+  api: null,
+  wasm: null,
+};
+
+function reloadApiWorker() {
+  if (workers.api) workers.api.terminate();
+  workers.api = new Worker("./worker-api.js", { name: "api-solver" });
+  workers.api.onmessage = onWorkerMessage;
+}
+function reloadWasmWorker() {
+  if (workers.wasm) workers.wasm.terminate();
+  workers.wasm = new Worker("./worker-wasm.js", { name: "wasm-solver" });
+  workers.wasm.onmessage = onWorkerMessage;
+}
+
+reloadApiWorker();
+reloadWasmWorker();
+
+const wasmWorking = { value: true };
+const currentProblem = {
+  year: 0,
+  day: 0,
+  part: 0,
+  input: null,
+  output: null,
+  isInternalError: false,
+};
+
+function onWorkerMessage(e) {
   if ("wasmWorking" in e.data) {
     if (!e.data.wasmWorking) {
       wasmWorking.value = false;
     }
   } else {
-    const { isError, output, executionTime } = e.data;
+    const {
+      worker,
+      isError,
+      isInternalError,
+      output,
+      executionTime,
+      year,
+      day,
+      part,
+      input,
+    } = e.data;
+
+    const secondAnswer =
+      currentProblem.year === year &&
+      currentProblem.day == day &&
+      currentProblem.part === part &&
+      currentProblem.input == input;
+
+    let extraOutput = "";
+
+    if (isInternalError) {
+      if (currentProblem.isInternalError) {
+        // Both workers have failed with internal errors.
+        extraOutput = "\n" + currentProblem.output;
+      } else if (secondAnswer) {
+        // This was the second answer, but first one was ok - ignore.
+        return;
+      } else {
+        // If this was the first worker, await other one which may have better luck.
+        currentProblem.isInternalError = true;
+        currentProblem.output = output;
+        return;
+      }
+    }
+
+    if (secondAnswer) {
+      // This is the second message about this problem.
+      return;
+    } else if (worker == "api") {
+      // We got an API response first and can abort the Wasm worker.
+      reloadWasmWorker();
+    } else if (worker == "wasm") {
+      // We got an API response first and can abort the API worker.
+      reloadApiWorker();
+    }
+
+    currentProblem.isInternalError = false;
+    currentProblem.year = year;
+    currentProblem.day = day;
+    currentProblem.part = part;
+    currentProblem.input = input;
+
     runButton.classList.remove("in-progress");
     runButton.disabled = false;
-    showMessage(output, isError, executionTime);
-  }
-};
 
-function showMessage(message, isError, executionTime) {
-  executionTimeElement.textContent = `${Math.round(executionTime)} ms`;
+    const roundedTime = Math.round(executionTime);
+    executionTimeElement.textContent = `${
+      roundedTime == 0 ? executionTime.toFixed(2) : roundedTime
+    } ms`;
 
-  outputElement.classList.remove("alert-info");
-  if (isError) {
-    outputElement.classList.add("alert-danger");
-    outputElement.classList.remove("alert-success");
-  } else {
-    outputElement.classList.add("alert-success");
-    outputElement.classList.remove("alert-danger");
+    outputElement.classList.remove("alert-info");
+    if (isError) {
+      outputElement.classList.add("alert-danger");
+      outputElement.classList.remove("alert-success");
+    } else {
+      outputElement.classList.add("alert-success");
+      outputElement.classList.remove("alert-danger");
+    }
+    outputElement.textContent =
+      (isInternalError ? "⚠ Internal Error ⚠\n\n" : "") + output + extraOutput;
+    outputElement.scrollIntoView();
+    outputElement.classList.add("blink");
+    outputElement.focus();
   }
-  outputElement.textContent = message;
-  outputElement.scrollIntoView();
-  outputElement.classList.add("blink");
-  outputElement.focus();
 }
 
 function execute() {
@@ -61,7 +137,12 @@ function execute() {
       partElement.value,
       inputElement.value,
     ];
-    worker.postMessage({ year, day, part, input });
+
+    currentProblem.input = null;
+    currentProblem.output = null;
+    currentProblem.isInternalError = false;
+    workers.api.postMessage({ year, day, part, input });
+    workers.wasm.postMessage({ year, day, part, input });
     outputElement.classList.remove("alert-danger");
     outputElement.classList.remove("alert-success");
     outputElement.classList.add("alert-info");
