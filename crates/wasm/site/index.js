@@ -83,10 +83,10 @@ function onWorkerMessage(e) {
       // This is the second message about this problem.
       return;
     } else if (worker == "api") {
-      // We got an API response first and can abort the Wasm worker.
+      // We got a API response first and can abort the Wasm worker.
       reloadWasmWorker();
     } else if (worker == "wasm") {
-      // We got an API response first and can abort the API worker.
+      // We got a Wasm response first and can abort the API worker.
       reloadApiWorker();
     }
 
