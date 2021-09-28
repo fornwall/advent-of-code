@@ -11,6 +11,10 @@ async function solveApi(host, year, day, part, input) {
       }
     );
 
+    if (![200, 400].includes(response.status)) {
+        throw new Error(`Unexpected response status code: ${response.status}`);
+    }
+
     const responseText = await response.text();
     const executionTime = performance.now() - startTime;
     console.log(
