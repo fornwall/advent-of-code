@@ -116,6 +116,24 @@ async function clipboardReadMayWork() {
   }
 }
 
+function setInputText(input) {
+  inputElement.value = input.trim();
+  storeForm();
+  runButton.dispatchEvent(new Event("click"));
+}
+
+const savedInterval = { value: null };
+function notifyOutputCopied() {
+  if (savedInterval.value) {
+    clearTimeout(savedInterval.value);
+  }
+  outputElement.classList.add("copied");
+  savedInterval.value = setTimeout(
+    () => outputElement.classList.remove("copied"),
+    2000
+  );
+}
+
 runButton.addEventListener("click", () => execute());
 
 showElement.addEventListener("click", visualize);
@@ -153,18 +171,7 @@ document.getElementById("open-input").addEventListener("click", () => {
   window.open(link);
 });
 
-const savedInterval = { value: null };
-function notifyOutputCopied() {
-  if (savedInterval.value) {
-    clearTimeout(savedInterval.value);
-  }
-  outputElement.classList.add("copied");
-  savedInterval.value = setTimeout(
-    () => outputElement.classList.remove("copied"),
-    2000
-  );
-}
-document.getElementById("output").addEventListener("click", (event) => {
+outputElement.addEventListener("click", (event) => {
   navigator.clipboard.writeText(event.target.textContent);
   notifyOutputCopied();
 });
@@ -190,53 +197,47 @@ document.getElementById("open-playground").addEventListener("click", () => {
   }
 });
 
-function setInputText(input) {
-  inputElement.value = input.trim();
-  storeForm();
-  runButton.dispatchEvent(new Event("click"));
-}
+document.documentElement.draggable = true;
 
-window.addEventListener("DOMContentLoaded", () => {
-  const element = document.documentElement;
-  element.draggable = true;
-  element.addEventListener("dragstart", (dragEvent) => {
-    if (dragEvent.target.tagName == "TEXTAREA") {
-      return;
+document.documentElement.addEventListener("dragstart", (dragEvent) => {
+  if (dragEvent.target.tagName == "TEXTAREA") {
+    return;
+  }
+  dragEvent.dataTransfer.dropEffect = "copy";
+  dragEvent.dataTransfer.effectAllowed = "copy";
+  dragEvent.dataTransfer.setDragImage(outputElement, 0, 0);
+  dragEvent.dataTransfer.setData(
+    "text/plain",
+    outputElement.textContent.trim()
+  );
+});
+
+document.documentElement.ondragover = (dragOverEvent) => {
+  dragOverEvent.preventDefault();
+  dragOverEvent.dataTransfer.dropEffect = Array.from(
+    dragOverEvent.dataTransfer.items
+  ).some((item) => item.type.match("^text/plain"))
+    ? "copy"
+    : "none";
+};
+
+document.documentElement.ondrop = async (dropEvent) => {
+  dropEvent.preventDefault();
+  for (const item of dropEvent.dataTransfer.items) {
+    if (item.kind == "string" && item.type.match("^text/plain")) {
+      item.getAsString((s) => setInputText(s));
+    } else if (item.kind == "file" && item.type.match("^text/plain")) {
+      setInputText(await item.getAsFile().text());
     }
-    dragEvent.dataTransfer.dropEffect = "copy";
-    dragEvent.dataTransfer.effectAllowed = "copy";
-    dragEvent.dataTransfer.setDragImage(outputElement, 0, 0);
-    dragEvent.dataTransfer.setData(
-      "text/plain",
-      outputElement.textContent.trim()
-    );
-  });
+  }
+};
 
-  document.documentElement.ondragover = (dragOverEvent) => {
-    dragOverEvent.preventDefault();
-    dragOverEvent.dataTransfer.dropEffect = Array.from(
-      dragOverEvent.dataTransfer.items
-    ).some((item) => item.type.match("^text/plain"))
-      ? "copy"
-      : "none";
-  };
-  document.documentElement.ondrop = async (dropEvent) => {
-    dropEvent.preventDefault();
-    for (const item of dropEvent.dataTransfer.items) {
-      if (item.kind == "string" && item.type.match("^text/plain")) {
-        item.getAsString((s) => setInputText(s));
-      } else if (item.kind == "file" && item.type.match("^text/plain")) {
-        setInputText(await item.getAsFile().text());
-      }
-    }
-  };
+document.addEventListener("paste", (event) => {
+  setInputText(event.clipboardData.getData("text/plain"));
+});
 
-  document.addEventListener("paste", (event) => {
-    setInputText(event.clipboardData.getData("text/plain"));
-  });
-  document.addEventListener("copy", (event) => {
-    event.clipboardData.setData("text/plain", outputElement.textContent.trim());
-    event.preventDefault();
-    notifyOutputCopied();
-  });
+document.addEventListener("copy", (event) => {
+  event.clipboardData.setData("text/plain", outputElement.textContent.trim());
+  event.preventDefault();
+  notifyOutputCopied();
 });
