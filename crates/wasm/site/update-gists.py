@@ -44,7 +44,7 @@ def add_header(src, year, day):
             path_in_repo = f"crates/core/src/{module_path}.rs"
         src_to_include = Path(f"../../../{path_in_repo}").read_text()
         module_rust = module.replace("::", " { pub mod ")
-        suffix += f"\n\n#[allow(dead_code)]\nmod {module_rust} {{\n"
+        suffix += f"\n\n#[allow(dead_code, unused_imports, unused_macros)]\nmod {module_rust} {{\n"
         suffix += f"    // This is https://github.com/fornwall/advent-of-code/tree/master/{path_in_repo} inlined to work in the Rust Playground."
         for line in iter(src_to_include.splitlines()):
             if line:

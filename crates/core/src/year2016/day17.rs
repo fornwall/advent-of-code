@@ -1,5 +1,5 @@
 use crate::common::md5::Context;
-use crate::Input;
+use crate::input::Input;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
 

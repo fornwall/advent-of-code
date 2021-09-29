@@ -1,5 +1,5 @@
 use crate::common::md5::Context;
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     const MAX_INDEX: i32 = 100_000_000;

@@ -37,15 +37,14 @@ mod year2018;
 mod year2019;
 mod year2020;
 
-use input::{Input, Part};
 #[cfg(feature = "visualization")]
 use painter::PainterRef;
 
 // Never inline to prevent stack size from blowing up in release builds.
 #[inline(never)]
 fn to_stringer_input<T: ToString>(
-    function: fn(&mut Input) -> Result<T, String>,
-    input: &mut Input,
+    function: fn(&mut input::Input) -> Result<T, String>,
+    input: &mut input::Input,
 ) -> Result<String, String> {
     function(input).map(|value| value.to_string())
 }
@@ -73,6 +72,7 @@ pub fn solve(
     #[cfg(feature = "visualization")] painter: PainterRef,
 ) -> Result<String, String> {
     #![allow(clippy::let_and_return)]
+    use crate::input::{Input, Part};
 
     if input.is_empty() {
         return Err("Empty input".to_string());

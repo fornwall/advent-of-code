@@ -1,5 +1,5 @@
 use crate::common::md5::Context;
-use crate::Input;
+use crate::input::Input;
 use std::iter::FromIterator;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {

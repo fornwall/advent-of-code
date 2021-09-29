@@ -1,5 +1,5 @@
 use super::assembunny::{Computer, Instruction, ValueOrRegister, Word};
-use crate::Input;
+use crate::input::Input;
 
 fn factorial(num: Word) -> Word {
     match num {

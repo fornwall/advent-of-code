@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     const TARGET_SIZE: u8 = 150;

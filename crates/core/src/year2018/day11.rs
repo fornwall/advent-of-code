@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 type GridValue = i32;
 
 /// A summed-area table is a data structure for quickly generating sum of values in a rectangular grid.

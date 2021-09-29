@@ -1,5 +1,5 @@
 use super::int_code::{Program, Word};
-use crate::Input;
+use crate::input::Input;
 use std::collections::{HashSet, VecDeque};
 
 const DIRECTIONS: [(i32, i32); 4] = [(0, 1), (0, -1), (-1, 0), (1, 0)];

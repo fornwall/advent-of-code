@@ -1,6 +1,6 @@
 use super::int_code::{Program, Word};
 use crate::common::character_recognition::recognize;
-use crate::Input;
+use crate::input::Input;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]

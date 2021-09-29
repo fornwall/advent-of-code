@@ -1,5 +1,5 @@
 use super::elfcode::Program;
-use crate::Input;
+use crate::input::Input;
 use std::collections::HashSet;
 
 fn parse(input_string: &str) -> Result<Program, String> {

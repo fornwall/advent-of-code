@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 struct Ingredient {
     capacity: i32,

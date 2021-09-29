@@ -1,5 +1,5 @@
 use crate::common::permutation::all_permutations;
-use crate::Input;
+use crate::input::Input;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 

@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 struct Disc {
     positions: u32,

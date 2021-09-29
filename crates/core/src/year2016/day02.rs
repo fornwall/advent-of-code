@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     #![allow(clippy::match_same_arms)]

@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 // arr[]  ---> Input Array
 // data[] ---> Temporary array to store current combination

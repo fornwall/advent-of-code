@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX_DELAY: usize = 10_000_000;

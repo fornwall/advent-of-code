@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
     let mut floor = 0;

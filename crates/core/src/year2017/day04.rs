@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     let anagrams_are_equal = input.is_part_two();

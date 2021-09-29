@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     fn is_triangle_possible(n1: u16, n2: u16, n3: u16) -> bool {

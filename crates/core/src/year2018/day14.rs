@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 fn run_until<F>(condition: F) -> Result<Vec<u8>, String>
 where

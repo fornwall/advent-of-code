@@ -1,5 +1,5 @@
 use crate::common::permutation::all_permutations;
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut password = [b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h'];

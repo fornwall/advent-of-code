@@ -1,5 +1,5 @@
 use super::int_code::Program;
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut program = Program::parse(input.text)?;

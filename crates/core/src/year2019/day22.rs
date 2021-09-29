@@ -1,5 +1,5 @@
+use crate::input::Input;
 use crate::mod_exp::mod_exp;
-use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<i128, String> {
     if input.is_part_one() {

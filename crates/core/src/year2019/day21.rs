@@ -1,5 +1,5 @@
 use super::int_code::{Program, Word};
-use crate::Input;
+use crate::input::Input;
 
 fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<Word, String> {
     let mut intcode_program = Program::parse(intcode_program_string)?;

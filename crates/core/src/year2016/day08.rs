@@ -1,5 +1,5 @@
 use crate::common::character_recognition::recognize;
-use crate::Input;
+use crate::input::Input;
 
 struct Screen {
     pixels: [bool; Screen::WIDTH * Screen::HEIGHT],

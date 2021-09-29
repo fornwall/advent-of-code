@@ -1,5 +1,5 @@
 use super::assembunny::{Computer, Word};
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<Word, String> {
     let mut computer = Computer::parse(input.text)?;

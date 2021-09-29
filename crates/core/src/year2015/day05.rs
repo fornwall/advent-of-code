@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     fn is_nice_part_1(string: &&str) -> bool {

@@ -1,4 +1,4 @@
-use crate::{Input, Part};
+use crate::input::{Input, Part};
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     fn parse_tuple(tuple: &str) -> Option<(u16, u16)> {

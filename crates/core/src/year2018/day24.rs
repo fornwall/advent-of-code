@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 #[derive(Copy, Clone, PartialEq)]
 enum AttackType {

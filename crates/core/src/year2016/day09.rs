@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 fn uncompressed_size(text: &[u8], recursive: bool) -> Result<u64, String> {
     let error_mapper_uf8 = |_| "Invalid input";

@@ -1,5 +1,5 @@
 use super::assembunny::{Computer, Instruction, ValueOrRegister};
-use crate::Input;
+use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let computer = Computer::parse(input.text)?;

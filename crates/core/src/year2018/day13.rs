@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
 enum TrackPiece {

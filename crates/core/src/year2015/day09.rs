@@ -1,5 +1,5 @@
 use crate::common::permutation::all_permutations;
-use crate::Input;
+use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {

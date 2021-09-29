@@ -1,5 +1,5 @@
 use crate::common::md5::Context;
-use crate::Input;
+use crate::input::Input;
 
 fn to_hash_chars(hash: &[u8]) -> [u8; 32] {
     let mut hash_chars = [0_u8; 32];

@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 fn compute_checksum(input: &str) -> String {
     let candidate = input

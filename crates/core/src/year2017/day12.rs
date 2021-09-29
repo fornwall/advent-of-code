@@ -1,5 +1,5 @@
+use crate::input::Input;
 use crate::year2017::disjoint_set::DisjointSet;
-use crate::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     let num_programs = input.text.lines().count();

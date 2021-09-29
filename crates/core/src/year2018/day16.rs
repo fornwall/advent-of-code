@@ -1,5 +1,5 @@
 use super::elfcode::{Opcode, Registers};
-use crate::Input;
+use crate::input::Input;
 use std::collections::HashSet;
 
 struct Sample {

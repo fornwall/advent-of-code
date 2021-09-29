@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 fn read_string(s: &str) -> String {
     let mut result = String::new();

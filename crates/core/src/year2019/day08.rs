@@ -1,5 +1,5 @@
 use crate::common::character_recognition::recognize;
-use crate::Input;
+use crate::input::Input;
 
 const PIXELS_WIDE: u32 = 25;
 const PIXELS_TALL: u32 = 6;

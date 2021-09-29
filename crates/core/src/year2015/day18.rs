@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 
 struct Grid {
     data: [bool; 10_000],

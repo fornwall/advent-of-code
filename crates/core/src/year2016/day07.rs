@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 use std::collections::HashSet;
 
 fn has_abba(ip: &&str) -> bool {

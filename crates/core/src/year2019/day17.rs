@@ -1,5 +1,5 @@
 use super::int_code::Program;
-use crate::Input;
+use crate::input::Input;
 use std::collections::VecDeque;
 use std::slice::Iter;
 

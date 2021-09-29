@@ -1,4 +1,4 @@
-use crate::Input;
+use crate::input::Input;
 use std::collections::HashSet;
 
 fn is_valid(password: &[u8]) -> bool {
