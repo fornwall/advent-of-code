@@ -523,8 +523,6 @@ jobs:
       run: |
         make install-nightly
         make install-wasm-bindgen
-    - name: Install the Netlify CLI
-      run: npm install netlify-cli -g
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v2
       with:
@@ -543,6 +541,8 @@ jobs:
         git config --global user.email "ci@fornwall.net"
         git config --global user.name "CI"
         make deploy-site
+    - name: Install the Netlify CLI
+      run: npm install netlify-cli -g
     - name: Deploy to Netlify
       run: make netlify
       env:
