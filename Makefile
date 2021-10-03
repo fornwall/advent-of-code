@@ -71,7 +71,7 @@ wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
 --run-devserver:
-	cd crates/wasm/site && NODE_ENV=development webpack serve
+	cd crates/wasm/site && NODE_ENV=development webpack serve --https
 
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell 'make site-wasm'
@@ -125,5 +125,18 @@ netlify:
 		cd .. && \
 		netlify deploy --prod
 
-.PHONY: check install-cargo-deps site-wasm site-pack wasm-size --run-devserver --watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify
+deploy-site:
+	npm install -g webpack webpack-cli && \
+		make WASM_RELEASE=1 site-pack && \
+		curl https://adventofcode.com/favicon.ico > crates/wasm/site/favicon.ico
+		cd crates/wasm && \
+		rm -Rf aoc.fornwall.net && \
+		git clone -b site git@github.com:fornwall/aoc.fornwall.net.git && \
+		cd aoc.fornwall.net && \
+		rm -Rf * && \
+		cp -Rf ../site/* . && \
+		git add * && \
+		git commit -m "Update site: ${GITHUB_SHA}" && \
+		git push
 
+.PHONY: check install-cargo-deps site-wasm site-pack wasm-size --run-devserver --watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify deploy-site

@@ -535,6 +535,14 @@ jobs:
       with:
         name: new-benchmark
         path: crates/wasm/site
+    - name: Deploy site
+      run: |
+        echo "${{ secrets.SITE_DEPLOY_SSH_KEY }}" | base64 --decode > /tmp/id_ed25519
+        chmod 0600 /tmp/id_ed25519
+        export GIT_SSH_COMMAND='ssh -i /tmp/id_ed25519'
+        git config --global user.email "ci@fornwall.net"
+        git config --global user.name "CI"
+        make deploy-site
     - name: Deploy to Netlify
       run: make netlify
       env:
