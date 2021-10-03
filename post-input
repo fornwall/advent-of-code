@@ -27,7 +27,7 @@ case $WHERE in
   cloudflare)
     HOST=https://aoc.fornwall.workers.dev;;
   netlify)
-    HOST=https://aoc.fornwall.net;;
+    HOST=https://mystifying-blackwell-9e705f.netlify.app;;
   local)
     HOST=http://localhost:8080;;
   *)

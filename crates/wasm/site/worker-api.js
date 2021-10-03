@@ -43,7 +43,7 @@ self.onmessage = async (message) => {
     part,
     input
   );
-  const apiPromise3 = solveApi("aoc.fornwall.net", year, day, part, input);
+  const apiPromise3 = solveApi("mystifying-blackwell-9e705f.netlify.app", year, day, part, input);
 
   Promise.any([apiPromise1, apiPromise2, apiPromise3])
     .then((response) => {
