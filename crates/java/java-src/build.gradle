@@ -10,7 +10,7 @@ repositories {
 }
 
 group = "net.fornwall"
-version = "2019.12.383"
+version = "2019.12.384"
 sourceCompatibility = 1.11
 
 dependencies {
