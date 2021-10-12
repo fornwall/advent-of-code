@@ -28,4 +28,4 @@ For learning and demonstration purposes, this repository contains additional res
   - Deployed to [Cloudflare Workers](https://workers.cloudflare.com/).
   - Deployed to [Netlify Functions](https://www.netlify.com/products/functions/).
 
-All builds and deployments are automated by the Github CI.
+All builds and deployments are done from the [CI using Github Actions](.github/workflows/github-ci.yml).
