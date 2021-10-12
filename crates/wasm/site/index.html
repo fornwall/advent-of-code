@@ -71,20 +71,8 @@
   <body>
     <main class="container" style="max-width: 720px">
       <form>
-        <div class="py-4 text-center">
+        <div class="py-3 text-center">
           <h1 class="mt-0">Advent of Code Solver</h1>
-          <p class="mb-0">
-            Solve
-            <a href="https://adventofcode.com/">Advent of Code</a> problems
-            using Wasm and a <a href="/api/">HTTP API</a>.
-          </p>
-          <p class="mb-0">
-            See the
-            <a href="https://github.com/fornwall/advent-of-code">
-              GitHub repository</a
-            >
-            and <a href="/times/">benchmarks</a>.
-          </p>
         </div>
 
         <div class="input-group mb-3">
@@ -148,12 +136,12 @@
           <div class="row mb-3">
             <div class="col p-0">
               <button
-                id="open-input"
+                id="open-problem"
                 type="button"
                 class="btn btn-secondary form-control"
                 accesskey="g"
               >
-                Get Input
+                Problem
               </button>
             </div>
             <div class="col pl-2 pr-2">
@@ -234,6 +222,19 @@
         </div>
       </form>
     </main>
+
+    <footer class="text-center">
+      <ul class="list-inline">
+        <li class="list-inline-item">
+          <a href="https://adventofcode.com/">Advent of Code</a>
+        </li>
+        <li class="list-inline-item"><a href="/api/">API</a></li>
+        <li class="list-inline-item"><a href="/times/">Benchmarks</a></li>
+        <li class="list-inline-item">
+          <a href="https://github.com/fornwall/advent-of-code">Source</a>
+        </li>
+      </ul>
+    </footer>
 
     <script type="module" src="index.min.js"></script>
   </body>

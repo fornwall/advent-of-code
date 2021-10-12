@@ -101,7 +101,9 @@ function onWorkerMessage(e) {
 
     const roundedTime = Math.round(executionTime);
     executionTimeElement.textContent = `${
-      roundedTime == 0 ? executionTime.toFixed(2) : roundedTime
+      roundedTime == 0
+        ? executionTime.toFixed(2)
+        : roundedTime.toLocaleString("en")
     } ms`;
 
     outputElement.classList.remove("alert-info");
@@ -247,8 +249,8 @@ window.addEventListener("pageshow", () => {
   }
 });
 
-document.getElementById("open-input").addEventListener("click", () => {
-  const link = `https://adventofcode.com/${yearElement.value}/day/${dayElement.value}/input`;
+document.getElementById("open-problem").addEventListener("click", () => {
+  const link = `https://adventofcode.com/${yearElement.value}/day/${dayElement.value}`;
   window.open(link);
 });
 
