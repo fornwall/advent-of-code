@@ -12,7 +12,7 @@ pip install --upgrade advent-of-code
 
 The `advent_of_code` package exports a single `solve` function with the following signature:
 
-```js
+```python
 def solve(year: int, day: int, part: int, input: str) -> str
 ```
 
@@ -21,8 +21,8 @@ Examples:
 ```python
 from advent_of_code import solve
 
-assert "2" == solve(2019, 1, 1, "14")
-assert "30" == solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4")
+assert solve(2019, 1, 1, "14") == "2"
+assert solve(2019, 3, 2, "R8,U5,L5,D3\nU7,R6,D4,L4") == "30"
 ```
 
 # Usage as a command line tool
