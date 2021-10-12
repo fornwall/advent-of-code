@@ -1,32 +1,45 @@
 plugins {
-	id 'signing'
-	id "maven-publish"
-	id "java-library"
-	id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
-}
-
-repositories {
-	mavenCentral()
+    id 'signing'
+    id "maven-publish"
+    id "java-library"
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
 group = "net.fornwall"
 version = "2019.12.385"
-sourceCompatibility = 1.11
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.0'
 }
 
 java {
-	withJavadocJar()
-	withSourcesJar()
+    withJavadocJar()
+    withSourcesJar()
+}
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
+
+compileJava {
+    options.release = 11
+}
+
+javadoc {
+    options.addBooleanOption('html5', true)
 }
 
 test {
-	useJUnitPlatform()
-	afterTest { desc, result ->
-		println "Test ${desc.name} [${desc.className}] result: ${result.resultType}"
-	}
+    useJUnitPlatform()
+    afterTest { desc, result ->
+        println "Test ${desc.name} [${desc.className}] result: ${result.resultType}"
+    }
 }
 
 // See https://docs.gradle.org/current/userguide/publishing_maven.html
@@ -42,62 +55,39 @@ test {
 // Then publish to local (~/.m2/) and remote with:
 //    ./gradlew publishToMavenLocal
 //    ./gradlew -PsonatypeUsername=XXX -PsonatypePassword=YYY publishMavenJavaPublicationToMavenRepository
-//
-// Finally sign in to https://oss.sonatype.org/ to Close and Release as described at
-// https://central.sonatype.org/publish/release/
-ext.admin = hasProperty('sonatypeUsername')
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			artifactId = 'aoc'
-			from components.java
-			pom {
-				name = 'AdventOfCode'
-				description = 'Advent of Code solver'
-				url = 'https://github.com/fornwall/advent-of-code'
-				licenses {
-					license {
-						name = 'The MIT License'
-						url = 'https://opensource.org/licenses/MIT'
-					}
-				}
-				developers {
-					developer {
-						id = 'fornwall'
-						name = 'Fredrik Fornwall'
-						email = 'fredrik@fornwall.net'
-					}
-				}
-				scm {
-					connection = 'scm:git:git://github.com/fornwall/advent-of-code.git'
-					developerConnection = 'scm:git:ssh://git@github.com/fornwall/advent-of-code.git'
-					url = 'http://github.com/fornwall/advent-of-code/'
-				}
-			}
-		}
-	}
-}
-
-nexusPublishing {
-    repositories {
-        sonatype()
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'aoc'
+            from components.java
+            pom {
+                name = 'AdventOfCode'
+                description = 'Advent of Code solver'
+                url = 'https://github.com/fornwall/advent-of-code'
+                licenses {
+                  license {
+                    name = 'The MIT License'
+                    url = 'https://opensource.org/licenses/MIT'
+                  }
+                }
+                developers {
+                    developer {
+                        id = 'fornwall'
+                        name = 'Fredrik Fornwall'
+                        email = 'fredrik@fornwall.net'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/fornwall/advent-of-code.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/fornwall/advent-of-code.git'
+                    url = 'http://github.com/fornwall/advent-of-code/'
+                }
+            }
+        }
     }
-}
-
-compileJava {
-    options.release = 11
 }
 
 signing {
-	sign publishing.publications.mavenJava
+    sign publishing.publications.mavenJava
 }
 
-javadoc {
-	options.addBooleanOption('html5', true)
-}
-
-task printBuiltJar {
-    doLast {
-        println jar.archiveFile.get().asFile
-    }
-}
