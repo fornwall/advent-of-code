@@ -316,11 +316,12 @@ document.documentElement.ondrop = async (dropEvent) => {
 };
 
 document.addEventListener("paste", (event) => {
+  event.preventDefault();
   setInputText(event.clipboardData.getData("text/plain"));
 });
 
 document.addEventListener("copy", (event) => {
-  event.clipboardData.setData("text/plain", outputElement.textContent.trim());
   event.preventDefault();
+  event.clipboardData.setData("text/plain", outputElement.textContent.trim());
   notifyOutputCopied();
 });
