@@ -1,5 +1,5 @@
 "use strict";
-self.importScripts("/generated/advent_of_code_wasm.js");
+self.importScripts(new URL("/generated/advent_of_code_wasm.js", import.meta.url));
 
 class WasmNotWorkingError extends Error {
   constructor(message) {
@@ -67,7 +67,7 @@ self.onmessage = async (message) => {
 
 self.wasmReadyPromise = (async () => {
   try {
-    await wasm_bindgen("/generated/advent_of_code_wasm_bg.wasm");
+    await wasm_bindgen(new URL("/generated/advent_of_code_wasm_bg.wasm", import.meta.url));
     self.wasmWorking = true;
   } catch (e) {
     console.warn("WebAssembly not working", e);

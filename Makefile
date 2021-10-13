@@ -61,13 +61,13 @@ site-wasm:
 	wasm-opt $(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
 site-pack: site-wasm
-	cd crates/wasm/site && webpack --mode=production
+	cd crates/wasm/site && rm -Rf dist && webpack --mode=production
 
 wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
 
 --run-devserver:
-	cd crates/wasm/site && NODE_ENV=development webpack serve
+	cd crates/wasm/site && NODE_ENV=development webpack serve --https
 
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell 'make site-wasm'
@@ -111,26 +111,16 @@ install-wasm-bindgen:
 	rustup target add wasm32-unknown-unknown
 	cargo install wasm-bindgen-cli
 
-netlify:
-	npm install -g webpack webpack-cli && \
-		make WASM_RELEASE=1 site-pack && \
-		curl https://adventofcode.com/favicon.ico > crates/wasm/site/favicon.ico
-		make node-package && \
-		cd crates/wasm/functions && \
-		npm install && \
-		cd .. && \
-		netlify deploy --prod
-
 deploy-site:
 	npm install -g webpack webpack-cli && \
 		make WASM_RELEASE=1 site-pack && \
-		curl https://adventofcode.com/favicon.ico > crates/wasm/site/favicon.ico
+		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico
 		cd crates/wasm && \
 		rm -Rf aoc.fornwall.net && \
 		git clone -b site git@github.com:fornwall/aoc.fornwall.net.git && \
 		cd aoc.fornwall.net && \
 		rm -Rf * && \
-		cp -Rf ../site/* . && \
+		cp -Rf ../site/dist/* . && \
 		git add * && \
 		git commit -m "Update site: ${GITHUB_SHA}" && \
 		git push

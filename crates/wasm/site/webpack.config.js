@@ -1,9 +1,10 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
   entry: "./index.js",
   output: {
-    path: __dirname,
     publicPath: "",
-    filename: "index.min.js",
+    filename: "[name].[contenthash].js"
   },
   devServer: {
     static: {
@@ -14,4 +15,9 @@ module.exports = {
       "Cross-Origin-Opener-Policy": "same-origin",
     },
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+        template: 'index.html',
+    })
+  ]
 };

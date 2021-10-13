@@ -16,12 +16,12 @@ const workers = {
 
 function reloadApiWorker() {
   if (workers.api) workers.api.terminate();
-  workers.api = new Worker("./worker-api.js", { name: "api-solver" });
+  workers.api = new Worker(new URL("./worker-api.js", import.meta.url), { name: "api-solver" });
   workers.api.onmessage = onWorkerMessage;
 }
 function reloadWasmWorker() {
   if (workers.wasm) workers.wasm.terminate();
-  workers.wasm = new Worker("./worker-wasm.js", { name: "wasm-solver" });
+  workers.wasm = new Worker(new URL("./worker-wasm.js", import.meta.url), { name: "wasm-solver" });
   workers.wasm.onmessage = onWorkerMessage;
 }
 
@@ -316,7 +316,9 @@ document.documentElement.ondrop = async (dropEvent) => {
 };
 
 document.addEventListener("paste", (event) => {
+  console.log('add paste');
   event.preventDefault();
+  //event.stopPropagation();
   setInputText(event.clipboardData.getData("text/plain"));
 });
 
