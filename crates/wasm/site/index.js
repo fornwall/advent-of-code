@@ -16,12 +16,16 @@ const workers = {
 
 function reloadApiWorker() {
   if (workers.api) workers.api.terminate();
-  workers.api = new Worker(new URL("./worker-api.js", import.meta.url), { name: "api-solver" });
+  workers.api = new Worker(new URL("./worker-api.js", import.meta.url), {
+    name: "api-solver",
+  });
   workers.api.onmessage = onWorkerMessage;
 }
 function reloadWasmWorker() {
   if (workers.wasm) workers.wasm.terminate();
-  workers.wasm = new Worker(new URL("./worker-wasm.js", import.meta.url), { name: "wasm-solver" });
+  workers.wasm = new Worker(new URL("./worker-wasm.js", import.meta.url), {
+    name: "wasm-solver",
+  });
   workers.wasm.onmessage = onWorkerMessage;
 }
 
@@ -316,14 +320,16 @@ document.documentElement.ondrop = async (dropEvent) => {
 };
 
 document.addEventListener("paste", (event) => {
-  console.log('add paste');
-  event.preventDefault();
-  //event.stopPropagation();
-  setInputText(event.clipboardData.getData("text/plain"));
+  if (event.target.tagName !== "TEXTAREA") {
+    event.preventDefault();
+    setInputText(event.clipboardData.getData("text/plain"));
+  }
 });
 
 document.addEventListener("copy", (event) => {
-  event.preventDefault();
-  event.clipboardData.setData("text/plain", outputElement.textContent.trim());
-  notifyOutputCopied();
+  if (event.target.tagName !== "TEXTAREA") {
+    event.preventDefault();
+    event.clipboardData.setData("text/plain", outputElement.textContent.trim());
+    notifyOutputCopied();
+  }
 });

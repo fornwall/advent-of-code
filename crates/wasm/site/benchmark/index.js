@@ -1,7 +1,5 @@
 const baselineJsonPromise = (async () => {
-  const baselineResponse = await fetch(
-    "https://aoc.fornwall.net/new-baseline.json"
-  );
+  const baselineResponse = await fetch("new-baseline.json");
   return await baselineResponse.json();
 })();
 

@@ -2,9 +2,12 @@ import Renderer from "./renderer.js";
 import CanvasRecorder from "./CanvasRecorder.js";
 import { AudioPlayer } from "./audio-player.js";
 
-const visualizerWorker = new Worker("./worker-visualizer.js", {
-  name: "visualizer",
-});
+const visualizerWorker = new Worker(
+  new URL("./worker-visualizer.js", import.meta.url),
+  {
+    name: "visualizer",
+  }
+);
 
 const spinnerImage = document.getElementById("spinnerImage");
 

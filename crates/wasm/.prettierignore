@@ -1,4 +1,6 @@
 **/advent_of_code_wasm.js
 **/*.min.js
 **/generated
+**/dist
 **/target
+/aoc.fornwall.net/

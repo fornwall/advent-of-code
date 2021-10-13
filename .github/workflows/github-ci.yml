@@ -504,7 +504,7 @@ jobs:
         body: ${{ steps.get-comment-body.outputs.body }}
     - run: ls -lha .github/workflows/
 
-  deploy-to-netlify:
+  deploy-site:
     needs: [bump-version, benchmark-current]
     runs-on: ubuntu-latest
     steps:
@@ -532,7 +532,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: new-benchmark
-        path: crates/wasm/site
+        path: crates/wasm/site/benchmark
     - name: Deploy site
       run: |
         echo "${{ secrets.SITE_DEPLOY_SSH_KEY }}" | base64 --decode > /tmp/id_ed25519

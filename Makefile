@@ -61,7 +61,12 @@ site-wasm:
 	wasm-opt $(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
 site-pack: site-wasm
-	cd crates/wasm/site && rm -Rf dist && webpack --mode=production
+	cd crates/wasm/site && \
+		rm -Rf dist && \
+		webpack --mode=production && \
+		cd show && \
+		rm -Rf dist && \
+		webpack --mode=production
 
 wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
@@ -121,7 +126,10 @@ deploy-site:
 		cd aoc.fornwall.net && \
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
-		git add * && \
+		mv ../site/show/dist/ show/ && \
+		cp -Rf ../site/api/ api/ && \
+		cp -Rf ../site/benchmark/ benchmark/ && \
+		git add . && \
 		git commit -m "Update site: ${GITHUB_SHA}" && \
 		git push
 
