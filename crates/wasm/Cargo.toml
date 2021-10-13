@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-wasm"
-version = "2019.12.386"
+version = "2019.12.387"
 keywords = ["advent-of-code", "wasm", "webassembly", "node"]
 categories = ["algorithms", "rust-patterns", "wasm"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
