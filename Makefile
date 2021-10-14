@@ -117,7 +117,7 @@ install-wasm-bindgen:
 	cargo install wasm-bindgen-cli
 
 deploy-site:
-	npm install -g webpack webpack-cli && \
+	npm install -g webpack webpack-cli html-webpack-plugin && \
 		make WASM_RELEASE=1 site-pack && \
 		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico
 		cd crates/wasm && \
