@@ -519,10 +519,10 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - name: Install wasm-opt
       run: brew install binaryen
-    - name: Install wasm-pack and nightly
-      run: |
-        make install-nightly
-        make install-wasm-bindgen
+    - name: Install Rust nightly
+      run: make install-nightly
+    - name: Install wasm-bindgen
+      run: make install-wasm-bindgen
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v2
       with:

@@ -63,10 +63,10 @@ site-wasm:
 site-pack: site-wasm
 	cd crates/wasm/site && \
 		rm -Rf dist && \
-		webpack --mode=production && \
+		npm i && npm run webpack --mode=production && \
 		cd show && \
 		rm -Rf dist && \
-		webpack --mode=production
+		npm i && npm run webpack --mode=production
 
 wasm-size: site-pack
 	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
@@ -116,10 +116,15 @@ install-wasm-bindgen:
 	rustup target add wasm32-unknown-unknown
 	cargo install wasm-bindgen-cli
 
+netlify: node-package
+	cd crates/wasm/functions && \
+		npm install && \
+		cd .. && \
+		netlify deploy --prod
+
 deploy-site:
-	npm install -g webpack webpack-cli html-webpack-plugin && \
-		make WASM_RELEASE=1 site-pack && \
-		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico
+	make WASM_RELEASE=1 site-pack && \
+		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico && \
 		cd crates/wasm && \
 		rm -Rf aoc.fornwall.net && \
 		git clone -b site git@github.com:fornwall/aoc.fornwall.net.git && \
