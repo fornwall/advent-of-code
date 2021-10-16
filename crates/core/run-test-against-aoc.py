@@ -50,6 +50,7 @@ else:
 
 for year in years:
     for day in days:
+        cached_inputs = {}
         for session in SESSIONS:
             session_cookie = session["cookie"]
             session_description = session["description"]
@@ -61,6 +62,12 @@ for year in years:
             print(f"# Year {year}, Day {day} - {session_description}")
             puzzle = Puzzle(year=year, day=day, user=user)
             input_data = puzzle.input_data
+
+            if input_data in cached_inputs:
+                print("Skipping - input already seen for " + cached_inputs[input_data])
+                continue
+            cached_inputs[input_data] = session_description
+
             for part in parts:
                 if day == 25 and part == 2:
                     continue
