@@ -56,7 +56,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         seconds += 1;
     }
 
-    if input.is_part_one() {
+    if input.is_part_two() {
         return Ok(seconds.to_string());
     }
 
