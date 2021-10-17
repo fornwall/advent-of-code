@@ -138,6 +138,6 @@ fn tests() {
     use crate::input::{test_part_one, test_part_two};
 
     let input = include_str!("day10_input.txt");
-    test_part_one!(input => "10888".to_string());
-    test_part_two!(input => "HKJFAKAF".to_string());
+    test_part_one!(input => "HKJFAKAF".to_string());
+    test_part_two!(input => "10888".to_string());
 }
