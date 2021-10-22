@@ -8,7 +8,7 @@ repository = "https://github.com/fornwall/advent-of-code"
 description = "Solutions to Advent of Code written in Rust"
 license = "MIT"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 advent-of-code = { path = "../core" }
