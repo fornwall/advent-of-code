@@ -1,17 +1,17 @@
 use crate::input::Input;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque};
 
 struct Tunnel {
     current_gen: std::vec::Vec<bool>,
     next_gen: std::vec::Vec<bool>,
     offset: usize,
-    evolutions: HashMap<(bool, bool, bool, bool, bool), bool>,
+    evolutions: HashSet<(bool, bool, bool, bool, bool)>,
     used_steps: HashSet<(bool, bool, bool, bool, bool)>,
 }
 
 impl Tunnel {
     fn parse(input_string: &str, space_for_generations: usize) -> Result<Self, String> {
-        let mut evolutions = HashMap::new();
+        let mut evolutions = HashSet::new();
 
         let mut lines = input_string.lines();
         let next_line = lines.next().ok_or("Invalid tunnel format")?;
@@ -36,15 +36,16 @@ impl Tunnel {
             if from_bytes.len() != 5 {
                 return Err("Invalid input".to_string());
             }
-            let result = part2 == "#";
-            let from = (
-                from_bytes[0] == b'#',
-                from_bytes[1] == b'#',
-                from_bytes[2] == b'#',
-                from_bytes[3] == b'#',
-                from_bytes[4] == b'#',
-            );
-            evolutions.insert(from, result);
+            if part2 == "#" {
+                let from = (
+                    from_bytes[0] == b'#',
+                    from_bytes[1] == b'#',
+                    from_bytes[2] == b'#',
+                    from_bytes[3] == b'#',
+                    from_bytes[4] == b'#',
+                );
+                evolutions.insert(from);
+            }
         }
 
         let capacity = evolutions.len();
@@ -69,14 +70,11 @@ impl Tunnel {
                 self.current_gen[i + 2],
             );
 
-            self.next_gen[i] = match self.evolutions.get(&current) {
-                Some(&value) => {
-                    if value {
-                        self.used_steps.insert(current);
-                    }
-                    value
-                }
-                None => false,
+            self.next_gen[i] = if self.evolutions.contains(&current) {
+                self.used_steps.insert(current);
+                true
+            } else {
+                false
             };
         }
 
