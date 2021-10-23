@@ -1,16 +1,15 @@
 use crate::input::Input;
-use std::collections::HashSet;
 
 struct Tunnel {
     current_gen: std::vec::Vec<bool>,
     next_gen: std::vec::Vec<bool>,
     offset: usize,
-    evolutions: HashSet<(bool, bool, bool, bool, bool)>,
+    evolutions: [bool; 32],
 }
 
 impl Tunnel {
     fn parse(input_string: &str, space_for_generations: usize) -> Result<Self, String> {
-        let mut evolutions = HashSet::new();
+        let mut evolutions = [false; 32];
 
         let mut lines = input_string.lines();
         let next_line = lines.next().ok_or("Invalid tunnel format")?;
@@ -31,19 +30,17 @@ impl Tunnel {
             let (part1, part2) = line
                 .split_once(" => ")
                 .ok_or_else(|| "Invalid input".to_string())?;
-            let from_bytes: Vec<u8> = part1.bytes().collect();
-            if from_bytes.len() != 5 {
-                return Err("Invalid input".to_string());
-            }
             if part2 == "#" {
-                let from = (
-                    from_bytes[0] == b'#',
-                    from_bytes[1] == b'#',
-                    from_bytes[2] == b'#',
-                    from_bytes[3] == b'#',
-                    from_bytes[4] == b'#',
-                );
-                evolutions.insert(from);
+                let from_bytes: Vec<u8> = part1.bytes().collect();
+                if from_bytes.len() != 5 {
+                    return Err("Invalid input".to_string());
+                }
+                let from = ((from_bytes[0] == b'#') as usize)
+                    + (((from_bytes[1] == b'#') as usize) << 1)
+                    + (((from_bytes[2] == b'#') as usize) << 2)
+                    + (((from_bytes[3] == b'#') as usize) << 3)
+                    + (((from_bytes[4] == b'#') as usize) << 4);
+                evolutions[from] = true;
             }
         }
 
@@ -57,15 +54,12 @@ impl Tunnel {
 
     fn evolve(&mut self) {
         for i in 2..self.current_gen.len() - 2 {
-            let current = (
-                self.current_gen[i - 2],
-                self.current_gen[i - 1],
-                self.current_gen[i],
-                self.current_gen[i + 1],
-                self.current_gen[i + 2],
-            );
-
-            self.next_gen[i] = self.evolutions.contains(&current);
+            let current = (self.current_gen[i - 2] as usize)
+                + ((self.current_gen[i - 1] as usize) << 1)
+                + ((self.current_gen[i] as usize) << 2)
+                + ((self.current_gen[i + 1] as usize) << 3)
+                + ((self.current_gen[i + 2] as usize) << 4);
+            self.next_gen[i] = self.evolutions[current];
         }
 
         std::mem::swap(&mut self.next_gen, &mut self.current_gen);
