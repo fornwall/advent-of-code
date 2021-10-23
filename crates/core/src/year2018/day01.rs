@@ -25,12 +25,12 @@ pub fn solve(input: &mut Input) -> Result<Frequency, String> {
         change_iterator.sum::<Result<_, _>>()
     } else {
         let mut frequency: Frequency = 0;
-        let mut seen_frequencies = HashSet::new();
+        let mut seen_frequencies = HashSet::from([frequency]);
 
-        for change in change_iterator.cycle().take(MAX_ITERATIONS) {
-            if seen_frequencies.insert(frequency) {
-                frequency = frequency.checked_add(change?).ok_or("Too high frequency")?;
-            } else {
+        let changes: Vec<Frequency> = change_iterator.collect::<Result<_, _>>()?;
+        for &change in changes.iter().cycle().take(MAX_ITERATIONS) {
+            frequency = frequency.checked_add(change).ok_or("Too high frequency")?;
+            if !seen_frequencies.insert(frequency) {
                 return Ok(frequency);
             }
         }
