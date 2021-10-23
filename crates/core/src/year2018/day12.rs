@@ -1,5 +1,5 @@
 use crate::input::Input;
-use std::collections::{HashSet, VecDeque};
+use std::collections::HashSet;
 
 struct Tunnel {
     current_gen: std::vec::Vec<bool>,
@@ -71,6 +71,14 @@ impl Tunnel {
         std::mem::swap(&mut self.next_gen, &mut self.current_gen);
     }
 
+    fn is_repeating(&self) -> bool {
+        self.current_gen
+            .iter()
+            .skip_while(|&&populated| !populated)
+            .zip(self.next_gen.iter().skip_while(|&&populated| !populated))
+            .all(|(a, b)| a == b)
+    }
+
     fn score(&self) -> i64 {
         let mut sum = 0;
         for (index, &value) in self.current_gen.iter().enumerate() {
@@ -84,7 +92,6 @@ impl Tunnel {
 }
 
 pub fn solve(input: &mut Input) -> Result<i64, String> {
-    const DESIRED_STALE_SCORE_DIFF: usize = 100;
     let max_steps = input.part_values(20, 1000);
 
     let mut tunnel = Tunnel::parse(input.text, max_steps)?;
@@ -96,24 +103,17 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
         return Ok(tunnel.score());
     }
 
-    let mut score_diffs = VecDeque::with_capacity(DESIRED_STALE_SCORE_DIFF);
     let mut previous_score = -1;
     for generation in 1..=max_steps {
         tunnel.evolve();
 
         let score_diff = tunnel.score() - previous_score;
         previous_score = tunnel.score();
-        score_diffs.push_back(score_diff);
 
-        if score_diffs.len() > DESIRED_STALE_SCORE_DIFF {
-            score_diffs.pop_front();
-            if score_diffs.iter().filter(|&&e| e == score_diffs[0]).count()
-                == DESIRED_STALE_SCORE_DIFF
-            {
-                let remaining_generations = 50_000_000_000_i64 - generation as i64;
-                let final_score = tunnel.score() + remaining_generations * score_diff;
-                return Ok(final_score);
-            }
+        if tunnel.is_repeating() {
+            let remaining_generations = 50_000_000_000_i64 - generation as i64;
+            let final_score = tunnel.score() + remaining_generations * score_diff;
+            return Ok(final_score);
         }
     }
 
