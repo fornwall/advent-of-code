@@ -6,7 +6,6 @@ struct Tunnel {
     next_gen: std::vec::Vec<bool>,
     offset: usize,
     evolutions: HashSet<(bool, bool, bool, bool, bool)>,
-    used_steps: HashSet<(bool, bool, bool, bool, bool)>,
 }
 
 impl Tunnel {
@@ -48,19 +47,15 @@ impl Tunnel {
             }
         }
 
-        let capacity = evolutions.len();
         Ok(Self {
             current_gen,
             next_gen,
             offset: max_growth,
             evolutions,
-            used_steps: HashSet::with_capacity(capacity),
         })
     }
 
     fn evolve(&mut self) {
-        self.used_steps.clear();
-
         for i in 2..self.current_gen.len() - 2 {
             let current = (
                 self.current_gen[i - 2],
@@ -70,12 +65,7 @@ impl Tunnel {
                 self.current_gen[i + 2],
             );
 
-            self.next_gen[i] = if self.evolutions.contains(&current) {
-                self.used_steps.insert(current);
-                true
-            } else {
-                false
-            };
+            self.next_gen[i] = self.evolutions.contains(&current);
         }
 
         std::mem::swap(&mut self.next_gen, &mut self.current_gen);
