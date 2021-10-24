@@ -2,7 +2,7 @@ use crate::input::Input;
 
 fn run_until<F>(condition: F) -> Result<Vec<u8>, String>
 where
-    F: Fn(&Vec<u8>) -> bool,
+    F: Fn(&[u8]) -> bool,
 {
     const MAX_ITERATIONS: i32 = 100_000_000;
 

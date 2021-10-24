@@ -1,6 +1,7 @@
 use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
+#[derive(Clone)]
 enum TrackPiece {
     // ⌜
     TopLeft,
@@ -28,22 +29,14 @@ impl Vector {
         self.y += other.y;
     }
     fn turn_left(&mut self) {
-        if self.x == 0 {
-            self.x = self.y;
-            self.y = 0;
-        } else {
-            self.y = -self.x;
-            self.x = 0;
-        }
+        let tmp = self.x;
+        self.x = self.y;
+        self.y = -tmp;
     }
     fn turn_right(&mut self) {
-        if self.x == 0 {
-            self.x = -self.y;
-            self.y = 0;
-        } else {
-            self.y = self.x;
-            self.x = 0;
-        }
+        let tmp = self.x;
+        self.x = -self.y;
+        self.y = tmp;
     }
 }
 
@@ -219,15 +212,11 @@ impl Track {
 
                 cart.advance();
 
-                match self.cart_positions.get(&cart.position) {
-                    Some(_) => {
-                        self.cart_positions.remove(&cart.position);
-                        removed_positions.insert(cart.position);
-                        continue;
-                    }
-                    None => {
-                        self.cart_positions.insert(cart.position);
-                    }
+                if self.cart_positions.remove(&cart.position) {
+                    removed_positions.insert(cart.position);
+                    continue;
+                } else {
+                    self.cart_positions.insert(cart.position);
                 };
 
                 if let Some(piece) = self.track.get(&cart.position) {
