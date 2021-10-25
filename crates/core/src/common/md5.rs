@@ -322,17 +322,4 @@ mod tests {
             "aa559b4e3523a6c931f08f4df52d58f2"
         );
     }
-
-    #[test]
-    #[cfg(target_pointer_width = "64")]
-    fn overflow_length() {
-        use std::u32::MAX;
-        let data = vec![0; MAX as usize + 1];
-        let mut context = super::Context::new();
-        context.consume(&data);
-        assert_eq!(
-            super::lower_hex(&context.compute()),
-            "c9a5a6878d97b48cc965c1e41859f034"
-        );
-    }
 }
