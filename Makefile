@@ -56,7 +56,7 @@ site-wasm:
 	cd site/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm && \
 	cd ../.. && \
-	RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals" rustup run $(NIGHTLY_TOOLCHAIN) \
+	RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext" rustup run $(NIGHTLY_TOOLCHAIN) \
 		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
 	$(WASM_BINDGEN) --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
