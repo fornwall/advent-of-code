@@ -118,7 +118,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             let mut this_char_string = String::new();
             for y in (min_y..=max_y).rev() {
                 for char_x in x..(x + 5) {
-                    this_char_string.push(if let Some(&Color::White) = painted.get(&(char_x, y)) {
+                    this_char_string.push(if Some(&Color::White) == painted.get(&(char_x, y)) {
                         '█'
                     } else {
                         ' '
