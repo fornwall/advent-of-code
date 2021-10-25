@@ -50,7 +50,7 @@ check:
 
 site-wasm:
 	cd crates/wasm && \
-	cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
+	RUSTFLAGS="-C target-feature=+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext" cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
 	rm -Rf site/generated && \
 	$(WASM_BINDGEN) --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/generated && \
@@ -70,8 +70,9 @@ site-pack: site-wasm
 		rm -Rf dist && \
 		npm i && npm run webpack --mode=production
 
-wasm-size: site-pack
-	ls -la crates/wasm/site/advent_of_code_wasm_bg.wasm
+wasm-size:
+	make WASM_RELEASE=1 site-wasm && \
+	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
 --run-devserver:
 	cd crates/wasm/site && NODE_ENV=development webpack serve --https
