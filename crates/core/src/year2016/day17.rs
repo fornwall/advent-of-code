@@ -14,7 +14,7 @@ fn check_doors(passcode: &[u8], path_so_far: &[u8]) -> [bool; 4] {
     let mut hasher = Context::new();
     hasher.consume(passcode);
     hasher.consume(path_so_far);
-    let output: [u8; 16] = hasher.compute().into();
+    let output: [u8; 16] = hasher.compute();
     //"Only the first four characters of the hash are used; they represent, respectively,
     // the doors up, down, left, and right from your current position.
     // Any b, c, d, e, or f means that the corresponding door is open; any other character

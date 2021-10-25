@@ -11,11 +11,13 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         return Err("Too long door id (max length: 8)".to_string());
     }
 
+    let mut hasher = Context::new();
+    hasher.consume(door_id);
+
     for index in 0..MAX_INDEX {
-        let mut hasher = Context::new();
-        hasher.consume(door_id);
-        hasher.consume(index.to_string().as_bytes());
-        let output: [u8; 16] = hasher.compute().into();
+        let mut new_hasher = hasher.clone();
+        new_hasher.consume(index.to_string().as_bytes());
+        let output: [u8; 16] = new_hasher.compute();
 
         // Check if hash starts with five zeros without converting it to a string:
         if output[..2] == [0, 0] && output[2] <= 0x0F {

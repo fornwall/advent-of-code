@@ -10,7 +10,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let mut hasher = Context::new();
         hasher.consume(secret_key);
         hasher.consume(index.to_string().as_bytes());
-        let output: [u8; 16] = hasher.compute().into();
+        let output: [u8; 16] = hasher.compute();
 
         // Check if hash starts with five/six zeros without converting it to a string:
         if output[..2] == [0, 0] && output[2] <= input.part_values(0x0F, 0) {

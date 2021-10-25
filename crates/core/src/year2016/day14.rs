@@ -35,14 +35,15 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }
 
     let mut hash_cache = Vec::new();
+    let mut orig_hasher = Context::new();
+    orig_hasher.consume(salt.as_bytes());
 
     for i in 0..1000 {
-        let content_to_hash = format!("{}{}", salt, i);
-        let mut hasher = Context::new();
-        hasher.consume(content_to_hash.as_bytes());
+        let mut hasher = orig_hasher.clone();
+        hasher.consume(i.to_string().as_bytes());
         if input.is_part_two() {
             for _ in 0..2016 {
-                let hash: [u8; 16] = hasher.compute().into();
+                let hash: [u8; 16] = hasher.compute();
                 let hash_str = to_hash_chars(&hash)
                     .iter()
                     .map(|&b| if b <= 9 { b'0' + b } else { b'a' + (b - 10) })
@@ -51,7 +52,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 hasher.consume(&hash_str);
             }
         }
-        let hash: [u8; 16] = hasher.compute().into();
+        let hash: [u8; 16] = hasher.compute();
         hash_cache.push(hash);
     }
 
@@ -65,7 +66,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             hasher.consume(content_to_hash.as_bytes());
             if input.is_part_two() {
                 for _ in 0..2016 {
-                    let hash: [u8; 16] = hasher.compute().into();
+                    let hash: [u8; 16] = hasher.compute();
                     hasher = Context::new();
                     let hash_str = to_hash_chars(&hash)
                         .iter()
@@ -74,7 +75,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     hasher.consume(&hash_str);
                 }
             }
-            let hash: [u8; 16] = hasher.compute().into();
+            let hash: [u8; 16] = hasher.compute();
             hash
         };
 

@@ -22,60 +22,6 @@
 // https://people.csail.mit.edu/rivest/Md5.c
 // https://tools.ietf.org/html/rfc1321
 
-use core::convert;
-use core::fmt;
-use core::ops;
-
-/// A digest.
-#[derive(Clone, Copy, Eq, Hash, PartialEq)]
-pub struct Digest(pub [u8; 16]);
-
-impl convert::From<Digest> for [u8; 16] {
-    #[inline]
-    fn from(digest: Digest) -> Self {
-        digest.0
-    }
-}
-
-impl fmt::Debug for Digest {
-    #[inline]
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        fmt::LowerHex::fmt(self, formatter)
-    }
-}
-
-impl ops::Deref for Digest {
-    type Target = [u8; 16];
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl ops::DerefMut for Digest {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-macro_rules! implement {
-    ($kind:ident, $format:expr) => {
-        impl fmt::$kind for Digest {
-            fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                for value in &self.0 {
-                    write!(formatter, $format, value)?;
-                }
-                Ok(())
-            }
-        }
-    };
-}
-
-implement!(LowerHex, "{:02x}");
-implement!(UpperHex, "{:02X}");
-
 /// A context.
 #[derive(Clone)]
 pub struct Context {
@@ -103,31 +49,45 @@ impl Context {
         }
     }
 
-    /// Consume data.
-    #[cfg(target_pointer_width = "32")]
-    #[inline]
-    pub fn consume<T: AsRef<[u8]>>(&mut self, data: T) {
-        consume(self, data.as_ref());
-    }
-
-    /// Consume data.
-    #[cfg(target_pointer_width = "64")]
-    pub fn consume<T: AsRef<[u8]>>(&mut self, data: T) {
-        for chunk in data.as_ref().chunks(core::u32::MAX as usize) {
-            consume(self, chunk);
+    pub fn consume(&mut self, data: &[u8]) {
+        let Self {
+            buffer,
+            count,
+            state,
+        } = self;
+        let mut input = [0_u32; 16];
+        let mut k = ((count[0] >> 3) & 0x3f) as usize;
+        let length = data.len() as u32;
+        count[0] = count[0].wrapping_add(length << 3);
+        if count[0] < length << 3 {
+            count[1] = count[1].wrapping_add(1);
+        }
+        count[1] = count[1].wrapping_add(length >> 29);
+        for &value in data {
+            buffer[k] = value;
+            k += 1;
+            if k == 0x40 {
+                let mut j = 0;
+                for i in &mut input {
+                    *i = (u32::from(buffer[j + 3]) << 24)
+                        | (u32::from(buffer[j + 2]) << 16)
+                        | (u32::from(buffer[j + 1]) << 8)
+                        | (u32::from(buffer[j]));
+                    j += 4;
+                }
+                transform(state, &input);
+                k = 0;
+            }
         }
     }
 
     /// Finalize and return the digest.
-    pub fn compute(mut self) -> Digest {
+    pub fn compute(mut self) -> [u8; 16] {
         let mut input = [0_u32; 16];
         let k = ((self.count[0] >> 3) & 0x3f) as usize;
         input[14] = self.count[0];
         input[15] = self.count[1];
-        consume(
-            &mut self,
-            &PADDING[..(if k < 56 { 56 - k } else { 120 - k })],
-        );
+        self.consume(&PADDING[..(if k < 56 { 56 - k } else { 120 - k })]);
         let mut j = 0;
         for i in input.iter_mut().take(14) {
             *i = (u32::from(self.buffer[j + 3]) << 24)
@@ -146,58 +106,28 @@ impl Context {
             digest[j + 3] = ((self.state[i] >> 24) & 0xff) as u8;
             j += 4;
         }
-        Digest(digest)
-    }
-}
-
-impl convert::From<Context> for Digest {
-    #[inline]
-    fn from(context: Context) -> Self {
-        context.compute()
+        digest
     }
 }
 
 /// Compute the digest of data.
 #[inline]
 #[cfg(test)]
-pub fn compute<T: AsRef<[u8]>>(data: T) -> Digest {
+pub fn compute<T: AsRef<[u8]>>(data: T) -> [u8; 16] {
     let mut context = Context::new();
-    context.consume(data);
+    context.consume(data.as_ref());
     context.compute()
 }
 
-fn consume(
-    Context {
-        buffer,
-        count,
-        state,
-    }: &mut Context,
-    data: &[u8],
-) {
-    let mut input = [0_u32; 16];
-    let mut k = ((count[0] >> 3) & 0x3f) as usize;
-    let length = data.len() as u32;
-    count[0] = count[0].wrapping_add(length << 3);
-    if count[0] < length << 3 {
-        count[1] = count[1].wrapping_add(1);
+#[cfg(test)]
+fn lower_hex(data: &[u8]) -> String {
+    use std::fmt::Write;
+    let mut buf = String::new();
+    for value in data {
+        write!(buf, "{:02x}", value).unwrap();
+        //buf.write_fmt("{:02x}", value);
     }
-    count[1] = count[1].wrapping_add(length >> 29);
-    for &value in data {
-        buffer[k] = value;
-        k += 1;
-        if k == 0x40 {
-            let mut j = 0;
-            for i in &mut input {
-                *i = (u32::from(buffer[j + 3]) << 24)
-                    | (u32::from(buffer[j + 2]) << 16)
-                    | (u32::from(buffer[j + 1]) << 8)
-                    | (u32::from(buffer[j]));
-                j += 4;
-            }
-            transform(state, &input);
-            k = 0;
-        }
-    }
+    buf
 }
 
 fn transform(state: &mut [u32; 4], input: &[u32; 16]) {
@@ -368,7 +298,7 @@ mod tests {
             "57edf4a22be3c955ac49da2e2107b67a",
         ];
         for (input, &output) in inputs.iter().zip(outputs.iter()) {
-            assert_eq!(format!("{:x}", super::compute(input)), output);
+            assert_eq!(super::lower_hex(&super::compute(input)), output);
         }
     }
 
@@ -388,7 +318,7 @@ mod tests {
             context.consume(&data);
         }
         assert_eq!(
-            format!("{:x}", context.compute()),
+            super::lower_hex(&context.compute()),
             "aa559b4e3523a6c931f08f4df52d58f2"
         );
     }
@@ -401,7 +331,7 @@ mod tests {
         let mut context = super::Context::new();
         context.consume(&data);
         assert_eq!(
-            format!("{:x}", context.compute()),
+            super::lower_hex(&context.compute()),
             "c9a5a6878d97b48cc965c1e41859f034"
         );
     }
