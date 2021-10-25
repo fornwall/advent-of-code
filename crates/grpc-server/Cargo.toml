@@ -12,7 +12,7 @@ edition = "2021"
 
 [dependencies]
 advent-of-code = { path = "../core" }
-prost = "0.8"
+prost = "*"
 tokio = { version = "*", features = ["macros", "rt-multi-thread"]}
 tonic = "*"
 
