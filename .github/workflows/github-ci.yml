@@ -437,7 +437,7 @@ jobs:
     - name: Run benchmark on current commit
       run: |
         cd crates/core
-        cargo bench -- --save-baseline new-baseline
+        RUSTFLAGS="-C target-cpu=native" cargo bench -- --save-baseline new-baseline
         critcmp --export new-baseline > new-baseline.json
     - name: Upload benchmark on current commit
       uses: actions/upload-artifact@v2
@@ -459,7 +459,7 @@ jobs:
     - name: Run benchmark on previous commit
       run: |
         cd crates/core
-        cargo bench -- --save-baseline old-baseline
+        RUSTFLAGS="-C target-cpu=native" cargo bench -- --save-baseline old-baseline
         critcmp --export old-baseline > old-baseline.json
     - name: Upload benchmark on previous commit
       uses: actions/upload-artifact@v2
