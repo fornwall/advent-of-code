@@ -1,24 +1,24 @@
+use crate::common::int_to_ascii::IntToAsciiContext;
 use crate::input::Input;
 
-fn read_string(s: &str) -> String {
-    let mut result = String::new();
-    let mut last_digit = None;
-    let mut num_digits = 0;
-    for digit in s.chars() {
-        if last_digit == Some(digit) {
+fn read_string(s: &[u8]) -> Vec<u8> {
+    let mut ascii_bytes_context = IntToAsciiContext::new();
+    let mut result = Vec::new();
+    let mut last_digit = s[0];
+    let mut num_digits = 1;
+    for &digit in &s[1..] {
+        if last_digit == digit {
             num_digits += 1;
         } else {
-            if let Some(last_digit_value) = last_digit {
-                result.push_str(&num_digits.to_string());
-                result.push_str(&last_digit_value.to_string());
-            }
-            last_digit = Some(digit);
+            result.extend_from_slice(ascii_bytes_context.ascii_bytes(num_digits));
+            result.extend_from_slice(ascii_bytes_context.ascii_bytes(u32::from(last_digit - 48)));
+            last_digit = digit;
             num_digits = 1;
         }
     }
 
-    result.push_str(&num_digits.to_string());
-    result.push_str(&last_digit.unwrap_or('0').to_string());
+    result.extend_from_slice(ascii_bytes_context.ascii_bytes(num_digits));
+    result.extend_from_slice(ascii_bytes_context.ascii_bytes(u32::from(last_digit - 48)));
 
     result
 }
@@ -28,7 +28,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         return Err("Too long input - max length is 16".to_string());
     }
 
-    let mut s = input.text.to_string();
+    let mut s = input.text.as_bytes().to_vec();
     for _ in 0..input.part_values(40, 50) {
         s = read_string(&s);
     }
@@ -39,9 +39,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 pub fn tests() {
     use crate::input::{test_part_one, test_part_two};
 
-    assert_eq!(read_string("1"), "11");
-    assert_eq!(read_string("11"), "21");
-    assert_eq!(read_string("1211"), "111221");
+    assert_eq!(read_string(b"1"), b"11".to_vec());
+    assert_eq!(read_string(b"11"), b"21".to_vec());
+    assert_eq!(read_string(b"1211"), b"111221".to_vec());
 
     let real_input = include_str!("day10_input.txt");
     test_part_one!(real_input => 252_594);

@@ -1,10 +1,12 @@
+use crate::common::int_to_ascii::IntToAsciiContext;
 use crate::common::md5::Context;
 use crate::input::Input;
 use std::iter::FromIterator;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
-    const MAX_INDEX: i32 = 100_000_000;
+    const MAX_INDEX: u32 = 100_000_000;
 
+    let mut ascii_bytes_context = IntToAsciiContext::new();
     let mut password = input.part_values(Vec::new(), vec![' '; 8]);
     let door_id = input.text.as_bytes();
     if door_id.len() > 8 {
@@ -16,7 +18,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
     for index in 0..MAX_INDEX {
         let mut new_hasher = hasher.clone();
-        new_hasher.consume(index.to_string().as_bytes());
+        new_hasher.consume(ascii_bytes_context.ascii_bytes(index));
         let output: [u8; 16] = new_hasher.compute();
 
         // Check if hash starts with five zeros without converting it to a string:
