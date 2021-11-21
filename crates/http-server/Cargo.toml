@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-server"
-version = "2019.12.394"
+version = "2019.12.395"
 keywords = ["advent-of-code", "rust", "warp"]
 categories = ["algorithms", "rust-patterns"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
