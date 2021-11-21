@@ -26,6 +26,8 @@ fn read_string(s: &[u8]) -> Vec<u8> {
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     if input.text.len() >= 16 {
         return Err("Too long input - max length is 16".to_string());
+    } else if !input.text.chars().all(|c| c.is_ascii_digit()) {
+        return Err("Input is not ASCII digits".to_string());
     }
 
     let mut s = input.text.as_bytes().to_vec();
@@ -37,11 +39,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two};
 
     assert_eq!(read_string(b"1"), b"11".to_vec());
     assert_eq!(read_string(b"11"), b"21".to_vec());
     assert_eq!(read_string(b"1211"), b"111221".to_vec());
+
+    test_part_one_error!("+," => "Input is not ASCII digits");
 
     let real_input = include_str!("day10_input.txt");
     test_part_one!(real_input => 252_594);
