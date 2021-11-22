@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e -u
 
-rm -Rf ../../target/release/deps/benchmark-*
+# rm -Rf ../../target/release/deps/benchmark-*
 RUSTFLAGS='-g' cargo build --release --bench benchmark
 
-FILE_TO_RUN=`find ../../target/release/deps -type f -perm +1 | grep benchmark`
+FILE_TO_RUN=`find ../../target/release/deps -type f -perm u=rwx | grep benchmark`
 
 FILTER=$1
 echo "Running benchmark with filter $FILTER"
@@ -19,7 +19,8 @@ echo "Running benchmark with filter $FILTER"
 sudo flamegraph \
     $FILE_TO_RUN \
     --bench \
-    --profile-time 60 \
+    --plotting-backend plotters \
+    --profile-time 10 \
     "$FILTER"
 
 sudo chown $USER flamegraph.svg
