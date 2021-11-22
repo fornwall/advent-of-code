@@ -75,7 +75,7 @@ wasm-size:
 	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
 --run-devserver:
-	cd crates/wasm/site && NODE_ENV=development webpack serve --https
+	cd crates/wasm/site && NODE_ENV=development npx webpack serve --https
 
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell 'make site-wasm'
