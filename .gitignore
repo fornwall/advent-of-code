@@ -31,3 +31,4 @@ favicon.ico
 *.min.js
 
 aoc.fornwall.net/
+/crates/wasm/site/benchmark/new-baseline.json
