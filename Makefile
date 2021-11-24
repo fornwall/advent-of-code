@@ -135,6 +135,7 @@ deploy-site:
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
 		mv ../site/show/dist/ show/ && \
+		cp ../site/show/*.mp4 ../site/show/*.svg show/ && \
 		cp -Rf ../site/api/ api/ && \
 		cp -Rf ../site/benchmark/ benchmark/ && \
 		git add . && \
