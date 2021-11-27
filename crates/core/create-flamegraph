@@ -2,12 +2,22 @@
 set -e -u
 
 # rm -Rf ../../target/release/deps/benchmark-*
-RUSTFLAGS='-g' cargo build --release --bench benchmark
 
-FILE_TO_RUN=`find ../../target/release/deps -type f -perm u=rwx | grep benchmark`
+# See CARGO_PROFILE_RELEASE_DEBUG=true for why CARGO_PROFILE_RELEASE_DEBUG=true
+CARGO_PROFILE_BENCH_DEBUG=true CARGO_PROFILE_RELEASE_DEBUG=true cargo build --release --bench benchmark
+# RUSTFLAGS='-g'
+
+FILE_TO_RUN=`find ../../target/release/deps -type f -perm u=rwx | grep benchmark | grep -v iai`
 
 FILTER=$1
 echo "Running benchmark with filter $FILTER"
+
+AS_ROOT=0
+FLAMEGRAPH=flamegraph
+if [ `uname` = Darwin ]; then
+    FLAMEGRAPH="sudo flamegraph"
+    AS_ROOT=1
+fi
 
 # https://bheisler.github.io/criterion.rs/book/user_guide/command_line_options.html
 # --profile-time:
@@ -16,13 +26,18 @@ echo "Running benchmark with filter $FILTER"
 # useful when profiling the benchmarks. It reduces the amount of unrelated clutter
 # in the profiling results and prevents Criterion.rs' normal dynamic sampling logic
 # from greatly increasing the runtime of the benchmarks.
-sudo flamegraph \
+$FLAMEGRAPH \
     $FILE_TO_RUN \
     --bench \
-    --plotting-backend plotters \
-    --profile-time 10 \
+    --profile-time 20 \
     "$FILTER"
 
-sudo chown $USER flamegraph.svg
-mv flamegraph.svg flamegraph-$FILTER.svg
-open flamegraph-$FILTER.svg
+if [ $AS_ROOT = 1 ]; then
+  sudo chown $USER flamegraph.svg
+fi
+
+cp flamegraph.svg flamegraph-$FILTER.svg
+
+if [ `which open` &> /dev/null ]; then
+  open flamegraph-$FILTER.svg
+fi
