@@ -71,14 +71,14 @@ site-pack: site-wasm
 		npm i && npm run webpack --mode=production
 
 wasm-size:
-	make WASM_RELEASE=1 site-wasm && \
+	$(MAKE) WASM_RELEASE=1 site-wasm && \
 	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
 --run-devserver:
-	cd crates/wasm/site && NODE_ENV=development npx webpack serve --https
+	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type https
 
 --watch-and-build-wasm:
-	cargo watch --ignore crates/wasm/site --shell 'make site-wasm'
+	cargo watch --ignore crates/wasm/site --shell '$(MAKE) site-wasm'
 
 serve-site: --run-devserver --watch-and-build-wasm ;
 
@@ -126,7 +126,7 @@ netlify: node-package
 		netlify deploy --prod
 
 deploy-site:
-	make WASM_RELEASE=1 site-pack && \
+	$(MAKE) WASM_RELEASE=1 site-pack && \
 		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico && \
 		cd crates/wasm && \
 		rm -Rf aoc.fornwall.net && \
