@@ -68,12 +68,11 @@ async function updatePage() {
 
   const layout = {
     margin: { l: 0, r: 0, b: 0, t: 0 },
-    //extendsunburstcolorway: true
   };
 
-  Plotly.newPlot("firstPlot", [data], layout, { displaylogo: false });
-  window.addEventListener("resize", () => {
-    Plotly.Plots.resize(document.getElementById("firstPlot"));
+  Plotly.newPlot("firstPlot", [data], layout, {
+    displaylogo: false,
+    responsive: true,
   });
 }
 
