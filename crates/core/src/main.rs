@@ -20,6 +20,14 @@ fn main() -> Result<(), String> {
         return Ok(());
     }
 
+    let repeat = if let Ok(value) = env::var("AOC_REPEAT") {
+        value
+            .parse::<usize>()
+            .map_err(|_| "Unable to parse AOC_REPEAT")?
+    } else {
+        1
+    };
+
     if args.len() == 4 {
         let year = &args[1];
         let day = &args[2];
@@ -29,16 +37,20 @@ fn main() -> Result<(), String> {
             .read_to_string(&mut input)
             .map_err(|error| format!("Error reading input: {}", error.to_string()))?;
 
-        let solution = solve_raw(
-            year,
-            day,
-            part,
-            input.as_ref(),
-            #[cfg(feature = "visualization")]
-            Box::new(MockPainter {}),
-        )
-        .unwrap_or_else(|error| format!("Error: {}", error));
-        println!("{}", solution);
+        for _ in 0..repeat {
+            let solution = solve_raw(
+                year,
+                day,
+                part,
+                input.as_ref(),
+                #[cfg(feature = "visualization")]
+                Box::new(MockPainter {}),
+            )
+            .unwrap_or_else(|error| format!("Error: {}", error));
+            if repeat == 1 {
+                println!("{}", solution);
+            }
+        }
     } else {
         usage();
     }
