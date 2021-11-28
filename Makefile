@@ -48,6 +48,9 @@ check:
 	$(CARGO_COMMAND) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
 	if [ -n "${COUNT_ALLOCATIONS}" ]; then $(CARGO_COMMAND) test --features count-allocations; else $(CARGO_COMMAND) test; fi
 
+check-site:
+	cd crates/wasm && npx prettier --write . && npx eslint . --ext .js && npx prettier --check .
+
 site-wasm:
 	cd crates/wasm && \
 	RUSTFLAGS="-C target-feature=+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext" cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
