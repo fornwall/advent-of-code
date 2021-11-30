@@ -36,6 +36,7 @@ mod year2017;
 mod year2018;
 mod year2019;
 mod year2020;
+mod year2021;
 
 #[cfg(feature = "visualization")]
 use painter::PainterRef;
@@ -242,6 +243,31 @@ pub fn solve(
         (2020, 23) => to_stringer_input(year2020::day23::solve, &mut input),
         (2020, 24) => to_stringer_input(year2020::day24::solve, &mut input),
         (2020, 25) => to_stringer_input(year2020::day25::solve, &mut input),
+        (2021, 1) => to_stringer_input(year2021::day01::solve, &mut input),
+        (2021, 2) => to_stringer_input(year2021::day02::solve, &mut input),
+        (2021, 3) => to_stringer_input(year2021::day03::solve, &mut input),
+        (2021, 4) => to_stringer_input(year2021::day04::solve, &mut input),
+        (2021, 5) => to_stringer_input(year2021::day05::solve, &mut input),
+        (2021, 6) => to_stringer_input(year2021::day06::solve, &mut input),
+        (2021, 7) => to_stringer_input(year2021::day07::solve, &mut input),
+        (2021, 8) => to_stringer_input(year2021::day08::solve, &mut input),
+        (2021, 9) => to_stringer_input(year2021::day09::solve, &mut input),
+        (2021, 10) => to_stringer_input(year2021::day10::solve, &mut input),
+        (2021, 11) => to_stringer_input(year2021::day11::solve, &mut input),
+        (2021, 12) => to_stringer_input(year2021::day12::solve, &mut input),
+        (2021, 13) => to_stringer_input(year2021::day13::solve, &mut input),
+        (2021, 14) => to_stringer_input(year2021::day14::solve, &mut input),
+        (2021, 15) => to_stringer_input(year2021::day15::solve, &mut input),
+        (2021, 16) => to_stringer_input(year2021::day16::solve, &mut input),
+        (2021, 17) => to_stringer_input(year2021::day17::solve, &mut input),
+        (2021, 18) => to_stringer_input(year2021::day18::solve, &mut input),
+        (2021, 19) => to_stringer_input(year2021::day19::solve, &mut input),
+        (2021, 20) => to_stringer_input(year2021::day20::solve, &mut input),
+        (2021, 21) => to_stringer_input(year2021::day21::solve, &mut input),
+        (2021, 22) => to_stringer_input(year2021::day22::solve, &mut input),
+        (2021, 23) => to_stringer_input(year2021::day23::solve, &mut input),
+        (2021, 24) => to_stringer_input(year2021::day24::solve, &mut input),
+        (2021, 25) => to_stringer_input(year2021::day25::solve, &mut input),
         _ => Err(format!(
             "Unsupported year={}, day={}, part={}",
             year, day, part
