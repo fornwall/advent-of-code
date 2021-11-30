@@ -4,6 +4,7 @@ target/
 generated/
 **/*.rs.bk
 *.swp
+*.swo
 *.log
 *.wasm
 *.wasi
