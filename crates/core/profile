@@ -18,7 +18,7 @@ AOC_DAY=$4
 AOC_PART=$5
 
 if [ $PROFILING_TOOL = perf ]; then
-  PROFILING_RUN_COMMAND="perf record --call-graph dwarf"
+  PROFILING_RUN_COMMAND="perf record --call-graph dwarf --delay 10"
   # This outputs a perf.data file.
 
   # To convert perf.data to a format that https://profiler.firefox.com/can understand:
