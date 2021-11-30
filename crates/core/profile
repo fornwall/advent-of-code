@@ -25,7 +25,8 @@ if [ $PROFILING_TOOL = perf ]; then
   #   perf script -F +pid > perf.txt
   # Note that this text files needs to be in a zip file to make share by url work.
   profile_analyse() {
-    perf report -g srcline --hierarchy
+    echo "Analyse with:"
+    echo perf report -g srcline --hierarchy
   }
 
   # To convert perf.data to a flamegraph.svg:
