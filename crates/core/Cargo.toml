@@ -28,10 +28,16 @@ count-allocations = ["allocation-counter"]
 
 [dependencies]
 allocation-counter = { version = "0", optional = true }
+iai = "0.1"
 
 [dev-dependencies]
 criterion = "0.3"
 
 [[bench]]
 name = "benchmark"
+harness = false
+
+[[bench]]
+# See https://bheisler.github.io/criterion.rs/book/iai/getting_started.html
+name = "iai"
 harness = false

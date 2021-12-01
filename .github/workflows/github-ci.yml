@@ -434,13 +434,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
-    - name: Install critcmp
-      run: cargo install critcmp
     - name: Run benchmark on current commit
       run: |
         cd crates/core
-        RUSTFLAGS="-C target-cpu=native" cargo bench -- --save-baseline new-baseline
-        critcmp --export new-baseline > new-baseline.json
+        ./run-iai-benchmark.py > new-baseline.json
     - name: Upload benchmark on current commit
       uses: actions/upload-artifact@v2
       with:
@@ -454,15 +451,12 @@ jobs:
       with:
         fetch-depth: 2
     - uses: hecrj/setup-rust-action@v1
-    - name: Install critcmp
-      run: cargo install critcmp
     - name: Checkout previous commit
       run: git checkout HEAD~1
     - name: Run benchmark on previous commit
       run: |
         cd crates/core
-        RUSTFLAGS="-C target-cpu=native" cargo bench -- --save-baseline old-baseline
-        critcmp --export old-baseline > old-baseline.json
+        ./run-iai-benchmark.py > new-baseline.json
     - name: Upload benchmark on previous commit
       uses: actions/upload-artifact@v2
       with:
@@ -485,17 +479,10 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
-    - uses: hecrj/setup-rust-action@v1
-    - name: Install critcmp
-      run: cargo install critcmp
-    - name: Compare benchmarks on current and previous commit
-      run: |
-        critcmp old-baseline.json new-baseline.json > benchcmp.txt
-        cat benchcmp.txt
     - name: Format commit comment
       id: get-comment-body
       run: |
-        body=$(./.github/workflows/benchcmp-to-diff.py benchcmp.txt)
+        body=$(./.github/workflows/compare-iai.py old-baseline.json new-baseline.json)
         body="${body//'%'/'%25'}"
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}"

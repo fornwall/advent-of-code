@@ -17,15 +17,14 @@ function sumDown(map) {
 
 async function updatePage() {
   const baselineJson = await baselineJsonPromise;
-  const benchmarks = Object.entries(baselineJson["benchmarks"]);
-  const extractMeanTime = (info) =>
-    info["criterion_estimates_v1"]["mean"]["point_estimate"];
+  const benchmarks = Object.entries(baselineJson);
 
   const dataMap = {};
-  for (const [benchmarkName, benchmarkInfo] of benchmarks) {
-    const [year, dayString, part] = benchmarkName.split("_");
-    const day = parseInt(dayString, 10);
-    const meanTime = extractMeanTime(benchmarkInfo) / 1000_000;
+  for (const [_benchmarkName, benchmarkInfo] of benchmarks) {
+    const year = benchmarkInfo["year"];
+    const day = benchmarkInfo["day"];
+    const part = benchmarkInfo["part"];
+    const meanTime = benchmarkInfo["time"];
     if (!dataMap[year]) dataMap[year] = {};
     if (!dataMap[year][day]) dataMap[year][day] = {};
     dataMap[year][day][part] = meanTime;
@@ -40,6 +39,7 @@ async function updatePage() {
     outsidetextfont: { size: 20, color: "#377eb8" },
     //marker: {line: {width: 2}},
     branchvalues: "total",
+    sort: false,
   };
 
   for (const [year, yearData] of Object.entries(dataMap).sort(
