@@ -434,6 +434,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+    - run: brew install valgrind
     - name: Run benchmark on current commit
       run: ./run-iai-benchmark.py > new-baseline.json
       working-directory: crates/core
@@ -450,6 +451,7 @@ jobs:
       with:
         fetch-depth: 2
     - uses: hecrj/setup-rust-action@v1
+    - run: brew install valgrind
     - name: Checkout previous commit
       run: git checkout HEAD~1
     - name: Run benchmark on previous commit
