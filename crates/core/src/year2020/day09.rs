@@ -1,3 +1,4 @@
+use crate::common::parse_lines;
 use crate::input::Input;
 
 /// Search for a subsequence which sums to the desired sum.
@@ -28,15 +29,7 @@ where
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     const PREAMBLE_LENGTH: usize = 25;
 
-    let numbers = input
-        .text
-        .lines()
-        .enumerate()
-        .map(|(line_idx, line)| {
-            line.parse::<u64>()
-                .map_err(|e| format!("Line {}: Invalid number - {}", line_idx + 1, e))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let numbers = parse_lines::<u64>(input.text)?;
 
     if numbers.len() <= PREAMBLE_LENGTH {
         return Err(format!("Too few input numbers ({})", numbers.len()));

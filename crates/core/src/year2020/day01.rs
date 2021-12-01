@@ -1,5 +1,6 @@
 #[cfg(feature = "visualization")]
 use super::day01_renderer::{render_part_one, render_part_two};
+use crate::common::parse_lines;
 use crate::input::Input;
 use core::cmp::Ordering::{Equal, Greater, Less};
 
@@ -33,21 +34,7 @@ fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     const DESIRED_SUM: u32 = 2020;
 
-    let mut expenses = input
-        .text
-        .lines()
-        .enumerate()
-        .map(|(line_index, line)| {
-            line.parse::<u32>().map_err(|parse_error| {
-                format!(
-                    "Line {}: Cannot parse expense ({})",
-                    line_index + 1,
-                    parse_error.to_string()
-                )
-            })
-        })
-        .collect::<Result<Vec<u32>, String>>()?;
-
+    let mut expenses = parse_lines::<u32>(input.text)?;
     expenses.sort_unstable();
 
     let result = if input.is_part_one() {
@@ -90,8 +77,8 @@ pub fn tests() {
     test_part_one_error!("1\n2\n3" => "No 2 expenses sum to 2020");
 
     test_part_two!("1721\n979\n366\n299\n675\n1456" => 241_861_950);
-    test_part_two_error!("asdf" => "Line 1: Cannot parse expense (invalid digit found in string)");
-    test_part_two_error!("12\nasdf" => "Line 2: Cannot parse expense (invalid digit found in string)");
+    test_part_two_error!("asdf" => "Line 1: Not a valid integer");
+    test_part_two_error!("12\nasdf" => "Line 2: Not a valid integer");
     test_part_two_error!("" => "No 3 expenses sum to 2020");
     test_part_two_error!("1" => "No 3 expenses sum to 2020");
     test_part_two_error!("1\n2" => "No 3 expenses sum to 2020");

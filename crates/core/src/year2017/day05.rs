@@ -1,3 +1,4 @@
+use crate::common::parse_lines;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -9,20 +10,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         }
     };
 
-    let mut jumps: Vec<i32> = input
-        .text
-        .lines()
-        .enumerate()
-        .map(|(line_index, line)| {
-            line.parse::<i32>().map_err(|error| {
-                format!(
-                    "Invalid input at line {}: {}",
-                    line_index + 1,
-                    error.to_string()
-                )
-            })
-        })
-        .collect::<Result<_, _>>()?;
+    let mut jumps: Vec<i32> = parse_lines::<i32>(input.text)?;
 
     let mut position: i32 = 0;
     for step in 1..100_000_000 {

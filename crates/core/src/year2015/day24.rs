@@ -1,3 +1,4 @@
+use crate::common::parse_lines;
 use crate::input::Input;
 
 // arr[]  ---> Input Array
@@ -37,12 +38,7 @@ where
 }
 
 pub fn solve(input: &mut Input) -> Result<u128, String> {
-    let weights = input
-        .text
-        .lines()
-        .map(str::parse::<u8>)
-        .collect::<Result<Vec<u8>, _>>()
-        .map_err(|_| "Invalid input")?;
+    let weights = parse_lines::<u8>(input.text)?;
 
     let sum: u32 = weights.iter().map(|&w| u32::from(w)).sum();
     let group_weight = sum / input.part_values(3, 4);

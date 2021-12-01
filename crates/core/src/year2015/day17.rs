@@ -1,13 +1,10 @@
+use crate::common::parse_lines;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     const TARGET_SIZE: u8 = 150;
 
-    let container_sizes = input
-        .text
-        .lines()
-        .map(|line| line.parse::<u8>().map_err(|_| "Invalid container size"))
-        .collect::<Result<Vec<u8>, _>>()?;
+    let container_sizes = parse_lines::<u8>(input.text)?;
 
     if input.is_part_one() {
         let mut answers = vec![0; (TARGET_SIZE + 1) as usize];
