@@ -19,8 +19,8 @@ for benchmark_name in old:
     old_values = old[benchmark_name]
     new_values = new[benchmark_name]
 
-    old_time = old_values['time']
-    new_time = new_values['time']
+    old_time = old_values["time"]
+    new_time = new_values["time"]
 
     total_time += new_time
 
