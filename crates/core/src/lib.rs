@@ -77,6 +77,8 @@ pub fn solve(
 
     if input.is_empty() {
         return Err("Empty input".to_string());
+    } else if input.len() > 200_000 {
+        return Err("Too long input".to_string());
     } else if !input.is_ascii() {
         return Err("Non-ASCII input".to_string());
     } else if !matches!(day, 1..=25) {
