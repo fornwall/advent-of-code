@@ -44,6 +44,8 @@ main_string += ");"
 print(main_string, file=output_file)
 output_file.close()
 
+subprocess.run(['cargo', 'fmt'], check=True)
+
 # Estimate based on stock Ryzen 5950x measurements
 CYCLES_PER_MICROSECOND = 22250
 
