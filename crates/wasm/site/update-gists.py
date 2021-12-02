@@ -42,6 +42,8 @@ def add_header(src, year, day):
             path_in_repo = f"crates/core/src/year{year}/{module_path}.rs"
         else:
             path_in_repo = f"crates/core/src/{module_path}.rs"
+            if not os.path.isfile(f"../../../{path_in_repo}"):
+                path_in_repo = f"crates/core/src/{module_path}/mod.rs"
         src_to_include = Path(f"../../../{path_in_repo}").read_text()
         module_rust = module.replace("::", " { pub mod ")
         suffix += f"\n\n#[allow(dead_code, unused_imports, unused_macros)]\nmod {module_rust} {{\n"
@@ -139,7 +141,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         src = replace_include_str(dirpath, src)
 
         # Finally format source code:
-        src = subprocess.run(['rustfmt'], stdout=subprocess.PIPE, input=src, encoding='utf-8').stdout
+        src = subprocess.run(['rustfmt'], stdout=subprocess.PIPE, input=src, encoding='utf-8', check=True).stdout
 
         year_str = str(year)
         day_str = str(day)
