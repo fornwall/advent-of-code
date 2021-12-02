@@ -3,7 +3,7 @@
 use std::io::Write;
 
 let file_path = std::env::args().nth(1).ok_or("No argument")?;
-let data = std::fs::read(&file_path).map_err(|error| format!("Could not open '{}': {}", file_path, error))?;
+let data = std::fs::read(&file_path).map_err(|error| format!("Error opening '{}': {}", file_path, error))?;
 
 let year = 2015 + u16::from(data[0] % 6);
 let day = 1 + data[1] % 25;
