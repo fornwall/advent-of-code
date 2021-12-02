@@ -16,4 +16,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 advent-of-code = { path = "../core" }
-pyo3 = { version = "*", features = ["abi3-py37", "extension-module"] }
+pyo3 = { version = "*", features = ["abi3-py38", "extension-module"] }
