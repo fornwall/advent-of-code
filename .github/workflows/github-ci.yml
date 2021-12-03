@@ -103,7 +103,7 @@ jobs:
           rm ../../Cargo.toml
           export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
           export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
-          if [ `uname` = Darwin ]; then export CIBW_ARCHS_MACOS="x86_64 arm64 universal2"; fi
+          if [ `uname` = Darwin ]; then export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin"; export CIBW_ARCHS_MACOS="x86_64 arm64 universal2"; fi
           python -m cibuildwheel --output-dir wheelhouse
       - name: Build wheels on Windows
         if: runner.os == 'Windows'
