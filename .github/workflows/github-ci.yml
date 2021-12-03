@@ -608,16 +608,13 @@ jobs:
       options: --security-opt seccomp=unconfined
     steps:
     - uses: actions/checkout@v2
-
     - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: nightly-2021-12-02
-
     - name: Generate code coverage
       # What about -all-features and --workspace?
-      run: cargo +nightly-2021-12-02 tarpaulin --verbose --timeout 480 --out Xml
+      run: cargo +nightly-2021-12-02 tarpaulin --verbose --timeout 720 --out Xml
       working-directory: crates/core
-
     - name: Upload to codecov.io
       uses: codecov/codecov-action@v1
       with:
