@@ -277,7 +277,7 @@ clipboardReadMayWork().then((enabled) => {
 document.getElementById("open-playground").addEventListener("click", () => {
   const gistId = gistMapping?.[yearElement.value]?.[dayElement.value]?.["gist"];
   if (gistId) {
-    const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=${gistId}`;
+    const link = `https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=${gistId}`;
     window.open(link);
   } else {
     alert("Not available yet!");
