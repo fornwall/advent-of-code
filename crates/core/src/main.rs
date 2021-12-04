@@ -35,7 +35,7 @@ fn main() -> Result<(), String> {
         let mut input = String::new();
         std::io::stdin()
             .read_to_string(&mut input)
-            .map_err(|error| format!("Error reading input: {}", error.to_string()))?;
+            .map_err(|error| format!("Error reading input: {}", error))?;
 
         for _ in 0..repeat {
             let solution = solve_raw(

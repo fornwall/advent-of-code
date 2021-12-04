@@ -46,13 +46,7 @@ impl<'a> ProgramTree<'a> {
                 .replace("(", "")
                 .replace(")", "")
                 .parse::<u32>()
-                .map_err(|error| {
-                    format!(
-                        "Line {}: Invalid weight ({})",
-                        line_index + 1,
-                        error.to_string()
-                    )
-                })?;
+                .map_err(|error| format!("Line {}: Invalid weight ({})", line_index + 1, error))?;
 
             let program_id = nodes.len();
             let program = Program {

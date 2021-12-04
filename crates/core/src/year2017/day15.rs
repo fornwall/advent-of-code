@@ -41,7 +41,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 format!(
                     "Line {}: Unable to parse starting value: {}",
                     line_index + 1,
-                    parse_error.to_string()
+                    parse_error
                 )
             })
         })

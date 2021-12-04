@@ -10,9 +10,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         .split_ascii_whitespace()
         .enumerate()
         .map(|(index, word)| {
-            word.parse::<u32>().map_err(|error| {
-                format!("Invalid input at word {}: {}", index + 1, error.to_string())
-            })
+            word.parse::<u32>()
+                .map_err(|error| format!("Invalid input at word {}: {}", index + 1, error))
         })
         .collect::<Result<_, _>>()?;
 

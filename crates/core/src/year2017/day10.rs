@@ -14,7 +14,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             .map(|length| {
                 length
                     .parse::<u8>()
-                    .map_err(|e| format!("Invalid length: {}", e.to_string()))
+                    .map_err(|e| format!("Invalid length: {}", e))
             })
             .collect::<Result<Vec<_>, _>>()?
     } else {

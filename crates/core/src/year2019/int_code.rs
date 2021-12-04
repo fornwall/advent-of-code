@@ -27,10 +27,7 @@ impl Program {
                     memory.push(value);
                 }
                 Err(error) => {
-                    return Err(format!(
-                        "Unable to parse program word ({})",
-                        error.to_string()
-                    ));
+                    return Err(format!("Unable to parse program word ({})", error));
                 }
             }
         }

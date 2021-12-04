@@ -48,7 +48,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         let input_num_recipes = input
             .text
             .parse::<u32>()
-            .map_err(|error| format!("Invalid input: {}", error.to_string()))?
+            .map_err(|error| format!("Invalid input: {}", error))?
             as usize;
         let num_recipes_after = 10;
         let desired_length = input_num_recipes + num_recipes_after;

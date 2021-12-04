@@ -7,7 +7,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         .split_whitespace()
         .map(|word| {
             word.parse::<InputNumber>()
-                .map_err(|error| format!("Invalid input: {}", error.to_string()))
+                .map_err(|error| format!("Invalid input: {}", error))
         })
         .collect::<Result<Vec<InputNumber>, _>>()?;
     Ok(evaluate_node(&data, 0, input.is_part_one())?.1)

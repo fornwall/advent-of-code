@@ -7,13 +7,8 @@ fn parse_frequency_changes(
     input_string: &str,
 ) -> impl Iterator<Item = Result<Frequency, String>> + Clone + '_ {
     input_string.lines().enumerate().map(|(line_index, line)| {
-        line.parse::<Frequency>().map_err(|error| {
-            format!(
-                "Invalid input on line {}: {}",
-                line_index + 1,
-                error.to_string()
-            )
-        })
+        line.parse::<Frequency>()
+            .map_err(|error| format!("Invalid input on line {}: {}", line_index + 1, error))
     })
 }
 
