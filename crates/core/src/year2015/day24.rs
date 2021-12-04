@@ -1,4 +1,4 @@
-use crate::common::parse_lines;
+use crate::common::parser::parse_lines;
 use crate::input::Input;
 
 // arr[]  ---> Input Array

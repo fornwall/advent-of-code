@@ -1,4 +1,4 @@
-use crate::common::parse_lines::parse_lines;
+use crate::common::parser::parse_lines;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {

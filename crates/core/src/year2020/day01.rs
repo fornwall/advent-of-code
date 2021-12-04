@@ -1,6 +1,6 @@
 #[cfg(feature = "visualization")]
 use super::day01_renderer::{render_part_one, render_part_two};
-use crate::common::parse_lines;
+use crate::common::parser::parse_lines;
 use crate::input::Input;
 use core::cmp::Ordering::{Equal, Greater, Less};
 
