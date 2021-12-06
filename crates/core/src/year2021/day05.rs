@@ -51,10 +51,11 @@ impl Board {
 }
 
 fn parse_point(s: &str) -> Option<(u16, u16)> {
-    if let Some((x, y)) = s.split_once(",").map(|(x,y)| (x.parse::<u16>(), y.parse::<u16>()))
-        if let (Ok(x), Ok(y)) = (x.parse::<u16>(), y.parse::<u16>()) {
-            return Some((x, y));
-        }
+    if let Some((Ok(x), Ok(y))) = s
+        .split_once(",")
+        .map(|(x, y)| (x.parse::<u16>(), y.parse::<u16>()))
+    {
+        return Some((x, y));
     }
     None
 }
