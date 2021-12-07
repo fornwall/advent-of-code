@@ -47,7 +47,7 @@ output_file.close()
 subprocess.run(['cargo', 'fmt'], check=True)
 
 # Estimate based on stock Ryzen 5950x measurements
-CYCLES_PER_MILLISECOND = 190_000_000
+CYCLES_PER_MILLISECOND = 10_000_000
 
 result = subprocess.run(['cargo', 'bench', '--bench', bench_name], check=True, stdout=subprocess.PIPE, text=True)
 # print(result.stdout)
