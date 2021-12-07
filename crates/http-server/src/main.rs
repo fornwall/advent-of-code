@@ -29,7 +29,7 @@ async fn handle_get() -> Result<impl warp::Reply, Infallible> {
         .header("content-type", "text/html")
         .status(warp::http::StatusCode::OK)
         .body("<h1>Advent of Code API</h1>\n\
-              <p>Check the <a href='https://aoc.fornwall.net/openapi.json'>OpenAPI document</a>.</p>"))
+              <p>Check the <a href='https://aoc.fornwall.net/api/openapi.json'>OpenAPI document</a>.</p>"))
 }
 
 async fn handle_post(
