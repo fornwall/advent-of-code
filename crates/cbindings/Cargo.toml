@@ -1,0 +1,22 @@
+[package]
+name = "advent-of-code-c"
+version = "2019.12.410"
+keywords = ["advent-of-code", "c", "cbindgen"]
+categories = ["algorithms", "rust-patterns"]
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+repository = "https://github.com/fornwall/advent-of-code"
+description = "Solutions to Advent of Code written in Rust"
+license = "MIT"
+edition = "2021"
+
+[build-dependencies]
+cbindgen = "0"
+
+[lib]
+name = "advent_of_code"
+doc = false
+crate-type = ["cdylib"]
+
+[dependencies]
+advent-of-code = { path = "../core" }
+libc = "0"
