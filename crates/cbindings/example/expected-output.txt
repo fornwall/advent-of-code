@@ -1,0 +1,7 @@
+2019-1-1: Input='14' -> ok=true, output='2'
+2019-1-1: Input='hej' -> ok=false, output='Line 1: Invalid digit found in string'
+2019-1-1: Input='' -> ok=false, output='Empty input'
+2019-1-1: Input='รถ' -> ok=false, output='Non-ASCII input'
+2019-1-1: Input='(null)' -> ok=true, output='Input is NULL'
+2019-1-1: Input='ร(' -> ok=true, output='Invalid UTF-8 input: invalid utf-8 sequence of 1 bytes from index 0'
+2021-7-2: Input='16,1,2,0,4,2,7,1,2,14' -> ok=true, output='168'

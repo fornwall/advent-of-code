@@ -27,6 +27,16 @@ jobs:
       if: matrix.rust == 'nightly-2021-12-02'
       continue-on-error: true
 
+  test-cbindings:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hecrj/setup-rust-action@v1
+    - run: make test-cbindings
+
   test-python:
     runs-on: ubuntu-latest
     strategy:
@@ -122,7 +132,7 @@ jobs:
           path: ./crates/python/wheelhouse/*.whl
 
   bump-version:
-    needs: [test-rust, test-python, test-wasm]
+    needs: [test-rust, test-python, test-wasm, test-cbindings]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
