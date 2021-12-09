@@ -38,18 +38,20 @@ impl HeightMap {
         }
     }
 
-    fn fill_map(&self, filled_map: &mut [bool], x: i32, y: i32) {
+    fn fill_map(&self, filled_map: &mut [bool], x: i32, y: i32) -> usize {
         if self.height_at(x, y) == 9 {
             // "Locations of height 9 do not count as being in any basin".
-            return;
+            return 0;
         }
         let map_idx = x as usize + (y as usize * self.width as usize);
-        if !filled_map[map_idx] {
+        if filled_map[map_idx] {
+            0
+        } else {
             filled_map[map_idx] = true;
-            self.fill_map(filled_map, x - 1, y);
-            self.fill_map(filled_map, x + 1, y);
-            self.fill_map(filled_map, x, y - 1);
-            self.fill_map(filled_map, x, y + 1);
+            1 + self.fill_map(filled_map, x - 1, y)
+                + self.fill_map(filled_map, x + 1, y)
+                + self.fill_map(filled_map, x, y - 1)
+                + self.fill_map(filled_map, x, y + 1)
         }
     }
 }
@@ -74,9 +76,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 if input.is_part_one() {
                     risk_level_sum += u32::from(h) + 1;
                 } else {
-                    filled_map.fill(false);
-                    map.fill_map(&mut filled_map, x, y);
-                    basin_sizes.push(filled_map.iter().filter(|&&b| b).count() as u32);
+                    let basin_size = map.fill_map(&mut filled_map, x, y);
+                    basin_sizes.push(basin_size as u32);
                 }
             }
         }
