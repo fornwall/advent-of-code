@@ -11,7 +11,7 @@ const fn part_2_fuel_consumption(distance: i32) -> i32 {
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let numbers = input
+    let mut positions = input
         .text
         .split(',')
         .map(str::parse::<u16>)
@@ -21,10 +21,17 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let fuel_consumption: fn(i32) -> i32 =
         input.part_values(part_1_fuel_consumption, part_2_fuel_consumption);
 
-    let max_position = numbers.iter().max().cloned().unwrap_or(0);
-    Ok((0..=max_position)
+    let range = if input.is_part_one() {
+        positions.sort_unstable();
+        let median = positions[positions.len() / 2];
+        median..=median
+    } else {
+        let mean = (positions.iter().map(|n| *n as usize).sum::<usize>() / positions.len()) as u16;
+        (if mean == 0 { 0 } else { mean - 1 })..=mean + 2
+    };
+    Ok(range
         .map(|candidate_spot| {
-            numbers
+            positions
                 .iter()
                 .map(|n| fuel_consumption((i32::from(*n) - i32::from(candidate_spot)).abs()))
                 .sum::<i32>() as u32
