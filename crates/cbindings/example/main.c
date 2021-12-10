@@ -4,9 +4,11 @@
 void test(uint16_t year, uint8_t day, uint8_t part, const char* input) {
     bool ok;
 
-    const char* result = advent_of_code_solve(year, day, part, input, &ok);
+    char* result = advent_of_code_solve(year, day, part, input, &ok);
 
     printf("%d-%d-%d: Input='%s' -> ok=%s, output='%s'\n", year, day, part, input, ok ? "true" : "false", result);
+
+    free(result);
 }
 
 int main() {
