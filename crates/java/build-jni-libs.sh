@@ -33,12 +33,8 @@ if [ "$UNAME" = "Darwin" ]; then
   strip -r -u java-src/src/main/resources/*.dylib
   echo "# After stripping:"
   ls -lha java-src/src/main/resources/*.dylib
-else
+elif [ "$UNAME" = "Linux" ]; then
   cd ../..
-
-  cross $BUILD_COMMAND --target x86_64-pc-windows-gnu --package advent-of-code-java
-  cp target/x86_64-pc-windows-gnu/$AOC_BUILD_TYPE/advent_of_code_java.dll \
-      crates/java/java-src/src/main/resources/advent_of_code_java_x86_64.dll
 
   cross $BUILD_COMMAND --target x86_64-unknown-linux-gnu --package advent-of-code-java
   cp target/x86_64-unknown-linux-gnu/$AOC_BUILD_TYPE/libadvent_of_code_java.so \
@@ -54,4 +50,14 @@ else
   aarch64-linux-gnu-strip crates/java/java-src/src/main/resources/libadvent_of_code_java_aarch64.so
   echo "# After stripping:"
   ls -lha crates/java/java-src/src/main/resources/*.so
+else
+  echo "Uknown uname: '$UNAME' (assuming windows)"
+  rustup target add x86_64-pc-windows-msvc aarch64-pc-windows-msvc
+  cargo $BUILD_COMMAND --target x86_64-pc-windows-msvc
+  cargo $BUILD_COMMAND --target aarch64-pc-windows-msvc
+
+  cp ../../target/x86_64-pc-windows-msvc/$AOC_BUILD_TYPE/advent_of_code_java.dll \
+      java-src/src/main/resources/advent_of_code_java_x86_64.dll
+  cp ../../target/aarch64-pc-windows-msvc/$AOC_BUILD_TYPE/advent_of_code_java.dll \
+      java-src/src/main/resources/advent_of_code_java_aarch64.dll
 fi
