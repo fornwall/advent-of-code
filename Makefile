@@ -145,7 +145,8 @@ deploy-site:
 		git commit -m "Update site: ${GITHUB_SHA}" && \
 		git push
 
-test-cbindings:
+test-c-and-cxx-bindings:
 	cd crates/cbindings && ./test-example.sh
+	cd crates/cxxbindings && ./test-example.sh
 
 .PHONY: check install-cargo-deps site-wasm site-pack wasm-size --run-devserver --watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify deploy-site test-cbindings

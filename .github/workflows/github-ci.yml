@@ -27,7 +27,7 @@ jobs:
       if: matrix.rust == 'nightly-2021-12-02'
       continue-on-error: true
 
-  test-cbindings:
+  test-c-and-cxx-bindings:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -37,7 +37,7 @@ jobs:
     - uses: hecrj/setup-rust-action@v1
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: sudo apt-get -y install libc6-dbg && brew install valgrind
-    - run: make test-cbindings
+    - run: make test-c-and-cxx-bindings
 
   test-python:
     runs-on: ubuntu-latest

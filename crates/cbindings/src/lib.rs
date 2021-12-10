@@ -31,7 +31,7 @@ pub extern "C" fn advent_of_code_solve(
     use advent_of_code::solve;
 
     if input.is_null() {
-        unsafe { *ok = true };
+        unsafe { *ok = false };
         let c_str_result = CString::new("Input is NULL").unwrap();
         return c_str_result.into_raw();
     }
@@ -40,7 +40,7 @@ pub extern "C" fn advent_of_code_solve(
     let input_string = match c_str.to_str() {
         Ok(value) => value,
         Err(error) => {
-            unsafe { *ok = true };
+            unsafe { *ok = false };
             let c_str_result = CString::new(format!("Invalid UTF-8 input: {}", error)).unwrap();
             return c_str_result.into_raw();
         }
