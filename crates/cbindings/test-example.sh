@@ -8,7 +8,7 @@ CC="cc -Wall -Werror"
 LIBS="-ladvent_of_code"
 if [ `uname` = Linux ]; then
   # CC="$CC -Wl,-rpath=../../../target/debug/"
-  LIBS="$LIBS -lm -lpthread"
+  LIBS="$LIBS -lm -lpthread -ldl"
 fi
 
 $CC -I ../target/ -L ../../../target/debug/ main.c $LIBS -o ../target/example
