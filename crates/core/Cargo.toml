@@ -28,10 +28,10 @@ count-allocations = ["allocation-counter"]
 
 [dependencies]
 allocation-counter = { version = "0", optional = true }
-iai = "0.1"
 
 [dev-dependencies]
 criterion = "0.3"
+iai = "0.1"
 
 [[bench]]
 name = "benchmark"
