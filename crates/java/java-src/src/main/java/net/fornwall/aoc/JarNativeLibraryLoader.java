@@ -54,7 +54,7 @@ class JarNativeLibraryLoader {
 
         if (isX86_64) {
             archExtension = "_x86_64";
-        } else if (isArm64 && !isWindows) {
+        } else if (isArm64) {
             archExtension = "_aarch64";
         } else {
             throw new RuntimeException("Unsupported CPU (os.arch): " + osName);
