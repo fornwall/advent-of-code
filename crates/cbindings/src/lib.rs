@@ -25,7 +25,7 @@ pub extern "C" fn advent_of_code_solve(
     part: u8,
     input: *const c_char,
     ok: *mut bool,
-) -> *const c_char {
+) -> *mut c_char {
     #![allow(clippy::unwrap_used, clippy::not_unsafe_ptr_arg_deref)]
 
     use advent_of_code::solve;
