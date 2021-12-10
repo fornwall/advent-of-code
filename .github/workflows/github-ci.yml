@@ -134,7 +134,7 @@ jobs:
           path: ./crates/python/wheelhouse/*.whl
 
   bump-version:
-    needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings]
+    needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings, build-jni-libraries]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -376,7 +376,7 @@ jobs:
   build-jni-libraries:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
@@ -403,6 +403,7 @@ jobs:
     - name: Build JNI libraries
       working-directory: crates/java
       run: ./build-jni-libs.sh
+      shell: bash
     - name: Test java
       working-directory: crates/java/java-src
       run: gradle test
@@ -412,7 +413,7 @@ jobs:
         path: ./crates/java/java-src/src/main/resources/*
 
   publish-to-maven-central:
-    needs: [build-jni-libraries, bump-version]
+    needs: [bump-version]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
