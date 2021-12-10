@@ -35,6 +35,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+    - run: sudo apt-get -y install libc6-dbg
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: brew install valgrind
     - run: make test-cbindings
