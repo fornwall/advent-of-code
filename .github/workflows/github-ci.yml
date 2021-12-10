@@ -134,7 +134,7 @@ jobs:
           path: ./crates/python/wheelhouse/*.whl
 
   bump-version:
-    needs: [test-rust, test-python, test-wasm, test-cbindings]
+    needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
