@@ -35,6 +35,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hecrj/setup-rust-action@v1
+    - if: ${{ matrix.os == 'macos-latest' }}
+      run: brew install valgrind
     - run: make test-cbindings
 
   test-python:
