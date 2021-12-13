@@ -45,20 +45,20 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
         let mut result = String::new();
         for x in (0..PIXELS_WIDE).step_by(5) {
-            let mut this_char_string = String::new();
+            let mut char_string = String::new();
             for y in 0..PIXELS_TALL {
                 for char_x in x..(x + 5) {
-                    this_char_string.push(if image[(char_x + PIXELS_WIDE * y) as usize] == b'1' {
+                    char_string.push(if image[(char_x + PIXELS_WIDE * y) as usize] == b'1' {
                         '█'
                     } else {
                         ' '
                     });
                 }
                 if y != PIXELS_TALL - 1 {
-                    this_char_string.push('\n');
+                    char_string.push('\n');
                 }
             }
-            result.push(recognize(&this_char_string)?);
+            result.push(recognize(&char_string)?);
         }
         Ok(result)
     }
