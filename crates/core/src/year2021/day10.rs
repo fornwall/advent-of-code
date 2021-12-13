@@ -52,18 +52,15 @@ const fn score_syntax_error(character: u8) -> u64 {
 }
 
 fn score_autocomplete(autocomplete: &[u8]) -> u64 {
-    let mut score = 0;
-    for c in autocomplete.iter().rev() {
-        score *= 5;
-        score += match c {
-            b')' => 1,
-            b']' => 2,
-            b'}' => 3,
-            _ => 4,
-        };
-    }
-
-    score
+    autocomplete.iter().rev().fold(0, |score, c| {
+        score * 5
+            + match c {
+                b')' => 1,
+                b']' => 2,
+                b'}' => 3,
+                _ => 4,
+            }
+    })
 }
 
 #[test]
