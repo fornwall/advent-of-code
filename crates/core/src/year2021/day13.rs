@@ -1,5 +1,6 @@
 use crate::common::character_recognition::recognize;
 use crate::input::Input;
+use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut dots = Vec::new();
@@ -17,21 +18,28 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             dots.push((x, y));
         } else if let Some((prefix, coord)) = line.split_once('=') {
             let coord = parse_number(coord)?;
+            let updater = |n: &mut u16| {
+                if *n > coord {
+                    if *n > 2 * coord {
+                        return Err("Folding would create dot with negative coordinate".to_string());
+                    }
+                    *n = 2 * coord - *n;
+                }
+                Ok(())
+            };
+
             if prefix.ends_with('x') {
                 for p in dots.iter_mut() {
-                    if p.0 > coord {
-                        p.0 = 2 * coord - p.0;
-                    }
+                    updater(&mut p.0)?;
                 }
             } else if prefix.ends_with('y') {
                 for p in dots.iter_mut() {
-                    if p.1 > coord {
-                        p.1 = 2 * coord - p.1;
-                    }
+                    updater(&mut p.1)?;
                 }
             } else {
                 return Err("Invalid line not ending width x=.. or y=..".to_string());
             }
+
             if input.is_part_one() {
                 dots.sort_unstable();
                 dots.dedup();
@@ -40,6 +48,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
     }
 
+    let dots = HashSet::<(u16, u16)>::from_iter(dots);
     let mut code = String::new();
     for letter in 0..8 {
         let mut char_string = String::new();
