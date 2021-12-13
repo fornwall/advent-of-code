@@ -128,10 +128,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                     this_char_string.push('\n');
                 }
             }
-            result.push(
-                recognize(&this_char_string)
-                    .ok_or(format!("Unrecognized character: {}", this_char_string))?,
-            );
+            result.push(recognize(&this_char_string)?);
         }
 
         Ok(result)

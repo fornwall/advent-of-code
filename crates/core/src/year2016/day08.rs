@@ -105,11 +105,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                 }
             }
 
-            code_on_screen.push(
-                recognize(&this_char_string).ok_or_else(|| {
-                    format!("Failed to recognize character: {}", this_char_string)
-                })?,
-            );
+            code_on_screen.push(recognize(&this_char_string)?);
         }
         Ok(code_on_screen)
     }
