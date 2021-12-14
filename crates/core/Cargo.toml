@@ -1,13 +1,13 @@
 [package]
 name = "advent-of-code"
-version = "2019.12.420"
+version = "2019.12.421"
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
 keywords = ["advent-of-code", "wasm", "webassembly", "node"]
 categories = ["algorithms", "rust-patterns"]
 repository = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
 description = "Solutions to Advent of Code"
-documentation = "https://docs.rs/advent-of-code/2019.12.420/advent_of_code/"
+documentation = "https://docs.rs/advent-of-code/2019.12.421/advent_of_code/"
 homepage = "https://github.com/fornwall/advent-of-code"
 readme = "README.md"
 edition = "2021"
