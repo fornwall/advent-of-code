@@ -16,38 +16,39 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
             let bytes = line.as_bytes();
             ((bytes[0], bytes[1]), bytes[6])
         })
-        .collect::<HashMap<_, _>>();
+        .collect::<Vec<_>>();
 
-    let mut pair_counts = HashMap::new();
+    let mut pair_occurrences = HashMap::new();
     for pair in template.windows(2) {
-        *pair_counts.entry((pair[0], pair[1])).or_insert(0) += 1;
+        *pair_occurrences.entry((pair[0], pair[1])).or_default() += 1;
     }
 
     for _step in 0..input.part_values(10, 40) {
         let mut additions = Vec::new();
         let mut removals = Vec::new();
-        for (&producing_pair, &inserted) in productions.iter() {
-            if let Some(&count) = pair_counts.get(&producing_pair) {
+        for &(producing_pair, inserted) in productions.iter() {
+            if let Some(&count) = pair_occurrences.get(&producing_pair) {
                 additions.push(((producing_pair.0, inserted), count));
                 additions.push(((inserted, producing_pair.1), count));
                 removals.push((producing_pair, count));
             }
         }
         for (added, count) in additions {
-            *pair_counts.entry(added).or_default() += count;
+            *pair_occurrences.entry(added).or_default() += count;
         }
-        for (removal, count) in removals {
-            *pair_counts.entry(removal).or_default() -= count;
+        for (removed, count) in removals {
+            *pair_occurrences.entry(removed).or_default() -= count;
         }
     }
 
     let mut element_count = HashMap::new();
-    for (key, count) in pair_counts.iter() {
-        *element_count.entry(key.0).or_insert(0) += count;
-        *element_count.entry(key.1).or_insert(0) += count;
+    for (key, count) in pair_occurrences.iter() {
+        *element_count.entry(key.0).or_default() += count;
+        *element_count.entry(key.1).or_default() += count;
     }
 
-    // The above counts every element twice (as pair Make edge double counted as well:
+    // The above counts every element twice (as each element in a pair) is counted twice -
+    // except the edge ones. So make the edge elements double counted as well:
     *element_count.entry(template[0]).or_default() += 1;
     *element_count
         .entry(template[template.len() - 1])
