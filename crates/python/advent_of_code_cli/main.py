@@ -1,5 +1,6 @@
-from advent_of_code import solve
 import sys
+
+from advent_of_code import solve
 
 
 def main():
