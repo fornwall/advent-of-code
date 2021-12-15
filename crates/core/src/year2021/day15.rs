@@ -5,8 +5,8 @@ use std::collections::BinaryHeap;
 struct Graph {
     risk_levels: Vec<u8>,
     visited: Vec<bool>,
-    width: usize,
-    height: usize,
+    width: u16,
+    height: u16,
 }
 
 impl Graph {
@@ -15,6 +15,8 @@ impl Graph {
         let original_width = text.lines().next().unwrap_or_default().len();
         if original_height < 1 || original_width < 1 {
             return Err("Too small input".to_string());
+        } else if original_width > 1000 || original_height > 1000 {
+            return Err("Too big input - max width and height is 1000".to_string());
         }
 
         let height = original_height * multiplier;
@@ -42,43 +44,41 @@ impl Graph {
         Ok(Self {
             risk_levels,
             visited,
-            width,
-            height,
+            width: width as u16,
+            height: width as u16,
         })
     }
 
     fn mark_visited(&mut self, x: usize, y: usize) {
-        self.visited[x + y * self.width] = true;
+        self.visited[x + y * self.width as usize] = true;
     }
 
     fn is_visited(&self, x: usize, y: usize) -> bool {
-        self.visited[x + y * self.width]
+        self.visited[x + y * self.width as usize]
     }
 
     fn risk_level_at(&self, x: usize, y: usize) -> u8 {
-        self.risk_levels[x + y * self.width]
+        self.risk_levels[x + y * self.width as usize]
     }
 
     fn contains(&self, x: i32, y: i32) -> bool {
-        (0..(self.width as i32)).contains(&x) && (0..(self.height as i32)).contains(&y)
+        (0..i32::from(self.width)).contains(&x) && (0..i32::from(self.height)).contains(&y)
     }
 }
 
 #[derive(Eq, PartialEq, Clone, PartialOrd, Ord)]
-struct State {
-    estimate: u64,
-    risk: u64,
-    x: usize,
-    y: usize,
+struct SearchNode {
+    risk: u32,
+    x: u16,
+    y: u16,
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut graph = Graph::parse(input.text, input.part_values(1, 5))?;
     let destination = (graph.width - 1, graph.height - 1);
 
     let mut to_visit = BinaryHeap::new();
-    to_visit.push(Reverse(State {
-        estimate: 0,
+    to_visit.push(Reverse(SearchNode {
         risk: 0,
         x: 0,
         y: 0,
@@ -91,20 +91,16 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
 
         for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
-            let new_x = state.x as i32 + dx;
-            let new_y = state.y as i32 + dy;
+            let new_x = i32::from(state.x) + dx;
+            let new_y = i32::from(state.y) + dy;
             if graph.contains(new_x, new_y) && !graph.is_visited(new_x as usize, new_y as usize) {
                 let new_risk =
-                    state.risk + u64::from(graph.risk_level_at(new_x as usize, new_y as usize));
-                let estimate = new_risk
-                    + (destination.0 - new_x as usize) as u64
-                    + (destination.1 - new_y as usize) as u64;
+                    state.risk + u32::from(graph.risk_level_at(new_x as usize, new_y as usize));
                 graph.mark_visited(new_x as usize, new_y as usize);
-                to_visit.push(Reverse(State {
-                    estimate,
+                to_visit.push(Reverse(SearchNode {
                     risk: new_risk,
-                    x: new_x as usize,
-                    y: new_y as usize,
+                    x: new_x as u16,
+                    y: new_y as u16,
                 }))
             }
         }
