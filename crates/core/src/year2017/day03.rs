@@ -66,7 +66,7 @@ impl Iterator for SquareIterator {
             State::Left => {
                 result.x -= 1;
                 if result.on_corner() {
-                    result.state = State::Down
+                    result.state = State::Down;
                 }
             }
         }

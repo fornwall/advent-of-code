@@ -93,7 +93,7 @@ impl CaveMap {
                     }
                     result.big_caves |= from_bitmask;
                 } else if to_is_big {
-                    result.big_caves |= to_bitmask
+                    result.big_caves |= to_bitmask;
                 };
             } else {
                 return Err("Not all lines have the format '${FROM}-${TO}".to_string());

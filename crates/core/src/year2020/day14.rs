@@ -18,7 +18,7 @@ impl Hasher for CustomHash {
 
     fn write_u64(&mut self, value: u64) {
         // From Fx Hash.
-        self.hash = value.wrapping_mul(0x51_7c_c1_b7_27_22_0a_95)
+        self.hash = value.wrapping_mul(0x51_7c_c1_b7_27_22_0a_95);
     }
 }
 

@@ -113,7 +113,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     risk: new_risk,
                     x: new_x as u16,
                     y: new_y as u16,
-                }))
+                }));
             }
         }
     }

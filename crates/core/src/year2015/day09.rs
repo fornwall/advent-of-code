@@ -29,7 +29,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         for pair in ordering.windows(2) {
             this_distance += distances.get(&(pair[0], pair[1])).ok_or_else(|| {
                 "Distances between every pair of locations not specified".to_string()
-            })?
+            })?;
         }
         best_distance = if input.is_part_one() {
             std::cmp::min(best_distance, this_distance)
