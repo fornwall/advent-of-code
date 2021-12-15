@@ -1,4 +1,3 @@
-"use strict";
 async function solveApi(host, year, day, part, input) {
   const startTime = performance.now();
   try {

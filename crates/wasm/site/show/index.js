@@ -6,6 +6,7 @@ const visualizerWorker = new Worker(
   new URL("./worker-visualizer.js", import.meta.url),
   {
     name: "visualizer",
+    type: "module",
   }
 );
 

@@ -1,7 +1,4 @@
-"use strict";
-self.importScripts(
-  new URL("/generated/advent_of_code_wasm.js", import.meta.url)
-);
+import init, { solve } from "./generated/advent_of_code_wasm.js";
 
 class WasmNotWorkingError extends Error {
   constructor(message) {
@@ -19,7 +16,7 @@ async function solveWasm(year, day, part, input) {
 
   const startTime = performance.now();
   try {
-    const answer = wasm_bindgen.solve(year, day, part, input);
+    const answer = solve(year, day, part, input);
     const executionTime = performance.now() - startTime;
     console.log(
       `Wasm ${year}-${day}-${part} solution in: ${executionTime.toFixed(2)} ms`
@@ -69,9 +66,7 @@ self.onmessage = async (message) => {
 
 self.wasmReadyPromise = (async () => {
   try {
-    await wasm_bindgen(
-      new URL("/generated/advent_of_code_wasm_bg.wasm", import.meta.url)
-    );
+    await init();
     self.wasmWorking = true;
   } catch (e) {
     console.warn("WebAssembly not working", e);

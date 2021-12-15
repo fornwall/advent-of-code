@@ -1,7 +1,4 @@
-"use strict";
-self.importScripts(
-  new URL("generated/advent_of_code_wasm.js", import.meta.url)
-);
+import init, { solve } from "./generated/advent_of_code_wasm.js";
 
 self.onmessage = async (message) => {
   try {
@@ -20,7 +17,7 @@ self.onmessage = async (message) => {
     //   Atomics.wait(memoryArray, offset, value);
     // }
 
-    const answer = wasm_bindgen.solve(year, day, part, input);
+    const answer = solve(year, day, part, input);
     self.postMessage({ done: true, answer });
   } catch (e) {
     console.log(e);
@@ -30,13 +27,10 @@ self.onmessage = async (message) => {
 
 self.wasmReadyPromise = (async () => {
   try {
-    return await wasm_bindgen(
-      new URL("generated/advent_of_code_wasm_bg.wasm", import.meta.url)
-    );
+    return await init();
   } catch (e) {
     throw new Error("WebAssembly not working - " + e.message);
   }
-  return result;
 })();
 
 (async () => {

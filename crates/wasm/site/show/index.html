@@ -71,5 +71,7 @@
         style="z-index: 100; max-width: 100%; max-height: 100%"
       />
     </div>
+    <!-- This is for local development - sed removes '<script' lines during build and creates generated-index.html which webpack uses as template -->
+    <script type="module" src="index.js"></script>
   </body>
 </html>

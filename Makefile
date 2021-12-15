@@ -32,8 +32,8 @@ else ifneq ($(NIGHTLY),1)
 endif
 
 WASM_DIR = debug
-WASM_OPT = wasm-opt -all
-WASM_BINDGEN = wasm-bindgen --target no-modules
+WASM_OPT = wasm-opt --all-features
+WASM_BINDGEN = wasm-bindgen --target web
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
   WASM_DIR = release
@@ -71,6 +71,7 @@ site-pack: site-wasm
 		npm i && npm run webpack --mode=production && \
 		cd show && \
 		rm -Rf dist && \
+		sed '/<script/d' ./index.html > generated-index.html && \
 		npm i && npm run webpack --mode=production
 
 wasm-size:
