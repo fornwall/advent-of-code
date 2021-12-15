@@ -4,6 +4,7 @@ export function AudioPlayer(...urlList) {
   // https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
   this.load = async (recording) => {
     this.context = new AudioContext();
+    this.context.resume(); // For safari
     if (recording) {
       this.mediaStreamDestination = this.context.createMediaStreamDestination();
     }
@@ -17,6 +18,7 @@ export function AudioPlayer(...urlList) {
 
   (this.play = (soundId) => {
     if (!this.buffers) return;
+    this.context.resume(); // For safari
     const source = this.context.createBufferSource();
     source.buffer = this.buffers[soundId];
     source.connect(this.context.destination);
