@@ -7,7 +7,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         })
     }
 
-    let mut grid = [0_u8; 1_000_000];
+    let mut grid = vec![0_u8; 1_000_000].into_boxed_slice();
     for line in input.text.lines() {
         let words = line.split(' ').collect::<Vec<&str>>();
         let is_toggle = words[0] == "toggle";

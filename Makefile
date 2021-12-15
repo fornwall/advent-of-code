@@ -10,6 +10,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::manual_filter_map \
 	-W clippy::if_not_else \
 	-W clippy::items_after_statements \
+	-W clippy::large_stack_arrays \
 	-W clippy::linkedlist \
 	-W clippy::match_same_arms \
 	-W clippy::nursery \
