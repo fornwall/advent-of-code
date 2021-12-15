@@ -44,6 +44,7 @@ pub trait Painter {
 
     /// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle
     fn fill_style_rgb_packed(&mut self, rgb: i32) {
+        #![allow(clippy::unreadable_literal)]
         let red = (rgb & 0xFF0000) >> 16;
         let green = (rgb & 0x00FF00) >> 8;
         let blue = rgb & 0x0000FF;

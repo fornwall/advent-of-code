@@ -8,7 +8,7 @@ pub fn start_rendering(painter: &mut PainterRef) {
 pub fn render(
     painter: &mut PainterRef,
     computer: &Computer,
-    executed_instructions: &Vec<bool>,
+    executed_instructions: &[bool],
     switched_instruction_idx: Option<usize>,
 ) {
     painter.clear();

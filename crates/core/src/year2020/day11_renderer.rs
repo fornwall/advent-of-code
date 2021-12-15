@@ -31,18 +31,18 @@ impl<'a> Renderer<'a> {
 
         let grid_width = (self.cols) as i32;
         let grid_height = (self.rows) as i32;
-        let grid_display_width = 1.0 / grid_width as f64;
-        let grid_display_height = (1.0 / grid_height as f64) / self.painter.aspect_ratio();
+        let grid_display_width = 1.0 / f64::from(grid_width);
+        let grid_display_height = (1.0 / f64::from(grid_height)) / self.painter.aspect_ratio();
 
         self.painter.clear();
         for (idx, &occupied) in seats.iter().enumerate() {
             let &(x, y) = self.idx_to_coordinates.get(&idx).unwrap();
-            let draw_x = x as f64 * grid_display_width;
-            let draw_y = y as f64 * grid_display_height;
+            let draw_x = f64::from(x) * grid_display_width;
+            let draw_y = f64::from(y) * grid_display_height;
             if occupied {
-                self.painter.fill_style_rgb_packed(0xFF0000);
+                self.painter.fill_style_rgb_packed(0xFF_0000);
             } else {
-                self.painter.fill_style_rgb_packed(0x444444);
+                self.painter.fill_style_rgb_packed(0x44_4444);
             }
             self.painter.fill_square(draw_x, draw_y, grid_display_width);
         }

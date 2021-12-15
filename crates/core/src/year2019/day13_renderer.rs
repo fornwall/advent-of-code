@@ -60,8 +60,8 @@ impl<'a> Renderer<'a> {
             self.painter.set_aspect_ratio(grid_width, grid_height);
         }
 
-        let grid_display_width = 1.0 / grid_width as f64;
-        let grid_display_height = (1.0 / grid_height as f64) / self.painter.aspect_ratio();
+        let grid_display_width = 1.0 / f64::from(grid_width);
+        let grid_display_height = (1.0 / f64::from(grid_height)) / self.painter.aspect_ratio();
 
         for y in min_y..=max_y {
             for x in min_x..=max_x {
@@ -88,25 +88,25 @@ impl<'a> Renderer<'a> {
                 match self.tiles.get(&(x, y)) {
                     Some(1) => {
                         // Wall.
-                        draw_rect(255, 0, 0, &mut self.painter);
+                        draw_rect(255, 0, 0, self.painter);
                     }
                     Some(2) => {
                         // Thing to blow up.
                         let r = (y * 11) % 256;
                         let g = 255 - (y * 3) % 256;
                         let b = 255 - (y * 9) % 256;
-                        draw_rect(r as i32, g as i32, b as i32, &mut self.painter);
+                        draw_rect(r as i32, g as i32, b as i32, self.painter);
                     }
                     Some(3) => {
                         // Paddle.
                         //self.painter.shadow_color(0x8a, 0xec, 0xff);
                         //self.painter.shadow_blur(85);
-                        draw_rect(0xb1, 0xf2, 0xff, &mut self.painter);
+                        draw_rect(0xb1, 0xf2, 0xff, self.painter);
                         //self.painter.shadow_blur(0);
                     }
                     Some(4) => {
                         // Ball.
-                        draw_rect(255, 255, 255, &mut self.painter);
+                        draw_rect(255, 255, 255, self.painter);
                     }
                     _ => {}
                 };

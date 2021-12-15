@@ -97,7 +97,7 @@ impl ComputerChecker {
     fn check_if_exits(
         &mut self,
         computer: &mut Computer,
-        #[cfg(feature = "visualization")] mut painter: &mut PainterRef,
+        #[cfg(feature = "visualization")] painter: &mut PainterRef,
         #[cfg(feature = "visualization")] switched_instruction_idx: Option<usize>,
     ) -> Result<bool, String> {
         self.executed_instructions
@@ -112,8 +112,8 @@ impl ComputerChecker {
         }
         #[cfg(feature = "visualization")]
         render(
-            &mut painter,
-            &computer,
+            painter,
+            computer,
             &self.executed_instructions,
             switched_instruction_idx,
         );

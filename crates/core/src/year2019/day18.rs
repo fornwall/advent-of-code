@@ -40,7 +40,7 @@ struct Edge {
 
 pub fn steps_to_gather_all_keys(
     input_string: &str,
-    #[cfg(feature = "visualization")] mut painter: &mut PainterRef,
+    #[cfg(feature = "visualization")] painter: &mut PainterRef,
     #[cfg(feature = "visualization")] map_x_offset: usize,
     #[cfg(feature = "visualization")] map_y_offset: usize,
     #[cfg(feature = "visualization")] mut global_cols: usize,
@@ -93,7 +93,7 @@ pub fn steps_to_gather_all_keys(
                     #[cfg(feature = "visualization")]
                     {
                         painter.fill_style_rgb(0, 0, 255);
-                        draw(&mut painter);
+                        draw(painter);
                     }
                     b'.'
                 }
@@ -105,7 +105,7 @@ pub fn steps_to_gather_all_keys(
                     #[cfg(feature = "visualization")]
                     {
                         painter.fill_style_rgb(0, 255, 0);
-                        draw(&mut painter);
+                        draw(painter);
                     }
                     byte
                 }
@@ -113,7 +113,7 @@ pub fn steps_to_gather_all_keys(
                     #[cfg(feature = "visualization")]
                     {
                         painter.fill_style_rgb(255, 0, 0);
-                        draw(&mut painter);
+                        draw(painter);
                     }
                     // Stone wall.
                     return;
@@ -123,7 +123,7 @@ pub fn steps_to_gather_all_keys(
                     {
                         if ('A'..='Z').contains(&c) {
                             painter.fill_style_rgb(0, 255, 255);
-                            draw(&mut painter);
+                            draw(painter);
                         }
                     }
                     byte
@@ -209,7 +209,7 @@ pub fn steps_to_gather_all_keys(
         &adjacency_list,
         all_keys_bitset,
         #[cfg(feature = "visualization")]
-        &mut painter,
+        painter,
         #[cfg(feature = "visualization")]
         map_x_offset,
         #[cfg(feature = "visualization")]
@@ -283,8 +283,8 @@ fn shortest_path(
         #[cfg(feature = "visualization")]
         {
             if visited_locations.insert((current.x, current.y)) && current.at_key.value != b'@' {
-                let canvas_x = (current.x + map_x_offset as i32) as f64 / global_cols as f64;
-                let canvas_y = (current.y + map_y_offset as i32) as f64 / global_rows as f64;
+                let canvas_x = f64::from(current.x + map_x_offset as i32) / global_cols as f64;
+                let canvas_y = f64::from(current.y + map_y_offset as i32) / global_rows as f64;
                 let draw_width = 0.95 / global_cols as f64;
                 let draw_height = 0.95 / global_rows as f64;
                 drawer.fill_style_rgb(80, 0, 80);

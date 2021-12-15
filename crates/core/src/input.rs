@@ -36,7 +36,8 @@ impl<'a> Input<'a> {
     }
 
     #[cfg(test)]
-    pub const fn part_one(text: &'a str) -> Self {
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn part_one(text: &'a str) -> Self {
         Self {
             part: Part::One,
             text,
@@ -46,7 +47,8 @@ impl<'a> Input<'a> {
     }
 
     #[cfg(test)]
-    pub const fn part_two(text: &'a str) -> Self {
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn part_two(text: &'a str) -> Self {
         Self {
             part: Part::Two,
             text,

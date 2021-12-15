@@ -42,16 +42,16 @@ impl<'a> Renderer<'a> {
         let grid_width = (max_x - min_x) as i32;
         let grid_height = (max_y - min_y) as i32;
         self.painter.set_aspect_ratio(grid_width, grid_height);
-        let grid_display_width = 1.0 / grid_width as f64;
-        let grid_display_height = (1.0 / grid_height as f64) / self.painter.aspect_ratio();
+        let grid_display_width = 1.0 / f64::from(grid_width);
+        let grid_display_height = (1.0 / f64::from(grid_height)) / self.painter.aspect_ratio();
 
         self.painter.line_width(0.002);
 
         // Mark origin:
         self.painter.fill_style_rgb(125, 125, 0);
         self.painter.fill_circle(
-            -min_x as f64 * grid_display_width,
-            -min_y as f64 * grid_display_height,
+            -f64::from(min_x) * grid_display_width,
+            -f64::from(min_y) * grid_display_height,
             0.005,
         );
 
@@ -62,10 +62,10 @@ impl<'a> Renderer<'a> {
 
             let new_ship_position = entities[SHIP_POSITION_ENTITY_IDX];
 
-            let start_x = (last_ship_position.0 - min_x) as f64 * grid_display_width;
-            let start_y = (last_ship_position.1 - min_y) as f64 * grid_display_height;
-            let end_x = (new_ship_position.0 - min_x) as f64 * grid_display_width;
-            let end_y = (new_ship_position.1 - min_y) as f64 * grid_display_height;
+            let start_x = f64::from(last_ship_position.0 - min_x) * grid_display_width;
+            let start_y = f64::from(last_ship_position.1 - min_y) * grid_display_height;
+            let end_x = f64::from(new_ship_position.0 - min_x) * grid_display_width;
+            let end_y = f64::from(new_ship_position.1 - min_y) * grid_display_height;
 
             self.painter.stroke_style_rgb(0xff, 0x00, 0x00);
             self.painter.begin_path();
@@ -75,11 +75,11 @@ impl<'a> Renderer<'a> {
 
             if !part_one {
                 self.painter.meta_switch_layer(1);
-                self.painter.fill_style_rgb_packed(0x00FF00);
+                self.painter.fill_style_rgb_packed(0x0000_FF00);
                 let waypoint_position = entities[WAYPOINT_ENTITY_IDX];
-                let draw_x =
-                    (new_ship_position.0 + waypoint_position.0 - min_x) as f64 * grid_display_width;
-                let draw_y = (new_ship_position.1 + waypoint_position.1 - min_y) as f64
+                let draw_x = f64::from(new_ship_position.0 + waypoint_position.0 - min_x)
+                    * grid_display_width;
+                let draw_y = f64::from(new_ship_position.1 + waypoint_position.1 - min_y)
                     * grid_display_height;
                 self.painter.fill_circle(draw_x, draw_y, 0.005);
                 self.painter.meta_switch_layer(0);

@@ -1,7 +1,7 @@
 use super::day03::Map;
 use crate::painter::PainterRef;
 
-pub fn render(map: &Map, slopes: &[(usize, usize)], mut painter: &mut PainterRef) {
+pub fn render(map: &Map, slopes: &[(usize, usize)], painter: &mut PainterRef) {
     let mut num_horizontal_repeats = 1;
     for slope in slopes {
         let num_iterations = map.rows / slope.1;
@@ -23,8 +23,8 @@ pub fn render(map: &Map, slopes: &[(usize, usize)], mut painter: &mut PainterRef
     painter.end_frame();
     painter.meta_delay(100);
 
-    let grid_display_width = 1.0 / grid_width as f64;
-    let grid_display_height = (1.0 / grid_height as f64) / painter.aspect_ratio();
+    let grid_display_width = 1.0 / f64::from(grid_width);
+    let grid_display_height = (1.0 / f64::from(grid_height)) / painter.aspect_ratio();
 
     let draw_rect = |x, y, rgb, circle, painter: &mut PainterRef| {
         let draw_width = grid_display_width;
@@ -46,7 +46,7 @@ pub fn render(map: &Map, slopes: &[(usize, usize)], mut painter: &mut PainterRef
     for y in 0..map.rows {
         for x in 0..(map.cols * num_horizontal_repeats) {
             if map.tree_at(x, y) {
-                draw_rect(x, y, 0x00FF00, false, &mut painter);
+                draw_rect(x, y, 0x00_FF00, false, painter);
             }
         }
     }
@@ -86,15 +86,15 @@ pub fn render(map: &Map, slopes: &[(usize, usize)], mut painter: &mut PainterRef
                 painter.play_sound(1);
                 trees_seen_now += 1;
             }
-            draw_rect(position.0, position.1, 0xFF0000, true, &mut painter);
+            draw_rect(position.0, position.1, 0xFF_0000, true, painter);
 
-            set_status(slope, trees_seen_now, current_product, &mut painter);
+            set_status(slope, trees_seen_now, current_product, painter);
             painter.end_frame();
         }
 
         current_product *= trees_seen_now;
 
-        set_status(slope, trees_seen_now, current_product, &mut painter);
+        set_status(slope, trees_seen_now, current_product, painter);
         painter.end_frame();
     }
 }

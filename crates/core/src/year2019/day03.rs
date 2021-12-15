@@ -242,14 +242,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let grid_height = (max_y - min_y) as i32;
         input.painter.set_aspect_ratio(grid_width, grid_height);
 
-        let grid_display_width = 1.0 / grid_width as f64;
-        let grid_display_height = (1.0 / grid_height as f64) / input.painter.aspect_ratio();
+        let grid_display_width = 1.0 / f64::from(grid_width);
+        let grid_display_height = (1.0 / f64::from(grid_height)) / input.painter.aspect_ratio();
 
         // Mark origin:
         input.painter.fill_style_rgb(255, 255, 0);
         input.painter.fill_circle(
-            -min_x as f64 * grid_display_width,
-            -min_y as f64 * grid_display_height,
+            -f64::from(min_x) * grid_display_width,
+            -f64::from(min_y) * grid_display_height,
             grid_display_width * 200.,
         );
 
@@ -257,14 +257,14 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         let mut drawn_lines2: Vec<LineSegment> = Vec::new();
 
         let draw_line = |painter: &mut PainterRef, line_segment: &LineSegment, r, g, b| {
-            let start_x = (line_segment.top_left.x - min_x) as f64 * grid_display_width;
-            let start_y = (line_segment.top_left.y - min_y) as f64 * grid_display_height;
+            let start_x = f64::from(line_segment.top_left.x - min_x) * grid_display_width;
+            let start_y = f64::from(line_segment.top_left.y - min_y) * grid_display_height;
             let mut end_x = start_x;
             let mut end_y = start_y;
             if line_segment.horizontal {
-                end_x += line_segment.length as f64 * grid_display_width
+                end_x += f64::from(line_segment.length) * grid_display_width
             } else {
-                end_y += line_segment.length as f64 * grid_display_height
+                end_y += f64::from(line_segment.length) * grid_display_height
             }
 
             painter.line_width(grid_display_width * 30.);
@@ -308,8 +308,8 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                             .line_width(grid_display_width * if is_best { 60. } else { 10. });
                         input.painter.stroke_style_rgb(255, 255, 255);
                         input.painter.stroke_circle(
-                            (intersection.point.x - min_x) as f64 * grid_display_width,
-                            (intersection.point.y - min_y) as f64 * grid_display_height,
+                            f64::from(intersection.point.x - min_x) * grid_display_width,
+                            f64::from(intersection.point.y - min_y) * grid_display_height,
                             grid_display_width * 100. * if is_best { 2. } else { 1. },
                         );
                     }

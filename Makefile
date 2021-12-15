@@ -45,6 +45,7 @@ endif
 check:
 	$(CARGO_COMMAND) fmt --all
 	$(CARGO_COMMAND) clippy --tests $(CLIPPY_PARAMS)
+	cd crates/core $(CARGO_COMMAND) --features visualization clippy --tests $(CLIPPY_PARAMS)
 	$(CARGO_COMMAND) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
 	if [ -n "${COUNT_ALLOCATIONS}" ]; then $(CARGO_COMMAND) test --features count-allocations; else $(CARGO_COMMAND) test; fi
 

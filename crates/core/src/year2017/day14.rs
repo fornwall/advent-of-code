@@ -42,7 +42,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         let canvas_y = row;
                         input.painter.fill_square(
                             canvas_x as f64 / 128.,
-                            canvas_y as f64 / 128.,
+                            f64::from(canvas_y) / 128.,
                             1.0 / 128.,
                         );
                     }

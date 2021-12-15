@@ -2,10 +2,13 @@ use crate::input::Input;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-struct Graph {
+#[cfg(feature = "visualization")]
+use super::day15_renderer::Renderer;
+
+pub struct Graph {
     risk_levels: Vec<u8>,
-    width: u16,
-    height: u16,
+    pub width: u16,
+    pub height: u16,
 }
 
 impl Graph {
@@ -49,11 +52,11 @@ impl Graph {
         self.risk_levels[x + y * self.width as usize] |= 0b1000_0000;
     }
 
-    fn is_visited(&self, x: usize, y: usize) -> bool {
+    pub fn is_visited(&self, x: usize, y: usize) -> bool {
         self.risk_levels[x + y * self.width as usize] & 0b1000_0000 > 0
     }
 
-    fn risk_level_at(&self, x: usize, y: usize) -> u8 {
+    pub fn risk_level_at(&self, x: usize, y: usize) -> u8 {
         self.risk_levels[x + y * self.width as usize] & 0b0111_1111
     }
 
@@ -64,6 +67,7 @@ impl Graph {
 
 #[derive(Eq, PartialEq, Clone, PartialOrd, Ord)]
 struct SearchNode {
+    // estimate: u32,
     risk: u32,
     x: u16,
     y: u16,
@@ -75,13 +79,22 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
     let mut to_visit = BinaryHeap::new();
     to_visit.push(Reverse(SearchNode {
+        // estimate: 0,
         risk: 0,
         x: 0,
         y: 0,
     }));
     graph.mark_visited(0, 0);
 
+    #[cfg(feature = "visualization")]
+    let mut renderer = Renderer::new(&mut input.painter);
+    #[cfg(feature = "visualization")]
+    renderer.render_initial(&graph);
+
     while let Some(Reverse(state)) = to_visit.pop() {
+        #[cfg(feature = "visualization")]
+        renderer.render(&graph, (state.x, state.y), state.risk);
+
         if (state.x, state.y) == destination {
             return Ok(state.risk);
         }
@@ -94,6 +107,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     state.risk + u32::from(graph.risk_level_at(new_x as usize, new_y as usize));
                 graph.mark_visited(new_x as usize, new_y as usize);
                 to_visit.push(Reverse(SearchNode {
+                    //estimate: new_risk
+                    //   + (destination.0 as u32 - new_x as u32)
+                    //+ (destination.1 as u32 - new_y as u32),
                     risk: new_risk,
                     x: new_x as u16,
                     y: new_y as u16,

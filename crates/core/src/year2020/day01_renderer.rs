@@ -16,7 +16,7 @@ pub fn render_part_one(input: &mut Vec<u32>, painter: &mut PainterRef) {
     let value_span = max_value - min_value;
 
     let grid_draw_width = 1. / input.len() as f64;
-    let grid_draw_height = 1. / value_span as f64;
+    let grid_draw_height = 1. / f64::from(value_span);
 
     let (mut left, mut right) = (0, input.len() - 1);
     while left != right {
@@ -27,7 +27,7 @@ pub fn render_part_one(input: &mut Vec<u32>, painter: &mut PainterRef) {
 
         // Draw line showing desired sum:
         painter.fill_style_rgb(0x0, 0x255, 0x00);
-        let desired_sum_height = (desired_sum - min_value) as f64 * grid_draw_height;
+        let desired_sum_height = f64::from(desired_sum - min_value) * grid_draw_height;
         painter.fill_rect(0., 1. - desired_sum_height, 1., grid_draw_height * 10.);
 
         for (i, value) in input.iter().enumerate() {
@@ -38,7 +38,7 @@ pub fn render_part_one(input: &mut Vec<u32>, painter: &mut PainterRef) {
             } else {
                 painter.fill_style_rgb(0x89, 0xA6, 0xFB);
             }
-            let draw_height = (value - min_value) as f64 * grid_draw_height;
+            let draw_height = f64::from(value - min_value) * grid_draw_height;
             painter.fill_rect(
                 i as f64 * grid_draw_width,
                 1. - draw_height,
@@ -63,9 +63,9 @@ pub fn render_part_one(input: &mut Vec<u32>, painter: &mut PainterRef) {
 }
 
 pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
-    const COLOR_LEFTMOST: i32 = 0xFFFFFF;
-    const COLOR_LEFT: i32 = 0x00FF00;
-    const COLOR_RIGHT: i32 = 0xFF0000;
+    const COLOR_LEFTMOST: i32 = 0xFF_FFFF;
+    const COLOR_LEFT: i32 = 0x00_FF00;
+    const COLOR_RIGHT: i32 = 0xFF_0000;
 
     let desired_sum = 2020;
 
@@ -82,8 +82,8 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
 
     let start_x = -10;
 
-    let grid_draw_width = 1. / (input.len() as i32 - start_x) as f64;
-    let grid_draw_height = 1. / value_span as f64;
+    let grid_draw_width = 1. / f64::from(input.len() as i32 - start_x);
+    let grid_draw_height = 1. / f64::from(value_span);
 
     let mut iteration = 0;
     for (leftmost_index, leftmost_value) in input.iter().enumerate() {
@@ -100,7 +100,7 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
 
             // Draw line showing desired sum:
             painter.fill_style_rgba(0xFF, 0xFF, 0xFF, 0.4);
-            let desired_sum_height = (desired_sum - min_value) as f64 * grid_draw_height;
+            let desired_sum_height = f64::from(desired_sum - min_value) * grid_draw_height;
             painter.fill_rect(0., 1. - desired_sum_height, 1., grid_draw_height * 10.);
 
             for (i, value) in input.iter().enumerate() {
@@ -115,9 +115,9 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
                 } else {
                     painter.fill_style_rgb(0x89, 0xA6, 0xFB);
                 }
-                let draw_height = (value - min_value) as f64 * grid_draw_height;
+                let draw_height = f64::from(value - min_value) * grid_draw_height;
                 painter.fill_rect(
-                    (i as i32 - start_x) as f64 * grid_draw_width,
+                    f64::from(i as i32 - start_x) * grid_draw_width,
                     1. - draw_height,
                     grid_draw_width,
                     draw_height,
@@ -125,7 +125,7 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
 
                 if i == left || i == right || i == leftmost_index {
                     painter.draw_text_centered(
-                        (i as i32 - start_x) as f64 * grid_draw_width,
+                        f64::from(i as i32 - start_x) * grid_draw_width,
                         1. - draw_height,
                         0.02,
                         &format!("{}", value),
@@ -136,21 +136,21 @@ pub fn render_part_two(input: &mut Vec<u32>, painter: &mut PainterRef) {
             {
                 // Draw stacked.
                 let draw_x = 0.;
-                let draw_y = 1. - ((leftmost_value - min_value) as f64 * grid_draw_height);
-                let draw_height = *leftmost_value as f64 * grid_draw_height;
+                let draw_y = 1. - (f64::from(leftmost_value - min_value) * grid_draw_height);
+                let draw_height = f64::from(*leftmost_value) * grid_draw_height;
                 painter.fill_style_rgb_packed(COLOR_LEFTMOST);
                 painter.fill_rect(draw_x, draw_y, grid_draw_width, draw_height);
 
                 let draw_y =
-                    1. - ((left_value + leftmost_value - min_value) as f64 * grid_draw_height);
-                let draw_height = (left_value) as f64 * grid_draw_height;
+                    1. - (f64::from(left_value + leftmost_value - min_value) * grid_draw_height);
+                let draw_height = f64::from(left_value) * grid_draw_height;
                 painter.fill_style_rgb_packed(COLOR_LEFT);
                 painter.fill_rect(draw_x, draw_y, grid_draw_width, draw_height);
 
                 let draw_y = 1.
-                    - ((right_value + left_value + leftmost_value - min_value) as f64
+                    - (f64::from(right_value + left_value + leftmost_value - min_value)
                         * grid_draw_height);
-                let draw_height = (right_value) as f64 * grid_draw_height;
+                let draw_height = f64::from(right_value) * grid_draw_height;
                 painter.fill_style_rgb_packed(COLOR_RIGHT);
                 painter.fill_rect(draw_x, draw_y, grid_draw_width, draw_height);
             }
