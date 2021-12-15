@@ -4,7 +4,6 @@ use std::collections::BinaryHeap;
 
 struct Graph {
     risk_levels: Vec<u8>,
-    visited: Vec<bool>,
     width: u16,
     height: u16,
 }
@@ -23,7 +22,6 @@ impl Graph {
         let width = original_width * multiplier;
 
         let mut risk_levels = vec![0; width * height];
-        let visited = vec![false; width * height];
         for (y, line) in text.lines().enumerate() {
             if line.len() != original_width {
                 return Err("Not all lines have equal length".to_string());
@@ -42,22 +40,21 @@ impl Graph {
         }
         Ok(Self {
             risk_levels,
-            visited,
             width: width as u16,
             height: width as u16,
         })
     }
 
     fn mark_visited(&mut self, x: usize, y: usize) {
-        self.visited[x + y * self.width as usize] = true;
+        self.risk_levels[x + y * self.width as usize] |= 0b1000_0000;
     }
 
     fn is_visited(&self, x: usize, y: usize) -> bool {
-        self.visited[x + y * self.width as usize]
+        self.risk_levels[x + y * self.width as usize] & 0b1000_0000 > 0
     }
 
     fn risk_level_at(&self, x: usize, y: usize) -> u8 {
-        self.risk_levels[x + y * self.width as usize]
+        self.risk_levels[x + y * self.width as usize] & 0b0111_1111
     }
 
     fn contains(&self, x: i32, y: i32) -> bool {
