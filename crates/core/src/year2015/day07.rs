@@ -36,21 +36,20 @@ fn output_of(num_or_wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<Signa
 
 fn find_output(wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<SignalValue> {
     let gate = gates.get(wire)?;
-    match gate.computed_value {
-        Some(value) => Some(value),
-        None => {
-            let signal_value = match gate.operation {
-                Operation::Assign(value) => output_of(value, gates)?,
-                Operation::Not(value) => !output_of(value, gates)?,
-                Operation::And(lhs, rhs) => output_of(lhs, gates)? & output_of(rhs, gates)?,
-                Operation::Or(lhs, rhs) => output_of(lhs, gates)? | output_of(rhs, gates)?,
-                Operation::LeftShift(lhs, rhs) => output_of(lhs, gates)? << output_of(rhs, gates)?,
-                Operation::RightShift(lhs, rhs) => output_of(lhs, gates)? >> output_of(rhs, gates)?,
-            };
+    if let Some(value) = gate.computed_value {
+        Some(value)
+    } else {
+        let signal_value = match gate.operation {
+            Operation::Assign(value) => output_of(value, gates)?,
+            Operation::Not(value) => !output_of(value, gates)?,
+            Operation::And(lhs, rhs) => output_of(lhs, gates)? & output_of(rhs, gates)?,
+            Operation::Or(lhs, rhs) => output_of(lhs, gates)? | output_of(rhs, gates)?,
+            Operation::LeftShift(lhs, rhs) => output_of(lhs, gates)? << output_of(rhs, gates)?,
+            Operation::RightShift(lhs, rhs) => output_of(lhs, gates)? >> output_of(rhs, gates)?,
+        };
 
-            gates.get_mut(wire).unwrap().computed_value = Some(signal_value);
-            Some(signal_value)
-        }
+        gates.get_mut(wire).unwrap().computed_value = Some(signal_value);
+        Some(signal_value)
     }
 }
 

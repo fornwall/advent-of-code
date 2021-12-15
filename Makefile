@@ -19,6 +19,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::needless_pass_by_value \
 	-W clippy::semicolon_if_nothing_returned \
 	-W clippy::similar_names \
+	-W clippy::single_match_else \
 	-W clippy::trivially_copy_pass_by_ref \
 	-W clippy::unreadable-literal \
 	-W clippy::unseparated-literal-suffix \
