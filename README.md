@@ -6,10 +6,9 @@ Solutions to [Advent of Code](https://adventofcode.com/) problems (2015-2021) in
 For learning and demonstration purposes, this repository contains additional resources building on the solutions:
 
 - [crates/core](crates/core): The solutions themselves as a library and a command-line tool.
-  - No unsafe code.
-  - No dependencies.
   - Published as a [crate](https://crates.io/crates/advent-of-code).
   - The command-line tool is wrapped in Docker and published to [Docker Hub](https://hub.docker.com/r/fredrikfornwall/advent-of-code).
+  - No unsafe code.
 - [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [Tonic](https://docs.rs/tonic).
   - Deployed to [fly.io](https://fly.io/).
 - [crates/http-server](crates/http-server): Server with a HTTP API using [warp](https://github.com/seanmonstar/warp).
