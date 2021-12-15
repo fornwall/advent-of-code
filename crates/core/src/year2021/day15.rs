@@ -30,7 +30,6 @@ impl Graph {
             }
             for (x, byte) in line.bytes().enumerate() {
                 let risk_level = byte - b'0';
-                risk_levels[x + y * width] = risk_level;
                 for mx in 0..multiplier {
                     for my in 0..multiplier {
                         let risk_level_unwrapped = risk_level + (mx as u8 + my as u8);
