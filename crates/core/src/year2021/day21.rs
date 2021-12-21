@@ -1,5 +1,6 @@
 use crate::input::Input;
 
+const MAX_POSITION: u64 = 10;
 const SCORE_REQUIRED_PART_2: u8 = 21;
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
@@ -9,9 +10,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         let mut p1_score_saved = 0;
         let mut p2_score_saved = 0;
         loop {
-            let next_die_sum = 6 + die_roll_count * 3;
+            let next_dice_sum = 6 + die_roll_count * 3;
             die_roll_count += 3;
-            game.on_die_roll(next_die_sum);
+            game.on_dice_sum(next_dice_sum);
             p1_score_saved += u32::from(game.player_1_score);
             game.player_1_score = 0;
             if p1_score_saved >= 1000 {
@@ -36,8 +37,10 @@ struct Game {
 }
 
 impl Game {
-    const MAX_POSSIBLE_STATES: usize =
-        (SCORE_REQUIRED_PART_2 as usize * 10 * SCORE_REQUIRED_PART_2 as usize * 10) as usize;
+    const MAX_POSSIBLE_STATES: usize = (SCORE_REQUIRED_PART_2 as usize
+        * MAX_POSITION as usize
+        * SCORE_REQUIRED_PART_2 as usize
+        * MAX_POSITION as usize) as usize;
 
     fn parse(text: &str) -> Result<Self, String> {
         fn parse_line(line: Option<&str>) -> Result<u8, String> {
@@ -54,11 +57,14 @@ impl Game {
         let mut lines = text.lines();
         let player_1_position = parse_line(lines.next())?;
         let player_2_position = parse_line(lines.next())?;
-        let valid_positions = 1..=10;
+        let valid_positions = 1..=(MAX_POSITION as u8);
         if !(valid_positions.contains(&player_1_position)
             && valid_positions.contains(&player_2_position))
         {
-            return Err("Positions must be in the interval [1,10]".to_string());
+            return Err(format!(
+                "Positions must be in the interval [1,{}]",
+                MAX_POSITION
+            ));
         }
         Ok(Self {
             player_1_position: player_1_position - 1,
@@ -68,15 +74,19 @@ impl Game {
         })
     }
 
-    fn on_die_roll(&mut self, die_sum: u64) {
-        self.player_1_position = ((u64::from(self.player_1_position) + die_sum) % 10) as u8;
+    fn on_dice_sum(&mut self, dice_sum: u64) {
+        self.player_1_position =
+            ((u64::from(self.player_1_position) + dice_sum) % MAX_POSITION) as u8;
         self.player_1_score += self.player_1_position + 1;
     }
 
     fn unique_hash(self) -> usize {
-        (u64::from(self.player_1_score) * 10 * u64::from(SCORE_REQUIRED_PART_2) * 10
-            + u64::from(self.player_1_position) * u64::from(SCORE_REQUIRED_PART_2) * 10
-            + u64::from(self.player_2_score) * 10
+        (u64::from(self.player_1_score)
+            * MAX_POSITION
+            * u64::from(SCORE_REQUIRED_PART_2)
+            * MAX_POSITION
+            + u64::from(self.player_1_position) * u64::from(SCORE_REQUIRED_PART_2) * MAX_POSITION
+            + u64::from(self.player_2_score) * MAX_POSITION
             + u64::from(self.player_2_position)) as usize
     }
 
@@ -118,7 +128,7 @@ fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcom
 
     let mut computed_outcome = GameOutcome::default();
 
-    for (sum, frequency) in [
+    for (dice_sum, frequency) in [
         (3_u64, 1_u64),
         (4, 3),
         (5, 6),
@@ -128,11 +138,11 @@ fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcom
         (9, 1),
     ] {
         let mut game_for_roll = game;
-        game_for_roll.on_die_roll(sum);
+        game_for_roll.on_dice_sum(dice_sum);
 
-        let recursive_wins = play_game_part_2(game_for_roll.switch_players(), outcome_cache);
-        computed_outcome.player_1_wins += recursive_wins.player_2_wins * frequency;
-        computed_outcome.player_2_wins += recursive_wins.player_1_wins * frequency;
+        let outcomes_for_roll = play_game_part_2(game_for_roll.switch_players(), outcome_cache);
+        computed_outcome.player_1_wins += outcomes_for_roll.player_2_wins * frequency;
+        computed_outcome.player_2_wins += outcomes_for_roll.player_1_wins * frequency;
     }
 
     outcome_cache[unique_game_hash] = computed_outcome;
