@@ -103,43 +103,6 @@ impl GameOutcome {
 }
 
 fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcome {
-    #[derive(Copy, Clone)]
-    struct DiracDiceRoll {
-        sum: u8,
-        frequency: u8,
-    }
-
-    const DIRAC_ROLLS_DISTRIBUTIONS: [DiracDiceRoll; 7] = [
-        DiracDiceRoll {
-            sum: 3,
-            frequency: 1,
-        },
-        DiracDiceRoll {
-            sum: 4,
-            frequency: 3,
-        },
-        DiracDiceRoll {
-            sum: 5,
-            frequency: 6,
-        },
-        DiracDiceRoll {
-            sum: 6,
-            frequency: 7,
-        },
-        DiracDiceRoll {
-            sum: 7,
-            frequency: 6,
-        },
-        DiracDiceRoll {
-            sum: 8,
-            frequency: 3,
-        },
-        DiracDiceRoll {
-            sum: 9,
-            frequency: 1,
-        },
-    ];
-
     if game.player_2_score >= SCORE_REQUIRED_PART_2 {
         return GameOutcome {
             player_1_wins: 0,
@@ -155,13 +118,21 @@ fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcom
 
     let mut computed_outcome = GameOutcome::default();
 
-    for DiracDiceRoll { sum, frequency } in DIRAC_ROLLS_DISTRIBUTIONS {
+    for (sum, frequency) in [
+        (3_u64, 1_u64),
+        (4, 3),
+        (5, 6),
+        (6, 7),
+        (7, 6),
+        (8, 3),
+        (9, 1),
+    ] {
         let mut game_for_roll = game;
-        game_for_roll.on_die_roll(u64::from(sum));
+        game_for_roll.on_die_roll(sum);
 
         let recursive_wins = play_game_part_2(game_for_roll.switch_players(), outcome_cache);
-        computed_outcome.player_1_wins += recursive_wins.player_2_wins * u64::from(frequency);
-        computed_outcome.player_2_wins += recursive_wins.player_1_wins * u64::from(frequency);
+        computed_outcome.player_1_wins += recursive_wins.player_2_wins * frequency;
+        computed_outcome.player_2_wins += recursive_wins.player_1_wins * frequency;
     }
 
     outcome_cache[unique_game_hash] = computed_outcome;
