@@ -40,25 +40,20 @@ impl Game {
         (SCORE_REQUIRED_PART_2 as usize * 10 * SCORE_REQUIRED_PART_2 as usize * 10) as usize;
 
     fn parse(text: &str) -> Result<Self, String> {
+        fn parse_line(line: Option<&str>) -> Result<u8, String> {
+            line.map(|s| {
+                if s.len() < 28 {
+                    return None;
+                }
+                s[28..].parse::<u8>().ok()
+            })
+            .flatten()
+            .ok_or_else(|| "Invalid input".to_string())
+        }
+
         let mut lines = text.lines();
-        let player_1_position = lines
-            .next()
-            .ok_or("No first line")?
-            .chars()
-            .nth(28)
-            .ok_or("No digit at index 28 of first line")?
-            .to_digit(10)
-            .ok_or("Character at index 28 of first line is no ASCII digit")?
-            as u8;
-        let player_2_position = lines
-            .next()
-            .ok_or("No second line")?
-            .chars()
-            .nth(28)
-            .ok_or("No digit at index 28 of second line")?
-            .to_digit(10)
-            .ok_or("Character at index 28 of second line is no ASCII digit")?
-            as u8;
+        let player_1_position = parse_line(lines.next())?;
+        let player_2_position = parse_line(lines.next())?;
         let valid_positions = 1..=10;
         if !(valid_positions.contains(&player_1_position)
             && valid_positions.contains(&player_2_position))
