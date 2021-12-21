@@ -122,15 +122,7 @@ fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcom
 
     let mut computed_outcome = GameOutcome::default();
 
-    for (dice_sum, frequency) in [
-        (3_u64, 1_u64),
-        (4, 3),
-        (5, 6),
-        (6, 7),
-        (7, 6),
-        (8, 3),
-        (9, 1),
-    ] {
+    for (dice_sum, frequency) in [(3, 1), (4, 3), (5, 6), (6, 7), (7, 6), (8, 3), (9, 1)] {
         let mut game_for_roll = game;
         game_for_roll.on_dice_sum(dice_sum);
 
