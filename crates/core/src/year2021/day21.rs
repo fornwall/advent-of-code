@@ -106,12 +106,6 @@ struct GameOutcome {
     player_2_wins: u64,
 }
 
-impl GameOutcome {
-    const fn has_someone_won(&self) -> bool {
-        self.player_1_wins > 0 || self.player_2_wins > 0
-    }
-}
-
 fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcome {
     if game.player_2_score >= SCORE_REQUIRED_PART_2 {
         return GameOutcome {
@@ -122,7 +116,7 @@ fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcom
 
     let unique_game_hash = game.unique_hash();
     let cached_outcome = outcome_cache[unique_game_hash];
-    if cached_outcome.has_someone_won() {
+    if cached_outcome.player_1_wins | cached_outcome.player_2_wins != 0 {
         return cached_outcome;
     }
 
