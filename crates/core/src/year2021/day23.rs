@@ -1,10 +1,10 @@
 use crate::input::Input;
-use crate::year2021::day23::Amphipod::{Amber, Bronze, Copper, Desert};
 use std::cmp::Reverse;
 use std::collections::hash_map::Entry;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter, Write};
+use Amphipod::{Amber, Bronze, Copper, Desert};
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     (if input.is_part_one() {
