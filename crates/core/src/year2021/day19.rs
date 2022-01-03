@@ -1,44 +1,174 @@
 use crate::input::Input;
+use std::collections::HashMap;
+use std::ops::{Add, Mul, Sub};
 
+// Based on the following nice solution:
+// - https://github.com/Mesoptier/advent-of-code-2021/blob/master/src/days/day19.rs
+// - https://www.reddit.com/r/adventofcode/comments/rjpf7f/comment/hp8btm1/?utm_source=share&utm_medium=web2x&context=3
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let scans = Scan::parse(input.text)?;
-    let mut sum = 0;
-    for scan in scans {
-        for beacon in scan.beacons {
-            sum += beacon.x + beacon.y + beacon.z;
+    let mut unmatched_scans = Scan::parse(input.text)?;
+    let mut matched_scans: Vec<Scan> = vec![unmatched_scans.remove(0)];
+    let mut matched_scanner_positions = vec![Point { x: 0, y: 0, z: 0 }];
+
+    while !unmatched_scans.is_empty() {
+        if let Some((matched_scanner_position, transformed_matched_scan, matched_scan_idx)) =
+            unmatched_scans
+                .iter()
+                .enumerate()
+                .find_map(|(scan_idx, scan)| {
+                    find_match(&matched_scans, scan).map(|(p, s)| (p, s, scan_idx))
+                })
+        {
+            matched_scans.push(transformed_matched_scan);
+            matched_scanner_positions.push(matched_scanner_position);
+            unmatched_scans.swap_remove(matched_scan_idx);
+        } else {
+            return Err("Unable to match beacons".to_string());
         }
     }
-    Ok(sum as u32)
+
+    Ok(if input.is_part_one() {
+        let mut known_beacons = matched_scans
+            .iter()
+            .flat_map(|scan| scan.beacons.iter())
+            .collect::<Vec<_>>();
+        known_beacons.sort_unstable();
+        known_beacons.dedup();
+        known_beacons.len() as u32
+    } else {
+        all_pairs(&matched_scanner_positions)
+            .map(|(s1, s2)| (*s1 - *s2).norm_l1())
+            .max()
+            .unwrap_or_default() as u32
+    })
 }
 
-#[derive(Copy, Clone)]
+fn all_pairs<T>(elements: &[T]) -> impl Iterator<Item = (&T, &T)> {
+    (0..elements.len())
+        .flat_map(move |i| (i + 1..elements.len()).map(move |j| (&elements[i], &elements[j])))
+}
+
+struct RotationMatrix {
+    elements: [i8; 9],
+}
+
+impl RotationMatrix {
+    #![allow(clippy::too_many_arguments)]
+    const fn new(e1: i8, e2: i8, e3: i8, e4: i8, e5: i8, e6: i8, e7: i8, e8: i8, e9: i8) -> Self {
+        Self {
+            elements: [e1, e2, e3, e4, e5, e6, e7, e8, e9],
+        }
+    }
+}
+
+impl<'a> Mul<Point> for &'a RotationMatrix {
+    type Output = Point;
+
+    fn mul(self, p: Point) -> Point {
+        Point {
+            x: i16::from(self.elements[0]) * p.x
+                + i16::from(self.elements[1]) * p.y
+                + i16::from(self.elements[2]) * p.z,
+            y: i16::from(self.elements[3]) * p.x
+                + i16::from(self.elements[4]) * p.y
+                + i16::from(self.elements[5]) * p.z,
+            z: i16::from(self.elements[6]) * p.x
+                + i16::from(self.elements[7]) * p.y
+                + i16::from(self.elements[8]) * p.z,
+        }
+    }
+}
+
+static ROTATION_MATRICES: [RotationMatrix; 24] = [
+    RotationMatrix::new(1, 0, 0, 0, 1, 0, 0, 0, 1),
+    RotationMatrix::new(1, 0, 0, 0, 0, 1, 0, -1, 0),
+    RotationMatrix::new(1, 0, 0, 0, -1, 0, 0, 0, -1),
+    RotationMatrix::new(1, 0, 0, 0, 0, -1, 0, 1, 0),
+    RotationMatrix::new(0, 1, 0, 0, 0, 1, 1, 0, 0),
+    RotationMatrix::new(0, 1, 0, 1, 0, 0, 0, 0, -1),
+    RotationMatrix::new(0, 1, 0, 0, 0, -1, -1, 0, 0),
+    RotationMatrix::new(0, 1, 0, -1, 0, 0, 0, 0, 1),
+    RotationMatrix::new(0, 0, 1, 1, 0, 0, 0, 1, 0),
+    RotationMatrix::new(0, 0, 1, 0, 1, 0, -1, 0, 0),
+    RotationMatrix::new(0, 0, 1, -1, 0, 0, 0, -1, 0),
+    RotationMatrix::new(0, 0, 1, 0, -1, 0, 1, 0, 0),
+    RotationMatrix::new(-1, 0, 0, 0, -1, 0, 0, 0, 1),
+    RotationMatrix::new(-1, 0, 0, 0, 0, 1, 0, 1, 0),
+    RotationMatrix::new(-1, 0, 0, 0, 1, 0, 0, 0, -1),
+    RotationMatrix::new(-1, 0, 0, 0, 0, -1, 0, -1, 0),
+    RotationMatrix::new(0, -1, 0, 0, 0, -1, 1, 0, 0),
+    RotationMatrix::new(0, -1, 0, 1, 0, 0, 0, 0, 1),
+    RotationMatrix::new(0, -1, 0, 0, 0, 1, -1, 0, 0),
+    RotationMatrix::new(0, -1, 0, -1, 0, 0, 0, 0, -1),
+    RotationMatrix::new(0, 0, -1, -1, 0, 0, 0, 1, 0),
+    RotationMatrix::new(0, 0, -1, 0, 1, 0, 1, 0, 0),
+    RotationMatrix::new(0, 0, -1, 1, 0, 0, 0, -1, 0),
+    RotationMatrix::new(0, 0, -1, 0, -1, 0, -1, 0, 0),
+];
+
+#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
 struct Point {
-    x: i32,
-    y: i32,
-    z: i32,
+    x: i16,
+    y: i16,
+    z: i16,
+}
+
+impl Point {
+    const fn norm_l1(self) -> i16 {
+        self.x.abs() + self.y.abs() + self.z.abs()
+    }
+
+    fn norm_lmax(self) -> i16 {
+        self.x.abs().max(self.y.abs()).max(self.z.abs())
+    }
+}
+
+impl Add for Point {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl Sub for Point {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
+    }
 }
 
 struct Scan {
     beacons: Vec<Point>,
+    fingerprints: HashMap<Fingerprint, Vec<(Point, Point)>>,
 }
 
 impl Scan {
     fn parse(text: &str) -> Result<Vec<Self>, String> {
         let mut scans = Vec::new();
-        let mut points = Vec::new();
+        let mut beacons = Vec::new();
         for line in text.lines() {
             if line.starts_with("---") || line.is_empty() {
-                if !points.is_empty() {
-                    scans.push(Self { beacons: points });
-                    points = Vec::new();
+                if !beacons.is_empty() {
+                    scans.push(Self::new(beacons));
+                    beacons = Vec::new();
                 }
             } else {
                 let coordinates = line
                     .split(',')
-                    .map(|s| s.parse::<i32>().map_err(|_| "Invalid point".to_string()))
+                    .map(|s| s.parse::<i16>().map_err(|_| "Invalid point".to_string()))
                     .collect::<Result<Vec<_>, String>>()?;
                 if coordinates.len() == 3 {
-                    points.push(Point {
+                    beacons.push(Point {
                         x: coordinates[0],
                         y: coordinates[1],
                         z: coordinates[2],
@@ -51,15 +181,103 @@ impl Scan {
                 }
             }
         }
-        if !points.is_empty() {
-            scans.push(Self { beacons: points });
+        if !beacons.is_empty() {
+            scans.push(Self::new(beacons));
+        }
+        if scans.is_empty() {
+            return Err("No scans".to_string());
         }
         Ok(scans)
     }
+
+    fn new(beacons: Vec<Point>) -> Self {
+        let mut fingerprints = HashMap::<Fingerprint, Vec<(Point, Point)>>::new();
+        for (&p1, &p2) in all_pairs(&beacons) {
+            let f = fingerprint(p1, p2);
+            fingerprints.entry(f).or_default().push((p1, p2));
+        }
+        Self {
+            beacons,
+            fingerprints,
+        }
+    }
+}
+
+type Fingerprint = (i16, i16);
+
+fn fingerprint(p1: Point, p2: Point) -> Fingerprint {
+    let d = p1 - p2;
+    (d.norm_l1(), d.norm_lmax())
+}
+
+fn find_match(matched_scans: &[Scan], scan_to_join: &Scan) -> Option<(Point, Scan)> {
+    for matched_scan in matched_scans {
+        let mut num_pairs_matching_fingerprint = 0;
+        let matching_fingerprints = scan_to_join
+            .fingerprints
+            .iter()
+            .filter(|(to_join_fingerprint, to_join_pairs)| {
+                matched_scan
+                    .fingerprints
+                    .get(to_join_fingerprint)
+                    .map_or(false, |matched_pairs| {
+                        num_pairs_matching_fingerprint += to_join_pairs.len() * matched_pairs.len();
+                        true
+                    })
+            })
+            .collect::<Vec<_>>();
+
+        if num_pairs_matching_fingerprint < 66 {
+            // At least (12 choose 2) fingerprints needs to match.
+            continue;
+        }
+
+        for (fingerprint, fingerprinted_beacons) in
+            matching_fingerprints
+                .iter()
+                .flat_map(|(fingerprint, multiple_fingerprints)| {
+                    multiple_fingerprints
+                        .iter()
+                        .map(move |fingerprinted_pair| (fingerprint, fingerprinted_pair))
+                })
+        {
+            for matched_pair in matched_scan.fingerprints.get(fingerprint).unwrap() {
+                for (first, second) in [
+                    (matched_pair, fingerprinted_beacons),
+                    (fingerprinted_beacons, matched_pair),
+                ] {
+                    let (first_1, first_2) = first;
+                    let (second_1, second_2) = second;
+
+                    if let Some(supported_rotation) = ROTATION_MATRICES.iter().find(|&rotation| {
+                        *first_1 - rotation * *second_1 == *first_2 - rotation * *second_2
+                    }) {
+                        let translation = *first_1 - supported_rotation * *second_1;
+
+                        let transformed_beacons = scan_to_join
+                            .beacons
+                            .iter()
+                            .map(|p| supported_rotation * *p + translation)
+                            .collect::<Vec<_>>();
+
+                        let mut num_matches = 0;
+                        for transformed_beacon in &transformed_beacons {
+                            if matched_scan.beacons.contains(transformed_beacon) {
+                                num_matches += 1;
+                                if num_matches == 12 {
+                                    return Some((translation, Scan::new(transformed_beacons)));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
 }
 
 #[test]
-#[ignore]
 pub fn tests() {
     use crate::input::{test_part_one, test_part_two};
 
@@ -200,9 +418,9 @@ pub fn tests() {
 -652,-548,-490
 30,-46,-14";
     test_part_one!(example => 79);
-    test_part_two!(example => 0);
+    test_part_two!(example => 3621);
 
     let real_input = include_str!("day19_input.txt");
-    test_part_one!(real_input => 0);
-    test_part_two!(real_input => 0);
+    test_part_one!(real_input => 378);
+    test_part_two!(real_input => 13_148);
 }
