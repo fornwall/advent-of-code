@@ -36,7 +36,7 @@ endif
 
 WASM_DIR = debug
 WASM_OPT = wasm-opt --all-features
-WASM_BINDGEN = wasm-bindgen --target web
+WASM_BINDGEN = wasm-bindgen --target web --weak-refs
 ifeq ($(WASM_REFERENCE_TYPES),1)
   WASM_BINDGEN += --reference-types
 endif
