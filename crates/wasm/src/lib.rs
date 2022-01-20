@@ -1,3 +1,4 @@
+#![allow(clippy::unused_unit)]
 extern crate js_sys;
 extern crate wasm_bindgen;
 use advent_of_code::solve_raw;
