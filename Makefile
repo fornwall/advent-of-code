@@ -1,4 +1,4 @@
-NIGHTLY_DATE = 2021-12-02 # Update versions in .github/workflows as well.
+NIGHTLY_DATE = 2022-01-19 # Update versions in .github/workflows as well.
 NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 
 CARGO_COMMAND = cargo
@@ -37,6 +37,9 @@ endif
 WASM_DIR = debug
 WASM_OPT = wasm-opt --all-features
 WASM_BINDGEN = wasm-bindgen --target web
+ifeq ($(WASM_REFERENCE_TYPES),1)
+  WASM_BINDGEN += --reference-types
+endif
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
   WASM_DIR = release
