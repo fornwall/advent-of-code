@@ -3,15 +3,17 @@ use crate::input::Input;
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let mut lines = input.text.lines();
     if input.is_part_one() {
-        let mut sum = SnailfishNumber::parse(lines.next().ok_or("Empty input")?);
+        let mut sum = SnailfishNumber::parse(lines.next().ok_or("Empty input")?)?;
         for line in lines {
-            let number = SnailfishNumber::parse(line);
+            let number = SnailfishNumber::parse(line)?;
             sum.add(&number);
         }
         Ok(sum.magnitude())
     } else {
         let mut highest = 0;
-        let numbers = lines.map(SnailfishNumber::parse).collect::<Vec<_>>();
+        let numbers = lines
+            .map(SnailfishNumber::parse)
+            .collect::<Result<Vec<_>, _>>()?;
         for (idx1, n1) in numbers.iter().enumerate() {
             for (idx2, n2) in numbers.iter().enumerate() {
                 if idx1 != idx2 {
@@ -39,7 +41,7 @@ struct SnailfishNumber {
 }
 
 impl SnailfishNumber {
-    fn parse(text: &str) -> Self {
+    fn parse(text: &str) -> Result<Self, String> {
         let mut depth = 0;
         let mut elements = Vec::new();
         for char in text.chars() {
@@ -48,6 +50,9 @@ impl SnailfishNumber {
                     depth += 1;
                 }
                 ']' => {
+                    if depth == 0 {
+                        return Err("Too many closing ]".to_string());
+                    }
                     depth -= 1;
                 }
                 c => {
@@ -57,7 +62,7 @@ impl SnailfishNumber {
                 }
             }
         }
-        Self { elements }
+        Ok(Self { elements })
     }
 
     fn check_explode(&mut self, idx: usize) -> bool {
