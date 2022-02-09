@@ -14,9 +14,12 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let productions = lines
         .map(|line| {
             let bytes = line.as_bytes();
-            ((bytes[0], bytes[1]), bytes[6])
+            if bytes.len() != 7 {
+                return Err("Production not in format 'AB -> C'".to_string());
+            }
+            Ok(((bytes[0], bytes[1]), bytes[6]))
         })
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>, _>>()?;
 
     let mut pair_occurrences = HashMap::new();
     for pair in template.windows(2) {

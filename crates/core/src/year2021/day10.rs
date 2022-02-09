@@ -37,6 +37,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     if input.is_part_one() {
         Ok(syntax_error_score)
     } else {
+        if autocomplete_scores.is_empty() {
+            return Err("No autocomplete scores".to_string());
+        }
         autocomplete_scores.sort_unstable();
         Ok(autocomplete_scores[autocomplete_scores.len() / 2])
     }

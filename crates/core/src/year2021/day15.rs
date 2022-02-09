@@ -15,7 +15,7 @@ impl Graph {
     fn parse(text: &str, multiplier: usize) -> Result<Self, String> {
         let original_height = text.lines().count();
         let original_width = text.lines().next().unwrap_or_default().len();
-        if original_height < 1 || original_width < 1 {
+        if original_height < 4 || original_width < 4 {
             return Err("Too small input".to_string());
         } else if original_width > 1000 || original_height > 1000 {
             return Err("Too big input - max width and height is 1000".to_string());
