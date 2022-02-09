@@ -2,9 +2,10 @@
 set -e -u
 
 usage() {
-  echo "usage:\n    ./post-input <where> <year> <day> <part> # reads input from stdin"
-  echo "where where is one of:"
+  echo "usage:\n    ./post-input <service> <year> <day> <part> # reads input from stdin"
+  echo "where <service> is one of:"
   echo "- fly"
+  echo "- fly-grpc"
   echo "- cloudflare"
   echo "- netlify"
   echo "- local"
@@ -24,6 +25,8 @@ PART=$4
 case $WHERE in
   fly)
     HOST=https://advent.fly.dev;;
+  fly-grpc)
+   HOST=fly-grpc;;
   cloudflare)
     HOST=https://aoc.fornwall.workers.dev;;
   netlify)
@@ -44,7 +47,31 @@ elif [ "$PART" -ge 2 ] && [ "$PART" -le 0 ]; then
   exit 1
 fi
 
-curl --fail \
-     -w '\n'\
-     --data-binary @- \
-     "$HOST/solve/$YEAR/$DAY/$PART"
+
+if [ "$HOST" = "fly-grpc" ]; then
+    echo | base64 --wrap 0 > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      # GNU coreutils base64, '-w' supported
+      BASE64_TEXT=$(base64 --wrap 0)
+    else
+      # Openssl base64, no wrapping by default
+      BASE64_TEXT=$(base64)
+    fi
+
+    JSON=$(jq --null-input \
+        --arg year $YEAR \
+        --arg day $DAY \
+        --arg part $PART \
+        --arg text "$BASE64_TEXT" \
+        '{"year":$year, "day":$day, "part":$part, "text":$text | @base64d }' \
+    )
+    grpcurl -d "$JSON" \
+          advent-grpc.fly.dev:443 \
+          advent.Solver/Solve \
+            | jq --raw-output .text
+else
+    curl --fail \
+         -w '\n'\
+         --data-binary @- \
+         "$HOST/solve/$YEAR/$DAY/$PART"
+fi
