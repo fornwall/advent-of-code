@@ -31,13 +31,11 @@ async function updatePage() {
   }
 
   const data = {
-    //maxdepth: 3,
     type: "sunburst",
     labels: ["All years"],
     parents: [""],
     values: [sumDown(dataMap)],
     outsidetextfont: { size: 20, color: "#377eb8" },
-    //marker: {line: {width: 2}},
     branchvalues: "total",
     sort: false,
   };
@@ -64,7 +62,6 @@ async function updatePage() {
       }
     }
   }
-  console.log(data);
 
   const layout = {
     margin: { l: 0, r: 0, b: 0, t: 0 },
@@ -73,6 +70,10 @@ async function updatePage() {
   Plotly.newPlot("firstPlot", [data], layout, {
     displaylogo: false,
     responsive: true,
+    scrollZoom: true,
+    toImageButtonOptions: {
+      format: "svg",
+    },
   });
 }
 
