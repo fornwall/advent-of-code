@@ -49,6 +49,7 @@ fi
 
 
 if [ "$HOST" = "fly-grpc" ]; then
+    set +e
     echo | base64 --wrap 0 > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       # GNU coreutils base64, '-w' supported
@@ -57,18 +58,19 @@ if [ "$HOST" = "fly-grpc" ]; then
       # Openssl base64, no wrapping by default
       BASE64_TEXT=$(base64)
     fi
+    set -e
 
     JSON=$(jq --null-input \
         --arg year $YEAR \
         --arg day $DAY \
         --arg part $PART \
-        --arg text "$BASE64_TEXT" \
-        '{"year":$year, "day":$day, "part":$part, "text":$text | @base64d }' \
+        --arg input "$BASE64_TEXT" \
+        '{"year":$year, "day":$day, "part":$part, "input":$input | @base64d }' \
     )
     grpcurl -d "$JSON" \
           advent-grpc.fly.dev:443 \
           advent.Solver/Solve \
-            | jq --raw-output .text
+            | jq --raw-output .answer
 else
     curl --fail \
          -w '\n'\

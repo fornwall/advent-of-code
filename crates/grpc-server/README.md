@@ -12,7 +12,7 @@ The service has gRPC reflection enabled and can be invoked using [grpcurl](https
 
 ```sh
 grpcurl \
-  -d '{"year": 2019, "day": 1, "part": 1, "text": "12334"}' \
+  -d '{"year": 2019, "day": 1, "part": 1, "input": "12334"}' \
   advent-grpc.fly.dev:443 \
   advent.Solver/Solve
 ```

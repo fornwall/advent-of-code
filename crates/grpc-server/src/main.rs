@@ -43,11 +43,11 @@ impl Solver for SolverImpl {
             }
         };
 
-        let result = solve(year, day, part, &input.text);
+        let result = solve(year, day, part, &input.input);
 
         match result {
             Err(error_string) => Err(Status::new(Code::InvalidArgument, error_string)),
-            Ok(text) => Ok(Response::new(ProblemOutput { text })),
+            Ok(answer) => Ok(Response::new(ProblemOutput { answer })),
         }
     }
 }
