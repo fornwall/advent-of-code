@@ -15,6 +15,7 @@ advent-of-code = { path = "../core" }
 prost = "*"
 tokio = { version = "*", features = ["macros", "rt-multi-thread"]}
 tonic = "*"
+tonic-reflection = "*"
 
 [build-dependencies]
 tonic-build = "*"

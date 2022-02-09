@@ -11,7 +11,7 @@ documentation = "https://docs.rs/advent-of-code/2019.12.434/advent_of_code/"
 homepage = "https://github.com/fornwall/advent-of-code"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.57"
+rust-version = "1.58"
 
 [[bin]]
 name = "advent-of-code"

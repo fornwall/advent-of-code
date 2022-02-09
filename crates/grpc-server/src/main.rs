@@ -57,11 +57,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     #![allow(clippy::expect_used)]
 
     let addr = "0.0.0.0:50051".parse()?;
-    let solver = SolverImpl::default();
+
+    let solver_service = SolverServer::new(SolverImpl::default());
+
+    let reflection_service = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(tonic::include_file_descriptor_set!("advent"))
+        .build()?;
 
     println!("Server listening on {}", addr);
     Server::builder()
-        .add_service(SolverServer::new(solver))
+        .add_service(solver_service)
+        .add_service(reflection_service)
         .serve(addr)
         .await?;
 

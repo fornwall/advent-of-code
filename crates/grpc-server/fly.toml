@@ -9,4 +9,5 @@ app = "advent-grpc"
 
   [[services.ports]]
     handlers = ["tls"]
+    tls_options = {"alpn"=["h2"]}
     port = "443"
