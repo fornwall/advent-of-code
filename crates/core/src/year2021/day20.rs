@@ -1,62 +1,23 @@
 use crate::input::Input;
-use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let (algorithm, mut image) = parse(input.text)?;
-    for _ in 0..input.part_values(2, 50) {
-        image = algorithm.enhance(&image);
-    }
-    Ok(image.lit_pixels.len() as u32)
+    let (algorithm, image) = parse(input.text)?;
+    let enhancement_steps = input.part_values(2, 50);
+    let lit_pixels = algorithm.enhance(&image, enhancement_steps);
+    Ok(lit_pixels)
 }
 
-type PixelCoordinate = i32;
-
 struct Image {
-    lit_pixels: HashSet<(PixelCoordinate, PixelCoordinate)>,
-    even_run: bool,
-    infinity_flashing: bool,
-    min_x: PixelCoordinate,
-    max_x: PixelCoordinate,
-    min_y: PixelCoordinate,
-    max_y: PixelCoordinate,
+    pixels: Vec<bool>,
 }
 
 impl Image {
-    fn new(
-        lit_pixels: HashSet<(PixelCoordinate, PixelCoordinate)>,
-        even_run: bool,
-        infinity_flashing: bool,
-    ) -> Self {
-        let mut min_x = 0;
-        let mut max_x = 0;
-        let mut min_y = 0;
-        let mut max_y = 0;
-        for &lit_pixel in lit_pixels.iter() {
-            min_x = std::cmp::min(min_x, lit_pixel.0);
-            max_x = std::cmp::max(max_x, lit_pixel.0);
-            min_y = std::cmp::min(min_y, lit_pixel.1);
-            max_y = std::cmp::max(max_y, lit_pixel.1);
-        }
-
-        Self {
-            lit_pixels,
-            even_run,
-            infinity_flashing,
-            min_x,
-            max_x,
-            min_y,
-            max_y,
-        }
+    fn new(pixels: Vec<bool>) -> Self {
+        Self { pixels }
     }
 
-    fn is_lit(&self, pixel: (PixelCoordinate, PixelCoordinate)) -> usize {
-        if (self.min_x..=self.max_x).contains(&pixel.0)
-            && (self.min_y..=self.max_y).contains(&pixel.1)
-        {
-            self.lit_pixels.contains(&pixel) as usize
-        } else {
-            (self.infinity_flashing && !self.even_run) as usize
-        }
+    fn size(&self) -> usize {
+        (self.pixels.len() as f64).sqrt() as usize
     }
 }
 
@@ -73,28 +34,88 @@ impl ImageEnhancementAlgorithm {
         Self { mappings }
     }
 
-    fn enhance(&self, image: &Image) -> Image {
-        #![allow(clippy::unusual_byte_groupings, clippy::identity_op)]
-        let mut lit_pixels = HashSet::new();
-
-        for x in (image.min_x - 1)..=(image.max_x + 1) {
-            for y in (image.min_y - 1)..=(image.max_y + 1) {
-                let algorithm_idx = 0b100_000_000 * image.is_lit((x - 1, y - 1))
-                    + 0b010_000_000 * image.is_lit((x, y - 1))
-                    + 0b001_000_000 * image.is_lit((x + 1, y - 1))
-                    + 0b000_100_000 * image.is_lit((x - 1, y))
-                    + 0b000_010_000 * image.is_lit((x, y))
-                    + 0b000_001_000 * image.is_lit((x + 1, y))
-                    + 0b000_000_100 * image.is_lit((x - 1, y + 1))
-                    + 0b000_000_010 * image.is_lit((x, y + 1))
-                    + 0b000_000_001 * image.is_lit((x + 1, y + 1));
-                if self.mappings[algorithm_idx] {
-                    lit_pixels.insert((x, y));
-                }
+    fn enhance(&self, image: &Image, steps: usize) -> u32 {
+        #![allow(clippy::unusual_byte_groupings)]
+        const fn is_pixel_lit(
+            pixels: &[bool],
+            prev_dim: usize,
+            image_size: usize,
+            x: usize,
+            y: isize,
+            eternity_val: bool,
+        ) -> bool {
+            if x >= prev_dim || y < 0 || y >= (prev_dim as isize) {
+                eternity_val
+            } else {
+                pixels[x + (y as usize) * image_size]
             }
         }
 
-        Image::new(lit_pixels, !image.even_run, image.infinity_flashing)
+        let start_image_size = image.size();
+        let final_image_size = start_image_size + 2 * steps;
+        let mut current = vec![false; final_image_size * final_image_size];
+        let mut new = vec![false; final_image_size * final_image_size];
+
+        for (idx, &val) in image.pixels.iter().enumerate() {
+            let x = idx % start_image_size;
+            let y = idx / start_image_size;
+            current[x + y * final_image_size] = val;
+        }
+
+        let flashes_at_infinity = self.flashes_at_infinity();
+
+        for step in 1..=steps {
+            let infinity_is_lit = flashes_at_infinity && step % 2 == 0;
+            let round_size = start_image_size + 2 * (step - 1);
+
+            for y in 0..start_image_size + 2 * step {
+                let mut running_idx = if infinity_is_lit { 0b011_011_011 } else { 0 };
+
+                for x in 0..start_image_size + 2 * step {
+                    let above = y as isize - 2;
+                    let at = y as isize - 1;
+                    let below = y as isize;
+
+                    let new_column = ((is_pixel_lit(
+                        &current,
+                        round_size,
+                        final_image_size,
+                        x,
+                        above,
+                        infinity_is_lit,
+                    ) as usize)
+                        << 6)
+                        | ((is_pixel_lit(
+                            &current,
+                            round_size,
+                            final_image_size,
+                            x,
+                            at,
+                            infinity_is_lit,
+                        ) as usize)
+                            << 3)
+                        | (is_pixel_lit(
+                            &current,
+                            round_size,
+                            final_image_size,
+                            x,
+                            below,
+                            infinity_is_lit,
+                        ) as usize);
+                    running_idx = ((running_idx << 1) & 0b110_110_110) | new_column;
+
+                    new[x + y * final_image_size] = self.mappings[running_idx];
+                }
+            }
+
+            std::mem::swap(&mut current, &mut new);
+        }
+
+        current.iter().filter(|&&b| b).count() as u32
+    }
+
+    const fn flashes_at_infinity(&self) -> bool {
+        self.mappings[0]
     }
 }
 
@@ -112,15 +133,33 @@ fn parse(text: &str) -> Result<(ImageEnhancementAlgorithm, Image), String> {
         );
     }
 
-    let mut lit_pixels = HashSet::new();
-    for (y, line) in image_string.lines().enumerate() {
-        for (x, b) in line.bytes().enumerate() {
+    let image_height = image_string.lines().count();
+    let image_width = image_string
+        .lines()
+        .next()
+        .map(str::len)
+        .unwrap_or_default();
+    if image_height < 4 || image_width < 4 {
+        return Err("Too small image (4x4 is minimal size)".to_string());
+    }
+    if image_height != image_width {
+        return Err("Not a square image".to_string());
+    }
+
+    let mut image_pixels = vec![false; image_width * image_height];
+
+    for (y, line_str) in image_string.lines().enumerate() {
+        let line_bytes = line_str.bytes();
+        if line_bytes.len() != image_width {
+            return Err("Not all image rows have equal length".to_string());
+        }
+        for (x, b) in line_bytes.enumerate() {
             if b == b'#' {
-                lit_pixels.insert((x as PixelCoordinate, y as PixelCoordinate));
+                image_pixels[x + y * image_width] = true;
             }
         }
     }
-    let image = Image::new(lit_pixels, true, algo.mappings[0]);
+    let image = Image::new(image_pixels);
     Ok((algo, image))
 }
 
