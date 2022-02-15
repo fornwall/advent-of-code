@@ -142,7 +142,7 @@ pub fn tests() {
     test_part_two!(example => 315);
 
     test_part_one_error!("" => "Too small input");
-    test_part_one_error!("a\nab" => "Not all lines have equal length");
+    test_part_one_error!("1234\n12345\n1234\n1234" => "Not all lines have equal length");
 
     let real_input = include_str!("day15_input.txt");
     test_part_one!(real_input => 790);
