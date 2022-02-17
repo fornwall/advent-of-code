@@ -22,36 +22,36 @@ const HALLWAY_SPACES: usize = 7;
 ///        R0  R1  R2  R3
 #[derive(Copy, Clone, PartialOrd, Ord, PartialEq, Eq, Hash)]
 struct State<const SIDE_ROOM_SIZE: usize> {
-    hallways: [SpaceOccupancy; HALLWAY_SPACES],
+    hallways: [Option<Amphipod>; HALLWAY_SPACES],
     /// Indexed by amphipod idx
-    rooms: [[SpaceOccupancy; SIDE_ROOM_SIZE]; 4],
+    rooms: [[Option<Amphipod>; SIDE_ROOM_SIZE]; 4],
 }
 
 impl<const SIDE_ROOM_SIZE: usize> State<SIDE_ROOM_SIZE> {
     fn parse(text: &str) -> Self {
-        let mut rooms = [[SpaceOccupancy::Empty; SIDE_ROOM_SIZE]; 4];
+        let mut rooms = [[Option::None; SIDE_ROOM_SIZE]; 4];
         let mut amphipod_count = 0;
         for b in text.bytes().filter(|b| b'A' <= *b && *b <= b'D') {
-            rooms[amphipod_count % 4][amphipod_count / 4] =
-                SpaceOccupancy::Occupied(Amphipod::from_idx(b - b'A'));
+            rooms[amphipod_count % 4][amphipod_count / 4] = Some(Amphipod::from_idx(b - b'A'));
             amphipod_count += 1;
             if SIDE_ROOM_SIZE == 4 && amphipod_count == 4 {
                 for b in [b'D', b'C', b'B', b'A', b'D', b'B', b'A', b'C'] {
                     rooms[amphipod_count % 4][amphipod_count / 4] =
-                        SpaceOccupancy::Occupied(Amphipod::from_idx(b - b'A'));
+                        Some(Amphipod::from_idx(b - b'A'));
                     amphipod_count += 1;
                 }
             }
         }
         Self {
-            hallways: [SpaceOccupancy::Empty; HALLWAY_SPACES],
+            hallways: [Option::None; HALLWAY_SPACES],
             rooms,
         }
     }
 
     fn is_organized(&self) -> bool {
         self.rooms.iter().enumerate().all(|(room_idx, room)| {
-            room.iter().all(|occupancy| matches!(occupancy, &SpaceOccupancy::Occupied(a) if (a as usize) == room_idx))
+            room.iter()
+                .all(|occupancy| matches!(occupancy, &Some(a) if (a as usize) == room_idx))
         })
     }
 
@@ -60,7 +60,7 @@ impl<const SIDE_ROOM_SIZE: usize> State<SIDE_ROOM_SIZE> {
         for room_idx in 0..self.rooms.len() {
             for (offset_in_room, occupancy) in self.rooms[room_idx].iter().enumerate() {
                 match occupancy {
-                    &SpaceOccupancy::Occupied(amphipod) => {
+                    &Some(amphipod) => {
                         for horizontal_direction in [-1, 1] {
                             // [ H0 H1  H2  H3  H4  H5 H6 ]
                             //        R0  R1  R2  R3
@@ -70,11 +70,11 @@ impl<const SIDE_ROOM_SIZE: usize> State<SIDE_ROOM_SIZE> {
                                 1 + room_idx + if horizontal_direction == 1 { 1 } else { 0 };
                             let mut hallway_travel_distance = 1;
 
-                            while matches!(self.hallways[hallway_end_idx], SpaceOccupancy::Empty) {
+                            while matches!(self.hallways[hallway_end_idx], None) {
                                 let mut new_hallways = self.hallways;
-                                new_hallways[hallway_end_idx] = SpaceOccupancy::Occupied(amphipod);
+                                new_hallways[hallway_end_idx] = Some(amphipod);
                                 let mut new_rooms = self.rooms;
-                                new_rooms[room_idx][offset_in_room] = SpaceOccupancy::Empty;
+                                new_rooms[room_idx][offset_in_room] = None;
                                 let total_travel_cost =
                                     (1 + offset_in_room as u64 + hallway_travel_distance as u64)
                                         * u64::from(amphipod.consumption());
@@ -106,74 +106,68 @@ impl<const SIDE_ROOM_SIZE: usize> State<SIDE_ROOM_SIZE> {
                         }
                         break;
                     }
-                    SpaceOccupancy::Empty => {}
+                    None => {}
                 }
             }
         }
         'hallway_loop: for hallway_idx in 0..self.hallways.len() {
-            match self.hallways[hallway_idx] {
-                SpaceOccupancy::Occupied(amphipod) => {
-                    let can_go_to_room =
-                        self.rooms[amphipod as usize]
-                            .iter()
-                            .all(|&occupancy| match occupancy {
-                                SpaceOccupancy::Empty => true,
-                                SpaceOccupancy::Occupied(a) if a == amphipod => true,
-                                _ => false,
-                            });
-                    if can_go_to_room {
-                        let (end_idx, direction) = if (amphipod as usize) + 1 < hallway_idx {
-                            ((amphipod as usize) + 2, -1)
-                        } else {
-                            ((amphipod as usize) + 1, 1)
-                        };
-                        let mut current_hallway_idx = hallway_idx;
-                        let mut hallway_travel_distance = 1;
-                        while current_hallway_idx != end_idx {
-                            let from_hallway_idx = current_hallway_idx;
-                            current_hallway_idx =
-                                ((current_hallway_idx as i32) + direction) as usize;
-                            if !matches!(self.hallways[current_hallway_idx], SpaceOccupancy::Empty)
-                            {
-                                continue 'hallway_loop;
-                            }
-
-                            hallway_travel_distance += 1;
-                            if !matches!(
-                                (from_hallway_idx, current_hallway_idx),
-                                (0, 1) | (1, 0) | (5, 6) | (6, 5)
-                            ) {
-                                hallway_travel_distance += 1;
-                            }
+            if let Some(amphipod) = self.hallways[hallway_idx] {
+                let can_go_to_room =
+                    self.rooms[amphipod as usize]
+                        .iter()
+                        .all(|&occupancy| match occupancy {
+                            None => true,
+                            Some(a) if a == amphipod => true,
+                            _ => false,
+                        });
+                if can_go_to_room {
+                    let (end_idx, direction) = if (amphipod as usize) + 1 < hallway_idx {
+                        ((amphipod as usize) + 2, -1)
+                    } else {
+                        ((amphipod as usize) + 1, 1)
+                    };
+                    let mut current_hallway_idx = hallway_idx;
+                    let mut hallway_travel_distance = 1;
+                    while current_hallway_idx != end_idx {
+                        let from_hallway_idx = current_hallway_idx;
+                        current_hallway_idx = ((current_hallway_idx as i32) + direction) as usize;
+                        if !matches!(self.hallways[current_hallway_idx], None) {
+                            continue 'hallway_loop;
                         }
 
-                        let mut new_hallways = self.hallways;
-                        new_hallways[hallway_idx] = SpaceOccupancy::Empty;
-                        let mut new_rooms = self.rooms;
-                        let offset_in_room = self.rooms[amphipod as usize]
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .find_map(|(room_offset, &occupancy)| match occupancy {
-                                SpaceOccupancy::Empty => Some(room_offset),
-                                _ => None,
-                            })
-                            .unwrap_or_default();
-                        new_rooms[amphipod as usize][offset_in_room] =
-                            SpaceOccupancy::Occupied(amphipod);
-                        let total_travel_cost = ((offset_in_room + 1 + hallway_travel_distance)
-                            * amphipod.consumption() as usize)
-                            as u64;
-                        moves.push((
-                            total_travel_cost,
-                            Self {
-                                hallways: new_hallways,
-                                rooms: new_rooms,
-                            },
-                        ));
+                        hallway_travel_distance += 1;
+                        if !matches!(
+                            (from_hallway_idx, current_hallway_idx),
+                            (0, 1) | (1, 0) | (5, 6) | (6, 5)
+                        ) {
+                            hallway_travel_distance += 1;
+                        }
                     }
+
+                    let mut new_hallways = self.hallways;
+                    new_hallways[hallway_idx] = None;
+                    let mut new_rooms = self.rooms;
+                    let offset_in_room = self.rooms[amphipod as usize]
+                        .iter()
+                        .enumerate()
+                        .rev()
+                        .find_map(|(room_offset, &occupancy)| match occupancy {
+                            None => Some(room_offset),
+                            _ => None,
+                        })
+                        .unwrap_or_default();
+                    new_rooms[amphipod as usize][offset_in_room] = Some(amphipod);
+                    let total_travel_cost = ((offset_in_room + 1 + hallway_travel_distance)
+                        * amphipod.consumption() as usize)
+                        as u64;
+                    moves.push((
+                        total_travel_cost,
+                        Self {
+                            hallways: new_hallways,
+                            rooms: new_rooms,
+                        },
+                    ));
                 }
-                SpaceOccupancy::Empty => {}
             }
         }
     }
@@ -183,7 +177,7 @@ impl<const SIDE_ROOM_SIZE: usize> State<SIDE_ROOM_SIZE> {
 
         for room_idx in 0..self.rooms.len() {
             for (offset_in_room, occupancy) in self.rooms[room_idx].iter().enumerate() {
-                if let SpaceOccupancy::Occupied(amphipod) = *occupancy {
+                if let Some(amphipod) = *occupancy {
                     if amphipod as usize != room_idx {
                         let hallway_distance_from_own_room =
                             ((room_idx as i32 - (amphipod as i32)).abs() * 2 + 1) as u64;
@@ -294,22 +288,6 @@ impl Amphipod {
             2 => Copper,
             _ => Desert,
         }
-    }
-}
-
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
-enum SpaceOccupancy {
-    Empty,
-    Occupied(Amphipod),
-}
-
-impl Debug for SpaceOccupancy {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let c = match self {
-            Self::Empty => b'.',
-            Self::Occupied(amphipod) => (*amphipod as u8) + b'A',
-        };
-        f.write_char(c as char)
     }
 }
 
