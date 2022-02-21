@@ -116,11 +116,11 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     std::cmp::min(current_location, n),
                     std::cmp::max(current_location, n),
                 );
-                total_distance += distances.get(&key).unwrap();
+                total_distance += distances.get(&key).unwrap_or(&0);
                 current_location = n;
             }
             if input.is_part_two() {
-                total_distance += distances.get(&(0, current_location)).unwrap();
+                total_distance += distances.get(&(0, current_location)).unwrap_or(&0);
             }
             answer = std::cmp::min(answer, total_distance);
             Ok(())

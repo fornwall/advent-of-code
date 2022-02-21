@@ -100,8 +100,13 @@ impl Grid {
     }
 
     fn resource_value(&self) -> usize {
-        self.cells.iter().fold(0, |n, c| n + (*c == b'|') as usize)
-            * self.cells.iter().fold(0, |n, c| n + (*c == b'#') as usize)
+        self.cells
+            .iter()
+            .fold(0, |n, c| n + usize::from(*c == b'|'))
+            * self
+                .cells
+                .iter()
+                .fold(0, |n, c| n + usize::from(*c == b'#'))
     }
 }
 

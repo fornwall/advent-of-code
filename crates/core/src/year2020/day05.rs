@@ -7,7 +7,7 @@ type SeatId = u16;
 fn parse_seat_specifier(specifier: &str) -> SeatId {
     specifier
         .chars()
-        .map(|c| matches!(c, 'B' | 'R') as SeatId)
+        .map(|c| SeatId::from(matches!(c, 'B' | 'R')))
         .enumerate()
         .map(|(bit_index, bit_flag)| bit_flag << (9 - bit_index))
         .sum()

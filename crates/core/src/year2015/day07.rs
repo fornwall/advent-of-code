@@ -48,7 +48,7 @@ fn find_output(wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<SignalValu
             Operation::RightShift(lhs, rhs) => output_of(lhs, gates)? >> output_of(rhs, gates)?,
         };
 
-        gates.get_mut(wire).unwrap().computed_value = Some(signal_value);
+        gates.get_mut(wire)?.computed_value = Some(signal_value);
         Some(signal_value)
     }
 }

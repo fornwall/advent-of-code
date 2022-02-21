@@ -241,7 +241,7 @@ fn find_match(matched_scans: &[Scan], scan_to_join: &Scan) -> Option<(Point, Sca
                         .map(move |fingerprinted_pair| (fingerprint, fingerprinted_pair))
                 })
         {
-            for matched_pair in matched_scan.fingerprints.get(fingerprint).unwrap() {
+            for matched_pair in matched_scan.fingerprints.get(fingerprint)? {
                 for (first, second) in [
                     (matched_pair, fingerprinted_beacons),
                     (fingerprinted_beacons, matched_pair),

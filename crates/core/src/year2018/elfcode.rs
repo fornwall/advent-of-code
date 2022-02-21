@@ -288,12 +288,12 @@ impl Registers {
             Opcode::Bori => self.reg(a) | b,
             Opcode::Setr => self.reg(a),
             Opcode::Seti => a,
-            Opcode::Gtir => (a > self.reg(b)) as u64,
-            Opcode::Gtri => (self.reg(a) > b) as u64,
-            Opcode::Gtrr => (self.reg(a) > self.reg(b)) as u64,
-            Opcode::Eqir => (a == self.reg(b)) as u64,
-            Opcode::Eqri => (self.reg(a) == b) as u64,
-            Opcode::Eqrr => (self.reg(a) == self.reg(b)) as u64,
+            Opcode::Gtir => u64::from(a > self.reg(b)),
+            Opcode::Gtri => u64::from(self.reg(a) > b),
+            Opcode::Gtrr => u64::from(self.reg(a) > self.reg(b)),
+            Opcode::Eqir => u64::from(a == self.reg(b)),
+            Opcode::Eqri => u64::from(self.reg(a) == b),
+            Opcode::Eqrr => u64::from(self.reg(a) == self.reg(b)),
         }
     }
 }

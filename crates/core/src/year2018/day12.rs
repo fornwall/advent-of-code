@@ -35,11 +35,11 @@ impl Tunnel {
                 if from_bytes.len() != 5 {
                     return Err("Invalid input".to_string());
                 }
-                let from = ((from_bytes[0] == b'#') as usize)
-                    + (((from_bytes[1] == b'#') as usize) << 1)
-                    + (((from_bytes[2] == b'#') as usize) << 2)
-                    + (((from_bytes[3] == b'#') as usize) << 3)
-                    + (((from_bytes[4] == b'#') as usize) << 4);
+                let from = (usize::from(from_bytes[0] == b'#'))
+                    + ((usize::from(from_bytes[1] == b'#')) << 1)
+                    + ((usize::from(from_bytes[2] == b'#')) << 2)
+                    + ((usize::from(from_bytes[3] == b'#')) << 3)
+                    + ((usize::from(from_bytes[4] == b'#')) << 4);
                 evolutions[from] = true;
             }
         }
@@ -54,11 +54,11 @@ impl Tunnel {
 
     fn evolve(&mut self) {
         for i in 2..self.current_gen.len() - 2 {
-            let current = (self.current_gen[i - 2] as usize)
-                + ((self.current_gen[i - 1] as usize) << 1)
-                + ((self.current_gen[i] as usize) << 2)
-                + ((self.current_gen[i + 1] as usize) << 3)
-                + ((self.current_gen[i + 2] as usize) << 4);
+            let current = usize::from(self.current_gen[i - 2])
+                + (usize::from(self.current_gen[i - 1]) << 1)
+                + (usize::from(self.current_gen[i]) << 2)
+                + (usize::from(self.current_gen[i + 1]) << 3)
+                + (usize::from(self.current_gen[i + 2]) << 4);
             self.next_gen[i] = self.evolutions[current];
         }
 

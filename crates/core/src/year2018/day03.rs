@@ -57,11 +57,11 @@ fn parse_input(input_string: &str) -> Result<Vec<Claim>, String> {
         .map(|(line_index, line)| {
             let error_message = || format!("Invalid input on line {}", line_index + 1);
             let parts: Vec<u32> = line
-                .replace("#", "")
-                .replace("@", "")
-                .replace(",", " ")
-                .replace(":", "")
-                .replace("x", " ")
+                .replace('#', "")
+                .replace('@', "")
+                .replace(',', " ")
+                .replace(':', "")
+                .replace('x', " ")
                 .split_whitespace()
                 .map(|s| s.parse::<u32>().map_err(|_| error_message()))
                 .collect::<Result<_, _>>()?;

@@ -34,17 +34,15 @@ impl<'a> ProgramTree<'a> {
 
         for (line_index, line) in input_string.lines().enumerate() {
             let parts: Vec<&str> = line.split(" -> ").collect();
-            let name_weight_parts: Vec<&str> = parts[0].split(' ').collect();
-            if name_weight_parts.len() != 2 {
-                return Err(format!(
+            let (name, weight_str) = parts[0].split_once(' ').ok_or_else(|| {
+                format!(
                     "Line {}: Invalid format, expected '$NAME ($WEIGHT)'",
                     line_index + 1
-                ));
-            }
-            let name = name_weight_parts[0];
-            let weight = name_weight_parts[1]
-                .replace("(", "")
-                .replace(")", "")
+                )
+            })?;
+            let weight = weight_str
+                .replace('(', "")
+                .replace(')', "")
                 .parse::<u32>()
                 .map_err(|error| format!("Line {}: Invalid weight ({})", line_index + 1, error))?;
 
@@ -63,9 +61,13 @@ impl<'a> ProgramTree<'a> {
             let name_weight_parts: Vec<&str> = parts[0].split(' ').collect();
             if parts.len() == 2 {
                 let name = name_weight_parts[0];
-                let parent = *name_to_node.get_mut(name).unwrap();
+                let parent = *name_to_node
+                    .get_mut(name)
+                    .ok_or("Internal error - no node for name")?;
                 for child_name in parts[1].trim().split(", ") {
-                    let child_ref = *name_to_node.get(child_name).unwrap();
+                    let child_ref = *name_to_node
+                        .get(child_name)
+                        .ok_or("Invalid input - no node for name")?;
                     nodes[parent].children.push(child_ref);
                 }
             }

@@ -1,28 +1,38 @@
 use crate::input::Input;
-use std::collections::HashMap;
 
-type BotId = u32;
+type BotId = u8;
 
 #[derive(Copy, Clone)]
 enum OnDone {
     GiveTo(BotId),
-    OutputTo(u32),
+    OutputTo(u8),
 }
 
+#[derive(Copy, Clone)]
 struct Bot {
     low_to: OnDone,
     high_to: OnDone,
-    received_chip: Option<u32>,
+    received_chip: Option<u8>,
+}
+
+impl Default for Bot {
+    fn default() -> Self {
+        Self {
+            low_to: OnDone::OutputTo(0),
+            high_to: OnDone::OutputTo(0),
+            received_chip: None,
+        }
+    }
 }
 
 fn receive(
-    bots: &mut HashMap<BotId, Bot>,
-    first_three_outputs: &mut [u32; 3],
-    microchip: u32,
+    bots: &mut [Bot; 256],
+    first_three_outputs: &mut [u8; 3],
+    microchip: u8,
     to_bot: BotId,
     part1: bool,
 ) -> Option<BotId> {
-    let mut bot = bots.get_mut(&to_bot).unwrap();
+    let mut bot = &mut bots[usize::from(to_bot)];
 
     if let Some(first_microchip) = bot.received_chip {
         let low_microchip = std::cmp::min(first_microchip, microchip);
@@ -71,23 +81,23 @@ fn receive(
     None
 }
 
-pub fn solve(input: &mut Input) -> Result<BotId, String> {
+pub fn solve(input: &mut Input) -> Result<u32, String> {
     let error_mapper = |_| "Invalid input";
-    let mut bots = HashMap::new();
+    let mut bots = [Bot::default(); 256];
     let mut initial_values = Vec::new();
 
     for line in input.text.lines() {
         let parts = line.split(' ').collect::<Vec<_>>();
         if parts[0] == "value" {
             // "value X goes to bot Y"
-            let value = parts[1].parse::<u32>().map_err(error_mapper)?;
+            let value = parts[1].parse::<u8>().map_err(error_mapper)?;
             let to_bot_id = parts[5].parse::<BotId>().map_err(error_mapper)?;
             initial_values.push((value, to_bot_id));
         } else if parts[0] == "bot" {
             // "bot X gives low to bot|output Y and high to bot|output Z"
-            let bot_id = parts[1].parse::<u32>().map_err(error_mapper)?;
-            let low_to_number = parts[6].parse::<u32>().map_err(error_mapper)?;
-            let high_to_number = parts[11].parse::<u32>().map_err(error_mapper)?;
+            let bot_id = parts[1].parse::<u8>().map_err(error_mapper)?;
+            let low_to_number = parts[6].parse::<u8>().map_err(error_mapper)?;
+            let high_to_number = parts[11].parse::<u8>().map_err(error_mapper)?;
 
             let low_to = if parts[5] == "bot" {
                 OnDone::GiveTo(low_to_number)
@@ -107,13 +117,13 @@ pub fn solve(input: &mut Input) -> Result<BotId, String> {
                 received_chip: None,
             };
 
-            bots.insert(bot_id, bot);
+            bots[usize::from(bot_id)] = bot;
         } else {
             return Err("Invalid input".to_string());
         }
     }
 
-    let mut first_three_outputs = [0_u32; 3];
+    let mut first_three_outputs = [0_u8; 3];
     for &(value, to_bot_id) in &initial_values {
         if let Some(desired_bot_id) = receive(
             &mut bots,
@@ -122,14 +132,14 @@ pub fn solve(input: &mut Input) -> Result<BotId, String> {
             to_bot_id,
             input.is_part_one(),
         ) {
-            return Ok(desired_bot_id);
+            return Ok(u32::from(desired_bot_id));
         }
     }
 
     if input.is_part_one() {
         Err("Not bot comparing chips 17 and 61".to_string())
     } else {
-        Ok(first_three_outputs.iter().product())
+        Ok(first_three_outputs.iter().map(|&v| u32::from(v)).product())
     }
 }
 

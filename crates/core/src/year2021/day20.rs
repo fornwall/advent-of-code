@@ -76,32 +76,30 @@ impl ImageEnhancementAlgorithm {
                     let at = y as isize - 1;
                     let below = y as isize;
 
-                    let new_column = ((is_pixel_lit(
+                    let new_column = (usize::from(is_pixel_lit(
                         &current,
                         round_size,
                         final_image_size,
                         x,
                         above,
                         infinity_is_lit,
-                    ) as usize)
-                        << 6)
-                        | ((is_pixel_lit(
+                    )) << 6)
+                        | (usize::from(is_pixel_lit(
                             &current,
                             round_size,
                             final_image_size,
                             x,
                             at,
                             infinity_is_lit,
-                        ) as usize)
-                            << 3)
-                        | (is_pixel_lit(
+                        )) << 3)
+                        | usize::from(is_pixel_lit(
                             &current,
                             round_size,
                             final_image_size,
                             x,
                             below,
                             infinity_is_lit,
-                        ) as usize);
+                        ));
                     running_idx = ((running_idx << 1) & 0b110_110_110) | new_column;
 
                     new[x + y * final_image_size] = self.mappings[running_idx];

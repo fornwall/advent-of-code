@@ -7,7 +7,7 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
 
     for (line_idx, line) in input.text.lines().enumerate() {
         match line
-            .split_once(" ")
+            .split_once(' ')
             .map(|(d, x)| (d, x.parse::<i16>().map(i32::from), input.part))
         {
             Some(("forward", Ok(amount), _)) => {

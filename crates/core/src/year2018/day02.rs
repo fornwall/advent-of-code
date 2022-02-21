@@ -12,8 +12,8 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             let has_occurrence = |count| occurrences.iter().any(|(_key, &value)| value == count);
 
             (
-                state.0 + has_occurrence(2) as i64,
-                state.1 + has_occurrence(3) as i64,
+                state.0 + i64::from(has_occurrence(2)),
+                state.1 + i64::from(has_occurrence(3)),
             )
         });
 

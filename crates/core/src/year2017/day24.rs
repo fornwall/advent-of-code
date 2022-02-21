@@ -34,7 +34,7 @@ fn extend(pieces: &Vec<Piece>, last: PieceComponent, part_two: bool) -> Vec<Piec
                 score(a).cmp(&score(b))
             }
         })
-        .unwrap_or_else(Vec::new)
+        .unwrap_or_default()
 }
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {

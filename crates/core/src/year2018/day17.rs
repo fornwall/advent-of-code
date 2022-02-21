@@ -224,11 +224,13 @@ impl Grid {
     fn count_water(&self) -> usize {
         self.cells
             .iter()
-            .fold(0, |n, c| n + (*c == b'w' || *c == b'|') as usize)
+            .fold(0, |n, c| n + usize::from(*c == b'w' || *c == b'|'))
     }
 
     fn count_drained_water(&self) -> usize {
-        self.cells.iter().fold(0, |n, c| n + (*c == b'w') as usize)
+        self.cells
+            .iter()
+            .fold(0, |n, c| n + usize::from(*c == b'w'))
     }
 }
 

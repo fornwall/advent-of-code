@@ -44,13 +44,12 @@ impl Game {
 
     fn parse(text: &str) -> Result<Self, String> {
         fn parse_line(line: Option<&str>) -> Result<u8, String> {
-            line.map(|s| {
+            line.and_then(|s| {
                 if s.len() < 28 {
                     return None;
                 }
                 s[28..].parse::<u8>().ok()
             })
-            .flatten()
             .ok_or_else(|| "Invalid input".to_string())
         }
 

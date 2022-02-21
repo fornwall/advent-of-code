@@ -1,5 +1,4 @@
 use crate::input::Input;
-use std::collections::HashMap;
 
 /// A 2x2 tile represented as bits. Example: "../.#" is stored as 0b_10_00.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -181,8 +180,8 @@ impl Tile4 {
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     #![allow(clippy::unusual_byte_groupings, clippy::unreadable_literal)]
-    let mut from_2_to_3 = HashMap::new();
-    let mut from_3_to_4 = HashMap::new();
+    let mut from_2_to_3 = [Tile3 { bits: 0 }; 16];
+    let mut from_3_to_4 = [Tile4 { bits: 0 }; 512];
 
     for (line_idx, line) in input.text.lines().enumerate() {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);
@@ -196,27 +195,27 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 // ../.. => #../##./...
                 let from = Tile2::from(from);
                 let to = Tile3::from(to);
-                from_2_to_3.insert(from, to);
-                from_2_to_3.insert(from.rotate(), to);
-                from_2_to_3.insert(from.rotate().rotate(), to);
-                from_2_to_3.insert(from.rotate().rotate().rotate(), to);
-                from_2_to_3.insert(from.flip(), to);
-                from_2_to_3.insert(from.flip().rotate(), to);
-                from_2_to_3.insert(from.flip().rotate().rotate(), to);
-                from_2_to_3.insert(from.flip().rotate().rotate().rotate(), to);
+                from_2_to_3[usize::from(from.bits)] = to;
+                from_2_to_3[usize::from(from.rotate().bits)] = to;
+                from_2_to_3[usize::from(from.rotate().rotate().bits)] = to;
+                from_2_to_3[usize::from(from.rotate().rotate().rotate().bits)] = to;
+                from_2_to_3[usize::from(from.flip().bits)] = to;
+                from_2_to_3[usize::from(from.flip().rotate().bits)] = to;
+                from_2_to_3[usize::from(from.flip().rotate().rotate().bits)] = to;
+                from_2_to_3[usize::from(from.flip().rotate().rotate().rotate().bits)] = to;
             }
             (11, 19) => {
                 // .../.../... => ##../#.../..../..#.
                 let from = Tile3::from(from);
                 let to = Tile4::from(to);
-                from_3_to_4.insert(from, to);
-                from_3_to_4.insert(from.rotate(), to);
-                from_3_to_4.insert(from.rotate().rotate(), to);
-                from_3_to_4.insert(from.rotate().rotate().rotate(), to);
-                from_3_to_4.insert(from.flip(), to);
-                from_3_to_4.insert(from.flip().rotate(), to);
-                from_3_to_4.insert(from.flip().rotate().rotate(), to);
-                from_3_to_4.insert(from.flip().rotate().rotate().rotate(), to);
+                from_3_to_4[usize::from(from.bits)] = to;
+                from_3_to_4[usize::from(from.rotate().bits)] = to;
+                from_3_to_4[usize::from(from.rotate().rotate().bits)] = to;
+                from_3_to_4[usize::from(from.rotate().rotate().rotate().bits)] = to;
+                from_3_to_4[usize::from(from.flip().bits)] = to;
+                from_3_to_4[usize::from(from.flip().rotate().bits)] = to;
+                from_3_to_4[usize::from(from.flip().rotate().rotate().bits)] = to;
+                from_3_to_4[usize::from(from.flip().rotate().rotate().rotate().bits)] = to;
             }
             _ => {
                 return Err(on_error());
@@ -237,10 +236,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 // Map each 3x3 matrix to a 4x4 one:
                 current_4_tiles = current_3_tiles
                     .iter()
-                    //.inspect(|tile| println!("Iteration {} - going from {:?}", iteration, tile))
-                    .map(|tile| from_3_to_4.get(tile).unwrap())
-                    //.inspect(|tile| println!(" to {:?}", tile))
-                    .copied()
+                    .map(|&tile| from_3_to_4[usize::from(tile.bits)])
                     .collect();
             }
             1 => {
@@ -252,8 +248,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     // Map each 2x2 matrix to the resulting 3x3 matrix:
                     let tile3_parts: Vec<Tile3> = tile2_parts
                         .iter()
-                        .map(|tile| from_2_to_3.get(tile).unwrap())
-                        .copied()
+                        .map(|&tile| from_2_to_3[usize::from(tile.bits)])
                         .collect();
 
                     // From the four 3x3 matrices, build the resulting nine 2x2 ones:
@@ -325,7 +320,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 // Map each 2x2 matrix to a 3x3 one:
                 current_3_tiles = current_2_tiles
                     .iter()
-                    .map(|tile| *from_2_to_3.get(tile).unwrap())
+                    .map(|tile| from_2_to_3[usize::from(tile.bits)])
                     .collect();
             }
             _ => {

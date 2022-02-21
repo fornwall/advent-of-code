@@ -82,7 +82,7 @@ fn scramble(input: &str, password: &mut [u8]) -> Result<(), String> {
             "move" => {
                 let x = words[2].parse::<usize>().map_err(error_mapper)?;
                 let y = words[5].parse::<usize>().map_err(error_mapper)?;
-                let mut buffer: Vec<u8> = password.iter().copied().collect();
+                let mut buffer: Vec<u8> = password.to_vec();
                 let removed_letter = buffer.remove(x);
                 buffer.insert(y, removed_letter);
                 password.clone_from_slice(&buffer);

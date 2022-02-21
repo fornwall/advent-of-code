@@ -1,8 +1,9 @@
+use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
+
 use crate::input::Input;
 #[cfg(feature = "visualization")]
 use crate::painter::PainterRef;
-use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 const DIRECTIONS: [(i32, i32); 4] = [(0, 1), (0, -1), (-1, 0), (1, 0)];
 
@@ -184,23 +185,28 @@ pub fn steps_to_gather_all_keys(
                 }
 
                 let new_steps = steps + 1;
-                if let Some(target_key) = found_key {
-                    adjacency_list
-                        .entry(this_key)
-                        .or_insert_with(Vec::new)
-                        .push(Edge {
-                            steps: new_steps as usize,
-                            needed_keys: new_needed_keys,
-                            target_key,
-                            #[cfg(feature = "visualization")]
-                            x: new_position.0,
-                            #[cfg(feature = "visualization")]
-                            y: new_position.1,
-                        });
-                } else if visited_positions.insert(new_position) {
-                    let new_state = (new_position, new_needed_keys, new_steps);
-                    to_visit.push_back(new_state);
-                }
+                found_key.map_or_else(
+                    || {
+                        if visited_positions.insert(new_position) {
+                            let new_state = (new_position, new_needed_keys, new_steps);
+                            to_visit.push_back(new_state);
+                        }
+                    },
+                    |target_key| {
+                        adjacency_list
+                            .entry(this_key)
+                            .or_insert_with(Vec::new)
+                            .push(Edge {
+                                steps: new_steps as usize,
+                                needed_keys: new_needed_keys,
+                                target_key,
+                                #[cfg(feature = "visualization")]
+                                x: new_position.0,
+                                #[cfg(feature = "visualization")]
+                                y: new_position.1,
+                            });
+                    },
+                );
             }
         }
     }
