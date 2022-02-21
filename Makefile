@@ -1,4 +1,4 @@
-NIGHTLY_DATE = 2022-01-19 # Update versions in .github/workflows as well.
+NIGHTLY_DATE = 2022-02-21 # Update versions in .github/workflows as well.
 NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
 
 CARGO_COMMAND = cargo
@@ -37,8 +37,10 @@ endif
 WASM_DIR = debug
 WASM_OPT = wasm-opt --all-features
 WASM_BINDGEN = wasm-bindgen --target web --weak-refs
+WASM_TARGET_FEATURES = "+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext"
 ifeq ($(WASM_REFERENCE_TYPES),1)
   WASM_BINDGEN += --reference-types
+  WASM_TARGET_FEATURES := "$(WASM_TARGET_FEATURES),+reference-types"
 endif
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
@@ -60,13 +62,13 @@ check-site:
 
 site-wasm:
 	cd crates/wasm && \
-	RUSTFLAGS="-C target-feature=+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext" cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
+	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
 	rm -Rf site/generated && \
 	$(WASM_BINDGEN) --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm && \
 	cd ../.. && \
-	RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext" rustup run $(NIGHTLY_TOOLCHAIN) \
+	RUSTFLAGS="-C target-feature=+atomics,$(WASM_TARGET_FEATURES)" rustup run $(NIGHTLY_TOOLCHAIN) \
 		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
 	$(WASM_BINDGEN) --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
