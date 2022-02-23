@@ -27,11 +27,11 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }
 }
 
-type RegularNumber = u32;
+type RegularNumber = u8;
 
 #[derive(Copy, Clone)]
 struct SnailfishElement {
-    depth: u16,
+    depth: u8,
     value: RegularNumber,
 }
 
@@ -43,21 +43,24 @@ struct SnailfishNumber {
 impl SnailfishNumber {
     fn parse(text: &str) -> Result<Self, String> {
         let mut depth = 0;
-        let mut elements = Vec::new();
-        for char in text.chars() {
+        let mut elements = Vec::with_capacity(text.len() / 2);
+        for char in text.as_bytes() {
             match char {
-                '[' => {
+                b'[' => {
                     depth += 1;
                 }
-                ']' => {
+                b']' => {
                     if depth == 0 {
                         return Err("Too many closing ]".to_string());
                     }
                     depth -= 1;
                 }
                 c => {
-                    if let Some(value) = c.to_digit(10) {
-                        elements.push(SnailfishElement { depth, value });
+                    if c.is_ascii_digit() {
+                        elements.push(SnailfishElement {
+                            depth,
+                            value: c - b'0',
+                        });
                     }
                 }
             }
@@ -80,8 +83,7 @@ impl SnailfishNumber {
 
             // "Then, the entire exploding pair is replaced with the regular number 0.":
             self.elements.remove(idx);
-            self.elements[idx].value = 0;
-            self.elements[idx].depth = 4;
+            self.elements[idx] = SnailfishElement { value: 0, depth: 4 };
             true
         } else {
             false
@@ -102,8 +104,10 @@ impl SnailfishNumber {
                     value: element.value / 2,
                 },
             );
-            self.elements[idx + 1].value = element.value / 2 + (element.value % 2);
-            self.elements[idx + 1].depth = new_depth;
+            self.elements[idx + 1] = SnailfishElement {
+                value: element.value / 2 + (element.value % 2),
+                depth: new_depth,
+            };
             true
         } else {
             false
@@ -130,21 +134,25 @@ impl SnailfishNumber {
         self.reduce();
     }
 
-    fn magnitude(&mut self) -> u32 {
-        for depth in (1..=4).rev() {
-            while let Some(idx) = self.elements.iter().position(|e| e.depth == depth) {
-                let a = self.elements.remove(idx);
-                let b = self.elements.remove(idx);
-                self.elements.insert(
-                    idx,
-                    SnailfishElement {
-                        depth: depth - 1,
-                        value: 3 * a.value + 2 * b.value,
-                    },
-                );
-            }
+    fn magnitude(&self) -> u32 {
+        fn recursive_magnitude(number: &[SnailfishElement], index: &mut usize, depth: u8) -> u32 {
+            let left = if number[*index].depth == depth {
+                *index += 1;
+                u32::from(number[*index - 1].value)
+            } else {
+                recursive_magnitude(number, index, depth + 1)
+            };
+
+            let right = if number[*index].depth == depth {
+                *index += 1;
+                u32::from(number[*index - 1].value)
+            } else {
+                recursive_magnitude(number, index, depth + 1)
+            };
+
+            3 * left + 2 * right
         }
-        self.elements.first().map(|n| n.value).unwrap_or_default()
+        recursive_magnitude(&self.elements, &mut 0, 1)
     }
 }
 
