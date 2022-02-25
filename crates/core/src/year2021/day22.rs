@@ -125,7 +125,7 @@ impl Cuboid {
     }
 
     fn combine_and_count_enclosed_cubes(cuboids: &[Self]) -> u64 {
-        let mut combined = Vec::new();
+        let mut combined = Vec::with_capacity(cuboids.len() / 2);
         for cuboid in cuboids {
             combined.append(
                 &mut combined
