@@ -123,7 +123,7 @@ impl SnailfishNumber {
     }
 
     fn add(&mut self, other: &Self) {
-        self.elements.extend(other.elements.iter());
+        self.elements.extend_from_slice(&other.elements);
         for element in self.elements.iter_mut() {
             element.depth += 1;
         }
