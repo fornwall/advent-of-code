@@ -83,12 +83,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2019]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         arch: [x86_64, aarch64]
         exclude:
           - os: macos-latest
             arch: aarch64
-          - os: windows-2019
+          - os: windows-latest
             arch: aarch64
     steps:
       - uses: actions/checkout@v2
@@ -128,6 +128,7 @@ jobs:
           rm ../../Cargo.toml
           move ..\core core
           python3 -m cibuildwheel --output-dir wheelhouse
+        continue-on-error: true
       - uses: actions/upload-artifact@v2
         with:
           name: wheels
