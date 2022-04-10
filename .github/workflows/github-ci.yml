@@ -121,13 +121,13 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: crates/python/
         env:
-          CIBW_BEFORE_BUILD: "python -m pip install setuptools_rust"
+          CIBW_BEFORE_BUILD: "python3 -m pip install setuptools_rust"
         run: |
           # Fix ../core being outside of the project built by cibuildwheel:
           perl -p -i -e 's/..\/core/core/' Cargo.toml
           rm ../../Cargo.toml
           move ..\core core
-          python -m cibuildwheel --output-dir wheelhouse
+          python3 -m cibuildwheel --output-dir wheelhouse
       - uses: actions/upload-artifact@v2
         with:
           name: wheels
