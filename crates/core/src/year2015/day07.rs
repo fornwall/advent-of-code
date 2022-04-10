@@ -36,8 +36,8 @@ fn output_of(num_or_wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<Signa
 
 fn find_output(wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<SignalValue> {
     let gate = gates.get(wire)?;
-    if let Some(value) = gate.computed_value {
-        Some(value)
+    if gate.computed_value.is_some() {
+        gate.computed_value
     } else {
         let signal_value = match gate.operation {
             Operation::Assign(value) => output_of(value, gates)?,
