@@ -83,10 +83,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-11, windows-2019]
+        os: [ubuntu-latest, macos-latest, windows-2019]
         arch: [x86_64, aarch64]
         exclude:
-          - os: macos-11
+          - os: macos-latest
             arch: aarch64
           - os: windows-2019
             arch: aarch64
