@@ -205,8 +205,9 @@ impl<const SIDE_ROOM_SIZE: usize> State<SIDE_ROOM_SIZE> {
                 return Some(cost);
             }
 
+            new_states.clear();
             state.enumerate_possible_moves(&mut new_states);
-            for (new_state_cost_diff, new_state) in new_states.drain(..) {
+            for &(new_state_cost_diff, new_state) in new_states.iter() {
                 let new_total_cost = cost + new_state_cost_diff;
 
                 let visit_this = match lowest_cost.entry(new_state) {
