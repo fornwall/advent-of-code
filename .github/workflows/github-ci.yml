@@ -135,7 +135,7 @@ jobs:
           path: ./crates/python/wheelhouse/*.whl
 
   bump-version:
-    needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings, build-jni-libraries]
+    needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings, build-jni-libraries, build-python-wheels]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -382,7 +382,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: hecrj/setup-rust-action@v1
-    - uses: actions/setup-java@v2
+    - uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: '17'
@@ -421,7 +421,7 @@ jobs:
     - uses: actions/setup-python@v4
     - run: pip install bump2version
     - run: bump2version patch
-    - uses: actions/setup-java@v2
+    - uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: '17'
