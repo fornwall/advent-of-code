@@ -98,7 +98,7 @@ jobs:
       - uses: actions/setup-python@v4
         name: Setup python
         with:
-          python-version: '3.9'
+          python-version: '3.x'
       - uses: docker/setup-qemu-action@v2
         if: ${{ matrix.arch == 'aarch64' }}
         name: Set up QEMU
@@ -142,6 +142,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - name: Install bump2version
       run: pip install bump2version
     - name: Setup git for commit
@@ -171,6 +173,8 @@ jobs:
     - uses: hecrj/setup-rust-action@v1
     - run: cargo install cross
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - name: Install bump2version
       run: pip install bump2version
     - name: Set up QEMU
@@ -208,6 +212,8 @@ jobs:
     - uses: hecrj/setup-rust-action@v1
     - run: cargo install cross
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - name: Install bump2version
       run: pip install bump2version
     - name: Set up QEMU
@@ -254,6 +260,8 @@ jobs:
     - uses: hecrj/setup-rust-action@v1
     - run: cargo install cross
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - name: Install bump2version
       run: pip install bump2version
     - name: Set up QEMU
@@ -322,6 +330,8 @@ jobs:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - name: Install bump2version
       run: pip install bump2version
     - name: Bump version
@@ -344,6 +354,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - uses: hecrj/setup-rust-action@v1
     - name: Install bump2version
       run: pip install bump2version
@@ -418,6 +430,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - run: pip install bump2version
     - run: bump2version patch
     - uses: actions/setup-java@v3
@@ -512,6 +526,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
     - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: nightly-2022-04-08
