@@ -195,13 +195,13 @@ jobs:
         NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
-        strip -s target/x86_64-unknown-linux-musl/release/advent-of-code
-        aarch64-linux-gnu-strip -s target/aarch64-unknown-linux-musl/release/advent-of-code
+        strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code
+        aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code
         IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         IMAGE_WITH_LATEST=${DOCKER_IMAGE_NAME}:latest
         mkdir -p target/linux/{arm64,amd64}
-        cp target/x86_64-unknown-linux-musl/release/advent-of-code target/linux/amd64/
-        cp target/aarch64-unknown-linux-musl/release/advent-of-code target/linux/arm64/
+        cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code target/linux/amd64/
+        cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code target/linux/arm64/
         docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
 
   publish-and-deploy-http-server:
@@ -232,17 +232,15 @@ jobs:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-http-server
       run: |
         NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
-        cp -Rf ../core core
-        perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
-        strip -s target/x86_64-unknown-linux-musl/release/advent-of-code-server
-        aarch64-linux-gnu-strip -s target/aarch64-unknown-linux-musl/release/advent-of-code-server
+        strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server
+        aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code-server
         IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         IMAGE_WITH_LATEST=${DOCKER_IMAGE_NAME}:latest
         mkdir -p target/linux/{arm64,amd64}
-        cp target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
-        cp target/aarch64-unknown-linux-musl/release/advent-of-code-server target/linux/arm64/
+        cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
+        cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code-server target/linux/arm64/
         docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
@@ -280,17 +278,15 @@ jobs:
         DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-grpc-server
       run: |
         NEW_VERSION=`cd ../.. && bump2version patch --list | grep new_version | cut -d = -f 2`
-        cp -Rf ../core core
-        perl -p -i -e 's/\.\.\/core/core/' Cargo.toml
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
-        strip -s target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server
-        aarch64-linux-gnu-strip -s target/aarch64-unknown-linux-musl/release/advent-of-code-grpc-server
+        strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server
+        aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code-grpc-server
         IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${NEW_VERSION}
         IMAGE_WITH_LATEST=${DOCKER_IMAGE_NAME}:latest
         mkdir -p target/linux/{arm64,amd64}
-        cp target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/amd64/
-        cp target/aarch64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/arm64/
+        cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/amd64/
+        cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/arm64/
         docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
