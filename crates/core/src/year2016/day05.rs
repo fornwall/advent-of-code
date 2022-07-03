@@ -49,7 +49,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
     }
 
-    return Err(format!("Aborting after {} iterations", MAX_INDEX));
+    Err(format!("Aborting after {} iterations", MAX_INDEX))
 }
 
 #[test]

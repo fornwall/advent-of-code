@@ -21,7 +21,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         }
     }
 
-    return Err(format!("Aborting after {} iterations", MAX_INDEX));
+    Err(format!("Aborting after {} iterations", MAX_INDEX))
 }
 
 #[test]

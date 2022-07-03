@@ -53,10 +53,10 @@ impl Instruction {
                     let second_parameter = parse_register(words[2])?;
                     Ok(Self::Copy(first_parameter, second_parameter))
                 } else {
-                    return Err(format!(
+                    Err(format!(
                         "Invalid cpy instruction with {} arguments",
                         words.len() - 1
-                    ));
+                    ))
                 }
             }
             "inc" => {
@@ -85,10 +85,10 @@ impl Instruction {
                     let second_parameter = ValueOrRegister::parse(words[2])?;
                     Ok(Self::Jump(first_parameter, second_parameter))
                 } else {
-                    return Err(format!(
+                    Err(format!(
                         "Invalid jnz instruction with {} arguments",
                         words.len() - 1
-                    ));
+                    ))
                 }
             }
             "tgl" => {

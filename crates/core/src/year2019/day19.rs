@@ -55,7 +55,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             }
         }
 
-        return Err(format!("Aborting after reaching y={}", MAX_COORDINATE));
+        Err(format!("Aborting after reaching y={}", MAX_COORDINATE))
     }
 }
 
