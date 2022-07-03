@@ -13,7 +13,7 @@ setup(
     url="https://github.com/fornwall/advent-of-code",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="2019.12.445",
+    version="2019.12.446",
     rust_extensions=[
         RustExtension(
             "advent_of_code", binding=Binding.PyO3, strip=Strip.All, py_limited_api=True
