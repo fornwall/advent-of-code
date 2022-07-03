@@ -48,7 +48,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             if do_insert {
                 let new_estimate = new_cost
                     + if input.is_part_one() {
-                        (new_x - TARGET.0).abs() as u32 + (new_y - TARGET.1).abs() as u32
+                        (new_x - TARGET.0).unsigned_abs() + (new_y - TARGET.1).unsigned_abs()
                     } else {
                         0
                     };

@@ -90,9 +90,10 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     );
                     if grid.is_open(new_location) && visited.insert(new_location) {
                         let new_distance = distance + 1;
-                        let heuristic = (new_location.0 as i32 - target_location.0 as i32).abs()
-                            as usize
-                            + (new_location.1 as i32 - target_location.1 as i32).abs() as usize;
+                        let heuristic = (new_location.0 as i32 - target_location.0 as i32)
+                            .unsigned_abs() as usize
+                            + (new_location.1 as i32 - target_location.1 as i32).unsigned_abs()
+                                as usize;
                         to_visit.push(Reverse((
                             new_distance + heuristic,
                             new_distance,

@@ -104,7 +104,7 @@ impl Vector {
     }
 
     const fn distance_from(self, other: Self) -> u32 {
-        (self.x - other.x).abs() as u32 + (self.y - other.y).abs() as u32
+        (self.x - other.x).unsigned_abs() + (self.y - other.y).unsigned_abs()
     }
 
     const fn multiply(self, factor: u32) -> Self {

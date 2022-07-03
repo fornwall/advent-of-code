@@ -57,7 +57,7 @@ impl Grid {
                                 coordinate.3 + dw,
                             );
 
-                            let value_to_add = (dx | dy | dz | dw).abs() as u8;
+                            let value_to_add = (dx | dy | dz | dw).unsigned_abs();
 
                             match self.active_neighbors_count.entry(coordinate) {
                                 Entry::Occupied(mut entry) => {
