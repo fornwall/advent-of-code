@@ -1,7 +1,7 @@
 #[cfg(feature = "debug-output")]
 use std::env;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Registers {
     pub values: [u64; 6],
 }

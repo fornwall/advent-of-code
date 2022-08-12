@@ -10,7 +10,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     let input_polymer = input.text.as_bytes();
     let mut new_polymer = Vec::<PolymerUnit>::with_capacity(input_polymer.len());
 
-    let candidates_for_removal = input.part_values(0..1, b'a'..b'z');
+    let candidates_for_removal = input.part_values(0..=0, b'a'..=b'z');
 
     candidates_for_removal
         .map(|to_remove_lower| {
