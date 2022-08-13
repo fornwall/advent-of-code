@@ -16,6 +16,8 @@ jobs:
         rust-version: ${{ matrix.rust }}
     - name: Show rust version
       run: rustc --version
+    - name: Install protobuf
+      run: brew install protobuf
     - name: Test and check (stable)
       run: |
         make COUNT_ALLOCATIONS=1 check
@@ -264,6 +266,8 @@ jobs:
       run: pip install bump2version
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
+    - name: Install protobuf
+      run: brew install protobuf
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to docker hub
