@@ -1,5 +1,5 @@
 #![allow(clippy::panic, clippy::borrow_deref_ref)]
-use advent_of_code::solve_raw;
+use ::advent_of_code::solve_raw;
 use core::fmt::Display;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
@@ -56,7 +56,7 @@ pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<S
 /// >>> solve(year=2019, day=1, part=1, input='14')
 /// '2'
 #[pymodule]
-fn advent_of_code(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn advent_of_code(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(solve))?;
 
     Ok(())
