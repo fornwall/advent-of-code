@@ -40,14 +40,8 @@ endif
 
 WASM_DIR = debug
 WASM_OPT = wasm-opt --all-features
-WASM_BINDGEN = wasm-bindgen --target web --weak-refs
-WASM_TARGET_FEATURES = "+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext"
-ifeq ($(WASM_REFERENCE_TYPES),1)
-  # Needs to have https://github.com/WebAssembly/binaryen/pull/4736
-  # released in binaryen.
-  WASM_BINDGEN += --reference-types
-  WASM_TARGET_FEATURES := "$(WASM_TARGET_FEATURES),+reference-types"
-endif
+WASM_BINDGEN = wasm-bindgen --target web --weak-refs --reference-types
+WASM_TARGET_FEATURES = "+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext,+reference-types"
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
   WASM_DIR = release
