@@ -1,3 +1,9 @@
+const API_HOSTS = [
+  "advent.fly.dev",
+  "aoc.fornwall.workers.dev",
+  "mystifying-blackwell-9e705f.netlify.app",
+];
+
 async function solveApi(host, year, day, part, input) {
   const startTime = performance.now();
   try {
@@ -34,47 +40,34 @@ async function solveApi(host, year, day, part, input) {
 self.onmessage = async (message) => {
   const { year, day, part, input } = message.data;
 
-  const apiPromise1 = solveApi("advent.fly.dev", year, day, part, input);
-  const apiPromise2 = solveApi(
-    "aoc.fornwall.workers.dev",
-    year,
-    day,
-    part,
-    input
-  );
-  const apiPromise3 = solveApi(
-    "mystifying-blackwell-9e705f.netlify.app",
-    year,
-    day,
-    part,
-    input
+  const apiPromises = API_HOSTS.map((host) =>
+    solveApi(host, year, day, part, input)
   );
 
-  Promise.any([apiPromise1, apiPromise2, apiPromise3])
-    .then((response) => {
-      postMessage({
-        worker: "api",
-        year,
-        day,
-        part,
-        input,
-        output: response.answer,
-        isError: response.isError,
-        executionTime: response.executionTime,
-      });
-    })
-    .catch((e) => {
-      const message = e.errors.map((e) => `• ${e.message}`).join("\n");
-      postMessage({
-        worker: "api",
-        year,
-        day,
-        part,
-        input,
-        output: message,
-        isError: true,
-        isInternalError: true,
-        executionTime: 0,
-      });
+  try {
+    const response = await Promise.any(apiPromises);
+    postMessage({
+      worker: "api",
+      year,
+      day,
+      part,
+      input,
+      output: response.answer,
+      isError: response.isError,
+      executionTime: response.executionTime,
     });
+  } catch (e) {
+    const message = e.errors.map((e) => `• ${e.message}`).join("\n");
+    postMessage({
+      worker: "api",
+      year,
+      day,
+      part,
+      input,
+      output: message,
+      isError: true,
+      isInternalError: true,
+      executionTime: 0,
+    });
+  }
 };
