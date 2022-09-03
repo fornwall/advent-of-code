@@ -69,7 +69,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
     - name: Install wasm-opt
-      run: brew install binaryen
+      run: brew update && brew install binaryen
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
     - name: Test with Node ${{ matrix.node-version }}
