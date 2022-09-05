@@ -335,7 +335,7 @@ jobs:
     - name: Bump version
       run: bump2version patch
     - name: Install wasm-opt
-      run: brew install binaryen
+      run: brew update && brew install binaryen
     - name: Publish npm packages
       run: |
         make install-wasm-bindgen
@@ -534,7 +534,7 @@ jobs:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
     - name: Install wasm-opt
-      run: brew install binaryen
+      run: brew update && brew install binaryen
     - name: Install Rust nightly
       run: make install-nightly
     - name: Install wasm-bindgen
