@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code-c"
-version = "2019.12.450"
+version = "2019.12.451"
 keywords = ["advent-of-code", "c", "cbindgen"]
 categories = ["algorithms", "rust-patterns"]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
