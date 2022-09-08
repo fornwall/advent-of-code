@@ -23,7 +23,7 @@ pub fn solve(input: &mut Input) -> Result<AnswersBitSet, String> {
         .bytes()
         .all(|b| matches!(b, b'a'..=b'z' | b'\r' | b'\n'))
     {
-        return Err("Invalid input - only a-z, \r and \n expected".to_string());
+        return Err("Invalid input - only a-z, \\r and \\n expected".to_string());
     }
 
     let initial_bit_set = input.part_values(0, AnswersBitSet::MAX);
