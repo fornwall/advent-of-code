@@ -26,7 +26,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 }
 
 #[test]
-fn test() {
+fn tests() {
     use crate::input::{test_part_one, test_part_two};
 
     let real_input = include_str!("day04_input.txt");

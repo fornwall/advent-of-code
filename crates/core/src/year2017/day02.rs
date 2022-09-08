@@ -32,7 +32,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 }
 
 #[test]
-fn test() {
+fn tests() {
     use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("5 1 9 5\n7 5 3\n2 4 6 8" => 18);

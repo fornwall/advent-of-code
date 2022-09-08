@@ -460,37 +460,22 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 }
 
 #[test]
-pub fn tests_part1() {
-    assert_eq!(
-        solve(&mut Input::part_one(
-            "#########
+pub fn tests() {
+    use crate::input::{test_part_one, test_part_two};
+
+    test_part_one!("#########
 #b.A.@.a#
 #########"
-        )),
-        Ok(8)
-    );
+        => 8);
 
-    assert_eq!(
-        solve(&mut Input::part_one(
-            "########################
+    test_part_one!("########################
 #f.D.E.e.C.b.A.@.a.B.c.#
 ######################.#
 #d.....................#
 ########################"
-        )),
-        Ok(86)
-    );
+            => 86);
 
-    assert_eq!(
-        solve(&mut Input::part_one(include_str!("day18_input.txt"))),
-        Ok(4248)
-    );
-}
-
-#[test]
-fn tests_part2() {
-    assert_eq!(
-        solve(&mut Input::part_two(include_str!("day18_input.txt"))),
-        Ok(1878)
-    );
+    let input = include_str!("day18_input.txt");
+    test_part_one!(input => 4248);
+    test_part_two!(input => 1878);
 }

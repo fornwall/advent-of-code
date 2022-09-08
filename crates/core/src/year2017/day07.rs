@@ -140,7 +140,7 @@ fn fixup_weight(program_id: ProgramId, tree: &ProgramTree) -> Option<u32> {
 }
 
 #[test]
-fn test() {
+fn tests() {
     use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day07_input.txt");
     test_part_one!(real_input => "veboyvy".to_string());
