@@ -64,7 +64,11 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     }
 
     fn get_at_hallway(self, hallway_idx: usize) -> Option<Amphipod> {
-        debug_assert!(hallway_idx < Self::HALLWAY_SPACES, "Hallway idx={}", hallway_idx);
+        debug_assert!(
+            hallway_idx < Self::HALLWAY_SPACES,
+            "Hallway idx={}",
+            hallway_idx
+        );
         let bit_idx = Self::ALL_ROOM_BITS + Self::BITS_PER_HALLWAY * hallway_idx;
         if self.storage & (1 << (bit_idx + 2)) == 0 {
             return None;
@@ -298,15 +302,11 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     }
 
     fn least_total_energy_to_organize(self) -> Option<u64> {
-        let mut to_visit = BinaryHeap::from([(Reverse(0), 0, self)]);
+        let mut to_visit = BinaryHeap::from([(Reverse(0), self)]);
         let mut lowest_cost: HashMap<Self, u64> = HashMap::from([(self, 0)]);
         let mut new_states = Vec::new();
 
-        while let Some((_cost_and_heuristic, cost, state)) = to_visit.pop() {
-            if cost > *lowest_cost.get(&state).unwrap_or(&u64::MAX) {
-                continue;
-            }
-
+        while let Some((Reverse(cost), state)) = to_visit.pop() {
             if cost > 0 && state.is_hallway_empty() {
                 // If the hallway is empty after we have left the initial position we are done.
                 return Some(cost);
@@ -329,20 +329,12 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
                     _ => false,
                 };
                 if visit_this {
-                    to_visit.push((
-                        Reverse(new_total_cost + state.heuristic_cost()),
-                        new_total_cost,
-                        new_state,
-                    ));
+                    to_visit.push((Reverse(new_total_cost), new_state));
                 }
             }
         }
 
         None
-    }
-
-    const fn heuristic_cost(self) -> u64 {
-        0 // TODO
     }
 }
 
