@@ -15,7 +15,7 @@ To add a dependency using Maven:
 <dependency>
     <groupId>net.fornwall</groupId>
     <artifactId>aoc</artifactId>
-    <version>2019.12.452</version>
+    <version>2019.12.453</version>
 </dependency>
 ```
 
@@ -23,7 +23,7 @@ To add a dependency using Gradle:
 
 ```gradle
 dependencies {
-    implementation 'net.fornwall:aoc:2019.12.452'
+    implementation 'net.fornwall:aoc:2019.12.453'
 }
 ```
 
