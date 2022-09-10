@@ -216,6 +216,46 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     }
 
     fn enumerate_possible_moves(self, moves: &mut Vec<(u64, Self)>) {
+        'hallway_loop: for hallway_idx in 0..Self::HALLWAY_SPACES {
+            if let Some(amphipod) = self.get_at_hallway(hallway_idx) {
+                if !self.can_amphipod_go_home(amphipod) {
+                    continue;
+                }
+                let (end_idx, direction) = if (amphipod as usize) + 1 < hallway_idx {
+                    ((amphipod as usize) + 2, -1)
+                } else {
+                    ((amphipod as usize) + 1, 1)
+                };
+                let mut current_hallway_idx = hallway_idx;
+                let mut hallway_travel_distance = 1;
+                while current_hallway_idx != end_idx {
+                    let from_hallway_idx = current_hallway_idx;
+                    current_hallway_idx = ((current_hallway_idx as i32) + direction) as usize;
+                    if !matches!(self.get_at_hallway(current_hallway_idx), None) {
+                        continue 'hallway_loop;
+                    }
+
+                    hallway_travel_distance += 1;
+                    if !matches!(
+                        (from_hallway_idx, current_hallway_idx),
+                        (0, 1) | (1, 0) | (5, 6) | (6, 5)
+                    ) {
+                        hallway_travel_distance += 1;
+                    }
+                }
+
+                let mut new_state = self;
+                new_state.set_at_hallway(hallway_idx, None);
+                let offset_in_room = new_state.push_to_room(amphipod as u8, amphipod);
+                let total_travel_cost = ((offset_in_room as usize + 1 + hallway_travel_distance)
+                    * amphipod.consumption() as usize)
+                    as u64;
+                moves.push((total_travel_cost, new_state));
+                // No need to consider more moves:
+                return;
+            }
+        }
+
         for room_idx in 0..Self::NUM_ROOMS {
             let mut new_state_from_leaving_room = self;
             if let Some((offset_in_room, amphipod)) =
@@ -259,44 +299,6 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
                         }
                     }
                 }
-            }
-        }
-        'hallway_loop: for hallway_idx in 0..Self::HALLWAY_SPACES {
-            if let Some(amphipod) = self.get_at_hallway(hallway_idx) {
-                if !self.can_amphipod_go_home(amphipod) {
-                    continue;
-                }
-                let (end_idx, direction) = if (amphipod as usize) + 1 < hallway_idx {
-                    ((amphipod as usize) + 2, -1)
-                } else {
-                    ((amphipod as usize) + 1, 1)
-                };
-                let mut current_hallway_idx = hallway_idx;
-                let mut hallway_travel_distance = 1;
-                while current_hallway_idx != end_idx {
-                    let from_hallway_idx = current_hallway_idx;
-                    current_hallway_idx = ((current_hallway_idx as i32) + direction) as usize;
-                    if !matches!(self.get_at_hallway(current_hallway_idx), None) {
-                        continue 'hallway_loop;
-                    }
-
-                    hallway_travel_distance += 1;
-                    if !matches!(
-                        (from_hallway_idx, current_hallway_idx),
-                        (0, 1) | (1, 0) | (5, 6) | (6, 5)
-                    ) {
-                        hallway_travel_distance += 1;
-                    }
-                }
-
-                let mut new_state = self;
-                new_state.set_at_hallway(hallway_idx, None);
-
-                let offset_in_room = new_state.push_to_room(amphipod as u8, amphipod);
-                let total_travel_cost = ((offset_in_room as usize + 1 + hallway_travel_distance)
-                    * amphipod.consumption() as usize)
-                    as u64;
-                moves.push((total_travel_cost, new_state));
             }
         }
     }
