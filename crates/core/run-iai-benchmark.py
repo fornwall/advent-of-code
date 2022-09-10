@@ -46,9 +46,6 @@ output_file.close()
 
 subprocess.run(['cargo', 'fmt'], check=True)
 
-# Estimate based on stock Ryzen 5950x measurements
-CYCLES_PER_MILLISECOND = 10_000_000
-
 result = subprocess.run(['cargo', 'bench', '--bench', bench_name], check=True, stdout=subprocess.PIPE, text=True)
 # print(result.stdout)
 current_year = None
@@ -77,6 +74,5 @@ for line in result.stdout.splitlines():
             current['ram'] = int(words[2])
         elif line.startswith('Estimated Cycles:'):
             current['cycles'] = int(words[2])
-            current['time'] = int(words[2]) / CYCLES_PER_MILLISECOND
 
 print(json.dumps(output_dict, indent=2))

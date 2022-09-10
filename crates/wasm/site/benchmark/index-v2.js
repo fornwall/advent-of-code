@@ -24,10 +24,10 @@ async function updatePage() {
     const year = benchmarkInfo["year"];
     const day = benchmarkInfo["day"];
     const part = benchmarkInfo["part"];
-    const meanTime = benchmarkInfo["time"];
+    const cycles = benchmarkInfo["cycles"];
     if (!dataMap[year]) dataMap[year] = {};
     if (!dataMap[year][day]) dataMap[year][day] = {};
-    dataMap[year][day][part] = meanTime;
+    dataMap[year][day][part] = cycles;
   }
 
   const data = {
