@@ -295,12 +295,6 @@ fn problem_2015_25_1() {
     solve(2015, 25, 1, &input).unwrap();
 }
 
-fn problem_2015_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2015/day25_input.txt").unwrap();
-    solve(2015, 25, 2, &input).unwrap();
-}
-
 fn problem_2016_1_1() {
     #![allow(clippy::unwrap_used)]
     let input = read_to_string("src/year2016/day01_input.txt").unwrap();
@@ -593,12 +587,6 @@ fn problem_2016_25_1() {
     #![allow(clippy::unwrap_used)]
     let input = read_to_string("src/year2016/day25_input.txt").unwrap();
     solve(2016, 25, 1, &input).unwrap();
-}
-
-fn problem_2016_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2016/day25_input.txt").unwrap();
-    solve(2016, 25, 2, &input).unwrap();
 }
 
 fn problem_2017_1_1() {
@@ -895,12 +883,6 @@ fn problem_2017_25_1() {
     solve(2017, 25, 1, &input).unwrap();
 }
 
-fn problem_2017_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2017/day25_input.txt").unwrap();
-    solve(2017, 25, 2, &input).unwrap();
-}
-
 fn problem_2018_1_1() {
     #![allow(clippy::unwrap_used)]
     let input = read_to_string("src/year2018/day01_input.txt").unwrap();
@@ -1193,12 +1175,6 @@ fn problem_2018_25_1() {
     #![allow(clippy::unwrap_used)]
     let input = read_to_string("src/year2018/day25_input.txt").unwrap();
     solve(2018, 25, 1, &input).unwrap();
-}
-
-fn problem_2018_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2018/day25_input.txt").unwrap();
-    solve(2018, 25, 2, &input).unwrap();
 }
 
 fn problem_2019_1_1() {
@@ -1495,12 +1471,6 @@ fn problem_2019_25_1() {
     solve(2019, 25, 1, &input).unwrap();
 }
 
-fn problem_2019_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2019/day25_input.txt").unwrap();
-    solve(2019, 25, 2, &input).unwrap();
-}
-
 fn problem_2020_1_1() {
     #![allow(clippy::unwrap_used)]
     let input = read_to_string("src/year2020/day01_input.txt").unwrap();
@@ -1793,12 +1763,6 @@ fn problem_2020_25_1() {
     #![allow(clippy::unwrap_used)]
     let input = read_to_string("src/year2020/day25_input.txt").unwrap();
     solve(2020, 25, 1, &input).unwrap();
-}
-
-fn problem_2020_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2020/day25_input.txt").unwrap();
-    solve(2020, 25, 2, &input).unwrap();
 }
 
 fn problem_2021_1_1() {
@@ -2095,12 +2059,6 @@ fn problem_2021_25_1() {
     solve(2021, 25, 1, &input).unwrap();
 }
 
-fn problem_2021_25_2() {
-    #![allow(clippy::unwrap_used)]
-    let input = read_to_string("src/year2021/day25_input.txt").unwrap();
-    solve(2021, 25, 2, &input).unwrap();
-}
-
 iai::main!(
     problem_2015_1_1,
     problem_2015_1_2,
@@ -2151,7 +2109,6 @@ iai::main!(
     problem_2015_24_1,
     problem_2015_24_2,
     problem_2015_25_1,
-    problem_2015_25_2,
     problem_2016_1_1,
     problem_2016_1_2,
     problem_2016_2_1,
@@ -2201,7 +2158,6 @@ iai::main!(
     problem_2016_24_1,
     problem_2016_24_2,
     problem_2016_25_1,
-    problem_2016_25_2,
     problem_2017_1_1,
     problem_2017_1_2,
     problem_2017_2_1,
@@ -2251,7 +2207,6 @@ iai::main!(
     problem_2017_24_1,
     problem_2017_24_2,
     problem_2017_25_1,
-    problem_2017_25_2,
     problem_2018_1_1,
     problem_2018_1_2,
     problem_2018_2_1,
@@ -2301,7 +2256,6 @@ iai::main!(
     problem_2018_24_1,
     problem_2018_24_2,
     problem_2018_25_1,
-    problem_2018_25_2,
     problem_2019_1_1,
     problem_2019_1_2,
     problem_2019_2_1,
@@ -2351,7 +2305,6 @@ iai::main!(
     problem_2019_24_1,
     problem_2019_24_2,
     problem_2019_25_1,
-    problem_2019_25_2,
     problem_2020_1_1,
     problem_2020_1_2,
     problem_2020_2_1,
@@ -2401,7 +2354,6 @@ iai::main!(
     problem_2020_24_1,
     problem_2020_24_2,
     problem_2020_25_1,
-    problem_2020_25_2,
     problem_2021_1_1,
     problem_2021_1_2,
     problem_2021_2_1,
@@ -2450,6 +2402,5 @@ iai::main!(
     problem_2021_23_2,
     problem_2021_24_1,
     problem_2021_24_2,
-    problem_2021_25_1,
-    problem_2021_25_2
+    problem_2021_25_1
 );

@@ -23,7 +23,7 @@ main_string  = ""
 
 for year in range(2015, 2022):
     for day in range(1, 26):
-        for part in range(1, 3):
+        for part in range(1, 2 if day == 25 else 3):
             problem_func = f"problem_{year}_{day}_{part}"
             if FILTER and not problem_func.startswith(FILTER):
                 continue
