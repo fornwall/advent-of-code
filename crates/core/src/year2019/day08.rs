@@ -9,7 +9,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     fn count(slice: &[u8], needle: u8) -> usize {
         slice
             .iter()
-            .fold(0, |acc, &b| acc + if b == needle { 1 } else { 0 })
+            .fold(0, |acc, &b| acc + usize::from(b == needle))
     }
 
     if input.text.len() % LAYER_SIZE != 0 {

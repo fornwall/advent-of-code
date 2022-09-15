@@ -36,10 +36,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         sum_required_fuel(input.text, |mass| mass / 3 - 2)
     } else {
         fn required_fuel(mass: u32) -> u32 {
-            match (mass / 3).checked_sub(2) {
-                Some(fuel) => fuel + required_fuel(fuel),
-                None => 0,
-            }
+            (mass / 3)
+                .checked_sub(2)
+                .map_or(0, |fuel| fuel + required_fuel(fuel))
         }
         sum_required_fuel(input.text, required_fuel)
     }

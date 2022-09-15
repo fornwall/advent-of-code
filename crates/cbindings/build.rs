@@ -1,8 +1,9 @@
 extern crate cbindgen;
 
-use cbindgen::Config;
 use std::env;
 use std::path::PathBuf;
+
+use cbindgen::Config;
 
 fn main() {
     #![allow(clippy::unwrap_used, clippy::expect_used)]
@@ -29,10 +30,9 @@ fn main() {
 /// overridden by `cmake`, so we also need to check the `CARGO_TARGET_DIR`
 /// variable.
 fn target_dir() -> PathBuf {
-    #![allow(clippy::unwrap_used, clippy::expect_used)]
-    if let Ok(target) = env::var("CARGO_TARGET_DIR") {
-        PathBuf::from(target)
-    } else {
-        PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("target")
-    }
+    #![allow(clippy::unwrap_used)]
+    env::var("CARGO_TARGET_DIR").map_or_else(
+        |_| PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("target"),
+        PathBuf::from,
+    )
 }

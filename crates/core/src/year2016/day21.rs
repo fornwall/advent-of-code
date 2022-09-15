@@ -56,7 +56,7 @@ fn scramble(input: &str, password: &mut [u8]) -> Result<(), String> {
                     if let Some((idx, _)) =
                         password.iter().enumerate().find(|&(_idx, &c)| c == letter)
                     {
-                        ((1 + idx + if idx >= 4 { 1 } else { 0 }) % password.len()) as i32
+                        ((1 + idx + usize::from(idx >= 4)) % password.len()) as i32
                     } else {
                         return Err(format!(
                             "Unable to find letter for rotation: '{}'",

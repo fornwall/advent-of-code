@@ -270,8 +270,7 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
                     //        R0  R1  R2  R3
                     // When going left from room 0, coming to 1+0+0 = 1
                     // When going right from room 1, coming to 1+0+1 = 2
-                    let mut hallway_end_idx =
-                        1 + room_idx + if horizontal_direction == 1 { 1 } else { 0 };
+                    let mut hallway_end_idx = 1 + room_idx + usize::from(horizontal_direction == 1);
                     let mut hallway_travel_distance = 1;
 
                     while self.get_at_hallway(hallway_end_idx).is_none() {

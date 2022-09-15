@@ -1,20 +1,25 @@
 #![allow(clippy::panic, clippy::borrow_deref_ref)]
-use ::advent_of_code::solve_raw;
+
 use core::fmt::Display;
+
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 use pyo3::FromPyObject;
 use pyo3::PyAny;
 
+use ::advent_of_code::solve_raw;
+
 fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &'a PyAny) -> String {
     if let Ok(value) = object.extract::<String>() {
-        value
-    } else if let Ok(value) = object.extract::<T>() {
-        value.to_string()
-    } else {
-        "".to_string()
+        return value;
     }
+
+    if let Ok(value) = object.extract::<T>() {
+        return value.to_string();
+    }
+
+    "".to_string()
 }
 
 /// Returns the answer for the specified problem and input.

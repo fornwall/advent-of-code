@@ -41,8 +41,7 @@ impl<'a> ProgramTree<'a> {
                 )
             })?;
             let weight = weight_str
-                .replace('(', "")
-                .replace(')', "")
+                .replace(['(', ')'], "")
                 .parse::<u32>()
                 .map_err(|error| format!("Line {}: Invalid weight ({})", line_index + 1, error))?;
 

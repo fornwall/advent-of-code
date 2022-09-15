@@ -87,14 +87,14 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
             // This takes the second if bounced from "Pressure-Sensitive Floor".
             room_id = line;
         } else if let Some(item) = line.strip_prefix("- ") {
-            match Direction::from_str(item) {
-                Some(direction) => {
-                    directions.push(direction);
-                }
-                None => {
+            Direction::from_str(item).map_or_else(
+                || {
                     items.push(item.to_string());
-                }
-            }
+                },
+                |direction| {
+                    directions.push(direction);
+                },
+            );
         } else if line.starts_with("\"Oh, hello! You should be able to get in by typing") {
             let error_message = "Unable to parse typing instruction";
             solution = Some(

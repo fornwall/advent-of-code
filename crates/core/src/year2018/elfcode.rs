@@ -64,7 +64,7 @@ impl Program {
             return Err("Invalid first line of elfcode".to_string());
         }
         let error = |_| "Invalid elfcode instruction";
-        let instruction_pointer_index = (&first_line[4..]).parse::<u8>().map_err(error)?;
+        let instruction_pointer_index = (first_line[4..]).parse::<u8>().map_err(error)?;
 
         let mut instructions = Vec::new();
         for line in lines {

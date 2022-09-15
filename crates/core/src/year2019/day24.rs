@@ -63,16 +63,12 @@ impl Grid {
         })
     }
 
-    const fn at(self, x: i32, y: i32) -> u32 {
+    fn at(self, x: i32, y: i32) -> u32 {
         if x < 0 || y < 0 || x >= 5 || y >= 5 {
             0
         } else {
             let bit = 1 << ((y * 5) + x);
-            if bit & self.value == bit {
-                1
-            } else {
-                0
-            }
+            u32::from(bit & self.value == bit)
         }
     }
 

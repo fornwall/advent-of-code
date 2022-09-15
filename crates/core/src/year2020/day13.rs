@@ -120,10 +120,10 @@ pub fn solve(input: &mut Input) -> Result<i128, String> {
             if entry == "x" {
                 None
             } else {
-                match entry.parse::<u32>() {
-                    Ok(value) if value > 0 => Some(Ok((offset, value))),
-                    _ => Some(Err("Line 2: Invalid entry".to_string())),
-                }
+                entry.parse::<u32>().map_or_else(
+                    |_| Some(Err("Line 2: Invalid entry".to_string())),
+                    |value| Some(Ok((offset, value))),
+                )
             }
         })
         .collect::<Result<Vec<_>, _>>()?;

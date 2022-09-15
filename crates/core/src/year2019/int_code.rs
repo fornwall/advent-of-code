@@ -47,14 +47,14 @@ impl Program {
     }
 
     pub fn run_until_halt_or_input(&mut self, max_instructions: u32) -> Result<(), String> {
-        if self.requires_input_to != None {
+        if self.requires_input_to.is_some() {
             return Err("Cannot run program requiring input".to_string());
         } else if self.halted {
             return Err("Cannot run halted program".to_string());
         }
 
         let mut current_instruction = 0;
-        while !self.halted && self.requires_input_to == None {
+        while !self.halted && self.requires_input_to.is_none() {
             self.evaluate()?;
 
             current_instruction += 1;
@@ -170,13 +170,10 @@ impl Program {
                 // it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
                 let parameter_1 = self.parameter_value(instruction, 1);
                 let parameter_2 = self.parameter_value(instruction, 2);
-                let output_value = if (opcode == 7 && (parameter_1 < parameter_2))
-                    || (opcode == 8 && (parameter_1 == parameter_2))
-                {
-                    1
-                } else {
-                    0
-                };
+                let output_value = i64::from(
+                    (opcode == 7 && (parameter_1 < parameter_2))
+                        || (opcode == 8 && (parameter_1 == parameter_2)),
+                );
 
                 let output_location = self.output_location(instruction, 3)?;
                 self.write_memory(output_location as usize, output_value);

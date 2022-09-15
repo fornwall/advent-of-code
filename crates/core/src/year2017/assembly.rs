@@ -20,13 +20,12 @@ impl Value {
 
     fn parse_register(input: &str) -> Option<RegisterSpecifier> {
         if input.len() == 1 {
-            match input.chars().next() {
-                Some(c) if ('a'..='z').contains(&c) => Some(c as u8 - b'a'),
-                _ => None,
+            let c = input.as_bytes()[0];
+            if (b'a'..=b'z').contains(&c) {
+                return Some(c - b'a');
             }
-        } else {
-            None
         }
+        None
     }
 }
 
