@@ -1,13 +1,15 @@
 [package]
-name = "advent-of-code-python"
-version = "2019.12.455"
-keywords = ["advent-of-code", "python", "pyo3"]
+authors.workspace = true
 categories = ["algorithms", "rust-patterns"]
-authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-repository = "https://github.com/fornwall/advent-of-code"
 description = "Solutions to Advent of Code written in Rust"
-license = "MIT"
-edition = "2021"
+edition.workspace = true
+homepage.workspace = true
+keywords = ["advent-of-code", "python", "pyo3"]
+license.workspace = true
+name = "advent-of-code-python"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
 
 [lib]
 name = "advent_of_code"

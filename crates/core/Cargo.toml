@@ -1,17 +1,17 @@
 [package]
-name = "advent-of-code"
-version = "2019.12.455"
-authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-keywords = ["advent-of-code", "wasm", "webassembly", "node"]
+authors.workspace = true
 categories = ["algorithms", "rust-patterns"]
-repository = "https://github.com/fornwall/advent-of-code"
-license = "MIT"
 description = "Solutions to Advent of Code"
-documentation = "https://docs.rs/advent-of-code/2019.12.455/advent_of_code/"
-homepage = "https://github.com/fornwall/advent-of-code"
+documentation = "https://docs.rs/advent-of-code/"
+edition.workspace = true
+homepage.workspace = true
+keywords = ["advent-of-code"]
+license.workspace = true
+name = "advent-of-code"
 readme = "README.md"
-edition = "2021"
-rust-version = "1.62"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
 
 [[bin]]
 name = "advent-of-code"

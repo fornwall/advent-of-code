@@ -1,14 +1,16 @@
 [package]
-name = "advent-of-code-grpc-server"
-version = "2019.12.455"
-keywords = ["advent-of-code", "rust", "warp"]
+authors.workspace = true
 categories = ["algorithms", "rust-patterns", "grpc"]
-authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-repository = "https://github.com/fornwall/advent-of-code"
 description = "Solutions to Advent of Code written in Rust"
-license = "MIT"
+edition.workspace = true
+homepage.workspace = true
+keywords = ["advent-of-code", "rust", "warp"]
+license.workspace = true
+name = "advent-of-code-grpc-server"
 readme = "../../README.md"
-edition = "2021"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
 
 [dependencies]
 advent-of-code = { path = "../core" }

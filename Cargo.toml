@@ -2,6 +2,15 @@
 members = [ "crates/*" ]
 exclude = [ "crates/painter", "crates/fuzzing-afl" ]
 
+[workspace.package]
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+edition = "2021"
+homepage = "https://github.com/fornwall/advent-of-code"
+license = "MIT"
+repository = "https://github.com/fornwall/advent-of-code"
+rust-version = "1.64"
+version = "2019.12.454"
+
 [profile.release]
 lto = true
 panic = 'abort'

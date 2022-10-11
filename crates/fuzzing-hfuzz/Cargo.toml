@@ -1,13 +1,15 @@
 [package]
-name = "advent-of-code-fuzzing-hfuzz"
-version = "1.0.0"
-keywords = ["advent-of-code", "rust", "honggfuzz", "fuzzing"]
+authors.workspace = true
 categories = ["algorithms", "rust-patterns"]
-authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-repository = "https://github.com/fornwall/advent-of-code"
 description = "Fuzzing of solutions to Advent of Code written in Rust"
-license = "MIT"
-edition = "2021"
+edition.workspace = true
+homepage.workspace = true
+keywords = ["advent-of-code", "rust", "honggfuzz", "fuzzing"]
+license.workspace = true
+name = "advent-of-code-fuzzing-hfuzz"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
 
 [dependencies]
 advent-of-code = { path = "../core" }
