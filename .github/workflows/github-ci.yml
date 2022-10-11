@@ -16,6 +16,7 @@ jobs:
         rust-version: ${{ matrix.rust }}
     - name: Show rust version
       run: rustc --version
+    - uses: Homebrew/actions/setup-homebrew@master
     - name: Install protobuf
       run: brew install protobuf
     - name: Test and check (stable)
@@ -37,6 +38,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: hecrj/setup-rust-action@v1
+    - if: ${{ matrix.os == 'ubuntu-latest' }}
+      uses: Homebrew/actions/setup-homebrew@master
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       run: sudo apt-get -y install libc6-dbg && brew install valgrind
     - run: make test-c-and-cxx-bindings
@@ -68,6 +71,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
+    - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - name: Install wasm-bindgen
@@ -334,6 +338,7 @@ jobs:
       run: pip install bump2version
     - name: Bump version
       run: bump2version patch
+    - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - name: Publish npm packages
@@ -459,6 +464,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: hecrj/setup-rust-action@v1
+    - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install valgrind
     - name: Run benchmark on current commit
       run: ./run-iai-benchmark.py > new-baseline.json
@@ -476,6 +482,7 @@ jobs:
       with:
         fetch-depth: 2
     - uses: hecrj/setup-rust-action@v1
+    - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install valgrind
     - name: Checkout previous commit
       run: git checkout HEAD~1
@@ -533,6 +540,7 @@ jobs:
       with:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
+    - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - name: Install Rust nightly
