@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "net.fornwall"
-version = "2019.12.455"
+version = "2019.12.456"
 
 repositories {
     mavenCentral()
