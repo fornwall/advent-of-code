@@ -25,7 +25,7 @@ pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
                 return env
                     .new_string(output)
                     .expect("Unable to create output string")
-                    .into_inner();
+                    .into_raw();
             }
             Err(msg) => msg,
         },
