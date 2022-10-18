@@ -92,6 +92,8 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         arch: [x86_64, aarch64]
         exclude:
+          - os: ubuntu-latest
+            arch: aarch64
           - os: macos-latest
             arch: aarch64
           - os: windows-latest
