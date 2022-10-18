@@ -24,7 +24,7 @@ For learning and demonstration purposes, this repository contains additional res
 - [crates/wasm](crates/wasm): WebAssembly build using [wasm-bindgen](https://rustwasm.github.io/docs/wasm-bindgen/).
   - Published to a static site at [aoc.fornwall.net](https://aoc.fornwall.net).
   - Published to [npm](https://www.npmjs.com/package/advent-of-code-wasm).
-  - Deployed to [Cloudflare Workers](https://workers.cloudflare.com/).
   - Deployed to [Netlify Functions](https://www.netlify.com/products/functions/).
+- [crates/worker](creates/worker): A [Cloudflare Worker](https://workers.cloudflare.com/).
 
 All builds and deployments are done from the [CI using Github Actions](.github/workflows/github-ci.yml).

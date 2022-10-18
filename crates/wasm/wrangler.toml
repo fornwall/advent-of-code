@@ -1,7 +1,0 @@
-account_id = "c494646a87f38a82ce35ea24edaada52"
-compatibility_date = "2021-09-25"
-name = "aoc"
-route = ""
-type = "rust"
-workers_dev = true
-zone_id = ""

@@ -40,19 +40,6 @@ $ echo 14 | advent-of-code-wasm 2019 1 1
 2
 ```
 
-## Deployment to CloudFlare workers
-
-The [worker/](https://github.com/fornwall/advent-of-code/tree/master/crates/wasm/worker) directory contains code and configuration to deploy the WebAssembly with a JS wrapper to [Cloudflare Workers](https://workers.cloudflare.com/).
-
-- Deployment URL: https://aoc.fornwall.workers.dev
-
-It implements the API described at [https://aoc.fornwall.net/api/](https://aoc.fornwall.net/api/):
-
-```sh
-$ curl -d 14 https://aoc.fornwall.workers.dev/solve/2019/1/1
-2
-```
-
 ## Deployment to Netlify Functions
 
 The [functions/](https://github.com/fornwall/advent-of-code/tree/master/crates/wasm/functions) directory contains code and configuration to deploy the WebAssembly with a JS wrapper to [Netlify Functions](https://www.netlify.com/products/functions/).
