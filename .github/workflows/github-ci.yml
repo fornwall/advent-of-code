@@ -308,7 +308,7 @@ jobs:
       run: brew update && brew install binaryen
     - name: Deploy to Cloudflare
       env:
-        CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       working-directory: crates/worker
       run: npx wrangler publish
 
