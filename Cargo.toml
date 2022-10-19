@@ -9,7 +9,7 @@ homepage = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
 repository = "https://github.com/fornwall/advent-of-code"
 rust-version = "1.64"
-version = "2019.12.460"
+version = "2019.12.461"
 
 [profile.release]
 lto = true
