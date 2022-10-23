@@ -25,7 +25,3 @@ worker = "*"
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
 # code size when deploying.
 console_error_panic_hook = { version = "*", optional = true }
-
-[profile.release]
-# Tell `rustc` to optimize for small code size.
-opt-level = "s"
