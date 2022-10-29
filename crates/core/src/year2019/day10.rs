@@ -95,7 +95,7 @@ fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
 
     // Sort each group so that closest points are at end of vector:
     for points_on_line in points_grouped_by_direction.iter_mut() {
-        points_on_line.sort_by_key(|point| -((point.0 * point.0 + point.1 * point.1) as i64));
+        points_on_line.sort_by_key(|point| -(point.0 * point.0 + point.1 * point.1));
     }
 
     // Sort between groups in clockwise order:

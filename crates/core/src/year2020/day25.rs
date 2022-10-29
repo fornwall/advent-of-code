@@ -87,7 +87,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         i128::from(MODULO),
     ) as u64;
 
-    Ok(encryption_key as u64)
+    Ok(encryption_key)
 }
 
 #[test]

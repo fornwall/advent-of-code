@@ -9,7 +9,7 @@ struct CustomHash {
 
 impl Hasher for CustomHash {
     fn finish(&self) -> u64 {
-        self.hash as u64
+        self.hash
     }
 
     fn write(&mut self, _: &[u8]) {

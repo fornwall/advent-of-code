@@ -32,7 +32,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     ("on", Part::One) => 1,
                     ("on", Part::Two) => grid[index] + 1,
                     ("off", Part::One) => 0,
-                    ("off", Part::Two) => grid[index] - if grid[index] == 0 { 0 } else { 1 },
+                    ("off", Part::Two) => grid[index] - u8::from(grid[index]),
                     (_, Part::One) => u8::from(grid[index] == 0),
                     (_, Part::Two) => grid[index] + 2,
                 };

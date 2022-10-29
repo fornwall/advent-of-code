@@ -37,10 +37,10 @@ struct Game {
 }
 
 impl Game {
-    const MAX_POSSIBLE_STATES: usize = (SCORE_REQUIRED_PART_2 as usize
+    const MAX_POSSIBLE_STATES: usize = SCORE_REQUIRED_PART_2 as usize
         * MAX_POSITION as usize
         * SCORE_REQUIRED_PART_2 as usize
-        * MAX_POSITION as usize) as usize;
+        * MAX_POSITION as usize;
 
     fn parse(text: &str) -> Result<Self, String> {
         fn parse_line(line: Option<&str>) -> Result<u8, String> {

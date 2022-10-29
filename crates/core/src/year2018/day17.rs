@@ -57,7 +57,7 @@ impl Grid {
         let width = ((x_range.1 - x_range.0) + 1) as usize;
         let height = ((y_range.1 - y_range.0) + 1) as usize;
 
-        let mut cells = vec![b'.'; width as usize * height as usize];
+        let mut cells = vec![b'.'; width * height];
         for point in points {
             let x = point.0 - x_range.0;
             let y = point.1 - y_range.0;
@@ -203,7 +203,7 @@ impl Grid {
         while line > 0 {
             line -= 1;
             for x in 0..self.width {
-                if self.at(x as u16, line as u16) == b'w' {
+                if self.at(x, line) == b'w' {
                     let below = if line == (self.height as u16 - 1) {
                         b'.'
                     } else {

@@ -56,7 +56,7 @@ fn evaluate_node(
     let offset_after_current = offset_after_children
         .checked_add(metadata_entries)
         .ok_or("Overflow in computation")?;
-    Ok((offset_after_current, node_value as usize))
+    Ok((offset_after_current, node_value))
 }
 
 #[test]

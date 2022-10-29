@@ -17,7 +17,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
         // Check if hash starts with five/six zeros without converting it to a string:
         if output[..2] == [0, 0] && output[2] <= input.part_values(0x0F, 0) {
-            return Ok(index as u32);
+            return Ok(index);
         }
     }
 

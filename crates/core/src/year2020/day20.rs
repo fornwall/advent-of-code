@@ -330,7 +330,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         let row = pixel_y % 8;
 
         composed_image
-            .get(&(tile_x as u8, tile_y as u8))
+            .get(&(tile_x, tile_y))
             .map(|tile| tile.body[row as usize] & (1 << (7 - bit)) != 0)
             .unwrap_or_default()
     };

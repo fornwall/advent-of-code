@@ -122,8 +122,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 
                     let field_idx = possible_fields.trailing_zeros();
                     if departure_fields.contains(&field_idx) {
-                        departure_values_multiplied *=
-                            u64::from(your_ticket_values[position as usize]);
+                        departure_values_multiplied *= u64::from(your_ticket_values[position]);
                     }
 
                     let clear_possibility_bitmask = !(1 << field_idx);

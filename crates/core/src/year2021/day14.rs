@@ -57,8 +57,8 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         .entry(template[template.len() - 1])
         .or_default() += 1;
 
-    let most_common_count = element_count.iter().map(|(_, c)| c).max().unwrap_or(&0);
-    let least_common_count = element_count.iter().map(|(_, c)| c).min().unwrap_or(&0);
+    let most_common_count = element_count.values().map(|c| c).max().unwrap_or(&0);
+    let least_common_count = element_count.values().map(|c| c).min().unwrap_or(&0);
     Ok((most_common_count - least_common_count) / 2)
 }
 

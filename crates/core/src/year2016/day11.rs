@@ -259,11 +259,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                                 let heuristic = (new_state.floors[0].count_items() * 3) / 2
                                     + new_state.floors[1].count_items()
                                     + new_state.floors[2].count_items() / 2;
-                                to_visit.push(Reverse((
-                                    new_cost + heuristic as u32,
-                                    new_cost,
-                                    new_state,
-                                )));
+                                to_visit.push(Reverse((new_cost + heuristic, new_cost, new_state)));
                             }
                         }
                     }

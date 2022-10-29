@@ -66,8 +66,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
                     let visited_idx = (new_x + cols * new_y) as usize;
                     if data[visited_idx] == b'L' {
-                        visibility_entry[visibility_count] =
-                            data_pos_to_seat_idx[visited_idx] as u16;
+                        visibility_entry[visibility_count] = data_pos_to_seat_idx[visited_idx];
                         visibility_count += 1;
                         break;
                     }

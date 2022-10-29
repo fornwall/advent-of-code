@@ -93,12 +93,8 @@ fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> Chemi
     {
         let (produced_amount, required) = &reactions.produced_by[needed_id];
 
-        let reaction_executions = needed_amount / *produced_amount
-            + if needed_amount % *produced_amount == 0 {
-                0
-            } else {
-                1
-            };
+        let reaction_executions =
+            needed_amount / *produced_amount + i64::from(needed_amount % *produced_amount);
 
         needed[needed_id] -= reaction_executions * *produced_amount;
 

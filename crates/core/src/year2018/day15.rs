@@ -120,7 +120,7 @@ impl Board {
                 0
             }
         });
-        let round_for_score = self.round - if self.full_round { 0 } else { 1 };
+        let round_for_score = self.round - u16::from(self.full_round);
         Some(hit_point_sum * i32::from(round_for_score))
     }
 
@@ -220,8 +220,7 @@ impl Board {
         let mut found_cost = -1;
 
         while let Some(visiting) = to_visit.pop_front() {
-            let (cost, visiting_x, visiting_y) =
-                (visiting.0 + 1, visiting.1 as u32, visiting.2 as u32);
+            let (cost, visiting_x, visiting_y) = (visiting.0 + 1, visiting.1, visiting.2);
 
             if found_cost != -1 && found_cost != cost {
                 break;

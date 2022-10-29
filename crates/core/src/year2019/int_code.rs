@@ -131,16 +131,16 @@ impl Program {
                 }
                 .ok_or("Overflow in program")?;
 
-                self.write_memory(output_location as usize, value);
+                self.write_memory(output_location, value);
                 self.instruction_pointer += 4;
             }
             3 => {
                 // Takes a single integer as input and saves it to the address given by its only parameter.
                 let output_location = self.output_location(instruction, 1)?;
                 if let Some(input_value) = self.input_values.pop_front() {
-                    self.write_memory(output_location as usize, input_value);
+                    self.write_memory(output_location, input_value);
                 } else {
-                    self.requires_input_to = Some(output_location as usize);
+                    self.requires_input_to = Some(output_location);
                 }
                 self.instruction_pointer += 2;
             }
@@ -176,7 +176,7 @@ impl Program {
                 );
 
                 let output_location = self.output_location(instruction, 3)?;
-                self.write_memory(output_location as usize, output_value);
+                self.write_memory(output_location, output_value);
                 self.instruction_pointer += 4;
             }
             9 => {

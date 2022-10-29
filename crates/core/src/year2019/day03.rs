@@ -136,7 +136,7 @@ fn parse_wire_points(
             {
                 let start_position = *current_position;
 
-                let direction = match Vector::direction(first_char as char) {
+                let direction = match Vector::direction(first_char) {
                     Ok(direction) => direction,
                     Err(description) => {
                         return Some(Err(description));

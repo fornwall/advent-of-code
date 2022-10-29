@@ -168,11 +168,7 @@ impl AABB {
         let mut closest: Position = point;
 
         for i in 0..3 {
-            if closest[i] > self.max[i] {
-                closest[i] = self.max[i];
-            } else if closest[i] < self.min[i] {
-                closest[i] = self.min[i];
-            }
+            closest[i] = closest[i].clamp(self.min[i], self.max[i]);
         }
 
         // Manhattan distance

@@ -31,7 +31,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                         .filter(|&(idx, _size)| ((1 << idx) & bit_mask) > 0)
                         .map(|(_idx, size)| size)
                         .sum();
-                    if total_size == u32::from(TARGET_SIZE) as u32 {
+                    if total_size == u32::from(TARGET_SIZE) {
                         possible_combinations += 1;
                     }
                 }
