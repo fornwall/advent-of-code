@@ -214,7 +214,7 @@ impl Grid {
                         && self.holds_in_direction(x as u16, line, -1)
                         && self.holds_in_direction(x as u16, line, 1))
                     {
-                        self.dry_at(x as u16, line as u16);
+                        self.dry_at(x as u16, line);
                     }
                 }
             }

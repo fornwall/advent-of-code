@@ -17,13 +17,13 @@ fn main() {
     };
 
     cbindgen::Builder::new()
-        .with_crate(&crate_dir)
+        .with_crate(crate_dir)
         .with_config(config)
         .with_include_guard("ADVENT_OF_CODE_H")
         .with_language(cbindgen::Language::C)
         .generate()
         .expect("Unable to generate bindings")
-        .write_to_file(&generated_header_path);
+        .write_to_file(generated_header_path);
 }
 
 /// Find the location of the `target/` directory. Note that this may be

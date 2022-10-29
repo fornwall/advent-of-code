@@ -120,7 +120,7 @@ impl Board {
                 0
             }
         });
-        let round_for_score = self.round - u16::from(self.full_round);
+        let round_for_score = self.round - u16::from(!self.full_round);
         Some(hit_point_sum * i32::from(round_for_score))
     }
 
