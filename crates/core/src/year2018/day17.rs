@@ -203,7 +203,7 @@ impl Grid {
         while line > 0 {
             line -= 1;
             for x in 0..self.width {
-                if self.at(x, line) == b'w' {
+                if self.at(x as u16, line) == b'w' {
                     let below = if line == (self.height as u16 - 1) {
                         b'.'
                     } else {
