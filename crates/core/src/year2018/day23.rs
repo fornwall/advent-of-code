@@ -165,7 +165,6 @@ impl AABB {
     }
 
     fn distance_from(&self, point: Position) -> i32 {
-        #![allow(clippy::manual_clamp)]
         let mut closest: Position = point;
 
         for i in 0..3 {
