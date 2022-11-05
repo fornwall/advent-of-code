@@ -39,6 +39,7 @@ jobs:
         targets: i686-unknown-linux-musl
     - run: rustc --version
     - run: cargo test --target i686-unknown-linux-musl
+      working-directory: crates/core
 
   test-c-and-cxx-bindings:
     runs-on: ${{ matrix.os }}
