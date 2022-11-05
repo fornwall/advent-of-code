@@ -30,17 +30,24 @@ export default function CanvasRecorder(
       throw new Error("No supported mime type found for MediaRecorder");
     }
 
-    const videoStream = canvas.captureStream();
-    let streamToRecord;
-    if (audioStream) {
+    const generator = new MediaStreamTrackGenerator({ kind: "video" });
+    this._writer = generator.writable.getWriter();
+    const streamToRecord = new MediaStream();
+    streamToRecord.addTrack(generator);
+
+    if (false) {
+      // if (audioStream) {
+      // FIXME: Do stuff
       // const videoTrack = videoStream.getVideoTracks()[0];
       const audioTrack = audioStream.getAudioTracks()[0];
+      // const audioTrackProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
+
       console.log("audio stream", audioStream, "audio track", audioTrack);
       // streamToRecord = new MediaStream([audioTrack, videoTrack]);
       videoStream.addTrack(audioTrack);
       streamToRecord = videoStream;
     } else {
-      streamToRecord = videoStream;
+      //streamToRecord = videoStream;
     }
     this.mediaRecorder = new MediaRecorder(streamToRecord, {
       mimeType,
@@ -56,10 +63,21 @@ export default function CanvasRecorder(
       window.URL.revokeObjectURL(url);
     };
 
+    this._frameCount = 0;
     this.mediaRecorder.start();
   };
 
-  this.onFrame = async () => {};
+  this.onFrame = async (canvas) => {
+    const fps = 30;
+    const timestamp = Math.floor((this._frameCount * 1000 * 1000) / fps);
+    console.log("timestamp", timestamp);
+    const frame = new VideoFrame(canvas, {
+      timestamp: timestamp,
+      duration: Math.floor(1000_000 / fps),
+    });
+    await this._writer.write(frame);
+    this._frameCount++;
+  };
 
   this.stopAndSave = (fileName) => {
     this.fileName = `${fileName}.webm`;

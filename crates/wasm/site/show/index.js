@@ -1,5 +1,5 @@
 import Renderer from "./renderer.js";
-import CanvasRecorder from "./CanvasRecorder.js";
+import CanvasRecorder from "./CanvasRecorder-mp4wasm.js";
 import { AudioPlayer } from "./audio-player.js";
 
 const visualizerWorker = new Worker(
@@ -102,14 +102,14 @@ visualizerWorker.onmessage = (message) => {
   window.renderer = renderer;
 
   function startRendering(renderer) {
-    function render(time) {
+    async function render(time) {
       // TODO: Do not ignore time parameter.
       if (renderer.done) {
         console.log("[main] Rendering done");
         if (state.recorder) {
           setTimeout(() => {
             // Give time for last frames to be recorded:
-            state.recorder.stopAndSave(generateFileName("webm"));
+            state.recorder.stopAndSave(generateFileName());
             updateHash({ download: "" });
           }, 1000);
         }
@@ -129,6 +129,7 @@ visualizerWorker.onmessage = (message) => {
             // composedCtx.clearRect(0, 0, composedCtx.canvas.width, composedCtx.canvas.height);
             composedCtx.drawImage(canvas, 0, 0);
             composedCtx.drawImage(overlayCanvas, 0, 0);
+            await state.recorder.onFrame(composedCanvas);
           }
           if (renderer.delay) {
             setTimeout(render, renderer.delay);
@@ -240,9 +241,9 @@ async function togglePause() {
   }
 }
 
-function generateFileName(extension) {
+function generateFileName() {
   const { year, day, part } = state.params;
-  return `Advent-of-Code-${year}-Day-${day}-Part-${part}.${extension}`;
+  return `Advent-of-Code-${year}-Day-${day}-Part-${part}`;
 }
 
 function downloadImage() {
