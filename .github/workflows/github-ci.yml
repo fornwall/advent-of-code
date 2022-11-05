@@ -30,6 +30,18 @@ jobs:
       if: matrix.rust == 'nightly-2022-10-29'
       continue-on-error: true
 
+  test-rust-32-bits:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: ${{ matrix.rust }}
+        targets: i686-unknown-linux-musl
+    - name: Show rust version
+      run: rustc --version
+    - cargo test --target i686-unknown-linux-musl
+
   test-c-and-cxx-bindings:
     runs-on: ${{ matrix.os }}
     strategy:
