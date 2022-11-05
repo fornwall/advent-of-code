@@ -80,4 +80,8 @@ pub fn tests() {
     let real_input = include_str!("day03_input.txt");
     test_part_one!(real_input => 286);
     test_part_two!(real_input => 3_638_606_400);
+
+    let real_input = include_str!("day03_input_2.txt");
+    test_part_one!(real_input => 169);
+    test_part_two!(real_input => 7_560_370_818);
 }
