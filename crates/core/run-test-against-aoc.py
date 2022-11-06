@@ -26,7 +26,7 @@ if "AOC_YEAR" in os.environ:
     else:
         years = [int(years_string)]
 else:
-    years = [2015, 2016, 2017, 2018, 2019, 2020]
+    years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
 
 if "AOC_DAY" in os.environ:
     days_string = os.environ["AOC_DAY"]
