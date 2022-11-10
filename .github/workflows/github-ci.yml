@@ -41,6 +41,20 @@ jobs:
     - run: cargo test --target i686-unknown-linux-musl
       working-directory: crates/core
 
+  test-rust-wasi:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        targets: wasm32-wasi
+    - run: rustc --version
+    - uses: Homebrew/actions/setup-homebrew@master
+    - run: brew install wasmtime
+    - run: cargo install cargo-wasi
+    - run: cargo wasi test -- --nocapture
+      working-directory: crates/core
+
   test-c-and-cxx-bindings:
     runs-on: ${{ matrix.os }}
     strategy:
