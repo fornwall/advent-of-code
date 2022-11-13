@@ -393,7 +393,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download built wheels
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: wheels
         path: dist
@@ -459,7 +459,7 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
     - name: Download JNI libraries
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: jnilibs
         path: crates/java/java-src/src/main/resources/
@@ -518,11 +518,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Download new benchmark
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: new-benchmark
     - name: Download old benchmark
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: old-benchmark
     - uses: actions/setup-python@v4
@@ -565,12 +565,12 @@ jobs:
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
     - name: Download new gist-mapping.json
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: gist-mapping
         path: crates/wasm/site
     - name: Download new benchmark
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: new-benchmark
         path: crates/wasm/site/benchmark
@@ -668,7 +668,7 @@ jobs:
       run: cargo +nightly-2022-10-29 tarpaulin --verbose --timeout 720 --out Xml
       working-directory: crates/core
     - name: Upload to codecov.io
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
         directory: crates/core
 
