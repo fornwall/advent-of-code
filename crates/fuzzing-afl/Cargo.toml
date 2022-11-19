@@ -7,7 +7,7 @@ keywords = ["advent-of-code", "rust", "afl", "fuzzing"]
 license = "MIT"
 name = "advent-of-code-fuzzing-afl"
 repository = "https://github.com/fornwall/advent-of-code"
-rust-version = "1.64"
+rust-version = "1.65"
 version = "1.0.0"
 
 [dependencies]
