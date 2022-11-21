@@ -1,5 +1,6 @@
-use crate::input::Input;
 use std::collections::{HashMap, HashSet};
+
+use crate::input::Input;
 
 #[derive(Clone)]
 enum TrackPiece {
@@ -11,16 +12,14 @@ enum TrackPiece {
     BottomLeft,
     // ⌟
     BottomRight,
-    // |
-    Vertical,
     // +
     Intersection,
 }
 
 #[derive(Hash, Eq, PartialEq, Copy, Clone, Ord, PartialOrd)]
 struct Vector {
-    y: i32,
-    x: i32,
+    y: i16,
+    x: i16,
 }
 
 impl Vector {
@@ -42,12 +41,12 @@ impl Vector {
 
 struct Cart {
     direction: Vector,
-    turns: i32,
+    turns: u8,
     position: Vector,
 }
 
 impl Cart {
-    const fn new(position: Vector, direction_x: i32, direction_y: i32) -> Self {
+    const fn new(position: Vector, direction_x: i16, direction_y: i16) -> Self {
         Self {
             direction: Vector {
                 x: direction_x,
@@ -87,9 +86,6 @@ impl Cart {
                 };
                 self.turns = (self.turns + 1) % 3;
             }
-            _ => {
-                // Do nothing.
-            }
         }
     }
 }
@@ -104,65 +100,57 @@ impl Track {
     fn parse(input_string: &str) -> Result<Self, String> {
         let mut carts = Vec::new();
         let mut track = HashMap::new();
+        let mut verticals = HashSet::new();
         for (y, line) in input_string.lines().enumerate() {
-            for (x, c) in line.chars().enumerate() {
+            for (x, c) in line.as_bytes().iter().enumerate() {
                 let position = Vector {
-                    x: x as i32,
-                    y: y as i32,
+                    x: x as i16,
+                    y: y as i16,
                 };
                 match c {
-                    '^' => {
+                    b'^' => {
                         carts.push(Cart::new(position, 0, -1));
+                        verticals.insert(position);
                     }
-                    'v' => {
+                    b'v' => {
                         carts.push(Cart::new(position, 0, 1));
+                        verticals.insert(position);
                     }
-                    '<' => {
+                    b'<' => {
                         carts.push(Cart::new(position, -1, 0));
                     }
-                    '>' => {
+                    b'>' => {
                         carts.push(Cart::new(position, 1, 0));
                     }
-                    '+' => {
+                    b'+' => {
                         track.insert(position, TrackPiece::Intersection);
                     }
-                    '|' => {
-                        track.insert(position, TrackPiece::Vertical);
+                    b'|' => {
+                        verticals.insert(position);
                     }
-                    '/' => {
-                        if y == 0 {
-                            track.insert(position, TrackPiece::TopLeft);
+                    b'/' => {
+                        let piece = if verticals.contains(&Vector {
+                            x: position.x,
+                            y: position.y - 1,
+                        }) {
+                            TrackPiece::BottomRight
                         } else {
-                            track.insert(
-                                position,
-                                match track.get(&Vector {
-                                    x: position.x,
-                                    y: position.y - 1,
-                                }) {
-                                    Some(TrackPiece::Vertical) => TrackPiece::BottomRight,
-                                    _ => TrackPiece::TopLeft,
-                                },
-                            );
-                        }
+                            TrackPiece::TopLeft
+                        };
+                        track.insert(position, piece);
                     }
-                    '\\' => {
-                        track.insert(position, TrackPiece::Intersection);
-                        if y == 0 {
-                            track.insert(position, TrackPiece::TopRight);
+                    b'\\' => {
+                        let piece = if verticals.contains(&Vector {
+                            x: position.x,
+                            y: position.y - 1,
+                        }) {
+                            TrackPiece::BottomLeft
                         } else {
-                            track.insert(
-                                position,
-                                match track.get(&Vector {
-                                    x: position.x,
-                                    y: position.y - 1,
-                                }) {
-                                    Some(TrackPiece::Vertical) => TrackPiece::BottomLeft,
-                                    _ => TrackPiece::TopRight,
-                                },
-                            );
-                        }
+                            TrackPiece::TopRight
+                        };
+                        track.insert(position, piece);
                     }
-                    '-' | ' ' => {
+                    b'-' | b' ' => {
                         // Ignore
                     }
                     _ => {
