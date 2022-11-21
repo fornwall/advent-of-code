@@ -39,7 +39,7 @@ else ifneq ($(NIGHTLY),1)
 endif
 
 WASM_DIR = debug
-WASM_OPT = wasm-opt --all-features
+WASM_OPT = wasm-opt --all-features --disable-gc
 WASM_BINDGEN = wasm-bindgen --target web --weak-refs --reference-types
 WASM_TARGET_FEATURES = "+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext,+reference-types"
 ifeq ($(WASM_RELEASE),1)
@@ -77,11 +77,7 @@ site-wasm:
 site-pack: site-wasm
 	cd crates/wasm/site && \
 		rm -Rf dist && \
-		npm i && npm run webpack --mode=production && \
-		cd show && \
-		rm -Rf dist && \
-		sed '/<script/d' ./index.html > generated-index.html && \
-		npm i && npm run webpack --mode=production
+		npm i && npm run webpack -- --mode=production
 
 wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-wasm && \
@@ -147,10 +143,8 @@ deploy-site:
 		cd aoc.fornwall.net && \
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
-		mv ../site/show/dist/ show/ && \
-		cp ../site/show/*.mp4 ../site/show/*.svg show/ && \
-		cp -Rf ../site/api/ api/ && \
-		cp -Rf ../site/benchmark/ benchmark/ && \
+		mkdir show/ && \
+		cp -Rf ../site/show/ show/ && \
 		git add . && \
 		git commit -m "Update site: ${GITHUB_SHA}" && \
 		git push

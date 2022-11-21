@@ -14,7 +14,7 @@ export default function CanvasRecorder(
     const encoderConfig = {
       width: canvas.width,
       height: canvas.height,
-      fps: 3,
+      fps: 30,
     };
     console.log("encoderConfig", encoderConfig);
     this._encoder = MP4.createWebCodecsEncoder(encoderConfig);
