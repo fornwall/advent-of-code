@@ -57,6 +57,9 @@ impl SnailfishNumber {
                 }
                 c => {
                     if c.is_ascii_digit() {
+                        if depth == 0 {
+                            return Err("Found not nested number".to_string());
+                        }
                         elements.push(SnailfishElement {
                             depth,
                             value: c - b'0',
