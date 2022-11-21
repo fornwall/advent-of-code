@@ -152,7 +152,7 @@ jobs:
           CIBW_BEFORE_BUILD: "python3 -m pip install setuptools_rust"
         run: |
           python3 -m cibuildwheel --output-dir wheelhouse crates/python
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: ./wheelhouse/*.whl
@@ -178,7 +178,7 @@ jobs:
       env:
         GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
     - name: Upload new gist-mapping.json
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: gist-mapping
         path: crates/wasm/site/gist-mapping.json
@@ -439,7 +439,7 @@ jobs:
     - name: Test java
       working-directory: crates/java/java-src
       run: gradle test
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: jnilibs
         path: ./crates/java/java-src/src/main/resources/*
@@ -487,7 +487,7 @@ jobs:
       run: ./run-iai-benchmark.py > new-baseline.json
       working-directory: crates/core
     - name: Upload benchmark on current commit
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: new-benchmark
         path: crates/core/new-baseline.json
@@ -507,7 +507,7 @@ jobs:
       run: ./run-iai-benchmark.py > old-baseline.json
       working-directory: crates/core
     - name: Upload benchmark on previous commit
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: old-benchmark
         path: crates/core/old-baseline.json
@@ -612,7 +612,7 @@ jobs:
     - name: Fuzz with AFL
       run: LLVM_CONFIG=llvm-config-12 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
     - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: ./crates/fuzzing-afl/target/fuzz-findings/default/crashes
         name: fuzzing-crashes-afl
@@ -629,7 +629,7 @@ jobs:
       run: timeout 1800s make fuzz-libfuzzer
       continue-on-error: true
     - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: crates/fuzzing-libfuzzer/fuzz/artifacts/fuzz_target/
         name: fuzzing-crashes-libfuzzer
@@ -648,7 +648,7 @@ jobs:
       env:
         HFUZZ_RUN_ARGS: "-t 10 --exit_upon_crash"
     - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: crates/fuzzing-hfuzz/hfuzz_workspace/advent-of-code-fuzzing-hfuzz/*.fuzz
         name: fuzzing-crashes-honggfuzz
