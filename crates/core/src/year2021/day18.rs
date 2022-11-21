@@ -65,6 +65,9 @@ impl SnailfishNumber {
                 }
             }
         }
+        if elements.is_empty() {
+            return Err("No elements".to_string());
+        }
         Ok(Self { elements })
     }
 
