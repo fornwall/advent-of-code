@@ -145,6 +145,9 @@ deploy-site:
 		cp -Rf ../site/dist/* . && \
 		mkdir show/ && \
 		cp -Rf ../site/show/ show/ && \
+		cp -Rf ../site/api/ api/ && \
+		cp -Rf ../site/benchmark/ benchmark/ && \
+		touch robots.txt && \
 		git add . && \
 		git commit -m "Update site: ${GITHUB_SHA}" && \
 		git push
