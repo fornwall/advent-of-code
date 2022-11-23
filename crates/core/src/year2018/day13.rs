@@ -23,6 +23,10 @@ struct Vector {
 }
 
 impl Vector {
+    fn is_outside_course(&self) -> bool {
+        self.x < 0 || self.y < 0 || self.x > 1000 || self.y > 1000
+    }
+
     fn add(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
@@ -56,8 +60,10 @@ impl Cart {
             position,
         }
     }
-    fn advance(&mut self) {
+
+    fn advance(&mut self) -> bool {
         self.position.add(self.direction);
+        self.position.is_outside_course()
     }
 
     fn on_enter(&mut self, piece: &TrackPiece) {
@@ -93,10 +99,11 @@ impl Cart {
 struct Track {
     track: HashMap<Vector, TrackPiece>,
     carts: Vec<Cart>,
-    cart_positions: HashSet<Vector>,
 }
 
 impl Track {
+    const MAX_TICKS: u32 = 100_000;
+
     fn parse(input_string: &str) -> Result<Self, String> {
         let mut carts = Vec::new();
         let mut track = HashMap::new();
@@ -157,64 +164,67 @@ impl Track {
                         return Err(format!("Invalid char: {}", c));
                     }
                 }
+
+                if carts.len() > 32 {
+                    return Err("Too many carts".to_string());
+                }
             }
         }
-        Ok(Self {
-            track,
-            carts,
-            cart_positions: HashSet::new(),
-        })
+        Ok(Self { track, carts })
     }
 
-    fn find_position(&mut self, part1: bool) -> Vector {
-        loop {
+    fn find_position(&mut self, part1: bool) -> Result<Vector, String> {
+        for _ in  0..Self::MAX_TICKS {
             self.carts.sort_by(|a, b| a.position.cmp(&b.position));
 
-            let mut removed_positions = HashSet::new();
-            for cart in self.carts.iter_mut() {
-                if removed_positions.contains(&cart.position) {
-                    continue;
+            let mut cart_idx = 0;
+            'outer: while cart_idx < self.carts.len() {
+                if self.carts[cart_idx].advance() {
+                    return Err("Cart ends up outside track".to_string());
                 }
 
-                self.cart_positions.remove(&cart.position);
-
-                cart.advance();
-
-                if self.cart_positions.remove(&cart.position) {
-                    if part1 {
-                        return cart.position;
+                for other_cart_idx in 0..self.carts.len() {
+                    if cart_idx == other_cart_idx {
+                        continue;
                     }
-                    removed_positions.insert(cart.position);
-                    continue;
-                } else {
-                    self.cart_positions.insert(cart.position);
-                };
-
-                if let Some(piece) = self.track.get(&cart.position) {
-                    cart.on_enter(piece);
+                    if self.carts[cart_idx].position == self.carts[other_cart_idx].position {
+                        if part1 {
+                            return Ok(self.carts[cart_idx].position);
+                        }
+                        self.carts.remove(std::cmp::max(cart_idx, other_cart_idx));
+                        self.carts.remove(std::cmp::min(cart_idx, other_cart_idx));
+                        if other_cart_idx < cart_idx {
+                            cart_idx -= 1;
+                        }
+                        continue 'outer;
+                    }
                 }
+
+                if let Some(piece) = self.track.get(&self.carts[cart_idx].position) {
+                    self.carts[cart_idx].on_enter(piece);
+                }
+
+                cart_idx += 1;
             }
 
-            if !removed_positions.is_empty() {
-                self.carts
-                    .retain(|cart| !removed_positions.contains(&cart.position));
-                if self.carts.len() == 1 {
-                    return self.carts[0].position;
-                }
+            if self.carts.len() == 1 {
+                return Ok(self.carts[0].position);
             }
         }
+
+        Err(format!("No solution found in {} ticks", Self::MAX_TICKS))
     }
 }
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut track = Track::parse(input.text)?;
-    let position = track.find_position(input.is_part_one());
+    let position = track.find_position(input.is_part_one())?;
     Ok(format!("{},{}", position.x, position.y))
 }
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two, test_part_one_error};
 
     test_part_one!(
             "|
@@ -251,4 +261,11 @@ v
         input => "65,73".into());
     test_part_two!(
         input => "54,66".into());
+
+    test_part_one_error!(
+            "|
+^
+v
+|"
+        => "Cart ends up outside track");
 }
