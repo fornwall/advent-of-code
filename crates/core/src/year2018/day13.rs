@@ -166,27 +166,7 @@ impl Track {
         })
     }
 
-    fn find_crash(&mut self) -> Vector {
-        loop {
-            self.carts.sort_by(|a, b| a.position.cmp(&b.position));
-
-            for cart in self.carts.iter_mut() {
-                self.cart_positions.remove(&cart.position);
-
-                cart.advance();
-
-                if !self.cart_positions.insert(cart.position) {
-                    return cart.position;
-                }
-
-                if let Some(piece) = self.track.get(&cart.position) {
-                    cart.on_enter(piece);
-                }
-            }
-        }
-    }
-
-    fn find_remaining(&mut self) -> Vector {
+    fn find_position(&mut self, part1: bool) -> Vector {
         loop {
             self.carts.sort_by(|a, b| a.position.cmp(&b.position));
 
@@ -201,6 +181,9 @@ impl Track {
                 cart.advance();
 
                 if self.cart_positions.remove(&cart.position) {
+                    if part1 {
+                        return cart.position;
+                    }
                     removed_positions.insert(cart.position);
                     continue;
                 } else {
@@ -225,11 +208,7 @@ impl Track {
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
     let mut track = Track::parse(input.text)?;
-    let position = if input.is_part_one() {
-        track.find_crash()
-    } else {
-        track.find_remaining()
-    };
+    let position = track.find_position(input.is_part_one());
     Ok(format!("{},{}", position.x, position.y))
 }
 
