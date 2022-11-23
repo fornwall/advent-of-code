@@ -23,7 +23,7 @@ struct Vector {
 }
 
 impl Vector {
-    fn is_outside_course(&self) -> bool {
+    const fn is_outside_track(self) -> bool {
         self.x < 0 || self.y < 0 || self.x > 1000 || self.y > 1000
     }
 
@@ -63,7 +63,7 @@ impl Cart {
 
     fn advance(&mut self) -> bool {
         self.position.add(self.direction);
-        self.position.is_outside_course()
+        self.position.is_outside_track()
     }
 
     fn on_enter(&mut self, piece: &TrackPiece) {
@@ -174,7 +174,7 @@ impl Track {
     }
 
     fn find_position(&mut self, part1: bool) -> Result<Vector, String> {
-        for _ in  0..Self::MAX_TICKS {
+        for _ in 0..Self::MAX_TICKS {
             self.carts.sort_by(|a, b| a.position.cmp(&b.position));
 
             let mut cart_idx = 0;
@@ -224,7 +224,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two, test_part_one_error};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two};
 
     test_part_one!(
             "|
