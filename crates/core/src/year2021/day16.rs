@@ -182,6 +182,11 @@ impl Packet {
                 LengthOrValue::TotalBitLength(value) => {
                     let consumed_bit_length =
                         transmission.bit_offset - bit_offset_at_start_of_sub_packets;
+                    if consumed_bit_length > usize::from(u16::MAX)
+                        || consumed_bit_length as u16 > value
+                    {
+                        return None;
+                    }
                     LengthOrValue::TotalBitLength(value - consumed_bit_length as u16)
                 }
                 _ => {
