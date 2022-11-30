@@ -2059,6 +2059,300 @@ fn problem_2021_25_1() {
     solve(2021, 25, 1, &input).unwrap();
 }
 
+fn problem_2022_1_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day01_input.txt").unwrap();
+    solve(2022, 1, 1, &input).unwrap();
+}
+
+fn problem_2022_1_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day01_input.txt").unwrap();
+    solve(2022, 1, 2, &input).unwrap();
+}
+
+fn problem_2022_2_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day02_input.txt").unwrap();
+    solve(2022, 2, 1, &input).unwrap();
+}
+
+fn problem_2022_2_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day02_input.txt").unwrap();
+    solve(2022, 2, 2, &input).unwrap();
+}
+
+fn problem_2022_3_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day03_input.txt").unwrap();
+    solve(2022, 3, 1, &input).unwrap();
+}
+
+fn problem_2022_3_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day03_input.txt").unwrap();
+    solve(2022, 3, 2, &input).unwrap();
+}
+
+fn problem_2022_4_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day04_input.txt").unwrap();
+    solve(2022, 4, 1, &input).unwrap();
+}
+
+fn problem_2022_4_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day04_input.txt").unwrap();
+    solve(2022, 4, 2, &input).unwrap();
+}
+
+fn problem_2022_5_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day05_input.txt").unwrap();
+    solve(2022, 5, 1, &input).unwrap();
+}
+
+fn problem_2022_5_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day05_input.txt").unwrap();
+    solve(2022, 5, 2, &input).unwrap();
+}
+
+fn problem_2022_6_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day06_input.txt").unwrap();
+    solve(2022, 6, 1, &input).unwrap();
+}
+
+fn problem_2022_6_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day06_input.txt").unwrap();
+    solve(2022, 6, 2, &input).unwrap();
+}
+
+fn problem_2022_7_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day07_input.txt").unwrap();
+    solve(2022, 7, 1, &input).unwrap();
+}
+
+fn problem_2022_7_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day07_input.txt").unwrap();
+    solve(2022, 7, 2, &input).unwrap();
+}
+
+fn problem_2022_8_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day08_input.txt").unwrap();
+    solve(2022, 8, 1, &input).unwrap();
+}
+
+fn problem_2022_8_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day08_input.txt").unwrap();
+    solve(2022, 8, 2, &input).unwrap();
+}
+
+fn problem_2022_9_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day09_input.txt").unwrap();
+    solve(2022, 9, 1, &input).unwrap();
+}
+
+fn problem_2022_9_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day09_input.txt").unwrap();
+    solve(2022, 9, 2, &input).unwrap();
+}
+
+fn problem_2022_10_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day10_input.txt").unwrap();
+    solve(2022, 10, 1, &input).unwrap();
+}
+
+fn problem_2022_10_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day10_input.txt").unwrap();
+    solve(2022, 10, 2, &input).unwrap();
+}
+
+fn problem_2022_11_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day11_input.txt").unwrap();
+    solve(2022, 11, 1, &input).unwrap();
+}
+
+fn problem_2022_11_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day11_input.txt").unwrap();
+    solve(2022, 11, 2, &input).unwrap();
+}
+
+fn problem_2022_12_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day12_input.txt").unwrap();
+    solve(2022, 12, 1, &input).unwrap();
+}
+
+fn problem_2022_12_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day12_input.txt").unwrap();
+    solve(2022, 12, 2, &input).unwrap();
+}
+
+fn problem_2022_13_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day13_input.txt").unwrap();
+    solve(2022, 13, 1, &input).unwrap();
+}
+
+fn problem_2022_13_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day13_input.txt").unwrap();
+    solve(2022, 13, 2, &input).unwrap();
+}
+
+fn problem_2022_14_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day14_input.txt").unwrap();
+    solve(2022, 14, 1, &input).unwrap();
+}
+
+fn problem_2022_14_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day14_input.txt").unwrap();
+    solve(2022, 14, 2, &input).unwrap();
+}
+
+fn problem_2022_15_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day15_input.txt").unwrap();
+    solve(2022, 15, 1, &input).unwrap();
+}
+
+fn problem_2022_15_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day15_input.txt").unwrap();
+    solve(2022, 15, 2, &input).unwrap();
+}
+
+fn problem_2022_16_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day16_input.txt").unwrap();
+    solve(2022, 16, 1, &input).unwrap();
+}
+
+fn problem_2022_16_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day16_input.txt").unwrap();
+    solve(2022, 16, 2, &input).unwrap();
+}
+
+fn problem_2022_17_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day17_input.txt").unwrap();
+    solve(2022, 17, 1, &input).unwrap();
+}
+
+fn problem_2022_17_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day17_input.txt").unwrap();
+    solve(2022, 17, 2, &input).unwrap();
+}
+
+fn problem_2022_18_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day18_input.txt").unwrap();
+    solve(2022, 18, 1, &input).unwrap();
+}
+
+fn problem_2022_18_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day18_input.txt").unwrap();
+    solve(2022, 18, 2, &input).unwrap();
+}
+
+fn problem_2022_19_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day19_input.txt").unwrap();
+    solve(2022, 19, 1, &input).unwrap();
+}
+
+fn problem_2022_19_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day19_input.txt").unwrap();
+    solve(2022, 19, 2, &input).unwrap();
+}
+
+fn problem_2022_20_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day20_input.txt").unwrap();
+    solve(2022, 20, 1, &input).unwrap();
+}
+
+fn problem_2022_20_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day20_input.txt").unwrap();
+    solve(2022, 20, 2, &input).unwrap();
+}
+
+fn problem_2022_21_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day21_input.txt").unwrap();
+    solve(2022, 21, 1, &input).unwrap();
+}
+
+fn problem_2022_21_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day21_input.txt").unwrap();
+    solve(2022, 21, 2, &input).unwrap();
+}
+
+fn problem_2022_22_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day22_input.txt").unwrap();
+    solve(2022, 22, 1, &input).unwrap();
+}
+
+fn problem_2022_22_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day22_input.txt").unwrap();
+    solve(2022, 22, 2, &input).unwrap();
+}
+
+fn problem_2022_23_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day23_input.txt").unwrap();
+    solve(2022, 23, 1, &input).unwrap();
+}
+
+fn problem_2022_23_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day23_input.txt").unwrap();
+    solve(2022, 23, 2, &input).unwrap();
+}
+
+fn problem_2022_24_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day24_input.txt").unwrap();
+    solve(2022, 24, 1, &input).unwrap();
+}
+
+fn problem_2022_24_2() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day24_input.txt").unwrap();
+    solve(2022, 24, 2, &input).unwrap();
+}
+
+fn problem_2022_25_1() {
+    #![allow(clippy::unwrap_used)]
+    let input = read_to_string("src/year2022/day25_input.txt").unwrap();
+    solve(2022, 25, 1, &input).unwrap();
+}
+
 iai::main!(
     problem_2015_1_1,
     problem_2015_1_2,
@@ -2402,5 +2696,54 @@ iai::main!(
     problem_2021_23_2,
     problem_2021_24_1,
     problem_2021_24_2,
-    problem_2021_25_1
+    problem_2021_25_1,
+    problem_2022_1_1,
+    problem_2022_1_2,
+    problem_2022_2_1,
+    problem_2022_2_2,
+    problem_2022_3_1,
+    problem_2022_3_2,
+    problem_2022_4_1,
+    problem_2022_4_2,
+    problem_2022_5_1,
+    problem_2022_5_2,
+    problem_2022_6_1,
+    problem_2022_6_2,
+    problem_2022_7_1,
+    problem_2022_7_2,
+    problem_2022_8_1,
+    problem_2022_8_2,
+    problem_2022_9_1,
+    problem_2022_9_2,
+    problem_2022_10_1,
+    problem_2022_10_2,
+    problem_2022_11_1,
+    problem_2022_11_2,
+    problem_2022_12_1,
+    problem_2022_12_2,
+    problem_2022_13_1,
+    problem_2022_13_2,
+    problem_2022_14_1,
+    problem_2022_14_2,
+    problem_2022_15_1,
+    problem_2022_15_2,
+    problem_2022_16_1,
+    problem_2022_16_2,
+    problem_2022_17_1,
+    problem_2022_17_2,
+    problem_2022_18_1,
+    problem_2022_18_2,
+    problem_2022_19_1,
+    problem_2022_19_2,
+    problem_2022_20_1,
+    problem_2022_20_2,
+    problem_2022_21_1,
+    problem_2022_21_2,
+    problem_2022_22_1,
+    problem_2022_22_2,
+    problem_2022_23_1,
+    problem_2022_23_2,
+    problem_2022_24_1,
+    problem_2022_24_2,
+    problem_2022_25_1
 );

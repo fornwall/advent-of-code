@@ -4,7 +4,7 @@ use std::fs::read_to_string;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     #![allow(clippy::unwrap_used)]
-    for year in 2015..=2021 {
+    for year in 2015..=2022 {
         let start_day = 1;
         let end_day = 25;
         for day in start_day..=end_day {
