@@ -143,7 +143,6 @@ deploy-site:
 		cd aoc.fornwall.net && \
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
-		mkdir show/ && \
 		cp -Rf ../site/show/ show/ && \
 		cp -Rf ../site/api/ api/ && \
 		cp -Rf ../site/benchmark/ benchmark/ && \
