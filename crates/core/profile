@@ -2,52 +2,28 @@
 set -e -u
 
 usage() {
-    echo "Usage: ./$0 <tool> <repeat> <year> <day> <part>"
-    echo "        where tool=perf|operf"
+    echo "Usage: ./$0 <year> <day> <part>"
     exit 1
 }
 
-if [ $# != 5 ]; then
+if [ $# != 3 ]; then
     usage
 fi
 
-PROFILING_TOOL=$1
-export AOC_REPEAT=$2
-AOC_YEAR=$3
-AOC_DAY=$4
-AOC_PART=$5
+export AOC_REPEAT=100000000
+AOC_YEAR=$1
+AOC_DAY=$2
+AOC_PART=$3
 
-if [ $PROFILING_TOOL = perf ]; then
-  PROFILING_RUN_COMMAND="perf record --call-graph dwarf --delay 10"
-  # This outputs a perf.data file.
+echo "Profiling $AOC_YEAR-$AOC_DAY-$AOC_PART"
 
-  # To convert perf.data to a format that https://profiler.firefox.com/can understand:
-  #   perf script -F +pid > perf.txt
-  # Note that this text files needs to be in a zip file to make share by url work.
-  profile_analyse() {
-    echo "Analyse with:"
-    echo perf report -g srcline --hierarchy
-  }
+CARGO_PROFILE_RELEASE_DEBUG=true RUSTFLAGS='-g' cargo build --profile=release-quickbuild --bins
 
-  # To convert perf.data to a flamegraph.svg:
-  #   flamegraph --perfdata perf.data
-elif [ $PROFILING_TOOL = operf ]; then
-  PROFILING_RUN_COMMAND="operf"
-  profile_analyse() {
-    opannotate --source | vim -
-  }
-else
-  echo "Invalid tool '$PROFILING_TOOL'"
-  usage
-fi
-
-echo "Profiling $AOC_YEAR-$AOC_DAY-$AOC_PART $AOC_REPEAT times using $PROFILING_TOOL"
-
-CARGO_PROFILE_RELEASE_DEBUG=true RUSTFLAGS='-g' cargo build --quiet --release --bins
-
-time $PROFILING_RUN_COMMAND \
-  ../../target/release/advent-of-code \
-    $AOC_YEAR $AOC_DAY $AOC_PART \
-      < src/year${AOC_YEAR}/day`printf "%02d" ${AOC_DAY}`_input.txt
-
-profile_analyse
+set +e
+echo "Collecting perf.data..."
+timeout 5s \
+    perf record --call-graph dwarf --delay 10 \
+      ../../target/release/advent-of-code \
+        $AOC_YEAR $AOC_DAY $AOC_PART \
+          < src/year${AOC_YEAR}/day`printf "%02d" ${AOC_DAY}`_input.txt
+set -e

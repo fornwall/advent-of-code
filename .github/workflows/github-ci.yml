@@ -535,11 +535,11 @@ jobs:
         body="${body//'%'/'%25'}"
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}"
-        echo "COMMIT_COMMENT=$body" >> $GITHUB_OUTPUT
+        echo "COMMIT_COMMENT=$body" > commit-comment.txt
     - name: Post commit comment
       uses: peter-evans/commit-comment@v1
       with:
-        body: ${{ steps.get-comment-body.outputs.COMMIT_COMMENT }}
+        body: commit-comment.txt
     - run: ls -lha .github/workflows/
 
   deploy-site:
