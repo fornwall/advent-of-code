@@ -532,15 +532,14 @@ jobs:
       id: get-comment-body
       run: |
         body=$(./.github/workflows/compare-iai.py old-baseline.json new-baseline.json)
-        body="${body//'%'/'%25'}"
-        body="${body//$'\n'/'%0A'}"
-        body="${body//$'\r'/'%0D'}"
-        echo "COMMIT_COMMENT=$body" > commit-comment.txt
+        delimiter="$(openssl rand -hex 8)"
+        echo "body<<$delimiter" >> $GITHUB_OUTPUT
+        echo "$body" >> $GITHUB_OUTPUT
+        echo "$delimiter" >> $GITHUB_OUTPUT
     - name: Post commit comment
-      uses: peter-evans/commit-comment@v1
+      uses: peter-evans/commit-comment@v2
       with:
-        body: commit-comment.txt
-    - run: ls -lha .github/workflows/
+        body: ${{ steps.get-comment-body.outputs.COMMIT_COMMENT }}
 
   deploy-site:
     needs: [bump-version, benchmark-current]
