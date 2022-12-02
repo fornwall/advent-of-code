@@ -489,10 +489,10 @@ jobs:
     - name: Checkout current commit
       uses: actions/checkout@v3
       if: matrix.tested-commit == 'new' || github.event_name != 'pull_request'
-    - name: Checkout head_ref
+    - name: Checkout base branch (${{ github.base_ref }} of pull request
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.head_ref }}
+        ref: ${{ github.base_ref }}
       if: matrix.tested-commit == 'old' && github.event_name == 'pull_request'
     - name: Checkout previous commit
       run: git checkout HEAD~1
