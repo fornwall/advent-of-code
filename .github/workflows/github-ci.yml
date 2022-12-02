@@ -476,44 +476,27 @@ jobs:
           publishToSonatype \
           closeAndReleaseSonatypeStagingRepository
 
-  benchmark-current:
+  benchmark:
+    strategy:
+      matrix:
+        tested-commit: [new, old]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install valgrind
-    - name: Run benchmark on current commit
-      run: ./run-iai-benchmark.py > new-baseline.json
+    - name: Run benchmark on ${{ matrix.tested-commit} commit
+      run: ./run-iai-benchmark.py > ${{ matrix.tested-commit }}-baseline.json
       working-directory: crates/core
     - name: Upload benchmark on current commit
       uses: actions/upload-artifact@v3
       with:
-        name: new-benchmark
-        path: crates/core/new-baseline.json
-
-  benchmark-previous:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: Homebrew/actions/setup-homebrew@master
-    - run: brew install valgrind
-    - name: Checkout previous commit
-      run: git checkout HEAD~1
-    - name: Run benchmark on previous commit
-      run: ./run-iai-benchmark.py > old-baseline.json
-      working-directory: crates/core
-    - name: Upload benchmark on previous commit
-      uses: actions/upload-artifact@v3
-      with:
-        name: old-benchmark
-        path: crates/core/old-baseline.json
+        name: ${{ matrix.tested-commit }}-benchmark
+        path: crates/core/${{ matrix.tested-commit }}-baseline.json
 
   compare-benchmarks:
-    needs: [benchmark-current, benchmark-previous]
+    needs: [benchmark]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -542,7 +525,7 @@ jobs:
         body: ${{ steps.get-comment-body.outputs.COMMIT_COMMENT }}
 
   deploy-site:
-    needs: [bump-version, benchmark-current]
+    needs: [bump-version, benchmark]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
