@@ -1,4 +1,5 @@
 #![allow(clippy::redundant_pub_crate)]
+#![allow(unused)]
 #[cfg(all(feature = "visualization", test))]
 use crate::painter::MockPainter;
 #[cfg(feature = "visualization")]
