@@ -486,6 +486,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install valgrind
+    - run: git checkout ${{ github.event.pull_request.head.sha }}
+      if: ${{ matrix.tested-commit }} == old
     - name: Run benchmark on ${{ matrix.tested-commit} commit
       run: ./run-iai-benchmark.py > ${{ matrix.tested-commit }}-baseline.json
       working-directory: crates/core
