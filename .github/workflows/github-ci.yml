@@ -526,7 +526,7 @@ jobs:
     - name: Post commit comment
       uses: peter-evans/commit-comment@v2
       with:
-        body: ${{ steps.get-comment-body.outputs.COMMIT_COMMENT }}
+        body: ${{ steps.get-comment-body.outputs.body }}
 
   deploy-site:
     needs: [bump-version, benchmark]
