@@ -16,6 +16,11 @@ lto = true
 panic = 'abort'
 codegen-units = 1
 
+[profile.release-quickbuild]
+inherits = "release"
+lto = false
+panic = 'abort'
+
 [profile.bench]
 lto = true
 codegen-units = 1
