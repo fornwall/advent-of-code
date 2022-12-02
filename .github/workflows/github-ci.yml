@@ -488,6 +488,8 @@ jobs:
     steps:
     - name: Checkout current commit
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
       if: matrix.tested-commit == 'new' || github.event_name != 'pull_request'
     - name: Checkout base branch (${{ github.base_ref }} of pull request
       uses: actions/checkout@v3
