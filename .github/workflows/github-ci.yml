@@ -488,12 +488,12 @@ jobs:
     steps:
     - name: Checkout current commit
       uses: actions/checkout@v3
-      if: matrix.tested-commit == 'new' || ${{ github.event_name != 'pull_request' }}
+      if: matrix.tested-commit == 'new' || github.event_name != 'pull_request'
     - name: Checkout head_ref
       uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
-      if: matrix.tested-commit == 'old' && ${{ github.event_name == 'pull_request' }}
+      if: matrix.tested-commit == 'old' && github.event_name == 'pull_request'
     - name: Checkout previous commit
       run: git checkout HEAD~1
       if: matrix.tested-commit == 'old' && github.ref == 'refs/heads/master'
