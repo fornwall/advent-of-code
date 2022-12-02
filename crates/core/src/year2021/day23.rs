@@ -10,9 +10,9 @@ use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     (if input.is_part_one() {
-        SearchState::<2>::parse(input.text).least_total_energy_to_organize()
+        SearchState::<2>::parse(input.text)?.least_total_energy_to_organize()
     } else {
-        SearchState::<4>::parse(input.text).least_total_energy_to_organize()
+        SearchState::<4>::parse(input.text)?.least_total_energy_to_organize()
     })
     .ok_or_else(|| "No solution found".to_string())
 }
@@ -44,11 +44,17 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     /// First a bit if occupied, then amphipod (if occupied)
     pub const BITS_PER_HALLWAY: usize = 3;
 
-    fn parse(text: &str) -> Self {
+    fn parse(text: &str) -> Result<Self, String> {
         let mut result = Self { storage: 0 };
         let mut amphipod_count = 0;
+        let mut per_type_count = [0_u32; 4];
         for b in text.bytes().filter(|b| b'A' <= *b && *b <= b'D').rev() {
-            result.push_to_room(3 - amphipod_count % 4, Amphipod::from_idx(b - b'A'));
+            let amphipod_idx = b - b'A';
+            per_type_count[usize::from(amphipod_idx)] += 1;
+            if per_type_count[usize::from(amphipod_idx)] > 2 {
+                return Err(format!("Too many amphipods of type {}", char::from(b)));
+            }
+            result.push_to_room(3 - amphipod_count % 4, Amphipod::from_idx(amphipod_idx));
             amphipod_count += 1;
             if SIDE_ROOM_SIZE == 4 && amphipod_count == 4 {
                 for b in [b'D', b'C', b'B', b'A', b'D', b'B', b'A', b'C']
@@ -60,7 +66,10 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
                 }
             }
         }
-        result
+        if per_type_count != [2, 2, 2, 2] {
+            return Err("Not 2 of each amphipod type".to_string());
+        }
+        Ok(result)
     }
 
     fn get_at_hallway(self, hallway_idx: usize) -> Option<Amphipod> {

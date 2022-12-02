@@ -30,8 +30,8 @@ impl Graph {
                 return Err("Not all lines have equal length".to_string());
             }
             for (x, byte) in line.bytes().enumerate() {
-                if !byte.is_ascii_digit() {
-                    return Err("Non ASCII digit in input".to_string());
+                if !byte.is_ascii_digit() || byte == b'0' {
+                    return Err("Non [1-9] character in input".to_string());
                 }
                 let risk_level = byte - b'0';
                 for mx in 0..multiplier {
