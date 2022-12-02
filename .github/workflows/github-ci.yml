@@ -1,6 +1,10 @@
 name: Github CI
 
-on: push
+on:
+  push:
+    branches:
+      - 'master'
+  on: pull_request
 
 jobs:
   test-rust:
@@ -482,14 +486,20 @@ jobs:
         tested-commit: [new, old]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout current commit
+      uses: actions/checkout@v3
+      if: matrix.tested-commit == 'new' || ${{ github.event_name != 'pull_request' }}
+    - name: Checkout head_ref
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+      if: matrix.tested-commit == 'old' && ${{ github.event_name == 'pull_request' }}
+    - name: Checkout previous commit
+      run: git checkout HEAD~1
+      if: matrix.tested-commit == 'old' && github.ref == 'refs/heads/master'
     - uses: dtolnay/rust-toolchain@stable
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install valgrind
-    - run: git checkout ${{ github.head_ref }}
-      if: matrix.tested-commit == 'old'
-    - run: git checkout HEAD~1
-      if: matrix.tested-commit == 'old' && github.ref == 'refs/heads/master'
     - name: Run benchmark on ${{ matrix.tested-commit }} commit
       run: ./run-iai-benchmark.py > ${{ matrix.tested-commit }}-baseline.json
       working-directory: crates/core
