@@ -5,6 +5,8 @@
 # Advent of Code solutions
 Solutions to [Advent of Code](https://adventofcode.com/) problems in Rust.
 
+Just a test line.
+
 ## Running locally
 The command line tool takes `<year> <day> <part>` as arguments and reads the problem input from stdin:
 
