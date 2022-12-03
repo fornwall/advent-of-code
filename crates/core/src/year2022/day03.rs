@@ -1,38 +1,46 @@
 use crate::input::Input;
+use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
-    let lines = input.text.lines();
     Ok(if input.is_part_one() {
-        lines
-            .map(|line| item_priority(common(line.split_at(line.len() / 2))))
+        input
+            .text
+            .lines()
+            .map(|line| {
+                HashSet::<u8>::from_iter((line[0..line.len() / 2]).bytes())
+                    .intersection(&HashSet::from_iter((line[line.len() / 2..]).bytes()))
+                    .copied()
+                    .map(item_priority)
+                    .sum::<u32>()
+            })
             .sum()
     } else {
-        lines
+        input
+            .text
+            .lines()
             .collect::<Vec<_>>()
-            .chunks_exact(3)
-            .map(|group| item_priority(common_three(group[0], group[1], group[2])))
+            .chunks(3)
+            .map(|group| {
+                HashSet::<u8>::from_iter(group[0].bytes())
+                    .intersection(&HashSet::from_iter(group[1].bytes()))
+                    .copied()
+                    .collect::<HashSet<_>>()
+                    .intersection(&HashSet::from_iter(group[2].bytes()))
+                    .copied()
+                    .map(item_priority)
+                    .sum::<u32>()
+            })
             .sum()
     })
 }
 
-fn common(pair: (&str, &str)) -> u8 {
-    pair.0
-        .bytes()
-        .find(|d| pair.1.as_bytes().contains(d))
-        .unwrap_or_default()
-}
-
-fn common_three(a: &str, b: &str, c: &str) -> u8 {
-    a.bytes()
-        .find(|d| b.as_bytes().contains(d) && c.as_bytes().contains(d))
-        .unwrap_or_default()
-}
-
 fn item_priority(b: u8) -> u32 {
-    u32::from(match b {
-        b'a'..=b'z' => b - b'a' + 1,
-        b'A'..=b'Z' => b - b'A' + 27,
-        _ => 0,
+    u32::from(if b.is_ascii_lowercase() {
+        b - b'a' + 1
+    } else if b.is_ascii_uppercase() {
+        b - b'A' + 27
+    } else {
+        0
     })
 }
 
