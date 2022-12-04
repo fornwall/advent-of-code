@@ -163,7 +163,7 @@ jobs:
 
   bump-version:
     needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings, build-jni-libraries, build-python-wheels]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master-foo'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -447,6 +447,57 @@ jobs:
       with:
         name: jnilibs
         path: ./crates/java/java-src/src/main/resources/*
+
+  build-and-upload-linux-brew-binaries:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo install cross
+    - name: Install aarch64 strip
+      run: sudo apt-get -y install binutils-aarch64-linux-gnu
+    - run: |
+        cross build --release --target aarch64-unknown-linux-musl
+        cross build --release --target x86_64-unknown-linux-musl
+        strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code
+        aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code
+      working-directory: crates/core
+    - name: Upload Linux x86_64 binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-x86_64-binary
+        path: target/x86_64-unknown-linux-musl/release/advent-of-code
+    - name: Upload Linux aarch64 binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-aarch64-binary
+        path: target/aarch64-unknown-linux-musl/release/advent-of-code
+
+  build-and-upload-mac-brew-binaries:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - run: rustup target add aarch64-apple-darwin
+    - run: |
+        cargo build --release
+        SDKROOT=`xcrun -sdk $MACOS_SDK --show-sdk-path` MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $MACOS_SDK --show-sdk-platform-version) cargo build --release --target=aarch64-apple-darwin
+        strip ../../target/release/advent-of-code
+        strip ../../target/aarch64-apple-darwin/release/advent-of-code
+      working-directory: crates/core
+    - name: Upload mac x86_64 binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-x86_64-binary
+        path: target/release/advent-of-code
+    - name: Upload mac aarch64 binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-aarch64-binary
+        path: target/aarch64-apple-darwin/release/advent-of-code
 
   publish-to-maven-central:
     needs: [bump-version]
