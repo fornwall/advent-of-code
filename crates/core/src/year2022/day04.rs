@@ -20,14 +20,18 @@ const fn overlaps(a: (u8, u8), b: (u8, u8)) -> bool {
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     let condition: fn((u8, u8), (u8, u8)) -> bool = input.part_values(contains, overlaps);
-    let mut count = 0;
 
-    for (line_idx, line) in input.text.lines().enumerate() {
-        let intervals = parse_intervals(line)
-            .ok_or_else(|| format!("Line {}: Invalid input - expected 'u8-u8,u8-u8'", line_idx))?;
-        count += usize::from(condition(intervals.0, intervals.1));
-    }
-    Ok(count)
+    input
+        .text
+        .lines()
+        .enumerate()
+        .map(|(line_idx, line)| {
+            let intervals = parse_intervals(line).ok_or_else(|| {
+                format!("Line {}: Invalid input - expected 'u8-u8,u8-u8'", line_idx)
+            })?;
+            Ok(usize::from(condition(intervals.0, intervals.1)))
+        })
+        .sum()
 }
 
 #[test]
