@@ -163,7 +163,7 @@ jobs:
 
   bump-version:
     needs: [test-rust, test-python, test-wasm, test-c-and-cxx-bindings, build-jni-libraries, build-python-wheels]
-    if: github.ref == 'refs/heads/master-foo'
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -461,17 +461,19 @@ jobs:
         cross build --release --target x86_64-unknown-linux-musl
         strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code
         aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code
+        cd ../../target/x86_64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-x86_64.tar.xz advent-of-code && mv *.tar.xz ../../../
+        cd ../../target/aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code && mv *.tar.xz ../../../
       working-directory: crates/core
     - name: Upload Linux x86_64 binary
       uses: actions/upload-artifact@v3
       with:
         name: linux-x86_64-binary
-        path: target/x86_64-unknown-linux-musl/release/advent-of-code
+        path: advent-of-code-linux-x86_64.tar.xz
     - name: Upload Linux aarch64 binary
       uses: actions/upload-artifact@v3
       with:
         name: linux-aarch64-binary
-        path: target/aarch64-unknown-linux-musl/release/advent-of-code
+        path: advent-of-code-linux-aarch64.tar.xz
 
   build-and-upload-mac-brew-binaries:
     runs-on: macos-latest
@@ -487,17 +489,19 @@ jobs:
         SDKROOT=`xcrun -sdk $MACOS_SDK --show-sdk-path` MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $MACOS_SDK --show-sdk-platform-version) cargo build --release --target=aarch64-apple-darwin
         strip ../../target/release/advent-of-code
         strip ../../target/aarch64-apple-darwin/release/advent-of-code
+        cd ../../target/release && tar cfJ advent-of-code-mac-x86_64.tar.xz advent-of-code && mv advent-of-code-mac-x86_64.tar.xz ../../
+        cd ../../target/aarch64-apple-darwin/release && tar cfJ advent-of-code-mac-aarch64.tar.xz advent-of-code && mv advent-of-code-mac-aarch64.tar.xz ../../../
       working-directory: crates/core
     - name: Upload mac x86_64 binary
       uses: actions/upload-artifact@v3
       with:
         name: mac-x86_64-binary
-        path: target/release/advent-of-code
+        path: advent-of-code-mac-x86_64.tar.xz
     - name: Upload mac aarch64 binary
       uses: actions/upload-artifact@v3
       with:
-        name: linux-aarch64-binary
-        path: target/aarch64-apple-darwin/release/advent-of-code
+        name: mac-aarch64-binary
+        path: advent-of-code-mac-aarch64.tar.xz
 
   publish-to-maven-central:
     needs: [bump-version]
@@ -613,6 +617,23 @@ jobs:
       run: make install-nightly
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
+    - run: mkdir crates/wasm/site/dist
+    - uses: actions/download-artifact@v3
+      with:
+        name: mac-x86_64-binary
+        path: crates/wasm/site/dist
+    - uses: actions/download-artifact@v3
+      with:
+        name: mac-aarch64-binary
+        path: crates/wasm/site/dist
+    - uses: actions/download-artifact@v3
+      with:
+        name: linux-x86_64-binary
+        path: crates/wasm/site/dist
+    - uses: actions/download-artifact@v3
+      with:
+        name: linux-aarch64-binary
+        path: crates/wasm/site/dist
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v3
       with:
@@ -638,15 +659,6 @@ jobs:
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-  check-seed:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - name: Check seed
-      run: cd crates/fuzzing-afl && timeout 900s ./check-seed.sh
-      continue-on-error: true
 
   fuzz-afl:
     runs-on: ubuntu-latest
