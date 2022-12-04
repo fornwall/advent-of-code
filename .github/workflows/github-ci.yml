@@ -462,7 +462,7 @@ jobs:
         strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code
         aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code
         cd ../../target/x86_64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-x86_64.tar.xz advent-of-code && mv *.tar.xz ../../../
-        cd ../../target/aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code && mv *.tar.xz ../../../
+        cd ../../aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code && mv *.tar.xz ../../../
       working-directory: crates/core
     - name: Upload Linux x86_64 binary
       uses: actions/upload-artifact@v3
@@ -490,7 +490,7 @@ jobs:
         strip ../../target/release/advent-of-code
         strip ../../target/aarch64-apple-darwin/release/advent-of-code
         cd ../../target/release && tar cfJ advent-of-code-mac-x86_64.tar.xz advent-of-code && mv advent-of-code-mac-x86_64.tar.xz ../../
-        cd ../../target/aarch64-apple-darwin/release && tar cfJ advent-of-code-mac-aarch64.tar.xz advent-of-code && mv advent-of-code-mac-aarch64.tar.xz ../../../
+        cd ../aarch64-apple-darwin/release && tar cfJ advent-of-code-mac-aarch64.tar.xz advent-of-code && mv advent-of-code-mac-aarch64.tar.xz ../../../
       working-directory: crates/core
     - name: Upload mac x86_64 binary
       uses: actions/upload-artifact@v3
