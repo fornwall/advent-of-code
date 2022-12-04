@@ -4,36 +4,39 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     let lines = input.text.lines();
     Ok(if input.is_part_one() {
         lines
-            .map(|line| item_priority(common(line.split_at(line.len() / 2))))
+            .map(|line| {
+                let compartments = line.split_at(line.len() / 2);
+                common_item_priority(&[compartments.0, compartments.1])
+            })
             .sum()
     } else {
         lines
             .collect::<Vec<_>>()
             .chunks_exact(3)
-            .map(|group| item_priority(common_three(group[0], group[1], group[2])))
+            .map(common_item_priority)
             .sum()
     })
 }
 
-fn common(pair: (&str, &str)) -> u8 {
-    pair.0
+fn common_item_priority(items_groups: &[&str]) -> u32 {
+    items_groups
+        .iter()
+        .map(|items| items_bitset(items))
+        .fold(u64::MAX, |acc, x| acc & x)
+        .trailing_zeros()
+}
+
+fn items_bitset(items: &str) -> u64 {
+    items
         .bytes()
-        .find(|d| pair.1.as_bytes().contains(d))
-        .unwrap_or_default()
-}
-
-fn common_three(a: &str, b: &str, c: &str) -> u8 {
-    a.bytes()
-        .find(|d| b.as_bytes().contains(d) && c.as_bytes().contains(d))
-        .unwrap_or_default()
-}
-
-fn item_priority(b: u8) -> u32 {
-    u32::from(match b {
-        b'a'..=b'z' => b - b'a' + 1,
-        b'A'..=b'Z' => b - b'A' + 27,
-        _ => 0,
-    })
+        .map(|item_char| {
+            1 << u64::from(match item_char {
+                b'a'..=b'z' => item_char - b'a' + 1,
+                b'A'..=b'Z' => item_char - b'A' + 27,
+                _ => 0,
+            })
+        })
+        .fold(0, |acc, x| acc | x)
 }
 
 #[test]
