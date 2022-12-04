@@ -1,3 +1,4 @@
+use crate::common::window_iterator::WindowIteratorExt;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -6,20 +7,16 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         lines
             .map(|line| {
                 let compartments = line.split_at(line.len() / 2);
-                common_item_priority(&[compartments.0, compartments.1])
+                common_item_priority([compartments.0, compartments.1])
             })
             .sum()
     } else {
-        lines
-            .collect::<Vec<_>>()
-            .chunks_exact(3)
-            .map(common_item_priority)
-            .sum()
+        lines.window::<3>().map(common_item_priority).sum()
     })
 }
 
-fn common_item_priority(items_groups: &[&str]) -> u32 {
-    items_groups
+fn common_item_priority<const N: usize>(item_groups: [&str; N]) -> u32 {
+    item_groups
         .iter()
         .map(|items| items_bitset(items))
         .fold(u64::MAX, |acc, x| acc & x)
