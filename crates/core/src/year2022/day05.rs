@@ -76,18 +76,14 @@ impl Crates {
     }
 
     fn top_crates(&self) -> String {
-        self.stacks
-            .iter()
-            .enumerate()
-            .filter_map(|(stack_idx, stack)| {
-                let stack_size = self.stack_sizes[stack_idx];
-                if stack_size > 0 {
-                    Some(stack[usize::from(self.stack_sizes[stack_idx] - 1)] as char)
-                } else {
-                    None
-                }
-            })
-            .collect()
+        let mut result = String::with_capacity(Self::MAX_STACKS);
+        for (stack_idx, stack) in self.stacks.iter().enumerate() {
+            let stack_size = self.stack_sizes[stack_idx];
+            if stack_size > 0 {
+                result.push(stack[usize::from(self.stack_sizes[stack_idx] - 1)] as char);
+            }
+        }
+        result
     }
 }
 
@@ -174,4 +170,16 @@ move 4 from 2 to 1";
         assert!(stacks.push(0, 1).is_ok());
     }
     assert!(stacks.push(0, 1).is_err());
+}
+
+#[cfg(feature = "count-allocations")]
+#[test]
+pub fn single_to_string_memory_allocation() {
+    use crate::input::{test_part_one, test_part_two};
+    let real_input = include_str!("day05_input.txt");
+    let allocations = allocation_counter::count(|| {
+        assert!(solve(&mut Input::part_one(real_input)).is_ok());
+        assert!(solve(&mut Input::part_two(real_input)).is_ok());
+    });
+    assert_eq!(allocations, 2);
 }
