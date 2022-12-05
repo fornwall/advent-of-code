@@ -8,8 +8,7 @@ use advent_of_code::solve_raw;
 
 fn main() -> Result<(), String> {
     let usage = || -> ! {
-        eprintln!("Arguments: year day part");
-        eprintln!("    where: day is 1-25 and part is 1-2");
+        eprintln!("usage: advent-of-code [year] [day] [part] < [input-file]");
         std::process::exit(1);
     };
 
