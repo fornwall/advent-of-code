@@ -144,6 +144,7 @@ deploy-site:
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
 		cp -Rf ../site/show/ show/ && \
+		cp -Rf ../site/release/ release/ && \
 		cp -Rf ../site/api/ api/ && \
 		cp -Rf ../site/benchmark/ benchmark/ && \
 		touch robots.txt && \

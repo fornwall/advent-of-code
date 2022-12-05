@@ -617,23 +617,23 @@ jobs:
       run: make install-nightly
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
-    - run: mkdir crates/wasm/site/dist
+    - run: mkdir crates/wasm/site/release
     - uses: actions/download-artifact@v3
       with:
         name: mac-x86_64-binary
-        path: crates/wasm/site/dist
+        path: crates/wasm/site/release
     - uses: actions/download-artifact@v3
       with:
         name: mac-aarch64-binary
-        path: crates/wasm/site/dist
+        path: crates/wasm/site/release
     - uses: actions/download-artifact@v3
       with:
         name: linux-x86_64-binary
-        path: crates/wasm/site/dist
+        path: crates/wasm/site/release
     - uses: actions/download-artifact@v3
       with:
         name: linux-aarch64-binary
-        path: crates/wasm/site/dist
+        path: crates/wasm/site/release
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v3
       with:
