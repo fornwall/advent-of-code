@@ -3,17 +3,17 @@ use std::num::NonZeroU8;
 use crate::input::Input;
 
 struct Crates {
-    stacks: [[u8; Self::MAX_STACK_SIZE]; Self::MAX_STACKS],
+    stacks: [u8; Self::MAX_STACK_SIZE * Self::MAX_STACKS],
     stack_sizes: [u8; Self::MAX_STACKS],
 }
 
 impl Crates {
     const MAX_STACKS: usize = 10;
-    const MAX_STACK_SIZE: usize = 50;
+    const MAX_STACK_SIZE: usize = 80;
 
     const fn new() -> Self {
         Self {
-            stacks: [[0; Self::MAX_STACK_SIZE]; Self::MAX_STACKS],
+            stacks: [0; Self::MAX_STACK_SIZE * Self::MAX_STACKS],
             stack_sizes: [0; Self::MAX_STACKS],
         }
     }
@@ -32,14 +32,15 @@ impl Crates {
                 Self::MAX_STACK_SIZE
             ));
         }
-        self.stacks[stack_idx][usize::from(stack_size)] = crate_char;
+
+        self.stacks[stack_idx * Self::MAX_STACK_SIZE + usize::from(stack_size)] = crate_char;
         self.stack_sizes[stack_idx] += 1;
         Ok(())
     }
 
     fn move_crates(
         &mut self,
-        num: u8,
+        count: u8,
         from_stack_idx: usize,
         to_stack_idx: usize,
         model_9001: bool,
@@ -49,10 +50,16 @@ impl Crates {
                 "Too high stack index - only {} supported",
                 Self::MAX_STACKS
             ));
-        } else if self.stack_sizes[from_stack_idx] < num {
+        }
+
+        let from_stack_size = usize::from(self.stack_sizes[from_stack_idx]);
+        let to_stack_size = usize::from(self.stack_sizes[to_stack_idx]);
+        let count_size = usize::from(count);
+
+        if from_stack_size < count_size {
             return Err("Stack underflow on move".to_string());
-        } else if usize::from(num) > Self::MAX_STACK_SIZE
-            || self.stack_sizes[to_stack_idx] > Self::MAX_STACK_SIZE as u8 - num
+        } else if count_size > Self::MAX_STACK_SIZE
+            || to_stack_size > Self::MAX_STACK_SIZE - count_size
         {
             return Err(format!(
                 "Stack overflow on move - max stack size is {}",
@@ -60,27 +67,30 @@ impl Crates {
             ));
         }
 
-        for i in 0..num {
-            let from_stack_size_idx = i32::from(self.stack_sizes[from_stack_idx])
-                + if model_9001 {
-                    -i32::from(num) + i32::from(i)
-                } else {
-                    -1 - i32::from(i)
-                };
-            let crate_char = self.stacks[from_stack_idx][from_stack_size_idx as usize];
-            self.stacks[to_stack_idx][usize::from(self.stack_sizes[to_stack_idx] + i)] = crate_char;
+        let to_range_start = to_stack_idx * Self::MAX_STACK_SIZE + to_stack_size;
+        let from_range_start = from_stack_idx * Self::MAX_STACK_SIZE + from_stack_size - count_size;
+        let from_range_end = from_range_start + count_size;
+        self.stacks
+            .copy_within(from_range_start..from_range_end, to_range_start);
+        if !model_9001 {
+            let to_range_end = to_range_start + count_size;
+            self.stacks[to_range_start..to_range_end].reverse();
         }
-        self.stack_sizes[from_stack_idx] -= num;
-        self.stack_sizes[to_stack_idx] += num;
+
+        self.stack_sizes[from_stack_idx] -= count;
+        self.stack_sizes[to_stack_idx] += count;
         Ok(())
     }
 
     fn top_crates(&self) -> String {
         let mut result = String::with_capacity(Self::MAX_STACKS);
-        for (stack_idx, stack) in self.stacks.iter().enumerate() {
+        for stack_idx in 0..Self::MAX_STACKS {
             let stack_size = self.stack_sizes[stack_idx];
             if stack_size > 0 {
-                result.push(stack[usize::from(self.stack_sizes[stack_idx] - 1)] as char);
+                result.push(
+                    self.stacks[stack_idx * Self::MAX_STACK_SIZE + usize::from(stack_size - 1)]
+                        as char,
+                );
             }
         }
         result
