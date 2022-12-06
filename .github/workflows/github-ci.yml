@@ -476,6 +476,7 @@ jobs:
       run: sudo apt-get -y install binutils-aarch64-linux-gnu
     - uses: actions/download-artifact@v3
       with:
+        name: man-page
         path: crates/core
     - run: |
         cross build --release --target aarch64-unknown-linux-musl
@@ -505,6 +506,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/download-artifact@v3
       with:
+        name: man-page
         path: crates/core
     - uses: maxim-lobanov/setup-xcode@v1
       with:
