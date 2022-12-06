@@ -501,6 +501,7 @@ jobs:
 
   build-and-upload-mac-brew-binaries:
     runs-on: macos-latest
+    needs: [build-and-upload-man-page]
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
