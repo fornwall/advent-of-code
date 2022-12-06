@@ -2,24 +2,22 @@ use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     let transmission = input.text.as_bytes();
-    let packet_len = input.part_values(4, 14);
+    let marker_len = input.part_values(4, 14);
 
-    if transmission.iter().any(|b| !b.is_ascii_lowercase()) {
-        return Err("Input is not lower case characters".to_string());
+    let mut last_idx_of_char = [0_usize; 256];
+    let mut distinct_start_idx = 0;
+
+    for (i, &char_at_offset_i) in transmission.iter().enumerate() {
+        distinct_start_idx = distinct_start_idx.max(last_idx_of_char[char_at_offset_i as usize]);
+
+        last_idx_of_char[char_at_offset_i as usize] = i;
+
+        if i - distinct_start_idx == marker_len {
+            return Ok(i + 1);
+        }
     }
 
-    transmission
-        .windows(packet_len)
-        .enumerate()
-        .find_map(|(window_idx, window)| {
-            let distinct_count = window
-                .iter()
-                .fold(0_u32, |acc, x| acc | 1 << (x - b'a'))
-                .count_ones() as usize;
-
-            (distinct_count == packet_len).then_some(window_idx + packet_len)
-        })
-        .ok_or_else(|| "No solution found".to_string())
+    Err("No solution found".to_string())
 }
 
 #[test]
