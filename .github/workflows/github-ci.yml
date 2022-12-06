@@ -483,6 +483,11 @@ jobs:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - run: pip install bump2version
+    - run: bump2version patch
     - run: rustup target add aarch64-apple-darwin
     - run: |
         cargo build --release
