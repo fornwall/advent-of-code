@@ -1,27 +1,25 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &mut Input) -> Result<usize, String> {
     let transmission = input.text.as_bytes();
     let packet_len = input.part_values(4, 14);
 
     if transmission.iter().any(|b| !b.is_ascii_lowercase()) {
         return Err("Input is not lower case characters".to_string());
-    } else if transmission.len() < packet_len {
-        return Err("Input too small".to_string());
     }
 
-    for i in 0..transmission.len() - packet_len {
-        let distinct_count = transmission[i..(i + packet_len)]
-            .iter()
-            .fold(0_u32, |acc, x| acc | 1 << (x - b'a'))
-            .count_ones();
+    transmission
+        .windows(packet_len)
+        .enumerate()
+        .find_map(|(window_idx, window)| {
+            let distinct_count = window
+                .iter()
+                .fold(0_u32, |acc, x| acc | 1 << (x - b'a'))
+                .count_ones() as usize;
 
-        if distinct_count as usize == packet_len {
-            return Ok((i + packet_len) as u32);
-        }
-    }
-
-    Err("No solution found".to_string())
+            (distinct_count == packet_len).then_some(window_idx + packet_len)
+        })
+        .ok_or_else(|| "No solution found".to_string())
 }
 
 #[test]
@@ -36,6 +34,6 @@ pub fn tests() {
     test_part_one!(real_input => 1109);
     test_part_two!(real_input => 3965);
 
-    test_part_one_error!("abc" => "Input too small");
+    test_part_one_error!("abc" => "No solution found");
     test_part_one_error!("abcc" => "No solution found");
 }
