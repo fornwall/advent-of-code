@@ -448,21 +448,44 @@ jobs:
         name: jnilibs
         path: ./crates/java/java-src/src/main/resources/*
 
+  build-and-upload-man-page:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: Homebrew/actions/setup-homebrew@master
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - run: pip install bump2version
+    - run: bump2version patch
+    - run: brew install pandoc
+    - run: make man-page
+    - uses: actions/upload-artifact@v3
+      with:
+        name: man-page
+        path: target/man/advent-of-code.1
+
   build-and-upload-linux-brew-binaries:
     runs-on: ubuntu-latest
+    needs: [build-and-upload-man-page]
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
     - run: cargo install cross
     - name: Install aarch64 strip
       run: sudo apt-get -y install binutils-aarch64-linux-gnu
+    - uses: actions/download-artifact@v3
+      with:
+        path: crates/core
     - run: |
         cross build --release --target aarch64-unknown-linux-musl
         cross build --release --target x86_64-unknown-linux-musl
         strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code
         aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code
-        cd ../../target/x86_64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-x86_64.tar.xz advent-of-code && mv *.tar.xz ../../../
-        cd ../../aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code && mv *.tar.xz ../../../
+        cp advent-of-code.1 ../../target/x86_64-unknown-linux-musl/release
+        cp advent-of-code.1 ../../target/aarch64-unknown-linux-musl/release
+        cd ../../target/x86_64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-x86_64.tar.xz advent-of-code advent-of-code.1 && mv *.tar.xz ../../../
+        cd ../../aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code advent-of-code.1 && mv *.tar.xz ../../../
       working-directory: crates/core
     - name: Upload Linux x86_64 binary
       uses: actions/upload-artifact@v3
@@ -480,6 +503,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/download-artifact@v3
+      with:
+        path: crates/core
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
@@ -494,8 +520,10 @@ jobs:
         SDKROOT=`xcrun -sdk $MACOS_SDK --show-sdk-path` MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $MACOS_SDK --show-sdk-platform-version) cargo build --release --target=aarch64-apple-darwin
         strip ../../target/release/advent-of-code
         strip ../../target/aarch64-apple-darwin/release/advent-of-code
-        cd ../../target/release && tar cfJ advent-of-code-mac-x86_64.tar.xz advent-of-code && mv advent-of-code-mac-x86_64.tar.xz ../../
-        cd ../aarch64-apple-darwin/release && tar cfJ advent-of-code-mac-aarch64.tar.xz advent-of-code && mv advent-of-code-mac-aarch64.tar.xz ../../../
+        cp advent-of-code.1 ../../target/release
+        cp advent-of-code.1 ../../target/aarch64-apple-darwin/release
+        cd ../../target/release && tar cfJ advent-of-code-mac-x86_64.tar.xz advent-of-code advent-of-code.1 && mv advent-of-code-mac-x86_64.tar.xz ../../
+        cd ../aarch64-apple-darwin/release && tar cfJ advent-of-code-mac-aarch64.tar.xz advent-of-code advent-of-code.1 && mv advent-of-code-mac-aarch64.tar.xz ../../../
       working-directory: crates/core
     - name: Upload mac x86_64 binary
       uses: actions/upload-artifact@v3
@@ -601,7 +629,7 @@ jobs:
         body: ${{ steps.get-comment-body.outputs.body }}
 
   deploy-site:
-    needs: [bump-version, benchmark]
+    needs: [bump-version, benchmark, build-and-upload-linux-brew-binaries, build-and-upload-mac-brew-binaries]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
