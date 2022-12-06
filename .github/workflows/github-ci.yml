@@ -660,6 +660,20 @@ jobs:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
+  publish-homebrew:
+    runs-on: ubuntu-latest
+    needs: [deploy-site]
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - run: pip install bump2version
+    - run: |
+        NEW_VERSION=`bump2version patch --list | grep new_version | cut -d = -f 2`
+        curl -X POST -H "Authorization: Bearer ${{ secrets.HOMEBREW_TAP_GITHUB_ACCESS_TOKEN }} " -H "Accept:application/vnd.github" "https://api.github.com/repos/fornwall/homebrew-tap/actions/workflows/ci.yaml/dispatches" -d "{\"ref\":\"main\", \"inputs\":{\"version\":\"$NEW_VERSION\"}}"
+
   fuzz-afl:
     runs-on: ubuntu-latest
     # Allow failures as LLVM is not always available for installation:
