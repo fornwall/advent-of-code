@@ -8,7 +8,7 @@ struct Stack {
 impl Stack {
     const MAX_SIZE: usize = 500;
 
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             data: [0; Self::MAX_SIZE],
             size: 0,
@@ -24,14 +24,17 @@ impl Stack {
         &self.data[0..self.size]
     }
 
-    fn is_full(&self) -> bool {
+    const fn is_full(&self) -> bool {
         self.size == Self::MAX_SIZE
     }
 }
 
-fn sizes<'a, I: Iterator<Item=&'a str>>(lines: &mut I, stack: &mut Stack) -> Result<u64, String> {
+fn sizes<'a, I: Iterator<Item = &'a str>>(lines: &mut I, stack: &mut Stack) -> Result<u64, String> {
     if stack.is_full() {
-        return Err(format!("Stack overflow - max {} directories supported", Stack::MAX_SIZE));
+        return Err(format!(
+            "Stack overflow - max {} directories supported",
+            Stack::MAX_SIZE
+        ));
     }
 
     let mut dir_size = 0;
@@ -62,12 +65,22 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut dir_stack = Stack::new();
     sizes(&mut input.text.lines().skip(1), &mut dir_stack)?;
     if input.is_part_one() {
-        Ok(dir_stack.data().iter().filter(|&&size| size <= 100_000).sum())
+        Ok(dir_stack
+            .data()
+            .iter()
+            .filter(|&&size| size <= 100_000)
+            .sum())
     } else {
         let root_dir_size = dir_stack.data().last().copied().unwrap_or_default();
         // 70_000_000 - root_dir_size + delete_bigger_than >= 30_000_000 =>:
         let delete_bigger_than = root_dir_size - 40_000_000;
-        Ok(dir_stack.data().iter().filter(|&&size| size >= delete_bigger_than).min().copied().unwrap_or_default())
+        Ok(dir_stack
+            .data()
+            .iter()
+            .filter(|&&size| size >= delete_bigger_than)
+            .min()
+            .copied()
+            .unwrap_or_default())
     }
 }
 
