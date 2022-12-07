@@ -1,20 +1,47 @@
 use crate::input::Input;
 
-fn sizes<'a, I: Iterator<Item = &'a str>>(lines: &mut I, delete_from: Option<u64>) -> (u64, u64) {
+struct Stack {
+    data: [u64; Self::MAX_SIZE],
+    size: usize,
+}
+
+impl Stack {
+    const MAX_SIZE: usize = 500;
+
+    fn new() -> Self {
+        Self {
+            data: [0; Self::MAX_SIZE],
+            size: 0,
+        }
+    }
+
+    fn push(&mut self, value: u64) {
+        self.data[self.size] = value;
+        self.size += 1;
+    }
+
+    fn data(&self) -> &[u64] {
+        &self.data[0..self.size]
+    }
+
+    fn is_full(&self) -> bool {
+        self.size == Self::MAX_SIZE
+    }
+}
+
+fn sizes<'a, I: Iterator<Item=&'a str>>(lines: &mut I, stack: &mut Stack) -> Result<u64, String> {
+    if stack.is_full() {
+        return Err(format!("Stack overflow - max {} directories supported", Stack::MAX_SIZE));
+    }
+
     let mut dir_size = 0;
-    let mut dir_result = if delete_from.is_none() { 0 } else { u64::MAX };
 
     while let Some(line) = lines.next() {
         if line.starts_with("$ cd ..") {
             break;
         } else if line.starts_with("$ cd ") {
-            let (subdir_size, subdir_matches) = sizes(lines, delete_from);
+            let subdir_size = sizes(lines, stack)?;
             dir_size += subdir_size;
-            if delete_from.is_none() {
-                dir_result += subdir_matches;
-            } else {
-                dir_result = dir_result.min(subdir_matches);
-            }
         } else if line.starts_with("$ ls") || line.starts_with("dir") {
             // Ignore
         } else {
@@ -22,29 +49,25 @@ fn sizes<'a, I: Iterator<Item = &'a str>>(lines: &mut I, delete_from: Option<u64
                 .split(' ')
                 .next()
                 .and_then(|word| word.parse::<u32>().ok())
-                .unwrap_or_default();
+                .ok_or_else(|| "Invalid file listing - not starting with a u32".to_string())?;
             dir_size += u64::from(file_size);
         }
     }
 
-    if let Some(delete_bigger_than) = delete_from {
-        if dir_size >= delete_bigger_than {
-            dir_result = dir_result.min(dir_size);
-        }
-    } else if dir_size <= 100_000 {
-        dir_result += dir_size;
-    }
-    (dir_size, dir_result)
+    stack.push(dir_size);
+    Ok(dir_size)
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
+    let mut dir_stack = Stack::new();
+    sizes(&mut input.text.lines().skip(1), &mut dir_stack)?;
     if input.is_part_one() {
-        Ok(sizes(&mut input.text.lines().skip(1), None).1)
+        Ok(dir_stack.data().iter().filter(|&&size| size <= 100_000).sum())
     } else {
-        let root_dir_size = sizes(&mut input.text.lines().skip(1), None).0;
-        // 70_000_000 - root_dir_size + delete_bigger_than >= 30_000_000 gives:
+        let root_dir_size = dir_stack.data().last().copied().unwrap_or_default();
+        // 70_000_000 - root_dir_size + delete_bigger_than >= 30_000_000 =>:
         let delete_bigger_than = root_dir_size - 40_000_000;
-        Ok(sizes(&mut input.text.lines().skip(1), Some(delete_bigger_than)).1)
+        Ok(dir_stack.data().iter().filter(|&&size| size >= delete_bigger_than).min().copied().unwrap_or_default())
     }
 }
 
