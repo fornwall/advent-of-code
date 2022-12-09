@@ -1,32 +1,32 @@
 use crate::input::Input;
-use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
-    let mut snake = vec![(0_i32, 0_i32); input.part_values(2, 10)];
+    let snake_len = input.part_values(2, 10);
+    let mut snake = vec![(0_i32, 0_i32); snake_len];
     let mut visited = Vec::with_capacity(input.text.len());
     visited.push((0_i32, 0_i32));
 
     for line in input.text.lines().filter(|line| line.len() > 2) {
+        let direction = line.as_bytes()[0];
         let steps = i32::from(line[2..]
             .parse::<u8>()
             .map_err(|_| "Not an integer for steps".to_string())?);
 
-        let direction = line.as_bytes()[0];
-        for _ in 0..steps {
-            match direction {
-                b'U' => snake[0].1 -= 1,
-                b'R' => snake[0].0 += 1,
-                b'D' => snake[0].1 += 1,
-                _ => snake[0].0 -= 1,
-            };
+        match direction {
+            b'U' => snake[0].1 -= steps,
+            b'R' => snake[0].0 += steps,
+            b'D' => snake[0].1 += steps,
+            _ => snake[0].0 -= steps,
+        };
 
-            for i in 1..snake.len() {
+        for _ in 0..steps {
+            for i in 1..snake_len {
                 if snake[i - 1].0.abs_diff(snake[i].0) > 1
                     || snake[i - 1].1.abs_diff(snake[i].1) > 1
                 {
                     snake[i].0 += (snake[i - 1].0 - snake[i].0).signum();
                     snake[i].1 += (snake[i - 1].1 - snake[i].1).signum();
-                    if i + 1 == snake.len() {
+                    if i + 1 == snake_len {
                         visited.push(snake[i]);
                     }
                 }
