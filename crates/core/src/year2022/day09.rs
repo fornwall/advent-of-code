@@ -3,16 +3,17 @@ use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     let mut snake = vec![(0_i32, 0_i32); input.part_values(2, 10)];
-    let mut visited = HashSet::new();
-    visited.insert((0_i32, 0_i32));
+    let mut visited = Vec::with_capacity(input.text.len());
+    visited.push((0_i32, 0_i32));
 
-    for line in input.text.lines() {
-        let steps = line[2..]
-            .parse::<i32>()
-            .map_err(|_| "Not an integer for steps".to_string())?;
+    for line in input.text.lines().filter(|line| line.len() > 2) {
+        let steps = i32::from(line[2..]
+            .parse::<u8>()
+            .map_err(|_| "Not an integer for steps".to_string())?);
 
+        let direction = line.as_bytes()[0];
         for _ in 0..steps {
-            match line.as_bytes()[0] {
+            match direction {
                 b'U' => snake[0].1 -= 1,
                 b'R' => snake[0].0 += 1,
                 b'D' => snake[0].1 += 1,
@@ -26,14 +27,15 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     snake[i].0 += (snake[i - 1].0 - snake[i].0).signum();
                     snake[i].1 += (snake[i - 1].1 - snake[i].1).signum();
                     if i + 1 == snake.len() {
-                        visited.insert(snake[i]);
+                        visited.push(snake[i]);
                     }
                 }
             }
         }
     }
 
-    Ok(visited.len())
+    visited.sort_unstable();
+    Ok(visited.windows(2).filter(|w| w[0] != w[1]).count() + 1)
 }
 
 #[test]
