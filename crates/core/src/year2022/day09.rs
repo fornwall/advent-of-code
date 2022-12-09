@@ -8,9 +8,11 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 
     for line in input.text.lines().filter(|line| line.len() > 2) {
         let direction = line.as_bytes()[0];
-        let steps = i32::from(line[2..]
-            .parse::<u8>()
-            .map_err(|_| "Not an integer for steps".to_string())?);
+        let steps = i32::from(
+            line[2..]
+                .parse::<u8>()
+                .map_err(|_| "Not an integer for steps".to_string())?,
+        );
 
         match direction {
             b'U' => snake[0].1 -= steps,
