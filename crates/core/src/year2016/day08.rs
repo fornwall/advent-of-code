@@ -1,4 +1,4 @@
-use crate::common::character_recognition::recognize;
+use crate::common::character_recognition::recognize_letter;
 use crate::input::Input;
 
 struct Screen {
@@ -105,7 +105,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                 }
             }
 
-            code_on_screen.push(recognize(&this_char_string)?);
+            code_on_screen.push(recognize_letter(&this_char_string)?);
         }
         Ok(code_on_screen)
     }

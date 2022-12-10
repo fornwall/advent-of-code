@@ -1,4 +1,4 @@
-use crate::common::character_recognition::recognize_bytes;
+use crate::common::character_recognition::recognize;
 use crate::input::Input;
 
 struct Device {
@@ -42,8 +42,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             let value_to_add = line
                 .split(' ')
                 .nth(1)
-                .map(|num| num.parse::<i32>().ok())
-                .flatten()
+                .and_then(|num| num.parse::<i32>().ok())
                 .ok_or_else(|| "Invalid input".to_string())?;
             device.on_cycle(value_to_add);
         };
@@ -52,7 +51,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     if input.is_part_one() {
         Ok(device.accumulated_signal_strength.to_string())
     } else {
-        recognize_bytes(&device.screen)
+        recognize(&device.screen)
     }
 }
 

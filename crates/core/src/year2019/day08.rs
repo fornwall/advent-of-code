@@ -1,4 +1,4 @@
-use crate::common::character_recognition::recognize;
+use crate::common::character_recognition::recognize_letter;
 use crate::input::Input;
 
 const PIXELS_WIDE: u32 = 25;
@@ -58,7 +58,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                     char_string.push('\n');
                 }
             }
-            result.push(recognize(&char_string)?);
+            result.push(recognize_letter(&char_string)?);
         }
         Ok(result)
     }

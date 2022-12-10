@@ -1,5 +1,5 @@
 use super::int_code::{Program, Word};
-use crate::common::character_recognition::recognize;
+use crate::common::character_recognition::recognize_letter;
 use crate::input::Input;
 use std::collections::HashMap;
 
@@ -128,7 +128,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                     this_char_string.push('\n');
                 }
             }
-            result.push(recognize(&this_char_string)?);
+            result.push(recognize_letter(&this_char_string)?);
         }
 
         Ok(result)

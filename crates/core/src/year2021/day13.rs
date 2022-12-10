@@ -1,4 +1,4 @@
-use crate::common::character_recognition::{recognize_bytes, CHAR_HEIGHT, CHAR_WIDTH};
+use crate::common::character_recognition::{recognize, CHAR_HEIGHT, CHAR_WIDTH};
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
@@ -52,7 +52,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     for (x, y) in dots {
         screen[usize::from(y) * NUM_LETTERS * CHAR_WIDTH + usize::from(x)] = true;
     }
-    recognize_bytes(&screen)
+    recognize(&screen)
 }
 
 #[test]

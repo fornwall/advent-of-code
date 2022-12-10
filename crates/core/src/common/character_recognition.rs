@@ -1,7 +1,7 @@
 pub const CHAR_WIDTH: usize = 5;
 pub const CHAR_HEIGHT: usize = 6;
 
-pub fn recognize(input: &str) -> Result<char, String> {
+pub fn recognize_letter(input: &str) -> Result<char, String> {
     Ok(match input {
         " ██  \n█  █ \n█  █ \n████ \n█  █ \n█  █ " => 'A',
         "███  \n█  █ \n███  \n█  █ \n█  █ \n███  " => 'B',
@@ -27,7 +27,7 @@ pub fn recognize(input: &str) -> Result<char, String> {
     })
 }
 
-pub fn recognize_bytes(bytes: &[bool]) -> Result<String, String> {
+pub fn recognize(bytes: &[bool]) -> Result<String, String> {
     if bytes.len() % (CHAR_WIDTH * CHAR_HEIGHT) != 0 {
         return Err(format!(
             "Input length is not a multiple of {}",
@@ -48,7 +48,7 @@ pub fn recognize_bytes(bytes: &[bool]) -> Result<String, String> {
                 letter_str.push('\n');
             }
         }
-        result.push(recognize(&letter_str)?);
+        result.push(recognize_letter(&letter_str)?);
     }
     Ok(result)
 }
