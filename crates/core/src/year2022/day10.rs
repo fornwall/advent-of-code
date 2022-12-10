@@ -5,16 +5,18 @@ struct Device {
     register_x: i32,
     cycle: i32,
     accumulated_signal_strength: i32,
-    screen: [bool; 240],
+    screen: [bool; Self::NUM_PIXELS],
 }
 
 impl Device {
+    const NUM_PIXELS: usize = 240;
+
     const fn new() -> Self {
         Self {
             register_x: 1,
             cycle: 1,
             accumulated_signal_strength: 0,
-            screen: [false; 240],
+            screen: [false; Self::NUM_PIXELS],
         }
     }
 
@@ -23,7 +25,7 @@ impl Device {
             self.screen[(self.cycle - 1) as usize] = true;
         }
 
-        self.cycle += 1;
+        self.cycle = (self.cycle + 1) % (Self::NUM_PIXELS as i32 + 1);
         self.register_x += value_to_add;
 
         if (self.cycle - 20) % 40 == 0 {
@@ -39,11 +41,12 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         device.on_cycle(0);
 
         if line != "noop" {
-            let value_to_add = line
-                .split(' ')
-                .nth(1)
-                .and_then(|num| num.parse::<i32>().ok())
-                .ok_or_else(|| "Invalid input".to_string())?;
+            let value_to_add = i32::from(
+                line.split(' ')
+                    .nth(1)
+                    .and_then(|num| num.parse::<i16>().ok())
+                    .ok_or_else(|| "Invalid input - not \"noop\" or \"addx <i16>\"".to_string())?,
+            );
             device.on_cycle(value_to_add);
         };
     }
