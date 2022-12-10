@@ -211,3 +211,17 @@ noop";
     test_part_one!(real_input => "12740".to_string());
     test_part_two!(real_input => "RBPARAGF".to_string());
 }
+
+#[cfg(feature = "count-allocations")]
+#[test]
+pub fn single_to_string_memory_allocation() {
+    let real_input = include_str!("day10_input.txt");
+    let allocations = allocation_counter::count(|| {
+        assert!(solve(&mut Input::part_one(real_input)).is_ok());
+    });
+    assert_eq!(allocations, 1);
+    let allocations = allocation_counter::count(|| {
+        assert!(solve(&mut Input::part_two(real_input)).is_ok());
+    });
+    assert_eq!(allocations, 1);
+}
