@@ -1,5 +1,5 @@
 use super::int_code::{Program, Word};
-use crate::common::character_recognition::recognize_letter;
+use crate::common::character_recognition::recognize;
 use crate::input::Input;
 use std::collections::HashMap;
 
@@ -100,10 +100,10 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     if input.is_part_one() {
         Ok(painted.len().to_string())
     } else {
-        let mut min_x = std::i32::MAX;
-        let mut max_x = std::i32::MIN;
-        let mut min_y = std::i32::MAX;
-        let mut max_y = std::i32::MIN;
+        let mut min_x = i32::MAX;
+        let mut max_x = i32::MIN;
+        let mut min_y = i32::MAX;
+        let mut max_y = i32::MIN;
         painted.iter().for_each(|(&(x, y), color)| {
             if *color == Color::White {
                 min_x = std::cmp::min(min_x, x);
@@ -113,25 +113,14 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             }
         });
 
-        let mut result = String::new();
-        for x in (min_x..=max_x).step_by(5) {
-            let mut this_char_string = String::new();
-            for y in (min_y..=max_y).rev() {
-                for char_x in x..(x + 5) {
-                    this_char_string.push(if Some(&Color::White) == painted.get(&(char_x, y)) {
-                        '█'
-                    } else {
-                        ' '
-                    });
-                }
-                if y != min_y {
-                    this_char_string.push('\n');
-                }
+        let mut screen = vec![false; (max_x - min_x) as usize * (max_y - min_y) as usize];
+        painted.iter().for_each(|(&(x, y), color)| {
+            if *color == Color::White {
+                screen[(y - min_y) as usize * (max_x - min_x) as usize + (x - min_x) as usize] =
+                    true;
             }
-            result.push(recognize_letter(&this_char_string)?);
-        }
-
-        Ok(result)
+        });
+        recognize(&screen)
     }
 }
 

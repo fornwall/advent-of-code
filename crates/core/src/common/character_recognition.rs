@@ -1,7 +1,7 @@
 pub const CHAR_WIDTH: usize = 5;
 pub const CHAR_HEIGHT: usize = 6;
 
-pub fn recognize_letter(input: &str) -> Result<char, String> {
+fn recognize_letter(input: &str) -> Result<char, String> {
     Ok(match input {
         " ██  \n█  █ \n█  █ \n████ \n█  █ \n█  █ " => 'A',
         "███  \n█  █ \n███  \n█  █ \n█  █ \n███  " => 'B',
@@ -35,7 +35,7 @@ pub fn recognize(bytes: &[bool]) -> Result<String, String> {
         ));
     }
     let num_letters = bytes.len() / (CHAR_WIDTH * CHAR_HEIGHT);
-    let mut result = String::new();
+    let mut result = String::with_capacity(num_letters);
     for letter_idx in 0..num_letters {
         let mut letter_str = String::new();
         for row in 0..CHAR_HEIGHT {

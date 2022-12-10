@@ -1,17 +1,11 @@
-use crate::common::character_recognition::recognize_letter;
+use crate::common::character_recognition::{recognize, CHAR_HEIGHT, CHAR_WIDTH};
 use crate::input::Input;
 
-const PIXELS_WIDE: u32 = 25;
-const PIXELS_TALL: u32 = 6;
-const LAYER_SIZE: usize = (PIXELS_WIDE * PIXELS_TALL) as usize;
+const NUM_LETTERS: usize = 5;
+const PIXELS_WIDE: usize = NUM_LETTERS * CHAR_WIDTH;
+const LAYER_SIZE: usize = PIXELS_WIDE * CHAR_HEIGHT;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
-    fn count(slice: &[u8], needle: u8) -> usize {
-        slice
-            .iter()
-            .fold(0, |acc, &b| acc + usize::from(b == needle))
-    }
-
     if input.text.len() % LAYER_SIZE != 0 {
         return Err(format!(
             "Invalid input - expected to be multiple of layer size ({})",
@@ -20,6 +14,12 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     }
 
     if input.is_part_one() {
+        fn count(slice: &[u8], needle: u8) -> usize {
+            slice
+                .iter()
+                .fold(0, |acc, &b| acc + usize::from(b == needle))
+        }
+
         input
             .text
             .as_bytes()
@@ -43,24 +43,8 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
                 });
         });
 
-        let mut result = String::new();
-        for x in (0..PIXELS_WIDE).step_by(5) {
-            let mut char_string = String::new();
-            for y in 0..PIXELS_TALL {
-                for char_x in x..(x + 5) {
-                    char_string.push(if image[(char_x + PIXELS_WIDE * y) as usize] == b'1' {
-                        '█'
-                    } else {
-                        ' '
-                    });
-                }
-                if y != PIXELS_TALL - 1 {
-                    char_string.push('\n');
-                }
-            }
-            result.push(recognize_letter(&char_string)?);
-        }
-        Ok(result)
+        let image_bytes = image.iter_mut().map(|b| *b == b'1').collect::<Vec<_>>();
+        recognize(&image_bytes)
     }
 }
 

@@ -1,14 +1,12 @@
-use crate::common::character_recognition::recognize_letter;
+use crate::common::character_recognition::{recognize, CHAR_HEIGHT};
 use crate::input::Input;
 
 struct Screen {
-    pixels: [bool; Screen::WIDTH * Screen::HEIGHT],
+    pixels: [bool; Screen::WIDTH * CHAR_HEIGHT],
 }
 
 impl Screen {
     const WIDTH: usize = 50;
-    const LETTER_WIDTH: usize = 5;
-    const HEIGHT: usize = 6;
 
     const fn get_pixel(&self, x: usize, y: usize) -> bool {
         self.pixels[y * Self::WIDTH + x]
@@ -37,9 +35,9 @@ impl Screen {
     }
 
     fn rotate_col(&mut self, col: usize, amount: usize) {
-        let mut new_col = [false; Self::HEIGHT];
-        for y in 0..Self::HEIGHT {
-            new_col[(y + amount) % Self::HEIGHT] = self.get_pixel(col, y);
+        let mut new_col = [false; CHAR_HEIGHT];
+        for y in 0..CHAR_HEIGHT {
+            new_col[(y + amount) % CHAR_HEIGHT] = self.get_pixel(col, y);
         }
 
         for (y, &on) in new_col.iter().enumerate() {
@@ -49,7 +47,7 @@ impl Screen {
 
     const fn new() -> Self {
         Self {
-            pixels: [false; Self::WIDTH * Self::HEIGHT],
+            pixels: [false; Self::WIDTH * CHAR_HEIGHT],
         }
     }
 }
@@ -86,28 +84,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
     if input.is_part_one() {
         Ok(screen.pixels.iter().filter(|&&p| p).count().to_string())
     } else {
-        let mut code_on_screen = String::new();
-
-        for letter_idx in 0..(Screen::WIDTH / Screen::LETTER_WIDTH) {
-            let mut this_char_string = String::new();
-            for y in 0..Screen::HEIGHT {
-                for x in 0..Screen::LETTER_WIDTH {
-                    this_char_string.push(
-                        if screen.get_pixel(letter_idx * Screen::LETTER_WIDTH + x, y) {
-                            '█'
-                        } else {
-                            ' '
-                        },
-                    );
-                }
-                if y != Screen::HEIGHT - 1 {
-                    this_char_string.push('\n');
-                }
-            }
-
-            code_on_screen.push(recognize_letter(&this_char_string)?);
-        }
-        Ok(code_on_screen)
+        recognize(&screen.pixels)
     }
 }
 
