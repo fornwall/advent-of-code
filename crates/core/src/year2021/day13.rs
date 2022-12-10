@@ -1,8 +1,8 @@
-use crate::common::character_recognition::recognize;
+use crate::common::character_recognition::{recognize_bytes, CHAR_HEIGHT, CHAR_WIDTH};
 use crate::input::Input;
-use std::collections::HashSet;
 
 pub fn solve(input: &mut Input) -> Result<String, String> {
+    const NUM_LETTERS: usize = 8;
     let mut dots = Vec::new();
 
     let parse_number = |num_str: &str| {
@@ -48,28 +48,11 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
         }
     }
 
-    let dots = HashSet::<(u16, u16)>::from_iter(dots);
-    let mut code = String::new();
-    for letter in 0..8 {
-        let mut char_string = String::new();
-        for y in 0..6 {
-            for x in 0..5 {
-                let x_pos = letter * 5 + x;
-                char_string.push(if dots.contains(&(x_pos, y)) {
-                    '█'
-                } else {
-                    ' '
-                });
-            }
-            if y != 5 {
-                char_string.push('\n');
-            }
-        }
-        let c = recognize(&char_string)?;
-        code.push(c);
+    let mut screen = [false; NUM_LETTERS * CHAR_HEIGHT * CHAR_WIDTH];
+    for (x, y) in dots {
+        screen[usize::from(y) * NUM_LETTERS * CHAR_WIDTH + usize::from(x)] = true;
     }
-
-    Ok(code)
+    recognize_bytes(&screen)
 }
 
 #[test]

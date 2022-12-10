@@ -1,3 +1,6 @@
+pub const CHAR_WIDTH: usize = 5;
+pub const CHAR_HEIGHT: usize = 6;
+
 pub fn recognize(input: &str) -> Result<char, String> {
     Ok(match input {
         " ██  \n█  █ \n█  █ \n████ \n█  █ \n█  █ " => 'A',
@@ -22,4 +25,30 @@ pub fn recognize(input: &str) -> Result<char, String> {
             return Err(format!("Unrecognized character:\n{}", input));
         }
     })
+}
+
+pub fn recognize_bytes(bytes: &[bool]) -> Result<String, String> {
+    if bytes.len() % (CHAR_WIDTH * CHAR_HEIGHT) != 0 {
+        return Err(format!(
+            "Input length is not a multiple of {}",
+            CHAR_WIDTH * CHAR_HEIGHT
+        ));
+    }
+    let num_letters = bytes.len() / (CHAR_WIDTH * CHAR_HEIGHT);
+    let mut result = String::new();
+    for letter_idx in 0..num_letters {
+        let mut letter_str = String::new();
+        for row in 0..CHAR_HEIGHT {
+            let start_offset = letter_idx * CHAR_WIDTH + row * num_letters * CHAR_WIDTH;
+            let end_offset = start_offset + CHAR_WIDTH;
+            for b in &bytes[start_offset..end_offset] {
+                letter_str.push(if *b { '█' } else { ' ' });
+            }
+            if row != CHAR_HEIGHT - 1 {
+                letter_str.push('\n');
+            }
+        }
+        result.push(recognize(&letter_str)?);
+    }
+    Ok(result)
 }
