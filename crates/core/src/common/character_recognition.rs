@@ -1,28 +1,179 @@
 pub const CHAR_WIDTH: usize = 5;
 pub const CHAR_HEIGHT: usize = 6;
 
-fn recognize_letter(input: &str) -> Result<char, String> {
-    Ok(match input {
-        " ██  \n█  █ \n█  █ \n████ \n█  █ \n█  █ " => 'A',
-        "███  \n█  █ \n███  \n█  █ \n█  █ \n███  " => 'B',
-        " ██  \n█  █ \n█    \n█    \n█  █ \n ██  " => 'C',
-        "████ \n█    \n███  \n█    \n█    \n████ " => 'E',
-        "████ \n█    \n███  \n█    \n█    \n█    " => 'F',
-        " ██  \n█  █ \n█    \n█ ██ \n█  █ \n ███ " => 'G',
-        "█  █ \n█  █ \n████ \n█  █ \n█  █ \n█  █ " => 'H',
-        " ███ \n  █  \n  █  \n  █  \n  █  \n ███ " => 'I',
-        "  ██ \n   █ \n   █ \n   █ \n█  █ \n ██  " => 'J',
-        "█  █ \n█ █  \n██   \n█ █  \n█ █  \n█  █ " => 'K',
-        "█    \n█    \n█    \n█    \n█    \n████ " => 'L',
-        " ██  \n█  █ \n█  █ \n█  █ \n█  █ \n ██  " => 'O',
-        "███  \n█  █ \n█  █ \n███  \n█    \n█    " => 'P',
-        "███  \n█  █ \n█  █ \n███  \n█ █  \n█  █ " => 'R',
-        " ███ \n█    \n█    \n ██  \n   █ \n███  " => 'S',
-        "█  █ \n█  █ \n█  █ \n█  █ \n█  █ \n ██  " => 'U',
-        "█   █\n█   █\n █ █ \n  █  \n  █  \n  █  " => 'Y',
-        "████ \n   █ \n  █  \n █   \n█    \n████ " => 'Z',
+fn recognize_letter(
+    r1: &[bool],
+    r2: &[bool],
+    r3: &[bool],
+    r4: &[bool],
+    r5: &[bool],
+    r6: &[bool],
+) -> Result<char, String> {
+    Ok(match (r1, r2, r3, r4, r5, r6) {
+        (
+            [false, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, true, true, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+        ) => 'A',
+
+        (
+            [true, true, true, false, false],
+            [true, false, false, true, false],
+            [true, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, true, true, false, false],
+        ) => 'B',
+
+        (
+            [false, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, false, false, true, false],
+            [false, true, true, false, false],
+        ) => 'C',
+
+        (
+            [true, true, true, true, false],
+            [true, false, false, false, false],
+            [true, true, true, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, true, true, true, false],
+        ) => 'E',
+
+        (
+            [true, true, true, true, false],
+            [true, false, false, false, false],
+            [true, true, true, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+        ) => 'F',
+
+        (
+            [false, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, false, false],
+            [true, false, true, true, false],
+            [true, false, false, true, false],
+            [false, true, true, true, false],
+        ) => 'G',
+
+        (
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, true, true, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+        ) => 'H',
+
+        (
+            [false, true, true, true, false],
+            [false, false, true, false, false],
+            [false, false, true, false, false],
+            [false, false, true, false, false],
+            [false, false, true, false, false],
+            [false, true, true, true, false],
+        ) => 'I',
+
+        (
+            [false, false, true, true, false],
+            [false, false, false, true, false],
+            [false, false, false, true, false],
+            [false, false, false, true, false],
+            [true, false, false, true, false],
+            [false, true, true, false, false],
+        ) => 'J',
+
+        (
+            [true, false, false, true, false],
+            [true, false, true, false, false],
+            [true, true, false, false, false],
+            [true, false, true, false, false],
+            [true, false, true, false, false],
+            [true, false, false, true, false],
+        ) => 'K',
+
+        (
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [true, true, true, true, false],
+        ) => 'L',
+
+        (
+            [false, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [false, true, true, false, false],
+        ) => 'O',
+
+        (
+            [true, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, true, true, false, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+        ) => 'P',
+
+        (
+            [true, true, true, false, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, true, true, false, false],
+            [true, false, true, false, false],
+            [true, false, false, true, false],
+        ) => 'R',
+
+        (
+            [false, true, true, true, false],
+            [true, false, false, false, false],
+            [true, false, false, false, false],
+            [false, true, true, false, false],
+            [false, false, false, true, false],
+            [true, true, true, false, false],
+        ) => 'S',
+
+        (
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [true, false, false, true, false],
+            [false, true, true, false, false],
+        ) => 'U',
+
+        (
+            [true, false, false, false, true],
+            [true, false, false, false, true],
+            [false, true, false, true, false],
+            [false, false, true, false, false],
+            [false, false, true, false, false],
+            [false, false, true, false, false],
+        ) => 'Y',
+
+        (
+            [true, true, true, true, false],
+            [false, false, false, true, false],
+            [false, false, true, false, false],
+            [false, true, false, false, false],
+            [true, false, false, false, false],
+            [true, true, true, true, false],
+        ) => 'Z',
+
         _ => {
-            return Err(format!("Unrecognized character:\n{}", input));
+            return Err("Unrecognized character".to_string());
         }
     })
 }
@@ -35,20 +186,22 @@ pub fn recognize(bytes: &[bool]) -> Result<String, String> {
         ));
     }
     let num_letters = bytes.len() / (CHAR_WIDTH * CHAR_HEIGHT);
+    let all_width = CHAR_WIDTH * num_letters;
     let mut result = String::with_capacity(num_letters);
     for letter_idx in 0..num_letters {
-        let mut letter_str = String::new();
-        for row in 0..CHAR_HEIGHT {
-            let start_offset = letter_idx * CHAR_WIDTH + row * num_letters * CHAR_WIDTH;
-            let end_offset = start_offset + CHAR_WIDTH;
-            for b in &bytes[start_offset..end_offset] {
-                letter_str.push(if *b { '█' } else { ' ' });
-            }
-            if row != CHAR_HEIGHT - 1 {
-                letter_str.push('\n');
-            }
-        }
-        result.push(recognize_letter(&letter_str)?);
+        result.push(recognize_letter(
+            &bytes[(letter_idx * CHAR_WIDTH)..((letter_idx + 1) * CHAR_WIDTH)],
+            &bytes[(letter_idx * CHAR_WIDTH + all_width)
+                ..((letter_idx + 1) * CHAR_WIDTH + all_width)],
+            &bytes[(letter_idx * CHAR_WIDTH + 2 * all_width)
+                ..((letter_idx + 1) * CHAR_WIDTH + 2 * all_width)],
+            &bytes[(letter_idx * CHAR_WIDTH + 3 * all_width)
+                ..((letter_idx + 1) * CHAR_WIDTH + 3 * all_width)],
+            &bytes[(letter_idx * CHAR_WIDTH + 4 * all_width)
+                ..((letter_idx + 1) * CHAR_WIDTH + 4 * all_width)],
+            &bytes[(letter_idx * CHAR_WIDTH + 5 * all_width)
+                ..((letter_idx + 1) * CHAR_WIDTH + 5 * all_width)],
+        )?);
     }
     Ok(result)
 }
