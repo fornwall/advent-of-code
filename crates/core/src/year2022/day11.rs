@@ -2,7 +2,7 @@ use crate::input::Input;
 
 type WorryType = u64;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 enum Operation {
     Add(WorryType),
     AddOld,
@@ -21,9 +21,7 @@ impl Operation {
     }
 }
 
-#[derive(Debug)]
 struct Monkey {
-    items: Vec<WorryType>,
     operation: Operation,
     divider_test: WorryType,
     throws: [u32; 2],
@@ -31,17 +29,15 @@ struct Monkey {
 }
 
 impl Monkey {
-    fn parse(input: &str) -> Option<Self> {
+    fn parse(monkey_idx: u8, input: &str, items: &mut Vec<(u8, WorryType)>) -> Option<Self> {
         let mut lines = input.lines();
         // Sample: "Monkey 1:"
         lines.next()?;
         // Sample: "  Starting items: 90, 79, 97, 52, 90, 94, 71, 70":
         let operation_line = lines.next()?;
-        let items = operation_line[18..]
-            .split(", ")
-            .map(str::parse::<WorryType>)
-            .collect::<Result<_, _>>()
-            .ok()?;
+        for item_str in operation_line[18..].split(", ") {
+            items.push((monkey_idx, item_str.parse::<WorryType>().ok()?));
+        }
         // Samples: "  Operation: new = old + 2" and "  Operation: new = old + old":
         let operation_line = lines.next()?;
         let operation = match (
@@ -64,7 +60,6 @@ impl Monkey {
         let if_false = lines.next()?[30..].parse::<u32>().ok()?;
 
         Some(Self {
-            items,
             divider_test: test,
             throws: [if_false, if_true],
             inspections: 0,
@@ -74,10 +69,13 @@ impl Monkey {
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
+    let mut items = Vec::with_capacity(36);
+
     let mut monkeys = input
         .text
         .split("\n\n")
-        .map(|block| Monkey::parse(block.trim()))
+        .enumerate()
+        .map(|(monkey_idx, block)| Monkey::parse(monkey_idx as u8, block.trim(), &mut items))
         .collect::<Option<Vec<_>>>()
         .ok_or_else(|| "Unable to parse input".to_string())?;
 
@@ -87,25 +85,17 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         .product::<WorryType>();
     let relax_divider = input.part_values(3, 1);
 
-    let mut to_push = Vec::with_capacity(16);
-
     for _round in 0..input.part_values(20, 10_000) {
         for i in 0..monkeys.len() {
-            let mut monkey = &mut monkeys[i];
-            monkey.inspections += monkey.items.len() as u32;
+            for (owner_idx, worry) in items.iter_mut().filter(|(idx, _)| *idx == i as u8) {
+                let current_owner = &mut monkeys[*owner_idx as usize];
+                current_owner.inspections += 1;
 
-            let operation = monkey.operation;
-            let throws = monkey.throws;
-            let test = monkey.divider_test;
-
-            for worry in monkey.items.drain(..) {
-                let worry = (operation.apply(worry) % divider_test_product) / relax_divider;
-                let to_monkey_idx = throws[usize::from(worry % test == 0)];
-                to_push.push((to_monkey_idx, worry));
-            }
-
-            for (to, worry) in to_push.drain(..) {
-                monkeys[to as usize].items.push(worry);
+                *worry =
+                    (current_owner.operation.apply(*worry) % divider_test_product) / relax_divider;
+                *owner_idx = current_owner.throws
+                    [usize::from(*worry % current_owner.divider_test == 0)]
+                    as u8;
             }
         }
     }
