@@ -23,7 +23,7 @@ set +e
 echo "Collecting perf.data..."
 timeout 5s \
     perf record --call-graph dwarf --delay 10 \
-      ../../target/release/advent-of-code \
+      ../../target/release-quickbuild/advent-of-code \
         $AOC_YEAR $AOC_DAY $AOC_PART \
           < src/year${AOC_YEAR}/day`printf "%02d" ${AOC_DAY}`_input.txt
 set -e
