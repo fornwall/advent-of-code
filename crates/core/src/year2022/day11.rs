@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-type WorryType = u64;
+type WorryType = u32;
 
 #[derive(Copy, Clone)]
 enum Operation {
@@ -11,11 +11,12 @@ enum Operation {
 }
 
 impl Operation {
-    const fn apply(self, value: WorryType) -> WorryType {
+    const fn apply(self, value: WorryType) -> u64 {
+        let value = value as u64;
         match self {
-            Self::Add(operand) => value + operand,
+            Self::Add(operand) => value + operand as u64,
             Self::AddOld => value + value,
-            Self::Multiply(operand) => value * operand,
+            Self::Multiply(operand) => value * operand as u64,
             Self::MultiplyOld => value * value,
         }
     }
@@ -38,7 +39,7 @@ impl Monkey {
         for item_str in operation_line[18..].split(", ") {
             items.push(Item {
                 owner_idx: monkey_idx,
-                worry: item_str.parse::<WorryType>().ok()?
+                worry: item_str.parse::<WorryType>().ok()?,
             });
         }
         // Samples: "  Operation: new = old + 2" and "  Operation: new = old + old":
@@ -73,7 +74,7 @@ impl Monkey {
 
 struct Item {
     owner_idx: u8,
-    worry: WorryType
+    worry: WorryType,
 }
 
 pub fn solve(input: &mut Input) -> Result<u64, String> {
@@ -100,7 +101,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 current_owner.inspections += 1;
 
                 item.worry =
-                    (current_owner.operation.apply(item.worry) % divider_test_product) / relax_divider;
+                    (current_owner.operation.apply(item.worry) % divider_test_product as u64) as WorryType / relax_divider;
                 item.owner_idx = current_owner.throws
                     [usize::from(item.worry % current_owner.divider_test == 0)]
                     as u8;
