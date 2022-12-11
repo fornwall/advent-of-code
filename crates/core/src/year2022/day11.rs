@@ -100,8 +100,9 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 let current_owner = &mut monkeys[item.owner_idx as usize];
                 current_owner.inspections += 1;
 
-                item.worry =
-                    (current_owner.operation.apply(item.worry) % divider_test_product as u64) as WorryType / relax_divider;
+                item.worry = (current_owner.operation.apply(item.worry)
+                    % u64::from(divider_test_product)) as WorryType
+                    / relax_divider;
                 item.owner_idx = current_owner.throws
                     [usize::from(item.worry % current_owner.divider_test == 0)]
                     as u8;

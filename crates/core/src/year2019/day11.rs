@@ -116,7 +116,7 @@ pub fn solve(input: &mut Input) -> Result<String, String> {
             }
         });
 
-        let mut screen = vec![false; (max_x - min_x+1) as usize * (max_y - min_y+1) as usize];
+        let mut screen = vec![false; (max_x - min_x + 1) as usize * (max_y - min_y + 1) as usize];
         painted.iter().for_each(|(&(x, y), color)| {
             if *color == Color::White {
                 screen
