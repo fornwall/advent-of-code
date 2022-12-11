@@ -29,14 +29,17 @@ struct Monkey {
 }
 
 impl Monkey {
-    fn parse(monkey_idx: u8, input: &str, items: &mut Vec<(u8, WorryType)>) -> Option<Self> {
+    fn parse(monkey_idx: u8, input: &str, items: &mut Vec<Item>) -> Option<Self> {
         let mut lines = input.lines();
         // Sample: "Monkey 1:"
         lines.next()?;
         // Sample: "  Starting items: 90, 79, 97, 52, 90, 94, 71, 70":
         let operation_line = lines.next()?;
         for item_str in operation_line[18..].split(", ") {
-            items.push((monkey_idx, item_str.parse::<WorryType>().ok()?));
+            items.push(Item {
+                owner_idx: monkey_idx,
+                worry: item_str.parse::<WorryType>().ok()?
+            });
         }
         // Samples: "  Operation: new = old + 2" and "  Operation: new = old + old":
         let operation_line = lines.next()?;
@@ -68,6 +71,11 @@ impl Monkey {
     }
 }
 
+struct Item {
+    owner_idx: u8,
+    worry: WorryType
+}
+
 pub fn solve(input: &mut Input) -> Result<u64, String> {
     let mut items = Vec::with_capacity(36);
 
@@ -87,14 +95,14 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
 
     for _round in 0..input.part_values(20, 10_000) {
         for i in 0..monkeys.len() {
-            for (owner_idx, worry) in items.iter_mut().filter(|(idx, _)| *idx == i as u8) {
-                let current_owner = &mut monkeys[*owner_idx as usize];
+            for item in items.iter_mut().filter(|item| item.owner_idx == i as u8) {
+                let current_owner = &mut monkeys[item.owner_idx as usize];
                 current_owner.inspections += 1;
 
-                *worry =
-                    (current_owner.operation.apply(*worry) % divider_test_product) / relax_divider;
-                *owner_idx = current_owner.throws
-                    [usize::from(*worry % current_owner.divider_test == 0)]
+                item.worry =
+                    (current_owner.operation.apply(item.worry) % divider_test_product) / relax_divider;
+                item.owner_idx = current_owner.throws
+                    [usize::from(item.worry % current_owner.divider_test == 0)]
                     as u8;
             }
         }
