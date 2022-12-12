@@ -3,6 +3,8 @@ use std::collections::BinaryHeap;
 
 use crate::input::Input;
 
+type Position = (usize, usize);
+
 struct Graph {
     cells: Vec<u8>,
     visited: Vec<bool>,
@@ -11,13 +13,16 @@ struct Graph {
 }
 
 impl Graph {
-    fn parse(input: &str) -> Result<((usize, usize), (usize, usize), Self), String> {
+    fn parse(input: &str) -> Result<(Position, Position, Self), String> {
         let height = input.bytes().filter(|b| *b == b'\n').count() + 1;
-        let width = input.lines().next().unwrap().len();
+        let width = input.lines().next().unwrap_or_default().len();
         let mut start_pos = (0, 0);
         let mut destination_pos = (0, 0);
-        let mut cells = vec![0_u8; height*width];
+        let mut cells = vec![0_u8; height * width];
         for (y, line) in input.lines().enumerate() {
+            if line.len() != width {
+                return Err("Not all rows have equal length".to_string());
+            }
             for (x, val) in line.bytes().enumerate() {
                 cells[y * width + x] = if val == b'S' {
                     // "Your current position (S) has elevation a"
@@ -33,12 +38,20 @@ impl Graph {
             }
         }
         let visited = vec![false; cells.len()];
-        Ok((start_pos, destination_pos, Self {
-            cells,
-            visited,
-            height,
-            width,
-        }))
+        Ok((
+            start_pos,
+            destination_pos,
+            Self {
+                cells,
+                visited,
+                height,
+                width,
+            },
+        ))
+    }
+
+    fn height_at(&mut self, x: usize, y: usize) -> u8 {
+        self.cells[y * self.width + x]
     }
 
     fn mark_visited(&mut self, x: usize, y: usize) -> bool {
@@ -47,22 +60,22 @@ impl Graph {
         !old
     }
 
-    fn can_go(&mut self, x: usize, y: usize, dx: i32, dy: i32, part_2: bool) -> Option<(usize, usize)> {
-        if (dx < 0 && x == 0) || (dy < 0 && y == 0) || (dx > 0 && x + 1 == self.width) || (dy > 0 && y + 1 == self.height) {
+    fn can_go(&mut self, x: usize, y: usize, dx: i32, dy: i32, part_2: bool) -> Option<Position> {
+        if (dx < 0 && x == 0)
+            || (dy < 0 && y == 0)
+            || (dx > 0 && x + 1 == self.width)
+            || (dy > 0 && y + 1 == self.height)
+        {
             return None;
         }
         let new_x = (x as i32 + dx) as usize;
         let new_y = (y as i32 + dy) as usize;
-        let mut new_height = self.cells[new_y * self.width + new_x];
-        let mut old_height = self.cells[y * self.width + x];
+        let mut new_height = self.height_at(new_x, new_y);
+        let mut old_height = self.height_at(x, y);
         if part_2 {
             std::mem::swap(&mut new_height, &mut old_height);
         }
-        if new_height <= old_height + 1  && self.mark_visited(new_x, new_y){
-            Some((new_x, new_y))
-        } else {
-            None
-        }
+        (new_height <= old_height + 1 && self.mark_visited(new_x, new_y)).then_some((new_x, new_y))
     }
 }
 
@@ -81,7 +94,12 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         for (dx, dy) in [(-1, 0), (0, -1), (1, 0), (0, 1)] {
             if let Some(new_pos) = graph.can_go(pos.0, pos.1, dx, dy, input.is_part_two()) {
                 let new_cost = cost + 1;
-                if (input.is_part_one() && new_pos == destination_pos) || (input.is_part_two() && graph.cells[new_pos.1 * graph.width + new_pos.0] == b'a') {
+                let at_goal = if input.is_part_one() {
+                    new_pos == destination_pos
+                } else {
+                    graph.height_at(new_pos.0, new_pos.1) == b'a'
+                };
+                if at_goal {
                     return Ok(new_cost);
                 }
                 to_visit.push(Reverse((new_cost, new_pos)));
