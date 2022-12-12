@@ -1,5 +1,4 @@
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
+use std::collections::VecDeque;
 
 use crate::input::Input;
 
@@ -86,11 +85,11 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         start_pos = destination_pos;
     }
 
-    let mut to_visit = BinaryHeap::new();
+    let mut to_visit = VecDeque::with_capacity(64);
     graph.mark_visited(start_pos.0, start_pos.1);
-    to_visit.push(Reverse((0, start_pos)));
+    to_visit.push_back((0, start_pos));
 
-    while let Some(Reverse((cost, pos))) = to_visit.pop() {
+    while let Some((cost, pos)) = to_visit.pop_front() {
         for (dx, dy) in [(-1, 0), (0, -1), (1, 0), (0, 1)] {
             if let Some(new_pos) = graph.can_go(pos.0, pos.1, dx, dy, input.is_part_two()) {
                 let new_cost = cost + 1;
@@ -102,7 +101,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 if at_goal {
                     return Ok(new_cost);
                 }
-                to_visit.push(Reverse((new_cost, new_pos)));
+                to_visit.push_back((new_cost, new_pos));
             }
         }
     }
