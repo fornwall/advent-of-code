@@ -26,12 +26,12 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         // Add 1 since indexing in the problem is one based:
         let packets_1_idx = 1 + packets
             .iter()
-            .filter(|&packet| compare_packets(packet, "2"))
+            .filter(|&packet| is_correctly_ordered(packet, "2"))
             .count();
         // Add 2 - once from one based indexing, and one from "[[6]]" being after "[[2]]" in the list:
         let packets_2_idx = 2 + packets
             .iter()
-            .filter(|&packet| compare_packets(packet, "6"))
+            .filter(|&packet| is_correctly_ordered(packet, "6"))
             .count();
         Ok(packets_1_idx * packets_2_idx)
     }
@@ -40,21 +40,21 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
 fn is_packet_pair_correctly_ordered(packet_pair: &str) -> bool {
     let mut lines = packet_pair.lines();
     if let (Some(first_line), Some(second_line)) = (lines.next(), lines.next()) {
-        compare_packets(first_line, second_line)
+        is_correctly_ordered(first_line, second_line)
     } else {
         false
     }
 }
 
-fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
+fn is_correctly_ordered(packet_1: &str, packet_2: &str) -> bool {
     let mut line_1 = packet_1.bytes().peekable();
     let mut line_2 = packet_2.bytes().peekable();
 
     let mut coerced_to_list_1 = 0;
     let mut coerced_to_list_2 = 0;
 
-    let mut value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
-    let mut value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
+    let mut value_1 = next_token(&mut line_1, &mut coerced_to_list_1);
+    let mut value_2 = next_token(&mut line_2, &mut coerced_to_list_2);
 
     loop {
         match (value_1, value_2) {
@@ -70,8 +70,8 @@ fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
                     }
                     Ordering::Equal => {
                         // "Otherwise, the inputs are the same integer; continue checking the next part of the input":
-                        value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
-                        value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
+                        value_1 = next_token(&mut line_1, &mut coerced_to_list_1);
+                        value_2 = next_token(&mut line_2, &mut coerced_to_list_2);
                     }
                 }
             }
@@ -80,11 +80,11 @@ fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
                 // only value, then retry the comparison. For example, if comparing [0,0,0] and 2, convert the right value
                 // to [2] (a list containing 2); the result is then found by instead comparing [0,0,0] and [2]":
                 coerced_to_list_1 += 1;
-                value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
+                value_2 = next_token(&mut line_2, &mut coerced_to_list_2);
             }
             (Token::ListStart, Token::Number(_)) => {
                 coerced_to_list_2 += 1;
-                value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
+                value_1 = next_token(&mut line_1, &mut coerced_to_list_1);
             }
             (Token::ListEnd, Token::Number(_)) | (Token::ListEnd, Token::ListStart) => {
                 // "If the left list runs out of items first, the inputs are in the right order":
@@ -98,8 +98,8 @@ fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
                 // "If both values are lists, compare the first value of each list, then the second value,
                 // and so on. If the lists are the same length and no comparison makes a decision about the order,
                 // continue checking the next part of the input":
-                value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
-                value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
+                value_1 = next_token(&mut line_1, &mut coerced_to_list_1);
+                value_2 = next_token(&mut line_2, &mut coerced_to_list_2);
             }
         }
     }
@@ -112,7 +112,7 @@ enum Token {
     Number(u8),
 }
 
-fn next_value<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mut i32) -> Token {
+fn next_token<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mut i32) -> Token {
     if *coerced_to_list > 0 {
         *coerced_to_list -= 1;
         return Token::ListEnd;
@@ -197,7 +197,7 @@ pub fn tests() {
 pub fn troublesome_packet() {
     let p1 = "[[[9,[9,[0,2]],10,[[0,7,9,4,2],2,[6,7,4,3],[7]],4],[],[[],10,4,5]]]";
     let p2 = "[[[[[9],[7],2,1,8],[[7,5,9],10],[],[]]]]";
-    assert!(compare_packets(p1, p2));
+    assert!(is_correctly_ordered(p1, p2));
 }
 
 #[cfg(feature = "count-allocations")]
