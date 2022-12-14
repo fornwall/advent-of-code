@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-type WorryType = u32;
+type WorryType = u64;
 
 #[derive(Copy, Clone)]
 enum Operation {
@@ -92,7 +92,6 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         .iter()
         .map(|m| m.divider_test)
         .product::<WorryType>();
-    let relax_divider = input.part_values(3, 1);
 
     for _round in 0..input.part_values(20, 10_000) {
         for i in 0..monkeys.len() {
@@ -100,9 +99,12 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
                 let current_owner = &mut monkeys[item.owner_idx as usize];
                 current_owner.inspections += 1;
 
-                item.worry = (current_owner.operation.apply(item.worry)
-                    % u64::from(divider_test_product)) as WorryType
-                    / relax_divider;
+                item.worry = current_owner.operation.apply(item.worry) as WorryType;
+                if input.is_part_one() {
+                    item.worry /= 3;
+                } else {
+                    item.worry %= divider_test_product;
+                }
                 item.owner_idx = current_owner.throws
                     [usize::from(item.worry % current_owner.divider_test == 0)]
                     as u8;
