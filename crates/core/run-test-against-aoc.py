@@ -94,8 +94,11 @@ for year in years:
                             puzzle.answer_a if part == 1 else puzzle.answer_b
                         )
                         if existing_answer != result:
+                            output = f"failing-input-day-{year}-{day}-{part}.txt"
+                            with open(output, "w") as outfile:
+                                outfile.write(input_data)
                             sys.exit(
-                                f"Incorrect! Expected={puzzle.answer_a}, got {result}"
+                                f"Incorrect! Expected={puzzle.answer_a}, got {result}. See {output}"
                             )
                     except Exception:
                         if part == 1:

@@ -117,8 +117,10 @@ fn next_value<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mu
         *coerced_to_list -= 1;
         return Token::ListEnd;
     }
+
     let mut number = 0;
     let mut parsing_number = false;
+
     while let Some(b) = it.peek() {
         match b {
             b'[' => {
@@ -148,6 +150,7 @@ fn next_value<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mu
             }
         }
     }
+
     it.next();
     if parsing_number {
         return Token::Number(number);

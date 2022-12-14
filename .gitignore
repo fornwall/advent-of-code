@@ -36,3 +36,5 @@ aoc.fornwall.net/
 generated-*
 perf.*
 oprofile_data
+
+failing-input*txt
