@@ -1,6 +1,7 @@
 use core::iter::Peekable;
 use std::cmp::Ordering;
 
+use crate::common::array_collect::collect_array;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
@@ -15,29 +16,22 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             .sum())
     } else {
         const MAX_LINES: usize = 512;
-
-        let mut lines = [""; MAX_LINES + 2];
-        let mut line_idx = 0;
-        for line in input.text.lines() {
-            if !line.is_empty() {
-                lines[line_idx] = line;
-                line_idx += 1;
-                if line_idx == MAX_LINES {
-                    return Err(format!("Too many lines - max {} supported", MAX_LINES));
-                }
-            }
-        }
-        let packets = &lines[..line_idx];
+        let mut packets = [""; MAX_LINES];
+        let packets = collect_array(
+            &mut input.text.lines().filter(|line| !line.is_empty()),
+            &mut packets,
+        )
+        .ok_or_else(|| format!("Too many lines - max {} supported", MAX_LINES))?;
 
         // Add 1 since indexing in the problem is one based:
         let packets_1_idx = 1 + packets
             .iter()
-            .filter(|&packet| compare_packets(packet, "[[2]]"))
+            .filter(|&packet| compare_packets(packet, "2"))
             .count();
         // Add 2 - once from one based indexing, and one from "[[6]]" being after "[[2]]" in the list:
         let packets_2_idx = 2 + packets
             .iter()
-            .filter(|&packet| compare_packets(packet, "[[6]]"))
+            .filter(|&packet| compare_packets(packet, "6"))
             .count();
         Ok(packets_1_idx * packets_2_idx)
     }
@@ -56,15 +50,15 @@ fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
     let mut line_1 = packet_1.bytes().peekable();
     let mut line_2 = packet_2.bytes().peekable();
 
-    let mut value_1 = next_value(&mut line_1);
-    let mut value_2 = next_value(&mut line_2);
+    let mut coerced_to_list_1 = 0;
+    let mut coerced_to_list_2 = 0;
 
-    let mut coerced_to_list_1 = false;
-    let mut coerced_to_list_2 = false;
+    let mut value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
+    let mut value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
 
     loop {
         match (value_1, value_2) {
-            (Event::Number(n1), Event::Number(n2)) => {
+            (Token::Number(n1), Token::Number(n2)) => {
                 match n1.cmp(&n2) {
                     Ordering::Less => {
                         // "If the left integer is lower than the right integer, the inputs are in the right order":
@@ -76,76 +70,67 @@ fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
                     }
                     Ordering::Equal => {
                         // "Otherwise, the inputs are the same integer; continue checking the next part of the input":
-                        if coerced_to_list_1 {
-                            coerced_to_list_1 = false;
-                            value_1 = Event::ListEnd;
-                            value_2 = next_value(&mut line_2);
-                            continue;
-                        } else if coerced_to_list_2 {
-                            coerced_to_list_2 = false;
-                            value_2 = Event::ListEnd;
-                            value_1 = next_value(&mut line_1);
-                            continue;
-                        }
-                        value_1 = next_value(&mut line_1);
-                        value_2 = next_value(&mut line_2);
-                        continue;
+                        value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
+                        value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
                     }
                 }
             }
-            (Event::Number(_), Event::ListStart) => {
+            (Token::Number(_), Token::ListStart) => {
                 // "If exactly one value is an integer, convert the integer to a list which contains that integer as its
                 // only value, then retry the comparison. For example, if comparing [0,0,0] and 2, convert the right value
                 // to [2] (a list containing 2); the result is then found by instead comparing [0,0,0] and [2]":
-                coerced_to_list_1 = true;
-                value_2 = next_value(&mut line_2);
+                coerced_to_list_1 += 1;
+                value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
             }
-            (Event::ListStart, Event::Number(_)) => {
-                coerced_to_list_2 = true;
-                value_1 = next_value(&mut line_1);
+            (Token::ListStart, Token::Number(_)) => {
+                coerced_to_list_2 += 1;
+                value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
             }
-            (Event::ListEnd, Event::Number(_)) | (Event::ListEnd, Event::ListStart) => {
+            (Token::ListEnd, Token::Number(_)) | (Token::ListEnd, Token::ListStart) => {
                 // "If the left list runs out of items first, the inputs are in the right order":
                 return true;
             }
-            (Event::Number(_), Event::ListEnd) | (Event::ListStart, Event::ListEnd) => {
+            (Token::Number(_), Token::ListEnd) | (Token::ListStart, Token::ListEnd) => {
                 // "If the right list runs out of items first, the inputs are not in the right order":
                 return false;
             }
-            (Event::ListEnd, Event::ListEnd) | (Event::ListStart, Event::ListStart) => {
+            (Token::ListEnd, Token::ListEnd) | (Token::ListStart, Token::ListStart) => {
                 // "If both values are lists, compare the first value of each list, then the second value,
                 // and so on. If the lists are the same length and no comparison makes a decision about the order,
                 // continue checking the next part of the input":
-                value_1 = next_value(&mut line_1);
-                value_2 = next_value(&mut line_2);
-                continue;
+                value_1 = next_value(&mut line_1, &mut coerced_to_list_1);
+                value_2 = next_value(&mut line_2, &mut coerced_to_list_2);
             }
         }
     }
 }
 
 #[derive(Copy, Clone, Debug)]
-enum Event {
+enum Token {
     ListStart,
     ListEnd,
     Number(u8),
 }
 
-fn next_value<I: Iterator<Item = u8>>(it: &mut Peekable<I>) -> Event {
+fn next_value<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mut i32) -> Token {
+    if *coerced_to_list > 0 {
+        *coerced_to_list -= 1;
+        return Token::ListEnd;
+    }
     let mut number = 0;
     let mut parsing_number = false;
     while let Some(b) = it.peek() {
         match b {
             b'[' => {
                 it.next();
-                return Event::ListStart;
+                return Token::ListStart;
             }
             b']' => {
                 if parsing_number {
-                    return Event::Number(number);
+                    return Token::Number(number);
                 }
                 it.next();
-                return Event::ListEnd;
+                return Token::ListEnd;
             }
             digit @ b'0'..=b'9' => {
                 parsing_number = true;
@@ -155,19 +140,19 @@ fn next_value<I: Iterator<Item = u8>>(it: &mut Peekable<I>) -> Event {
             b',' => {
                 it.next();
                 if parsing_number {
-                    return Event::Number(number);
+                    return Token::Number(number);
                 }
             }
             _ => {
-                return Event::ListEnd;
+                return Token::ListEnd;
             }
         }
     }
     it.next();
     if parsing_number {
-        return Event::Number(number);
+        return Token::Number(number);
     }
-    Event::ListEnd
+    Token::ListEnd
 }
 
 #[test]
@@ -203,6 +188,13 @@ pub fn tests() {
     let real_input = include_str!("day13_input.txt");
     test_part_one!(real_input => 4821);
     test_part_two!(real_input => 21_890);
+}
+
+#[test]
+pub fn troublesome_packet() {
+    let p1 = "[[[9,[9,[0,2]],10,[[0,7,9,4,2],2,[6,7,4,3],[7]],4],[],[[],10,4,5]]]";
+    let p2 = "[[[[[9],[7],2,1,8],[[7,5,9],10],[],[]]]]";
+    assert!(compare_packets(p1, p2));
 }
 
 #[cfg(feature = "count-allocations")]
