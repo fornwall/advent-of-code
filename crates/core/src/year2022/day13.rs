@@ -14,9 +14,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             })
             .sum())
     } else {
-        const MAX_LINES: usize = 510;
-        const DIVIDER_PACKET_1: &str = "[[2]]";
-        const DIVIDER_PACKET_2: &str = "[[6]]";
+        const MAX_LINES: usize = 512;
 
         let mut lines = [""; MAX_LINES + 2];
         let mut line_idx = 0;
@@ -29,28 +27,19 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                 }
             }
         }
+        let packets = &lines[..line_idx];
 
-        lines[line_idx] = DIVIDER_PACKET_1;
-        lines[line_idx + 1] = DIVIDER_PACKET_2;
-
-        let packets = &mut lines[..(line_idx + 2)];
-
-        packets.sort_unstable_by(|a, b| {
-            if compare_packets(a, b) {
-                Ordering::Less
-            } else {
-                Ordering::Greater
-            }
-        });
-
-        Ok(packets
+        // Add 1 since indexing in the problem is one based:
+        let packets_1_idx = 1 + packets
             .iter()
-            .enumerate()
-            .filter_map(|(zero_based_idx, packet)| {
-                (packet == &DIVIDER_PACKET_1 || packet == &DIVIDER_PACKET_2)
-                    .then_some(zero_based_idx + 1)
-            })
-            .product())
+            .filter(|&packet| compare_packets(packet, "[[2]]"))
+            .count();
+        // Add 2 - once from one based indexing, and one from "[[6]]" being after "[[2]]" in the list:
+        let packets_2_idx = 2 + packets
+            .iter()
+            .filter(|&packet| compare_packets(packet, "[[6]]"))
+            .count();
+        Ok(packets_1_idx * packets_2_idx)
     }
 }
 
