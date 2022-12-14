@@ -105,7 +105,7 @@ fn compare_packets(packet_1: &str, packet_2: &str) -> bool {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 enum Token {
     ListStart,
     ListEnd,

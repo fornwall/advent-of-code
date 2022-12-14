@@ -220,7 +220,7 @@ impl Program {
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Opcode {
     Addr, // (add register) stores into register C the result of adding register A and register B
     Addi, // (add immediate) stores into register C the result of adding register A and value B.
