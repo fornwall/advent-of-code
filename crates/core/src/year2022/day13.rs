@@ -1,7 +1,6 @@
 use core::iter::Peekable;
 use std::cmp::Ordering;
 
-use crate::common::array_collect::collect_array;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
@@ -15,13 +14,11 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             })
             .sum())
     } else {
-        const MAX_LINES: usize = 512;
-        let mut packets = [""; MAX_LINES];
-        let packets = collect_array(
-            &mut input.text.lines().filter(|line| !line.is_empty()),
-            &mut packets,
-        )
-        .ok_or_else(|| format!("Too many lines - max {} supported", MAX_LINES))?;
+        let packets = input
+            .text
+            .lines()
+            .filter(|line| !line.is_empty())
+            .collect::<Vec<_>>();
 
         // Add 1 since indexing in the problem is one based:
         let packets_1_idx = 1 + packets
@@ -202,12 +199,12 @@ pub fn troublesome_packet() {
 
 #[cfg(feature = "count-allocations")]
 #[test]
-pub fn no_memory_allocations() {
+pub fn limited_memory_allocations() {
     use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day13_input.txt");
     let allocations = allocation_counter::count(|| {
         test_part_one!(real_input => 4821);
         test_part_two!(real_input => 21_890);
     });
-    assert_eq!(allocations, 0);
+    assert_eq!(allocations, 8);
 }

@@ -185,7 +185,6 @@ move 4 from 2 to 1";
 #[cfg(feature = "count-allocations")]
 #[test]
 pub fn single_to_string_memory_allocation() {
-    use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day05_input.txt");
     let allocations = allocation_counter::count(|| {
         assert!(solve(&mut Input::part_one(real_input)).is_ok());
