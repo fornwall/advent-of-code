@@ -1,4 +1,4 @@
-use crate::common::window_iterator::WindowIteratorExt;
+use crate::common::chunk_iterator::ChunkIteratorExt;
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
@@ -11,7 +11,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             })
             .sum()
     } else {
-        lines.window::<3>().map(common_item_priority).sum()
+        lines.chunks_exact::<3>().map(common_item_priority).sum()
     })
 }
 
