@@ -168,6 +168,7 @@ impl AABB {
         let mut closest: Position = point;
 
         for i in 0..3 {
+            #[allow(clippy::manual_clamp)]
             if closest[i] > self.max[i] {
                 closest[i] = self.max[i];
             } else if closest[i] < self.min[i] {

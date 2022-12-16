@@ -12,11 +12,10 @@ enum Operation {
 
 impl Operation {
     const fn apply(self, value: WorryType) -> u64 {
-        let value = value as u64;
         match self {
-            Self::Add(operand) => value + operand as u64,
+            Self::Add(operand) => value + operand,
             Self::AddOld => value + value,
-            Self::Multiply(operand) => value * operand as u64,
+            Self::Multiply(operand) => value * operand,
             Self::MultiplyOld => value * value,
         }
     }
