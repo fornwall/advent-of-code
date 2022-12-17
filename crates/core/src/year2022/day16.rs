@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::input::Input;
+use std::collections::HashMap;
 
 type ReleasedPressure = i16;
 
@@ -150,7 +150,8 @@ impl SearchState {
             if valve.flow_rate > 0 && (opened_valves_bitset as i32 & valve.mask) == 0 {
                 let flow_increase = minutes_left as ReleasedPressure * valve.flow_rate;
                 let new_released_pressure = released_pressure + flow_increase;
-                let new_opened_valves_bitset = ((opened_valves_bitset as i32) | valve.mask) as usize;
+                let new_opened_valves_bitset =
+                    ((opened_valves_bitset as i32) | valve.mask) as usize;
                 Self::set_if_higher(
                     &mut self.released_pressure_new
                         [valve_idx * self.num_possible_values_of_bitset + new_opened_valves_bitset],
@@ -169,8 +170,9 @@ impl SearchState {
             }
             let opened_valves_bitset = state_idx % self.num_possible_values_of_bitset;
             Self::set_if_higher(
-                &mut self.released_pressure_new
-                    [self.start_valve_idx * self.num_possible_values_of_bitset + opened_valves_bitset],
+                &mut self.released_pressure_new[self.start_valve_idx
+                    * self.num_possible_values_of_bitset
+                    + opened_valves_bitset],
                 released_pressure,
             );
         }
