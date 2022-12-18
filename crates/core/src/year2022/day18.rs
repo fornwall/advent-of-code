@@ -48,7 +48,8 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             for adjacent in adjacent(point) {
                 if (0..SIZE).contains(&adjacent.0)
                     && (0..SIZE).contains(&adjacent.1)
-                    && (0..SIZE).contains(&adjacent.2) {
+                    && (0..SIZE).contains(&adjacent.2)
+                {
                     if grid[(adjacent.0) as usize][(adjacent.1) as usize][(adjacent.2) as usize] {
                         wet_sides += 1;
                     } else if !water_points[(adjacent.0) as usize][(adjacent.1) as usize]
@@ -65,19 +66,17 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     }
 }
 
-fn adjacent(point: (i32, i32, i32)) -> impl Iterator<Item=(i32, i32, i32)> {
-    [-1_i32, 0, 1]
-        .iter()
-        .flat_map(|&dx| [-1_i32, 0, 1].iter().map(move |&dy| (dx, dy)))
-        .flat_map(move |(dx, dy)| {
-            [-1_i32, 0, 1].iter().filter_map(move |&dz| {
-                (dx.abs() + dy.abs() + dz.abs() == 1).then_some((
-                    point.0 + dx,
-                    point.1 + dy,
-                    point.2 + dz,
-                ))
-            })
-        })
+fn adjacent(point: (i32, i32, i32)) -> impl Iterator<Item = (i32, i32, i32)> {
+    [
+        (1, 0, 0),
+        (-1, 0, 0),
+        (0, 1, 0),
+        (0, -1, 0),
+        (0, 0, 1),
+        (0, 0, -1),
+    ]
+    .iter()
+    .map(move |d| (d.0 + point.0, d.1 + point.1, d.2 + point.2))
 }
 
 #[test]
