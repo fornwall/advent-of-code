@@ -1,17 +1,11 @@
-use crate::input::Input;
 use std::collections::VecDeque;
 use std::num::NonZeroU32;
+
+use crate::input::Input;
 
 type MarbleValue = u32;
 
 struct MarbleCircle {
-    // A double-ended queue representing the circular structure with the front
-    // of the queue being the current marble and the ordering from front to back
-    // of the queue represents clockwise ordering of the marbles. This means the
-    // following operations can be implemented efficiently:
-    // - Inserting at the current position: push_front().
-    // - Moving clockwise: push_back(pop_front()).
-    // - Moving counter-clockwise: push_front(pop_back()).
     marbles: VecDeque<MarbleValue>,
 }
 
@@ -26,16 +20,14 @@ impl MarbleCircle {
         self.marbles.push_front(marble_number);
     }
 
-    fn move_clockwise(&mut self) -> Result<(), String> {
-        let popped = self.marbles.pop_front().ok_or("No marble to pop")?;
-        self.marbles.push_back(popped);
-        Ok(())
+    fn move_clockwise(&mut self, steps: usize) {
+        if self.marbles.len() > 1 {
+            self.marbles.rotate_left(steps);
+        }
     }
 
-    fn move_counter_clockwise(&mut self) -> Result<(), String> {
-        let popped = self.marbles.pop_back().ok_or("No marble to pop")?;
-        self.marbles.push_front(popped);
-        Ok(())
+    fn move_counter_clockwise(&mut self, steps: usize) {
+        self.marbles.rotate_right(steps);
     }
 
     fn take_current(&mut self) -> Option<MarbleValue> {
@@ -70,7 +62,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             max_last_marble_points
         ));
     }
-    let num_marbles = (last_marble_points + 1) * last_marble_multiplier; // 0 based.
+    let num_marbles = (last_marble_points) * last_marble_multiplier;
 
     let mut player_scores = vec![0_u32; num_players as usize];
     let mut marbles = MarbleCircle::new(num_marbles);
@@ -86,9 +78,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
             // circle is large enough, this means that there is one marble between the marble that was
             // just placed and the current marble.) The marble that was just placed then becomes the
             // current marble."
-            for _ in 0..2 {
-                marbles.move_clockwise()?;
-            }
+            marbles.move_clockwise(2);
             marbles.add(marble_number);
         } else {
             // "However, if the marble that is about to be placed has a number which is a multiple of 23,
@@ -96,19 +86,15 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
 
             // "First, the current player keeps the marble they would have placed, adding it to their score":
             let player_number = marble_number % num_players;
-            player_scores[player_number as usize] = player_scores[player_number as usize]
-                .checked_add(marble_number)
-                .ok_or("Aborting after too high score")?;
-
             // "In addition, the marble 7 marbles counter-clockwise
             // from the current marble is removed from the circle and also added to the current player's
             // score. The marble located immediately clockwise of the marble that was removed becomes
             // the new current marble."
-            for _ in 0..7 {
-                marbles.move_counter_clockwise()?;
-            }
-            player_scores[player_number as usize] +=
-                marbles.take_current().ok_or("No marble to pop")?;
+            marbles.move_counter_clockwise(7);
+
+            player_scores[player_number as usize] = player_scores[player_number as usize]
+                .checked_add(marble_number + marbles.take_current().ok_or("No marble to pop")?)
+                .ok_or("Aborting after too high score")?;
         };
     }
 
@@ -124,21 +110,12 @@ fn tests() {
     use crate::input::{test_part_one, test_part_two};
 
     test_part_one!("9 players; last marble is worth 25 points" => 32);
-    test_part_one!(
-            "10 players; last marble is worth 1618 points" => 8317
-    );
-    test_part_one!(
-        "13 players; last marble is worth 7999 points" => 146_373
-    );
-    test_part_one!(
-            "17 players; last marble is worth 1104 points"=>2764
-    );
-    test_part_one!(
-            "21 players; last marble is worth 6111 points" => 54718
-    );
-    test_part_one!(
-            "30 players; last marble is worth 5807 points" => 37305
-    );
+    test_part_one!("10 players; last marble is worth 1618 points" => 8317);
+    test_part_one!("13 players; last marble is worth 7999 points" => 146_373);
+    test_part_one!("17 players; last marble is worth 1104 points" => 2764);
+    test_part_one!("21 players; last marble is worth 6111 points" => 54718);
+    test_part_one!("30 players; last marble is worth 5807 points" => 37305);
+    test_part_one!("1 players; last marble is worth 22 points" => 0);
 
     let input = include_str!("day09_input.txt");
     test_part_one!(input => 423_717);
