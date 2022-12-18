@@ -75,6 +75,7 @@ pub fn solve(
 ) -> Result<String, String> {
     #![allow(clippy::let_and_return)]
     use crate::input::{Input, Part};
+    let input = input.trim_end();
 
     if input.is_empty() {
         return Err("Empty input".to_string());
