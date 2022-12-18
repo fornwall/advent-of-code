@@ -3,8 +3,8 @@ use std::collections::HashMap;
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
-    let target_rocks_count = input.part_values(2022, 1_000_000_000_000);
+pub fn solve(input: &mut Input) -> Result<u64, String> {
+    let target_rocks_count = input.part_values(2022, 1_000_000_000_000_u64);
     let mut grid = Grid::new();
 
     let mut seen = HashMap::new();
@@ -14,7 +14,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         .iter()
         .cycle()
         .enumerate()
-        .take(target_rocks_count)
+        .take(target_rocks_count.min(100_000) as usize)
     {
         // "Each rock appears so that its left edge is two units away from the left
         // wall and its bottom edge is three units above the highest rock in the
@@ -45,21 +45,22 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                     (current_rock_count % ROCK_SEQUENCE.len(), direction_idx);
 
                 match seen.entry(rock_and_direction_idx) {
+                    Entry::Vacant(entry) => {
+                        entry.insert((current_rock_count, grid.highest_rock));
+                    }
                     Entry::Occupied(entry) => {
                         let (last_seen_rock_drop_iteration, last_seen_highest_rock) = *entry.get();
-                        let rocks_per_cycle = current_rock_count - last_seen_rock_drop_iteration;
-                        let remaining_rocks = target_rocks_count - current_rock_count;
+                        let rocks_per_cycle =
+                            (current_rock_count - last_seen_rock_drop_iteration) as u64;
+                        let remaining_rocks = target_rocks_count - current_rock_count as u64;
 
                         if remaining_rocks % rocks_per_cycle == 0 {
                             let remaining_cycles = remaining_rocks / rocks_per_cycle;
                             let highest_rock_growth = grid.highest_rock - last_seen_highest_rock;
-                            return Ok(
-                                grid.highest_rock + remaining_cycles * highest_rock_growth - 1
-                            );
+                            return Ok(grid.highest_rock as u64
+                                + remaining_cycles * highest_rock_growth as u64
+                                - 1);
                         }
-                    }
-                    Entry::Vacant(entry) => {
-                        entry.insert((current_rock_count, grid.highest_rock));
                     }
                 }
             }
@@ -67,7 +68,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         }
     }
 
-    Ok(grid.highest_rock)
+    Ok(grid.highest_rock as u64)
 }
 
 type Rock = u16;
