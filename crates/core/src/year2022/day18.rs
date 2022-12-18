@@ -3,7 +3,12 @@ use crate::input::Input;
 pub fn solve(input: &mut Input) -> Result<usize, String> {
     const MAX: i32 = 24;
     const SIZE: i32 = MAX + 2;
-    let mut grid = [[[false; SIZE as usize]; SIZE as usize]; SIZE as usize];
+
+    const AIR_VALUE: u8 = 0;
+    const LAVA_VALUE: u8 = 1;
+    const WATER_VALUE: u8 = 2;
+
+    let mut grid = [[[AIR_VALUE; SIZE as usize]; SIZE as usize]; SIZE as usize];
 
     let points = input
         .text
@@ -19,7 +24,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                 parse_coordinate(parts.next()?)?,
                 parse_coordinate(parts.next()?)?,
             );
-            grid[point.0 as usize][point.1 as usize][point.2 as usize] = true;
+            grid[point.0 as usize][point.1 as usize][point.2 as usize] = LAVA_VALUE;
             Some(point)
         })
         .collect::<Option<Vec<_>>>()
@@ -32,31 +37,32 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             .iter()
             .map(|&point| {
                 adjacent(point)
-                    .filter(|p| !grid[(p.0) as usize][(p.1) as usize][(p.2) as usize])
+                    .filter(|p| grid[(p.0) as usize][(p.1) as usize][(p.2) as usize] != LAVA_VALUE)
                     .count()
             })
             .sum())
     } else {
-        let mut water_points = [[[false; SIZE as usize]; SIZE as usize]; SIZE as usize];
         let mut points_to_fill = Vec::with_capacity(MAX as usize * MAX as usize * MAX as usize);
 
         points_to_fill.push((0, 0, 0));
-        water_points[0][0][0] = true;
         let mut wet_sides = 0;
 
-        while let Some(point) = points_to_fill.pop() {
-            for adjacent in adjacent(point) {
+        while let Some(point_to_fill) = points_to_fill.pop() {
+            for adjacent in adjacent(point_to_fill) {
                 if (0..SIZE).contains(&adjacent.0)
                     && (0..SIZE).contains(&adjacent.1)
                     && (0..SIZE).contains(&adjacent.2)
                 {
-                    if grid[(adjacent.0) as usize][(adjacent.1) as usize][(adjacent.2) as usize] {
-                        wet_sides += 1;
-                    } else if !water_points[(adjacent.0) as usize][(adjacent.1) as usize]
-                        [(adjacent.2) as usize]
+                    if grid[(adjacent.0) as usize][(adjacent.1) as usize][(adjacent.2) as usize]
+                        == LAVA_VALUE
                     {
-                        water_points[(adjacent.0) as usize][(adjacent.1) as usize]
-                            [(adjacent.2) as usize] = true;
+                        wet_sides += 1;
+                    } else if grid[(adjacent.0) as usize][(adjacent.1) as usize]
+                        [(adjacent.2) as usize]
+                        == AIR_VALUE
+                    {
+                        grid[(adjacent.0) as usize][(adjacent.1) as usize][(adjacent.2) as usize] =
+                            WATER_VALUE;
                         points_to_fill.push(adjacent);
                     }
                 }
