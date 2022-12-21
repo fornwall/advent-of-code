@@ -1,108 +1,139 @@
 use std::collections::HashMap;
 
 use crate::input::Input;
-use crate::year2022::rational::Rational;
 
 pub fn solve(input: &mut Input) -> Result<i64, String> {
-    let (root_id, human_id, monkeys) = MonkeyAction::parse(input.text).ok_or("Invalid input")?;
+    let (root_id, human_id, mut actions) =
+        MonkeyAction::parse(input.text).ok_or("Invalid input")?;
 
     if input.is_part_one() {
-        eval(&monkeys, root_id, MonkeyId::MAX).number
+        Ok(eval(&actions, root_id))
     } else {
         let MonkeyAction::Operation {
-            first_operand,
+            lhs: first_operand,
             operator: _,
-            second_operand,
-        } = monkeys[root_id as usize] else {
+            rhs: second_operand,
+        } = actions[root_id as usize].action else {
             return Err("The root monkey does not do any action".to_string());
         };
 
-        let v1 = eval(&monkeys, first_operand, human_id);
-        let v2 = eval(&monkeys, second_operand, human_id);
-        // v1.number + h * v1.human_output = v2.number + h * v2.human_output
-        // =>
-        // h * (v1.human_output - v2.human_output) = v2.number - v1.number
-        // =>
-        (v2.number - v1.number) / (v1.human_output - v2.human_output)
+        setup_contains_human(&mut actions, root_id, human_id);
+
+        Ok(if actions[root_id as usize].contains_human {
+            eval_for_human_output(
+                &actions,
+                first_operand,
+                human_id,
+                eval(&actions, second_operand),
+            )
+        } else {
+            if !actions[root_id as usize].contains_human {
+                return Err("No sides of the root operation contains human output".to_string());
+            }
+            eval_for_human_output(
+                &actions,
+                second_operand,
+                human_id,
+                eval(&actions, first_operand),
+            )
+        })
     }
-    .int_value()
-    .ok_or_else(|| "No solution found".to_string())
 }
+
+fn eval(actions: &[Monkey], evaluated_id: MonkeyId) -> Value {
+    match actions[evaluated_id as usize].action {
+        MonkeyAction::Constant(number) => Value::from(number),
+        MonkeyAction::Operation { lhs, operator, rhs } => {
+            let o1 = eval(actions, lhs);
+            let o2 = eval(actions, rhs);
+            match operator {
+                b'+' => o1 + o2,
+                b'-' => o1 - o2,
+                b'*' => o1 * o2,
+                _ => o1 / o2,
+            }
+        }
+    }
+}
+
+fn setup_contains_human(
+    actions: &mut [Monkey],
+    evaluated_id: MonkeyId,
+    human_id: MonkeyId,
+) -> bool {
+    let value = if actions[evaluated_id as usize].contains_human {
+        true
+    } else {
+        match actions[evaluated_id as usize].action {
+            MonkeyAction::Constant(_) => false,
+            MonkeyAction::Operation {
+                lhs,
+                operator: _,
+                rhs,
+            } => {
+                setup_contains_human(actions, lhs, human_id)
+                    || setup_contains_human(actions, rhs, human_id)
+            }
+        }
+    };
+    actions[evaluated_id as usize].contains_human = value;
+    value
+}
+
+fn eval_for_human_output(
+    actions: &[Monkey],
+    evaluated_id: MonkeyId,
+    human_id: MonkeyId,
+    human_output: Value,
+) -> Value {
+    if evaluated_id == human_id {
+        return human_output;
+    }
+
+    match actions[evaluated_id as usize].action {
+        MonkeyAction::Constant(number) => Value::from(number),
+        MonkeyAction::Operation { lhs, operator, rhs } => {
+            let lhs_human = actions[lhs as usize].contains_human;
+            let rhs_human = actions[rhs as usize].contains_human;
+
+            let new_value = match (operator, lhs_human, rhs_human) {
+                (b'+', true, false) => human_output - eval(actions, rhs),
+                (b'+', false, true) => human_output - eval(actions, lhs),
+                (b'-', true, false) => human_output + eval(actions, rhs),
+                (b'-', false, true) => eval(actions, lhs) - human_output,
+                (b'*', true, false) => human_output / eval(actions, rhs),
+                (b'*', false, true) => human_output / eval(actions, lhs),
+                (b'/', true, false) => human_output * eval(actions, rhs),
+                _ => eval(actions, lhs) / human_output,
+            };
+
+            let evaluated_id = if lhs_human { lhs } else { rhs };
+            eval_for_human_output(actions, evaluated_id, human_id, new_value)
+        }
+    }
+}
+
+type Value = i64;
+type MonkeyId = u16;
 
 #[derive(Copy, Clone)]
-struct Value {
-    number: Rational,
-    human_output: Rational,
+struct Monkey {
+    contains_human: bool,
+    action: MonkeyAction,
 }
-
-impl Value {
-    fn op(self, operator: u8, other: Self) -> Self {
-        match operator {
-            b'+' => Self {
-                number: self.number + other.number,
-                human_output: self.human_output + other.human_output,
-            },
-            b'-' => Self {
-                number: self.number - other.number,
-                human_output: self.human_output - other.human_output,
-            },
-            b'*' => {
-                assert!(self.human_output.x == 0 || other.human_output.x == 0);
-                Self {
-                    number: self.number * other.number,
-                    human_output: self.number * other.human_output
-                        + self.human_output * other.number,
-                }
-            }
-            _ => {
-                assert_eq!(other.human_output.x, 0);
-                Self {
-                    number: self.number / other.number,
-                    human_output: self.human_output / other.number,
-                }
-            }
-        }
-    }
-}
-
-fn eval(actions: &[MonkeyAction], evaluated_id: MonkeyId, human_idx: MonkeyId) -> Value {
-    if evaluated_id == human_idx {
-        return Value {
-            number: Rational::integer(0),
-            human_output: Rational::integer(1),
-        };
-    }
-    match actions[evaluated_id as usize] {
-        MonkeyAction::Constant(number) => Value {
-            number: Rational::integer(i64::from(number)),
-            human_output: Rational::integer(0),
-        },
-        MonkeyAction::Operation {
-            first_operand,
-            operator,
-            second_operand,
-        } => {
-            let o1 = eval(actions, first_operand, human_idx);
-            let o2 = eval(actions, second_operand, human_idx);
-            o1.op(operator, o2)
-        }
-    }
-}
-
-type MonkeyId = u16;
 
 #[derive(Copy, Clone)]
 enum MonkeyAction {
     Constant(u16),
     Operation {
-        first_operand: MonkeyId,
+        lhs: MonkeyId,
         operator: u8,
-        second_operand: MonkeyId,
+        rhs: MonkeyId,
     },
 }
 
 impl MonkeyAction {
-    fn parse<'a>(input: &'a str) -> Option<(MonkeyId, MonkeyId, Vec<Self>)> {
+    fn parse<'a>(input: &'a str) -> Option<(MonkeyId, MonkeyId, Vec<Monkey>)> {
         let mut name_to_id = HashMap::new();
         let mut actions = Vec::with_capacity(40_000);
 
@@ -119,7 +150,8 @@ impl MonkeyAction {
 
             let monkey_name = words.next().map(|w| &w[0..w.len() - 1])?;
             let monkey_id = id_of(monkey_name);
-            if monkey_name == "humn" {
+            let is_human = monkey_name == "humn";
+            if is_human {
                 human_id = Some(monkey_id);
             } else if monkey_name == "root" {
                 root_id = Some(monkey_id);
@@ -131,19 +163,29 @@ impl MonkeyAction {
                 let operator = third_word.as_bytes()[0];
                 let second_operand = id_of(words.next()?);
                 Self::Operation {
-                    first_operand,
+                    lhs: first_operand,
                     operator,
-                    second_operand,
+                    rhs: second_operand,
                 }
             } else {
                 let number = second_word.parse::<u16>().ok()?;
                 Self::Constant(number)
             };
+            let monkey = Monkey {
+                contains_human: is_human,
+                action,
+            };
 
             if actions.len() < (monkey_id + 1) as usize {
-                actions.resize((monkey_id + 1) as usize, Self::Constant(999));
+                actions.resize(
+                    (monkey_id + 1) as usize,
+                    Monkey {
+                        contains_human: false,
+                        action: Self::Constant(0),
+                    },
+                );
             }
-            actions[monkey_id as usize] = action;
+            actions[monkey_id as usize] = monkey;
         }
 
         Some((root_id?, human_id?, actions))
