@@ -7,31 +7,31 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
     let iterations = input.part_values(1, 10);
     let decryption_key = input.part_values(1, 811_589_153);
 
-    let mut numbers = input
+    let numbers = input
         .text
         .lines()
-        .enumerate()
-        .map(|(idx, line)| Some((idx, i64::from(line.parse::<i16>().ok()?) * decryption_key)))
-        .collect::<Option<VecDeque<_>>>()
-        .ok_or_else(|| "Invalid input".to_string())?;
+        .map(|line| Some(i64::from(line.parse::<i16>().ok()?) * decryption_key))
+        .collect::<Option<Vec<_>>>()
+        .ok_or("Invalid input")?;
+    let mut pointers = numbers.iter().collect::<VecDeque<_>>();
 
-    for original_idx in (0..numbers.len()).cycle().take(numbers.len() * iterations) {
-        let current_idx = numbers
+    for n in numbers.iter().cycle().take(numbers.len() * iterations) {
+        let current_idx = pointers
             .iter()
-            .position(|(idx, _)| *idx == original_idx)
-            .unwrap();
+            .position(|&e| std::ptr::eq(e, n))
+            .unwrap_or_default();
 
-        let (_, number) = numbers.remove(current_idx).unwrap();
-        numbers.insert(
-            (number + current_idx as i64).rem_euclid(numbers.len() as i64) as usize,
-            (original_idx, number),
+        pointers.remove(current_idx).unwrap();
+        pointers.insert(
+            (n + current_idx as i64).rem_euclid(pointers.len() as i64) as usize,
+            n,
         );
     }
 
-    let zero_idx = numbers.iter().position(|&(_, n)| n == 0).unwrap();
+    let zero_idx = pointers.iter().position(|&&n| n == 0).unwrap();
     Ok([1000, 2000, 3000]
         .iter()
-        .map(|offset| numbers[(zero_idx + offset) % numbers.len()].1)
+        .map(|offset| pointers[(zero_idx + offset) % pointers.len()])
         .sum())
 }
 
