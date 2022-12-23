@@ -17,7 +17,7 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
             return Err("The root monkey does not do any action".to_string());
         };
 
-        setup_contains_human(&mut actions, root_id, human_id);
+        setup_contains_human(&mut actions, root_id);
 
         Ok(if actions[root_id as usize].contains_human {
             eval_for_human_output(
@@ -56,11 +56,7 @@ fn eval(actions: &[Monkey], evaluated_id: MonkeyId) -> Value {
     }
 }
 
-fn setup_contains_human(
-    actions: &mut [Monkey],
-    evaluated_id: MonkeyId,
-    human_id: MonkeyId,
-) -> bool {
+fn setup_contains_human(actions: &mut [Monkey], evaluated_id: MonkeyId) -> bool {
     let value = if actions[evaluated_id as usize].contains_human {
         true
     } else {
@@ -70,10 +66,7 @@ fn setup_contains_human(
                 lhs,
                 operator: _,
                 rhs,
-            } => {
-                setup_contains_human(actions, lhs, human_id)
-                    || setup_contains_human(actions, rhs, human_id)
-            }
+            } => setup_contains_human(actions, lhs) || setup_contains_human(actions, rhs),
         }
     };
     actions[evaluated_id as usize].contains_human = value;
@@ -134,8 +127,8 @@ enum MonkeyAction {
 
 impl MonkeyAction {
     fn parse<'a>(input: &'a str) -> Option<(MonkeyId, MonkeyId, Vec<Monkey>)> {
-        let mut name_to_id = HashMap::new();
-        let mut actions = Vec::with_capacity(40_000);
+        let mut name_to_id = HashMap::with_capacity(3000);
+        let mut actions = Vec::with_capacity(3000);
 
         let mut human_id = None;
         let mut root_id = None;
