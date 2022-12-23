@@ -42,18 +42,14 @@ impl Grid {
 
     fn count_around(&self, x: usize, y: usize, needle: u8) -> u8 {
         let mut sum = 0;
-        for dy in [-1_i32, 0, 1] {
-            for dx in [-1_i32, 0, 1] {
+        for dy in [-1_isize, 0, 1] {
+            for dx in [-1_isize, 0, 1] {
                 if dx == 0 && dy == 0 {
                     continue;
                 }
-                let nx = x as i32 + dx;
-                let ny = y as i32 + dy;
-                if nx >= 0
-                    && (nx as usize) < self.width
-                    && ny >= 0
-                    && (ny as usize) < self.height
-                    && self.cells[(self.width as i32 * ny + nx) as usize] == needle
+                let nx = x.wrapping_add_signed(dx);
+                let ny = y.wrapping_add_signed(dy);
+                if nx < self.width && ny < self.height && self.cells[self.width * ny + nx] == needle
                 {
                     sum += 1;
                 }
