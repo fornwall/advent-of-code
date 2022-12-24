@@ -224,8 +224,8 @@ impl Cube {
     }
 
     fn step_forward(&mut self, steps: u8, mut direction: Direction) -> Direction {
+        #![allow(clippy::panic)]
         let mut delta = direction.delta();
-        // println!("Currrent pos {:?}, cube={:?} - taking {} steps, direction {:?}", self.current_position, self.sides[self.current_cube_idx].grid_position, steps, delta);
         for _step in 0..steps {
             let mut new_position = (
                 self.current_position.0 + delta.0,
