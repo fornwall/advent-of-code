@@ -246,23 +246,6 @@ impl Cube {
                 None
             } {
                 new_cube_idx = c;
-                //       ┌─────┬─────┐
-                //       │  g  │  e  |
-                //       │f 0  │  1 d|
-                //       │     │  b  |
-                //       +-----┼-----+
-                //       │     |
-                //       │a 2 b|
-                //       │     |
-                // +-----+-----+
-                // |  a  |     |
-                // |f 3  |  4 d|
-                // |     |  c  |
-                // +-----+-----+
-                // |     |
-                // |g 5 c|
-                // |  e  |
-                // +-----+
                 new_position = match (direction, facing_direction) {
                     (Direction::Up, Direction::Up) => (new_position.0, (CubeSide::SIZE - 1) as i32),
                     (Direction::Up, Direction::Right) => (0, new_position.0),
@@ -293,7 +276,6 @@ impl Cube {
             }
 
             if self.sides[new_cube_idx].is_free(new_position.0, new_position.1) {
-                //println!("    Stepping to {:?}, cube={:?}", new_position, new_cube_idx);
                 self.current_position = new_position;
                 self.current_cube_idx = new_cube_idx;
                 direction = new_direction;
@@ -314,6 +296,7 @@ impl Cube {
     }
 }
 
+/// "Facing is 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)."
 #[derive(Copy, Clone)]
 enum Direction {
     Right = 0,
@@ -357,4 +340,8 @@ pub fn tests() {
     let real_input = include_str!("day22_input.txt");
     test_part_one!(real_input => 89_224);
     test_part_two!(real_input => 136_182);
+
+    let real_input = include_str!("day22_input_other.txt");
+    test_part_one!(real_input => 76_332);
+    test_part_two!(real_input => 144_012);
 }
