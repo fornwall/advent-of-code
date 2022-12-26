@@ -5,15 +5,14 @@ use crate::input::Input;
 pub fn solve(input: &mut Input) -> Result<i32, String> {
     let mut valley = Valley::parse(input.text).ok_or("Invalid input")?;
 
-    let start_pos = (0, -1);
-    let goal_post = (valley.width as i32 - 1, valley.height as i32);
-    let trip_length = find_shortest(&mut valley, 0, start_pos, goal_post)?;
-    if input.is_part_one() {
-        Ok(trip_length)
-    } else {
-        let trip_length = find_shortest(&mut valley, trip_length, goal_post, start_pos)?;
-        find_shortest(&mut valley, trip_length, start_pos, goal_post)
+    let mut start_pos = (0, -1);
+    let mut goal_post = (valley.width as i32 - 1, valley.height as i32);
+    let mut minute = 0;
+    for _trip in 0..input.part_values(1, 3) {
+        minute = find_shortest(&mut valley, minute, start_pos, goal_post)?;
+        std::mem::swap(&mut start_pos, &mut goal_post);
     }
+    Ok(minute)
 }
 
 fn find_shortest(

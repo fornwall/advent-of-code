@@ -29,7 +29,7 @@ fn decimal_to_snafu(mut decimal: i64) -> String {
         return "0".to_string();
     }
 
-    let mut result = Vec::new();
+    let mut result = Vec::with_capacity(32);
     while decimal > 0 {
         result.push(match decimal % 5 {
             0 => b'0',
