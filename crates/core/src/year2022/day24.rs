@@ -32,9 +32,7 @@ fn find_shortest(
             valley.reset_visited();
         }
         for (nx, ny) in [(x, y), (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)] {
-            if valley.can_go_to(nx, ny, (minute + 1) as usize)
-                && valley.mark_visited(nx, ny)
-            {
+            if valley.can_go_to(nx, ny, (minute + 1) as usize) && valley.mark_visited(nx, ny) {
                 if nx == end_pos.0 && ny == end_pos.1 {
                     return Ok(minute + 1);
                 }
