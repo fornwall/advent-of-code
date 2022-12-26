@@ -29,7 +29,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
         }
     }
     if steps_forward != 0 {
-        cube.step_forward(steps_forward, direction);
+        direction = cube.step_forward(steps_forward, direction);
     }
 
     Ok(cube.password(direction))
