@@ -43,19 +43,10 @@ fn find_shortest(
     Err("No solution found".to_string())
 }
 
-#[derive(Copy, Clone, Eq, PartialEq)]
-enum MapCell {
-    ClearGround,
-    BlizzardUp,
-    BlizzardRight,
-    BlizzardDown,
-    BlizzardLeft,
-}
-
 struct Valley {
     width: usize,
     height: usize,
-    cells: Vec<MapCell>,
+    cells: Vec<u8>,
     visited: Vec<bool>,
 }
 
@@ -68,20 +59,12 @@ impl Valley {
         let width = line.len() - 2;
         let height = num_lines - 2;
 
-        let mut cells = vec![MapCell::ClearGround; width * height];
-        for (row, line) in lines.enumerate().take(height) {
-            for (x, c) in line.bytes().skip(1).enumerate().take(width) {
-                cells[row * width + x] = match c {
-                    b'^' => MapCell::BlizzardUp,
-                    b'>' => MapCell::BlizzardRight,
-                    b'v' => MapCell::BlizzardDown,
-                    b'<' => MapCell::BlizzardLeft,
-                    _ => MapCell::ClearGround,
-                };
-            }
-        }
+        let cells = lines
+            .take(height)
+            .flat_map(|line| line.bytes().skip(1).take(width))
+            .collect::<Vec<u8>>();
 
-        Some(Self {
+        (cells.len() == width * height).then_some(Self {
             width,
             height,
             cells,
@@ -89,7 +72,7 @@ impl Valley {
         })
     }
 
-    fn at(&self, x: i32, y: i32) -> MapCell {
+    fn at(&self, x: i32, y: i32) -> u8 {
         let x = x.rem_euclid(self.width as i32);
         let y = y.rem_euclid(self.height as i32);
         self.cells[y as usize * self.width + x as usize]
@@ -115,10 +98,10 @@ impl Valley {
             return (x, y) == (0, -1) || (x, y) == (self.width as i32 - 1, self.height as i32);
         }
         let minute = minute as i32;
-        self.at(x - minute, y) != MapCell::BlizzardRight
-            && self.at(x + minute, y) != MapCell::BlizzardLeft
-            && self.at(x, y - minute) != MapCell::BlizzardDown
-            && self.at(x, y + minute) != MapCell::BlizzardUp
+        self.at(x - minute, y) != b'>'
+            && self.at(x + minute, y) != b'<'
+            && self.at(x, y - minute) != b'v'
+            && self.at(x, y + minute) != b'^'
     }
 }
 
