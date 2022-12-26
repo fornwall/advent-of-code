@@ -1,40 +1,39 @@
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
 
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
-    let valley = Valley::parse(input.text).ok_or("Invalid input")?;
+    let mut valley = Valley::parse(input.text).ok_or("Invalid input")?;
 
     let start_pos = (0, -1);
     let goal_post = (valley.width as i32 - 1, valley.height as i32);
-    let trip_length = find_shortest(&valley, 0, start_pos, goal_post)?;
+    let trip_length = find_shortest(&mut valley, 0, start_pos, goal_post)?;
     if input.is_part_one() {
         Ok(trip_length)
     } else {
-        let trip_length = find_shortest(&valley, trip_length, goal_post, start_pos)?;
-        find_shortest(&valley, trip_length, start_pos, goal_post)
+        let trip_length = find_shortest(&mut valley, trip_length, goal_post, start_pos)?;
+        find_shortest(&mut valley, trip_length, start_pos, goal_post)
     }
 }
 
 fn find_shortest(
-    valley: &Valley,
+    valley: &mut Valley,
     start_minute: i32,
     start_pos: (i32, i32),
     end_pos: (i32, i32),
 ) -> Result<i32, String> {
-    let mut visited = HashSet::new();
     let mut to_visit = VecDeque::new();
     let mut last_minute = start_minute;
     to_visit.push_back((start_minute, start_pos));
 
     while let Some((minute, (x, y))) = to_visit.pop_front() {
         if minute != last_minute {
-            visited.clear();
             last_minute = minute;
+            valley.reset_visited();
         }
         for (nx, ny) in [(x, y), (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)] {
             if valley.can_go_to(nx, ny, (minute + 1) as usize)
-                && visited.insert((minute + 1, (nx, ny)))
+                && valley.mark_visited(nx, ny)
             {
                 if nx == end_pos.0 && ny == end_pos.1 {
                     return Ok(minute + 1);
@@ -59,6 +58,7 @@ struct Valley {
     width: usize,
     height: usize,
     cells: Vec<MapCell>,
+    visited: Vec<bool>,
 }
 
 impl Valley {
@@ -87,6 +87,7 @@ impl Valley {
             width,
             height,
             cells,
+            visited: vec![false; width * height],
         })
     }
 
@@ -96,8 +97,23 @@ impl Valley {
         self.cells[y as usize * self.width + x as usize]
     }
 
+    fn mark_visited(&mut self, x: i32, y: i32) -> bool {
+        if (x, y) == (0, -1) || (x, y) == (self.width as i32 - 1, self.height as i32) {
+            return true;
+        }
+        if self.visited[y as usize * self.width + x as usize] {
+            return false;
+        }
+        self.visited[y as usize * self.width + x as usize] = true;
+        true
+    }
+
+    fn reset_visited(&mut self) {
+        self.visited.fill(false);
+    }
+
     fn can_go_to(&self, x: i32, y: i32, minute: usize) -> bool {
-        if x < 0 || y < 0 || x == self.width as i32 || y == self.height as i32 {
+        if x < 0 || y < 0 || x >= self.width as i32 || y >= self.height as i32 {
             return (x, y) == (0, -1) || (x, y) == (self.width as i32 - 1, self.height as i32);
         }
         let minute = minute as i32;
