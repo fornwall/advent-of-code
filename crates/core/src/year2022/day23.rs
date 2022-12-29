@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<usize, String> {
@@ -29,63 +27,116 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         (0b0001_1100, (1, 0)),
     ];
 
+    const MAX_SIZE: usize = 512;
+    const MAX_ELVES: usize = 10_000;
+    const OFFSET: usize = MAX_SIZE / 2;
+    const NO_CHOICE: (i16, i16) = (i16::MAX, i16::MAX);
+    const NO_ELF: u16 = u16::MAX;
+
+    let is_outside_max = |position: (i16, i16)| {
+        position.0 < 0
+            || position.1 < 0
+            || position.0 >= MAX_SIZE as i16
+            || position.1 >= MAX_SIZE as i16
+    };
+
     let mut elves = input
         .text
         .lines()
         .rev()
         .enumerate()
         .flat_map(|(y, line)| {
-            line.bytes()
-                .enumerate()
-                .filter_map(move |(x, c)| (c == b'#').then_some((x as i16, y as i16)))
+            line.bytes().enumerate().filter_map(move |(x, c)| {
+                (c == b'#').then_some(Elf {
+                    position: (x as i16 + OFFSET as i16, y as i16 + OFFSET as i16),
+                    to_move_choice: NO_CHOICE,
+                })
+            })
         })
-        .collect::<HashSet<_>>();
+        .collect::<Vec<_>>();
+
+    if elves.len() > MAX_ELVES {
+        return Err(format!("Too many elves - max {MAX_ELVES} supported"));
+    }
+
+    let mut elf_grid = vec![NO_ELF; MAX_SIZE * MAX_SIZE];
+    for (elf_idx, elf) in elves.iter().enumerate() {
+        if is_outside_max(elf.position) {
+            return Err(format!("Elf is outside of [0,{MAX_SIZE})"));
+        }
+        elf_grid[elf.position.1 as usize * MAX_SIZE + elf.position.0 as usize] = elf_idx as u16;
+    }
 
     for round in 0..input.part_values(10, 10000) {
-        let mut new_elves = HashSet::with_capacity(elves.len());
-        let mut any_moved = false;
-        'elf: for elf in elves.iter() {
+        let mut num_moves = 0;
+
+        for elf in elves.iter_mut() {
             let adjacent_bitmask = DIRECTIONS
                 .iter()
                 .enumerate()
                 .fold(0, |acc, (idx, (dx, dy))| {
-                    acc | if elves.contains(&(elf.0 + dx, elf.1 + dy)) {
-                        1 << idx
-                    } else {
+                    acc | if elf_grid
+                        [(elf.position.1 + dy) as usize * MAX_SIZE + (elf.position.0 + dx) as usize]
+                        == NO_ELF
+                    {
                         0
+                    } else {
+                        1 << idx
                     }
                 });
 
             // "During the first half of each round, each Elf considers the eight positions adjacent to themself.
             // If no other Elves are in one of those eight positions, the Elf does not do anything during this round."
             if adjacent_bitmask != 0 {
-                'rule: for rule_offset in 0..RULES.len() {
+                for rule_offset in 0..RULES.len() {
                     let (check_mask, to_move) = RULES[(round + rule_offset) % RULES.len()];
-
                     if (check_mask & adjacent_bitmask) == 0 {
-                        let new_elf = (elf.0 + to_move.0, elf.1 + to_move.1);
-                        if new_elves.remove(&new_elf) {
-                            // This was occupied - push other elf back (coming from other direction
-                            new_elves.insert((new_elf.0 + to_move.0, new_elf.1 + to_move.1));
-                            break 'rule;
-                        } else {
-                            new_elves.insert(new_elf);
-                            any_moved = true;
-                            continue 'elf;
-                        }
+                        elf.to_move_choice = to_move;
+                        break;
                     }
                 }
             }
-
-            new_elves.insert(*elf);
-            continue 'elf;
         }
 
-        if !any_moved {
+        for elf_idx in 0..elves.len() {
+            let elf = &mut elves[elf_idx];
+            if elf.to_move_choice != NO_CHOICE {
+                let to_move = elf.to_move_choice;
+                elf.to_move_choice = NO_CHOICE;
+
+                let new_position = (elf.position.0 + to_move.0, elf.position.1 + to_move.1);
+                if is_outside_max(new_position) {
+                    return Err(format!(
+                        "Elf tried to moved outside of [0,{}): {:?}",
+                        MAX_SIZE, new_position
+                    ));
+                }
+
+                let elf_idx_at_position =
+                    elf_grid[new_position.1 as usize * MAX_SIZE + new_position.0 as usize];
+
+                if elf_idx_at_position == NO_ELF {
+                    elf_grid[elf.position.1 as usize * MAX_SIZE + elf.position.0 as usize] = NO_ELF;
+                    elf.position = new_position;
+                    elf_grid[elf.position.1 as usize * MAX_SIZE + elf.position.0 as usize] =
+                        elf_idx as u16;
+                    num_moves += 1;
+                } else {
+                    // Position was occupied - stand still and push other elf (which must be coming from other direction) back:
+                    elf_grid[new_position.1 as usize * MAX_SIZE + new_position.0 as usize] = NO_ELF;
+                    let pushed_back_position =
+                        (new_position.0 + to_move.0, new_position.1 + to_move.1);
+                    elves[elf_idx_at_position as usize].position = pushed_back_position;
+                    elf_grid[pushed_back_position.1 as usize * MAX_SIZE
+                        + pushed_back_position.0 as usize] = elf_idx_at_position;
+                    num_moves -= 1;
+                }
+            }
+        }
+
+        if num_moves == 0 {
             return Ok(round + 1);
         }
-
-        elves = new_elves;
     }
 
     let (min_x, max_x, min_y, max_y) =
@@ -93,14 +144,20 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             .iter()
             .fold((i16::MAX, i16::MIN, i16::MAX, i16::MIN), |acc, e| {
                 (
-                    acc.0.min(e.0),
-                    acc.1.max(e.0),
-                    acc.2.min(e.1),
-                    acc.3.max(e.1),
+                    acc.0.min(e.position.0),
+                    acc.1.max(e.position.0),
+                    acc.2.min(e.position.1),
+                    acc.3.max(e.position.1),
                 )
             });
     let rectangle_size = ((max_x + 1 - min_x) * (max_y + 1 - min_y)) as usize;
     Ok(rectangle_size - elves.len())
+}
+
+#[derive(Copy, Clone)]
+struct Elf {
+    position: (i16, i16),
+    to_move_choice: (i16, i16),
 }
 
 #[test]

@@ -1,107 +1,110 @@
-use std::collections::VecDeque;
-
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<i32, String> {
-    let mut valley = Valley::parse(input.text).ok_or("Invalid input")?;
+    const MAX_STEPS: usize = 10_000;
+    let mut remaining_trips = input.part_values(1, 3);
 
-    let mut start_pos = (0, -1);
-    let mut goal_post = (valley.width as i32 - 1, valley.height as i32);
-    let mut minute = 0;
-    for _trip in 0..input.part_values(1, 3) {
-        minute = find_shortest(&mut valley, minute, start_pos, goal_post)?;
-        std::mem::swap(&mut start_pos, &mut goal_post);
-    }
-    Ok(minute)
-}
+    let mut valley = parse(input.text)?;
+    let mut reachable = vec![0; valley.width];
 
-fn find_shortest(
-    valley: &mut Valley,
-    start_minute: i32,
-    start_pos: (i32, i32),
-    end_pos: (i32, i32),
-) -> Result<i32, String> {
-    let mut to_visit = VecDeque::new();
-    let mut last_minute = start_minute;
-    to_visit.push_back((start_minute, start_pos));
+    let top_row_bitmask = 1;
+    let bottom_row_bitmask = 1 << (valley.height - 1);
 
-    while let Some((minute, (x, y))) = to_visit.pop_front() {
-        if minute != last_minute {
-            last_minute = minute;
-            valley.reset_visited();
-        }
-        for (nx, ny) in [(x, y), (x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)] {
-            if valley.can_go_to(nx, ny, (minute + 1) as usize) && valley.mark_visited(nx, ny) {
-                if nx == end_pos.0 && ny == end_pos.1 {
-                    return Ok(minute + 1);
-                }
-                to_visit.push_back((minute + 1, (nx, ny)));
+    for minute in 0..MAX_STEPS {
+        valley
+            .blizzards_up
+            .iter_mut()
+            .for_each(|m| *m = (*m >> 1) | ((*m & top_row_bitmask) << (valley.height - 1)));
+        valley
+            .blizzards_down
+            .iter_mut()
+            .for_each(|m| *m = (*m << 1) | ((*m & bottom_row_bitmask) >> (valley.height - 1)));
+        valley.blizzards_right.rotate_right(1);
+        valley.blizzards_left.rotate_left(1);
+
+        let heading_down = remaining_trips % 2 == 1;
+
+        let one_trip_completed = if heading_down {
+            reachable[valley.width - 1] & bottom_row_bitmask != 0
+        } else {
+            reachable[0] & 1 != 0
+        };
+
+        if one_trip_completed {
+            if remaining_trips == 1 {
+                return Ok(minute as i32 + 1);
             }
+            reachable.fill(0);
+            remaining_trips -= 1;
+            continue;
+        }
+
+        let mut prev = if heading_down { top_row_bitmask } else { 0 };
+        let last = if heading_down { 0 } else { bottom_row_bitmask };
+        for x in 0..valley.width {
+            let prev = std::mem::replace(&mut prev, reachable[x]);
+            let next = reachable.get(x + 1).copied().unwrap_or(last);
+
+            // Expand reachable up, down, left and right:
+            reachable[x] |= (reachable[x] >> 1) | (reachable[x] << 1) | prev | next;
+            // Positions where there are blizzards are not reachable:
+            reachable[x] &= valley.blizzards_up[x]
+                & valley.blizzards_down[x]
+                & valley.blizzards_right[x]
+                & valley.blizzards_left[x];
         }
     }
-    Err("No solution found".to_string())
+
+    Err(format!("No solution found in {MAX_STEPS} minutes"))
 }
 
 struct Valley {
     width: usize,
     height: usize,
-    cells: Vec<u8>,
-    visited: Vec<bool>,
+    blizzards_up: Vec<u64>,
+    blizzards_down: Vec<u64>,
+    blizzards_right: Vec<u64>,
+    blizzards_left: Vec<u64>,
 }
 
-impl Valley {
-    fn parse(input: &str) -> Option<Self> {
-        let num_lines = input.lines().count();
-        let mut lines = input.lines();
-        let line = lines.next()?;
-
-        let width = line.len() - 2;
-        let height = num_lines - 2;
-
-        let cells = lines
-            .take(height)
-            .flat_map(|line| line.bytes().skip(1).take(width))
-            .collect::<Vec<u8>>();
-
-        (cells.len() == width * height).then_some(Self {
-            width,
-            height,
-            cells,
-            visited: vec![false; width * height],
-        })
+fn parse(input: &str) -> Result<Valley, String> {
+    let width = input
+        .find('\n')
+        .ok_or("Invalid input - not multiple lines")?
+        - 2;
+    let height = input.lines().count() - 2;
+    if height > 64 {
+        return Err("Too big height for input - must be less than 64".to_string());
     }
 
-    fn at(&self, x: i32, y: i32) -> u8 {
-        let x = x.rem_euclid(self.width as i32);
-        let y = y.rem_euclid(self.height as i32);
-        self.cells[y as usize * self.width + x as usize]
-    }
+    let mut blizzards_up = vec![(1 << height) - 1; width];
+    let mut blizzards_down = vec![(1 << height) - 1; width];
+    let mut blizzards_right = vec![(1 << height) - 1; width];
+    let mut blizzards_left = vec![(1 << height) - 1; width];
 
-    fn mark_visited(&mut self, x: i32, y: i32) -> bool {
-        if (x, y) == (0, -1) || (x, y) == (self.width as i32 - 1, self.height as i32) {
-            return true;
+    for (y, line) in input.lines().skip(1).take(height).enumerate() {
+        if line.len() != width + 2 {
+            return Err("Not all lines have equal length".to_string());
         }
-        if self.visited[y as usize * self.width + x as usize] {
-            return false;
+        for (x, c) in line.bytes().skip(1).take(width).enumerate() {
+            match c {
+                b'^' => blizzards_up[x] &= !(1 << y),
+                b'v' => blizzards_down[x] &= !(1 << y),
+                b'>' => blizzards_right[x] &= !(1 << y),
+                b'<' => blizzards_left[x] &= !(1 << y),
+                _ => {}
+            }
         }
-        self.visited[y as usize * self.width + x as usize] = true;
-        true
     }
 
-    fn reset_visited(&mut self) {
-        self.visited.fill(false);
-    }
-
-    fn can_go_to(&self, x: i32, y: i32, minute: usize) -> bool {
-        if x < 0 || y < 0 || x >= self.width as i32 || y >= self.height as i32 {
-            return (x, y) == (0, -1) || (x, y) == (self.width as i32 - 1, self.height as i32);
-        }
-        let minute = minute as i32;
-        self.at(x - minute, y) != b'>'
-            && self.at(x + minute, y) != b'<'
-            && self.at(x, y - minute) != b'v'
-            && self.at(x, y + minute) != b'^'
-    }
+    Ok(Valley {
+        width,
+        height,
+        blizzards_up,
+        blizzards_down,
+        blizzards_right,
+        blizzards_left,
+    })
 }
 
 #[test]

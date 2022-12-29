@@ -1,14 +1,16 @@
+use std::array;
+
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<u32, String> {
     let minutes = input.part_values(24, 32);
     let max_blueprints = input.part_values(64, 3);
 
-    let blueprints = Blueprint::parse(input.text);
+    let blueprints = parse_blueprints(input.text);
 
     let max_geodes = blueprints
         .take(max_blueprints)
-        .map(|blueprint| State::most_geodes_opened(&blueprint, minutes));
+        .map(|blueprint| most_geodes_opened(&blueprint, minutes));
 
     Ok(if input.is_part_one() {
         max_geodes
@@ -20,195 +22,141 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     })
 }
 
-struct Blueprint {
-    ore_cost_ore: u32,
-    clay_cost_ore: u32,
-    obsidian_cost_ore: u32,
-    obsidian_cost_clay: u32,
-    geode_cost_ore: u32,
-    geode_cost_obsidian: u32,
+type Blueprint = [[u32; 4]; 4];
+
+fn parse_blueprints(input: &str) -> impl Iterator<Item = Blueprint> + '_ {
+    input.lines().filter_map(|line| {
+        let mut words = line.split(' ');
+        Some([
+            [words.nth(6)?.parse::<u32>().ok()?, 0, 0, 0],
+            [words.nth(5)?.parse::<u32>().ok()?, 0, 0, 0],
+            [
+                words.nth(5)?.parse::<u32>().ok()?,
+                words.nth(2)?.parse::<u32>().ok()?,
+                0,
+                0,
+            ],
+            [
+                words.nth(5)?.parse::<u32>().ok()?,
+                0,
+                words.nth(2)?.parse::<u32>().ok()?,
+                0,
+            ],
+        ])
+    })
 }
 
-impl Blueprint {
-    fn parse(input: &str) -> impl Iterator<Item = Self> + '_ {
-        input.lines().filter_map(|line| {
-            let mut words = line.split(' ');
-            Some(Self {
-                ore_cost_ore: words.nth(6)?.parse::<u32>().ok()?,
-                clay_cost_ore: words.nth(5)?.parse::<u32>().ok()?,
-                obsidian_cost_ore: words.nth(5)?.parse::<u32>().ok()?,
-                obsidian_cost_clay: words.nth(2)?.parse::<u32>().ok()?,
-                geode_cost_ore: words.nth(5)?.parse::<u32>().ok()?,
-                geode_cost_obsidian: words.nth(2)?.parse::<u32>().ok()?,
-            })
-        })
-    }
-}
-
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 struct State {
-    resource_ore: u32,
-    robots_ore: u32,
-    resource_clay: u32,
-    robots_clay: u32,
-    resource_obsidian: u32,
-    robots_obsidian: u32,
-    resource_geode: u32,
-    robots_geode: u32,
-    could_have_created_ore: bool,
-    could_have_created_clay: bool,
-    could_have_created_obsidian: bool,
+    upper_bound: u32,
+    minutes_remaining: u32,
+    ores: [u32; 4],
+    robots: [u32; 4],
 }
 
-impl State {
-    fn most_geodes_opened(blueprint: &Blueprint, minutes: u32) -> u32 {
-        let max_ore_cost = blueprint
-            .ore_cost_ore
-            .max(blueprint.clay_cost_ore)
-            .max(blueprint.obsidian_cost_ore)
-            .max(blueprint.geode_cost_ore);
+fn most_geodes_opened(blueprint: &Blueprint, minutes: u32) -> u32 {
+    let max_costs: [_; 4] = array::from_fn(|resource_idx| {
+        if resource_idx == 3 {
+            u32::MAX
+        } else {
+            blueprint
+                .iter()
+                .map(|costs| costs[resource_idx])
+                .max()
+                .unwrap_or_default()
+        }
+    });
 
-        let mut initial_state = Self {
-            resource_ore: 0,
-            robots_ore: 1,
-            resource_clay: 0,
-            robots_clay: 0,
-            resource_obsidian: 0,
-            robots_obsidian: 0,
-            resource_geode: 0,
-            robots_geode: 0,
-            could_have_created_ore: false,
-            could_have_created_clay: false,
-            could_have_created_obsidian: false,
-        };
+    let initial_state = State {
+        upper_bound: 1,
+        minutes_remaining: minutes,
+        ores: [0, 0, 0, 0],
+        robots: [1, 0, 0, 0],
+    };
 
-        initial_state.most_geodes_opened_recursive(blueprint, max_ore_cost, minutes)
-    }
+    let mut to_visit = Vec::from([initial_state]);
+    let mut most_geodes_produced = 0;
 
-    fn most_geodes_opened_recursive(
-        &mut self,
-        blueprint: &Blueprint,
-        max_ore_cost: u32,
-        remaining_minutes: u32,
-    ) -> u32 {
-        if remaining_minutes == 1 {
-            return self.resource_geode + self.robots_geode;
+    while let Some(state) = to_visit.pop() {
+        if state.upper_bound <= most_geodes_produced {
+            continue;
         }
 
-        let remaining_minutes = remaining_minutes - 1;
-        let mut most_geodes = 0;
+        most_geodes_produced = std::cmp::max(
+            most_geodes_produced,
+            state.ores[3] + state.robots[3] * state.minutes_remaining,
+        );
 
-        for (resource_type, mut new_state) in ALL_RESOURCE_TYPES
-            .iter()
-            .filter(|&&resource_type| remaining_minutes > 1 || resource_type == ResourceType::Geode)
-            .filter(|&&resource_type| {
-                self.will_produce_robot(blueprint, resource_type, max_ore_cost)
-            })
-            .map(|&resource_type| (resource_type, self.produce_robot(blueprint, resource_type)))
-        {
-            let produced =
-                new_state.most_geodes_opened_recursive(blueprint, max_ore_cost, remaining_minutes);
-            if resource_type == ResourceType::Geode {
-                // Build a geode robot if possible.
-                return produced;
+        for robot_to_build_idx in 0..4 {
+            if state.robots[robot_to_build_idx] == max_costs[robot_to_build_idx] {
+                // No point in creating more robots of this type, as we are producing
+                // enough each minute to fulfill all possible needs.
+                continue;
             }
-            most_geodes = most_geodes.max(produced);
-        }
 
-        self.could_have_created_ore = self.resource_ore >= blueprint.ore_cost_ore;
-        self.could_have_created_clay = self.resource_ore >= blueprint.clay_cost_ore;
-        self.could_have_created_obsidian = self.resource_ore >= blueprint.obsidian_cost_ore
-            && self.resource_clay >= blueprint.obsidian_cost_clay;
-        self.produce_resources();
+            let minutes_before_resources_obtained = (0..3)
+                .map(|resource_idx| {
+                    let resource_cost = blueprint[robot_to_build_idx][resource_idx];
+                    if resource_cost <= state.ores[resource_idx] {
+                        // We have enough resources already.
+                        0
+                    } else if state.robots[resource_idx] == 0 {
+                        // We are not producing a resource required for this robot - abort.
+                        state.minutes_remaining
+                    } else {
+                        1 + (resource_cost - state.ores[resource_idx] - 1)
+                            / state.robots[resource_idx]
+                    }
+                })
+                .max()
+                .unwrap_or_default();
 
-        most_geodes.max(self.most_geodes_opened_recursive(
-            blueprint,
-            max_ore_cost,
-            remaining_minutes,
-        ))
-    }
+            if minutes_before_resources_obtained >= state.minutes_remaining {
+                // There is not enough time to await constructing this robot.
+                continue;
+            }
 
-    fn produce_resources(&mut self) {
-        self.resource_ore += self.robots_ore;
-        self.resource_clay += self.robots_clay;
-        self.resource_obsidian += self.robots_obsidian;
-        self.resource_geode += self.robots_geode;
-    }
+            let mut new_state = state;
+            for j in 0..4 {
+                new_state.ores[j] = new_state.ores[j]
+                    + state.robots[j] * (minutes_before_resources_obtained + 1)
+                    - blueprint[robot_to_build_idx][j];
+            }
+            new_state.minutes_remaining -= minutes_before_resources_obtained + 1;
+            new_state.robots[robot_to_build_idx] += 1;
+            new_state.upper_bound = {
+                let mut ores = [new_state.ores; 4];
+                let mut robots = new_state.robots;
 
-    fn produce_robot(&self, blueprint: &Blueprint, resource_type: ResourceType) -> Self {
-        let mut result = self.clone();
-        result.produce_resources();
-        match resource_type {
-            ResourceType::Ore => {
-                result.resource_ore -= blueprint.ore_cost_ore;
-                result.robots_ore += 1;
-            }
-            ResourceType::Clay => {
-                result.resource_ore -= blueprint.clay_cost_ore;
-                result.robots_clay += 1;
-            }
-            ResourceType::Obsidian => {
-                result.resource_ore -= blueprint.obsidian_cost_ore;
-                result.resource_clay -= blueprint.obsidian_cost_clay;
-                result.robots_obsidian += 1;
-            }
-            ResourceType::Geode => {
-                result.resource_ore -= blueprint.geode_cost_ore;
-                result.resource_obsidian -= blueprint.geode_cost_obsidian;
-                result.robots_geode += 1;
-            }
-        }
-        result.could_have_created_ore = false;
-        result.could_have_created_clay = false;
-        result.could_have_created_obsidian = false;
-        result
-    }
+                for _ in 0..new_state.minutes_remaining {
+                    let can_build_robot: [u32; 4] = array::from_fn(|robot_idx| {
+                        u32::from((0..3).all(|resource_idx| {
+                            ores[robot_idx][resource_idx] >= blueprint[robot_idx][resource_idx]
+                        }))
+                    });
+                    let new_ores: [[u32; 4]; 4] = array::from_fn(|robot_idx| {
+                        array::from_fn(|resource_idx| {
+                            ores[robot_idx][resource_idx] + robots[resource_idx]
+                                - (can_build_robot[robot_idx] * blueprint[robot_idx][resource_idx])
+                        })
+                    });
+                    for robot_idx in 0..4 {
+                        robots[robot_idx] += can_build_robot[robot_idx];
+                    }
+                    ores = new_ores;
+                }
 
-    const fn will_produce_robot(
-        &self,
-        blueprint: &Blueprint,
-        resource_type: ResourceType,
-        max_ore_cost: u32,
-    ) -> bool {
-        match resource_type {
-            ResourceType::Ore => {
-                !self.could_have_created_ore
-                    && self.robots_ore < max_ore_cost
-                    && self.resource_ore >= blueprint.ore_cost_ore
-            }
-            ResourceType::Clay => {
-                !self.could_have_created_clay
-                    && self.robots_clay < blueprint.obsidian_cost_clay
-                    && self.resource_ore >= blueprint.clay_cost_ore
-            }
-            ResourceType::Obsidian => {
-                !self.could_have_created_obsidian
-                    && self.robots_obsidian < blueprint.geode_cost_obsidian
-                    && self.resource_ore >= blueprint.obsidian_cost_ore
-                    && self.resource_clay >= blueprint.obsidian_cost_clay
-            }
-            ResourceType::Geode => {
-                self.resource_ore >= blueprint.geode_cost_ore
-                    && self.resource_obsidian >= blueprint.geode_cost_obsidian
+                ores[0][3]
+            };
+
+            if new_state.upper_bound > most_geodes_produced {
+                to_visit.push(new_state);
             }
         }
     }
+
+    most_geodes_produced
 }
-
-#[derive(Copy, Clone, Eq, PartialEq)]
-enum ResourceType {
-    Ore,
-    Clay,
-    Obsidian,
-    Geode,
-}
-
-const ALL_RESOURCE_TYPES: [ResourceType; 4] = [
-    ResourceType::Geode,
-    ResourceType::Obsidian,
-    ResourceType::Clay,
-    ResourceType::Ore,
-];
 
 #[test]
 pub fn tests() {

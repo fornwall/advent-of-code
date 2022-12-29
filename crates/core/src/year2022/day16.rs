@@ -1,195 +1,217 @@
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
+
 use crate::input::Input;
-use std::collections::HashMap;
 
-type ReleasedPressure = i16;
+pub fn solve(input: &mut Input) -> Result<usize, String> {
+    let actor_1_remaining_minutes = input.part_values(30, 26);
+    let actor_2_remaining_minutes = input.part_values(0, 26);
 
-pub fn solve(input: &mut Input) -> Result<ReleasedPressure, String> {
-    let (start_valve_idx, valves) =
-        Valve::parse(input.text).ok_or_else(|| "Invalid input".to_string())?;
-    let mut search_state = SearchState::new(valves, start_valve_idx);
+    let (distances, flows) = parse(input.text).ok_or("Invalid input")?;
 
-    let available_minutes = input.part_values(30, 26);
-    let num_actors = input.part_values(1, 2);
-
-    for actor in 0..num_actors {
-        for minute in 0..available_minutes {
-            let minutes_left = available_minutes - minute - 1;
-            search_state.advance_one_minute(minutes_left);
-        }
-
-        if num_actors > 1 && actor == 0 {
-            search_state.setup_for_second_actor();
-        }
-    }
-
-    Ok(search_state.most_pressure_that_can_be_released())
-}
-
-struct Valve {
-    tunnels: Vec<usize>,
-    flow_rate: ReleasedPressure,
-    mask: i32,
-}
-
-impl Valve {
-    fn parse(input: &str) -> Option<(usize, Vec<Self>)> {
-        let mut valves = Vec::new();
-        let mut tunnel_names = Vec::new();
-
-        let mut name_to_valve_idx = HashMap::new();
-
-        let mut num_working_valves = 0;
-        for (line_idx, line) in input.lines().enumerate() {
-            if line.len() < 10 {
-                return None;
-            }
-            let name = &line[6..8];
-            name_to_valve_idx.insert(name.to_string(), line_idx);
-
-            let flow = line
-                .split(['=', ';'])
-                .nth(1)?
-                .parse::<ReleasedPressure>()
-                .ok()?;
-
-            let tunnels_comma_separated = if line.contains("tunnels") {
-                line.split("valves ").nth(1)?
-            } else {
-                line.split("valve ").nth(1)?
-            };
-
-            let mask = if flow > 0 {
-                let result = 1 << num_working_valves;
-                num_working_valves += 1;
-                result
-            } else {
-                0
-            };
-
-            valves.push(Self {
-                tunnels: Vec::new(),
-                flow_rate: flow,
-                mask,
+    // Compute min distances useful for upper bound calculations.
+    // Maps from available minutes, to the shortest path to reach
+    // a flow_idx, ordered by
+    let min_distances = (0..=std::cmp::max(actor_1_remaining_minutes, actor_2_remaining_minutes))
+        .map(|minute| {
+            let mut v = distances
+                .iter()
+                .map(|distances| {
+                    distances
+                        .iter()
+                        .copied()
+                        .filter(|&distance| distance != 0)
+                        .min()
+                        .unwrap_or(usize::MAX - 1)
+                })
+                .enumerate()
+                .filter(|&(flow_idx, min_distance)| {
+                    minute > (min_distance + 1) && flows[flow_idx] != 0
+                })
+                .collect::<Vec<_>>();
+            v.sort_unstable_by_key(|&(flow_idx, min_distance)| {
+                Reverse(flows[flow_idx] * (minute - (min_distance + 1)))
             });
-            tunnel_names.push(
-                tunnels_comma_separated
-                    .split(", ")
-                    .map(str::to_string)
-                    .collect::<Vec<_>>(),
-            );
+            v
+        })
+        .collect::<Vec<_>>();
+
+    let initial = SearchState {
+        upper_bound: usize::MAX,
+        released_pressure: 0,
+        actor_1_flow_idx: 0,
+        actor_2_flow_idx: 0,
+        actor_1_remaining_minutes,
+        actor_2_remaining_minutes,
+        opened_bitset: 1,
+    };
+
+    let mut best = 0;
+    let mut queue = BinaryHeap::from_iter([initial]);
+    let mut seen = HashSet::new();
+
+    while let Some(state) = queue.pop() {
+        best = best.max(state.released_pressure);
+
+        if state.upper_bound <= best {
+            break;
         }
 
-        for (valve_idx, names) in tunnel_names.iter().enumerate() {
-            valves[valve_idx]
-                .tunnels
-                .extend(names.iter().filter_map(|name| name_to_valve_idx.get(name)));
+        if !seen.insert(SearchState {
+            upper_bound: 0,
+            released_pressure: 0,
+            ..state
+        }) {
+            continue;
         }
 
-        let start_valve_idx = *name_to_valve_idx.get("AA")?;
-        Some((start_valve_idx, valves))
+        let upper_bound = |data: SearchState| {
+            let mut upper_bound = data.released_pressure;
+            let mut opened_bitset = data.opened_bitset;
+            let mut t1 = data.actor_1_remaining_minutes;
+            let mut t2 = data.actor_2_remaining_minutes;
+            'outer: loop {
+                for &(flow_idx, min_distance) in &min_distances[t1] {
+                    if opened_bitset & (1 << flow_idx) == 0 {
+                        opened_bitset |= 1 << flow_idx;
+                        t1 -= min_distance + 1;
+                        upper_bound += flows[flow_idx] * t1;
+                        (t1, t2) = (t1.max(t2), t1.min(t2));
+                        continue 'outer;
+                    }
+                }
+                return upper_bound;
+            }
+        };
+
+        for (flow_idx, &travel_time) in distances[state.actor_1_flow_idx].iter().enumerate() {
+            let enough_time_remaining = travel_time < state.actor_1_remaining_minutes;
+            let can_be_opened = (state.opened_bitset & (1 << flow_idx)) == 0;
+
+            if enough_time_remaining && can_be_opened {
+                let remaining_minutes_after_opening =
+                    state.actor_1_remaining_minutes - (travel_time + 1);
+                let mut new_state = SearchState {
+                    actor_1_flow_idx: flow_idx,
+                    actor_1_remaining_minutes: remaining_minutes_after_opening,
+                    released_pressure: state.released_pressure
+                        + remaining_minutes_after_opening * flows[flow_idx],
+                    opened_bitset: state.opened_bitset | (1 << flow_idx),
+                    ..state
+                };
+                if new_state.actor_1_remaining_minutes < new_state.actor_2_remaining_minutes {
+                    std::mem::swap(
+                        &mut new_state.actor_1_remaining_minutes,
+                        &mut new_state.actor_2_remaining_minutes,
+                    );
+                    std::mem::swap(
+                        &mut new_state.actor_1_flow_idx,
+                        &mut new_state.actor_2_flow_idx,
+                    );
+                }
+                new_state.upper_bound = upper_bound(new_state);
+                if new_state.upper_bound > best {
+                    queue.push(new_state);
+                }
+            }
+        }
+
+        if state.actor_2_remaining_minutes != 0 {
+            // The second actor could proceed even if first actor is stuck.
+            let mut new_state = SearchState {
+                actor_1_remaining_minutes: state.actor_2_remaining_minutes,
+                actor_1_flow_idx: state.actor_2_flow_idx,
+                actor_2_remaining_minutes: 0,
+                ..state
+            };
+            new_state.upper_bound = upper_bound(new_state);
+            queue.push(new_state);
+        }
     }
+
+    Ok(best)
 }
 
+fn parse(input: &str) -> Option<(Vec<Vec<usize>>, Vec<usize>)> {
+    const CAPACITY_ESTIMATE: usize = 64;
+    let mut flow_rates = Vec::with_capacity(CAPACITY_ESTIMATE);
+    let mut tunnel_names = Vec::with_capacity(CAPACITY_ESTIMATE);
+    let mut name_to_valve_idx = HashMap::with_capacity(CAPACITY_ESTIMATE);
+
+    for (line_idx, line) in input.lines().enumerate() {
+        if line.len() < 10 {
+            return None;
+        }
+        let (name, rest) = line[6..].split_once(' ')?;
+        name_to_valve_idx.insert(name.to_string(), line_idx);
+        let (_, rest) = rest.split_once('=')?;
+        let (flow_rate_str, rest) = rest.split_once(';')?;
+        let flow_rate = flow_rate_str.parse::<u16>().ok()? as usize;
+        let (_, rest) = rest.split_once("valve")?;
+        let rest = rest.trim_start_matches('s').trim_start();
+        let linked_tunnel_names = rest.split(", ").map(str::to_string).collect::<Vec<_>>();
+        flow_rates.push(flow_rate);
+        tunnel_names.push(linked_tunnel_names);
+    }
+
+    let tunnel_ids = tunnel_names.iter().map(|names|
+        names.iter().filter_map(|name| name_to_valve_idx.get(name).copied()).collect::<Vec<_>>()
+    ).collect::<Vec<_>>();
+
+    let mut flows = vec![0];
+    // nonzero[valve_idx]:
+    //   - If valve_idx has a zero flow: usize::MAX
+    //   - If valve_idx has a non-zero flow: index into flows
+    let mut nonzero = vec![usize::MAX; flow_rates.len()];
+    nonzero[*name_to_valve_idx.get("AA")?] = 0;
+
+    for (valve_idx, &flow_rate) in flow_rates.iter().enumerate() {
+        if flow_rate != 0 {
+            nonzero[valve_idx] = flows.len();
+            flows.push(flow_rate);
+        }
+    }
+
+    let mut distances = vec![vec![usize::MAX; flows.len()]; flows.len()];
+    let mut visited = vec![false; flow_rates.len()];
+    let mut queue = VecDeque::with_capacity(flow_rates.len());
+
+    for (valve_idx, &flow_idx) in nonzero.iter().enumerate() {
+        if flow_idx != usize::MAX {
+            let distances = &mut distances[flow_idx];
+
+            queue.clear();
+            queue.push_back((valve_idx, 0));
+            visited.fill(false);
+
+            while let Some((visited_valve_idx, d)) = queue.pop_front() {
+                if !visited[visited_valve_idx] {
+                    visited[visited_valve_idx] = true;
+                    if nonzero[visited_valve_idx] != usize::MAX {
+                        distances[nonzero[visited_valve_idx]] = d;
+                    }
+                    queue.extend(
+                        tunnel_ids[visited_valve_idx]
+                            .iter()
+                            .map(|&next| (next, d + 1)),
+                    );
+                }
+            }
+        }
+    }
+
+    Some((distances, flows))
+}
+
+#[derive(Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct SearchState {
-    start_valve_idx: usize,
-    num_possible_values_of_bitset: usize,
-    valves: Vec<Valve>,
-    /// Indexed by (current_position, opened_valves_bitset), where
-    ///   current_position is the index of the actor position
-    ///   enabled_valves_bitset is a bitset of opened valves (101 means that valve 0 and 2 are opened)
-    /// These are encoded as:
-    ///   index = current_position * (num_possible_values_of_bitset + 1) + opened_valves_bitset
-    /// The value at the index is the highest possible pressure released while being at the state
-    /// associated with the index - (current_position, opened_valves_bitset).
-    released_pressure: Vec<ReleasedPressure>,
-    released_pressure_new: Vec<ReleasedPressure>,
-}
-
-impl SearchState {
-    const IMPOSSIBLE: ReleasedPressure = -1;
-
-    fn new(valves: Vec<Valve>, start_valve_idx: usize) -> Self {
-        let num_working_valves = valves.iter().filter(|valve| valve.flow_rate > 0).count();
-        let num_total_valves = valves.len();
-
-        let num_possible_values_of_bitset = 1 << num_working_valves;
-        let num_total_states = num_total_valves * num_possible_values_of_bitset;
-
-        let mut released_pressure = vec![Self::IMPOSSIBLE; num_total_states];
-        released_pressure[start_valve_idx * num_possible_values_of_bitset] = 0;
-
-        Self {
-            start_valve_idx,
-            num_possible_values_of_bitset,
-            valves,
-            released_pressure,
-            released_pressure_new: vec![Self::IMPOSSIBLE; num_total_states],
-        }
-    }
-
-    fn advance_one_minute(&mut self, minutes_left: i32) {
-        for (state_idx, &released_pressure) in self.released_pressure.iter().enumerate() {
-            if released_pressure == Self::IMPOSSIBLE {
-                continue;
-            }
-
-            let valve_idx = state_idx / self.num_possible_values_of_bitset;
-            let opened_valves_bitset = state_idx % self.num_possible_values_of_bitset;
-            let valve = &self.valves[valve_idx];
-
-            for &possible_new_valve_idx in valve.tunnels.iter() {
-                Self::set_if_higher(
-                    &mut self.released_pressure_new[possible_new_valve_idx
-                        * self.num_possible_values_of_bitset
-                        + opened_valves_bitset],
-                    self.released_pressure
-                        [valve_idx * self.num_possible_values_of_bitset + opened_valves_bitset],
-                );
-            }
-
-            if valve.flow_rate > 0 && (opened_valves_bitset as i32 & valve.mask) == 0 {
-                let flow_increase = minutes_left as ReleasedPressure * valve.flow_rate;
-                let new_released_pressure = released_pressure + flow_increase;
-                let new_opened_valves_bitset =
-                    ((opened_valves_bitset as i32) | valve.mask) as usize;
-                Self::set_if_higher(
-                    &mut self.released_pressure_new
-                        [valve_idx * self.num_possible_values_of_bitset + new_opened_valves_bitset],
-                    new_released_pressure,
-                );
-            }
-        }
-        std::mem::swap(&mut self.released_pressure, &mut self.released_pressure_new);
-    }
-
-    fn setup_for_second_actor(&mut self) {
-        self.released_pressure_new.fill(Self::IMPOSSIBLE);
-        for (state_idx, &released_pressure) in self.released_pressure.iter().enumerate() {
-            let opened_valves_bitset = state_idx % self.num_possible_values_of_bitset;
-            Self::set_if_higher(
-                &mut self.released_pressure_new[self.start_valve_idx
-                    * self.num_possible_values_of_bitset
-                    + opened_valves_bitset],
-                released_pressure,
-            );
-        }
-        std::mem::swap(&mut self.released_pressure, &mut self.released_pressure_new);
-        self.released_pressure_new.fill(Self::IMPOSSIBLE);
-    }
-
-    fn most_pressure_that_can_be_released(&mut self) -> ReleasedPressure {
-        self.released_pressure
-            .iter()
-            .copied()
-            .max()
-            .unwrap_or_default()
-    }
-
-    fn set_if_higher(current: &mut ReleasedPressure, possibly_higher: ReleasedPressure) {
-        if possibly_higher > *current {
-            *current = possibly_higher;
-        }
-    }
+    upper_bound: usize,
+    released_pressure: usize,
+    actor_1_flow_idx: usize,
+    actor_1_remaining_minutes: usize,
+    actor_2_flow_idx: usize,
+    actor_2_remaining_minutes: usize,
+    opened_bitset: u64,
 }
 
 #[test]
