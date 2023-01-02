@@ -154,9 +154,15 @@ fn parse(input: &str) -> Option<(Vec<Vec<usize>>, Vec<usize>)> {
         tunnel_names.push(linked_tunnel_names);
     }
 
-    let tunnel_ids = tunnel_names.iter().map(|names|
-        names.iter().filter_map(|name| name_to_valve_idx.get(name).copied()).collect::<Vec<_>>()
-    ).collect::<Vec<_>>();
+    let tunnel_ids = tunnel_names
+        .iter()
+        .map(|names| {
+            names
+                .iter()
+                .filter_map(|name| name_to_valve_idx.get(name).copied())
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
 
     let mut flows = vec![0];
     // nonzero[valve_idx]:
