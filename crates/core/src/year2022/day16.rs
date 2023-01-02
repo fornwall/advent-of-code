@@ -10,8 +10,6 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
     let (distances, flows) = parse(input.text).ok_or("Invalid input")?;
 
     // Compute min distances useful for upper bound calculations.
-    // Maps from available minutes, to the shortest path to reach
-    // a flow_idx, ordered by
     let min_distances = (0..=std::cmp::max(actor_1_remaining_minutes, actor_2_remaining_minutes))
         .map(|minute| {
             let mut v = distances
@@ -36,7 +34,27 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         })
         .collect::<Vec<_>>();
 
-    let initial = SearchState {
+    let upper_bound = |state: SearchState| {
+        let mut upper_bound = state.released_pressure;
+        let mut opened_bitset = state.opened_bitset;
+        let mut t1 = state.actor_1_remaining_minutes;
+        let mut t2 = state.actor_2_remaining_minutes;
+        'outer: loop {
+            for &(flow_idx, min_distance) in &min_distances[t1] {
+                if opened_bitset & (1 << flow_idx) == 0 {
+                    opened_bitset |= 1 << flow_idx;
+                    t1 -= min_distance + 1;
+                    upper_bound += flows[flow_idx] * t1;
+                    (t1, t2) = (t1.max(t2), t1.min(t2));
+                    continue 'outer;
+                }
+            }
+            return upper_bound;
+        }
+    };
+
+    let mut best = 0;
+    let mut to_visit = BinaryHeap::from_iter([SearchState {
         upper_bound: usize::MAX,
         released_pressure: 0,
         actor_1_flow_idx: 0,
@@ -44,45 +62,25 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         actor_1_remaining_minutes,
         actor_2_remaining_minutes,
         opened_bitset: 1,
-    };
+    }]);
+    let mut visited = HashSet::new();
 
-    let mut best = 0;
-    let mut queue = BinaryHeap::from_iter([initial]);
-    let mut seen = HashSet::new();
-
-    while let Some(state) = queue.pop() {
-        best = best.max(state.released_pressure);
-
+    while let Some(state) = to_visit.pop() {
         if state.upper_bound <= best {
             break;
         }
 
-        if !seen.insert(SearchState {
-            upper_bound: 0,
-            released_pressure: 0,
-            ..state
-        }) {
+        best = best.max(state.released_pressure);
+
+        if !visited.insert((
+            state.actor_1_flow_idx,
+            state.actor_1_remaining_minutes,
+            state.actor_2_flow_idx,
+            state.actor_2_remaining_minutes,
+            state.opened_bitset,
+        )) {
             continue;
         }
-
-        let upper_bound = |data: SearchState| {
-            let mut upper_bound = data.released_pressure;
-            let mut opened_bitset = data.opened_bitset;
-            let mut t1 = data.actor_1_remaining_minutes;
-            let mut t2 = data.actor_2_remaining_minutes;
-            'outer: loop {
-                for &(flow_idx, min_distance) in &min_distances[t1] {
-                    if opened_bitset & (1 << flow_idx) == 0 {
-                        opened_bitset |= 1 << flow_idx;
-                        t1 -= min_distance + 1;
-                        upper_bound += flows[flow_idx] * t1;
-                        (t1, t2) = (t1.max(t2), t1.min(t2));
-                        continue 'outer;
-                    }
-                }
-                return upper_bound;
-            }
-        };
 
         for (flow_idx, &travel_time) in distances[state.actor_1_flow_idx].iter().enumerate() {
             let enough_time_remaining = travel_time < state.actor_1_remaining_minutes;
@@ -111,7 +109,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                 }
                 new_state.upper_bound = upper_bound(new_state);
                 if new_state.upper_bound > best {
-                    queue.push(new_state);
+                    to_visit.push(new_state);
                 }
             }
         }
@@ -125,7 +123,7 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
                 ..state
             };
             new_state.upper_bound = upper_bound(new_state);
-            queue.push(new_state);
+            to_visit.push(new_state);
         }
     }
 
@@ -206,10 +204,10 @@ fn parse(input: &str) -> Option<(Vec<Vec<usize>>, Vec<usize>)> {
         }
     }
 
-    Some((distances, flows))
+    (flows.len() < 64).then_some((distances, flows))
 }
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct SearchState {
     upper_bound: usize,
     released_pressure: usize,

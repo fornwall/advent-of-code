@@ -1,32 +1,13 @@
 use crate::input::Input;
 
 pub fn solve(input: &mut Input) -> Result<i64, String> {
-    #![allow(clippy::unwrap_used)]
-
-    const MAX_LENGTH: usize = 10_000;
-
-    fn find_bucket_and_offset(
-        buckets: &[Vec<usize>],
-        mut bucket: usize,
-        mut offset_relative_to_bucket: usize,
-    ) -> (usize, usize) {
-        // Buckets are of different length initially as the input
-        // might not split evenly into buckets, and later on we do
-        // not balance buckets on insertion.
-        while offset_relative_to_bucket >= buckets[bucket].len() {
-            offset_relative_to_bucket -= buckets[bucket].len();
-            bucket = (bucket + 1) % buckets.len();
-        }
-        (bucket, offset_relative_to_bucket)
-    }
-
     let iterations = input.part_values(1, 10);
-    let decryption_key = input.part_values(1, 811_589_153);
+    let input_multiplier = input.part_values(1, 811_589_153);
 
     let numbers = input
         .text
         .lines()
-        .map(|line| Some(i64::from(line.parse::<i16>().ok()?) * decryption_key))
+        .map(|line| Some(i64::from(line.parse::<i16>().ok()?) * input_multiplier))
         .collect::<Option<Vec<_>>>()
         .ok_or("Invalid input - lines are not numbers in the range [-32,768, 32_767]")?;
 
@@ -41,15 +22,13 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
         .position(|&n| n == 0)
         .ok_or("No zero value in input")?;
 
-    // Set up buckets containing indices, so that a rotation (that needs to lookup
-    // a position from an index) does not need to search through numbers.len() entries:
+    // Set up buckets containing indices, so that a rotation (that needs to lookup a position
+    // from an index) does not need to search through and update numbers.len() entries.
     let bucket_size = (numbers.len() as f64).sqrt() as usize;
     let mut buckets = Vec::with_capacity(numbers.len() / bucket_size);
-    let mut i = 0;
-    while i < numbers.len() {
+    for i in (0..numbers.len()).step_by(bucket_size) {
         let range_end = (i + bucket_size).min(numbers.len());
         buckets.push((i..range_end).collect::<Vec<_>>());
-        i += bucket_size;
     }
 
     // Setup lookup table from an index to the bucket containing that index:
@@ -60,9 +39,10 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
     for _ in 0..iterations {
         for idx_to_shift in 0..numbers.len() {
             // rem_euclid() is necessary as there are negative numbers.
-            // We subtract 1 from the array length as we are effectively
-            // removing the element from the circle and inserting it into
-            // the `numbers.len() - 1` sized list.
+            //
+            // Subtract 1 from the array length as we are  removing the
+            // element from the circle and inserting it into the
+            // `numbers.len() - 1` sized list.
             //
             // Example: [1, 2, 3]
             // When rotating 3, we actually remove it and insert it into [1, 2]:
@@ -77,17 +57,17 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
             let old_offset_in_bucket = buckets[old_bucket_containing_idx]
                 .iter()
                 .position(|&n| n == idx_to_shift)
-                .unwrap();
+                .unwrap_or_default();
 
             // Remove the index from the old bucket:
             buckets[old_bucket_containing_idx].remove(old_offset_in_bucket);
 
+            // Insert the index into the new bucket:
             let (new_bucket_containing_idx, new_offset_in_bucket) = find_bucket_and_offset(
                 &buckets,
                 old_bucket_containing_idx,
                 old_offset_in_bucket + shift_at_idx,
             );
-
             buckets[new_bucket_containing_idx].insert(new_offset_in_bucket, idx_to_shift);
             idx_to_bucket[idx_to_shift] = new_bucket_containing_idx;
         }
@@ -97,7 +77,7 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
     let mut number_offset_in_bucket = buckets[bucket_containing_number]
         .iter()
         .position(|&n| n == zero_idx)
-        .unwrap();
+        .unwrap_or_default();
 
     Ok(std::iter::from_fn(|| {
         (bucket_containing_number, number_offset_in_bucket) = find_bucket_and_offset(
@@ -111,6 +91,23 @@ pub fn solve(input: &mut Input) -> Result<i64, String> {
     .take(3)
     .sum())
 }
+
+fn find_bucket_and_offset(
+    buckets: &[Vec<usize>],
+    mut bucket: usize,
+    mut offset_relative_to_bucket: usize,
+) -> (usize, usize) {
+    // Buckets are of different length initially as the input
+    // might not split evenly into buckets, and later on we do
+    // not balance buckets on insertion.
+    while offset_relative_to_bucket >= buckets[bucket].len() {
+        offset_relative_to_bucket -= buckets[bucket].len();
+        bucket = (bucket + 1) % buckets.len();
+    }
+    (bucket, offset_relative_to_bucket)
+}
+
+const MAX_LENGTH: usize = 10_000;
 
 #[test]
 pub fn tests() {
