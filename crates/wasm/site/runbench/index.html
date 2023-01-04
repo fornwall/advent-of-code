@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Advent of Code Solver</title>
+    <title>AoC Benchmark</title>
     <meta name="description" content="A solver of Advent of Code problems" />
     <meta name="viewport" content="width=device-width" />
     <link rel="shortcut icon" href="favicon_1.ico" type="image/x-icon" />
@@ -20,6 +20,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.17.0/plotly.min.js"
       integrity="sha512-sjutd+c6x3kSut3vvsg/67D6l1OJBTsDGtCxUjOqd+PZN50k7QOQ5eXEhRO1iyDNa7g2+4UwrJ5qaF/PgEPBgw=="
@@ -31,7 +32,7 @@
   <body>
     <main class="container" style="max-width: 720px">
       <div class="py-3">
-        <h1 class="text-center">WASM Solver</h1>
+        <h1 class="text-center">AoC Benchmark</h1>
       </div>
 
       <div class="d-flex justify-content-center" id="spinner">
@@ -40,6 +41,12 @@
         </div>
       </div>
       <div id="result" class="invisible">
+        <p class="text-center">
+          Benchmark running
+          <a href="https://github.com/fornwall/advent-of-code">solutions</a> to
+          <a href="https://adventofcode.com/2022/">Advent of Code 2022</a> in
+          the current browser using WebAssembly.
+        </p>
         <p id="total-time" class="text-center"></p>
 
         <div
@@ -75,7 +82,6 @@
     ).json();
     const year2022Days = tests.years.find((y) => y.year == 2022).days;
     const tbody = document.querySelector("tbody");
-    console.log(tbody);
 
     const worker = new Worker("../worker-wasm.js", {
       name: "wasm-runner",
@@ -130,7 +136,6 @@
             data.values.push(dayTime);
             for (let part = 1; part <= 2; part++) {
               if (day === 25 && part === 2) continue;
-              console.log("day", day, "part", part);
               const partTime = times.filter(
                 (d) => d.day == day && d.part == part
               )[0].executionTime;
