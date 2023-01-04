@@ -20,49 +20,154 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.17.0/plotly.min.js"
+      integrity="sha512-sjutd+c6x3kSut3vvsg/67D6l1OJBTsDGtCxUjOqd+PZN50k7QOQ5eXEhRO1iyDNa7g2+4UwrJ5qaF/PgEPBgw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
   </head>
 
   <body>
     <main class="container" style="max-width: 720px">
-        <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Day-Part</th>
-      <th scope="col">Time (ms)</th>
-      <th scope="col">Time (%)</th>
-    </tr>
-  </thead>
-  <tbody>
-  </tbody>
+      <div class="py-3">
+        <h1 class="text-center">WASM Solver</h1>
+      </div>
 
-  <script>
-    const tbody = document.querySelector('tbody');
+      <div class="d-flex justify-content-center" id="spinner">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div id="result" class="invisible">
+        <p id="total-time" class="text-center"></p>
+
+        <div
+          id="plot"
+          style="
+            margin: 1em;
+            width: min(50vw, 50vh);
+            height: min(50vw, 50vh);
+            margin-left: auto;
+            margin-right: auto;
+          "
+        ></div>
+        <table
+          class="table table-striped text-center"
+          style="width: auto !important; margin: auto"
+        >
+          <thead>
+            <tr>
+              <th scope="col" class="text-end">Day-Part</th>
+              <th scope="col" class="text-end">Time (ms)</th>
+              <th scope="col" class="text-end">Time (%)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+
+  <script type="module">
+    const tests = await (
+      await fetch("https://fornwall.net/aoc/tests.json")
+    ).json();
+    const year2022Days = tests.years.find((y) => y.year == 2022).days;
+    const tbody = document.querySelector("tbody");
     console.log(tbody);
 
-    const worker = new Worker("../worker-wasm.js", { name: "wasm-runner", type:"module" });
+    const worker = new Worker("../worker-wasm.js", {
+      name: "wasm-runner",
+      type: "module",
+    });
     worker.onmessage = (e) => {
-        if (!e.data.wasmWorking) {
-            alert('WASM not working');
-            return;
-        }
-        worker.onmessage = (e) => {
-            console.log('Message from worker', e.data);
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${e.data.day}-${e.data.part}</td><td>${e.data.executionTime.toFixed(2)}</td><td></td>`;
+      if (!e.data.wasmWorking) {
+        alert("WASM not working");
+        return;
+      }
+      const times = [];
+      worker.onmessage = (e) => {
+        times.push(e.data);
+        if (e.data.day == 25) {
+          const totalTime = times
+            .map((d) => d.executionTime)
+            .reduce((a, b) => a + b, 0);
+          document.getElementById(
+            "total-time"
+          ).textContent = `Total time: ${totalTime.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+          })} ms`;
+          for (const data of times) {
+            const tr = document.createElement("tr");
+            const percentageTime = (data.executionTime * 100) / totalTime;
+            tr.innerHTML = `<td class="text-end">${data.day}-${
+              data.part
+            }</td><td class="text-end">${data.executionTime.toFixed(
+              2
+            )}</td><td class="text-end">${percentageTime.toFixed(2)}</td>`;
             tbody.appendChild(tr);
+          }
 
-        }
+          const data = {
+            type: "sunburst",
+            labels: ["2022"],
+            parents: [""],
+            values: [totalTime],
+            outsidetextfont: { size: 20, color: "#fff" },
+            branchvalues: "total",
+            sort: false,
+          };
 
-        const year = 2022;
-        const input = "hello";
-        for (let day = 1; day < 26; day++) {
-            for (let part = 1; part < 3; part++) {
-                worker.postMessage({ year, day, part, input });
+          for (let day = 1; day < 26; day++) {
+            const dayLabel = `Day ${day}`;
+            const dayTime = times
+              .filter((d) => d.day == day)
+              .map((d) => d.executionTime)
+              .reduce((a, b) => a + b, 0);
+            data.labels.push(dayLabel);
+            data.parents.push("2022");
+            data.values.push(dayTime);
+            for (let part = 1; part <= 2; part++) {
+              if (day === 25 && part === 2) continue;
+              console.log("day", day, "part", part);
+              const partTime = times.filter(
+                (d) => d.day == day && d.part == part
+              )[0].executionTime;
+              data.labels.push(`Day ${day} part ${part}`);
+              data.parents.push(dayLabel);
+              data.values.push(partTime);
             }
+          }
+
+          const layout = {
+            margin: { l: 0, r: 0, b: 0, t: 0 },
+            paper_bgcolor: "rgba(0,0,0,0)",
+          };
+
+          Plotly.newPlot("plot", [data], layout, {
+            displayModeBar: false,
+            displaylogo: false,
+            responsive: true,
+            scrollZoom: true,
+          });
+
+          document.getElementById("spinner").remove();
+          document.getElementById("result").classList.remove("invisible");
         }
+      };
+
+      const year = 2022;
+      const input = "hello";
+      for (const day of year2022Days) {
+        const input = day.input;
+        for (let part = 1; part < 3; part++) {
+          if (!(day.day == 25 && part == 2)) {
+            const partAnswer = day["part" + part];
+            worker.postMessage({ year: 2022, day: day.day, part, input });
+          }
+        }
+      }
     };
   </script>
-</table>
-
 </html>
