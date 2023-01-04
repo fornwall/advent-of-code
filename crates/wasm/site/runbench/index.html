@@ -31,8 +31,9 @@
 
   <body>
     <main class="container" style="max-width: 720px">
-      <div class="py-3">
+      <div style="padding-top: 1em">
         <h1 class="text-center">AoC Benchmark</h1>
+        <p class="text-center" id="description"></p>
       </div>
 
       <div class="d-flex justify-content-center" id="spinner">
@@ -41,24 +42,35 @@
         </div>
       </div>
       <div id="result" class="invisible">
-        <p class="text-center">
-          Benchmark running
-          <a href="https://github.com/fornwall/advent-of-code">solutions</a> to
-          <a href="https://adventofcode.com/2022/">Advent of Code 2022</a> in
-          the current browser using WebAssembly.
-        </p>
         <p id="total-time" class="text-center"></p>
 
         <div
           id="plot"
           style="
-            margin: 1em;
+            margin-top: 1em;
+            margin-bottom: 1em;
             width: min(50vw, 50vh);
             height: min(50vw, 50vh);
             margin-left: auto;
             margin-right: auto;
           "
         ></div>
+
+        <form id="form" class="text-center">
+          <p>
+            <select id="year" name="year">
+              <option value="2022">Year 2022</option>
+              <option value="2021">Year 2021</option>
+              <option value="2020">Year 2020</option>
+              <option value="2019">Year 2019</option>
+              <option value="2018">Year 2018</option>
+              <option value="2017">Year 2017</option>
+              <option value="2016">Year 2016</option>
+              <option value="2015">Year 2015</option>
+            </select>
+          </p>
+        </form>
+
         <table
           class="table table-striped text-center"
           style="width: auto !important; margin: auto"
@@ -77,10 +89,40 @@
   </body>
 
   <script type="module">
+    addEventListener("error", (e) => {
+      console.log("error", e);
+      if (
+        window.navigator.userAgent.includes("Firefox") &&
+        e.message.includes(
+          "import declarations may only appear at top level of a module"
+        )
+      ) {
+        alert(
+          "Awaiting worker modules in Firefox:\n\nhttps://bugzilla.mozilla.org/show_bug.cgi?id=1247687"
+        );
+      } else {
+        alert(e.message);
+      }
+    });
+
+    const year = parseInt(
+      new URLSearchParams(window.location.search).get("year") || "2022"
+    );
+    document.getElementById("description").innerHTML = `Benchmark running
+          <a href="https://github.com/fornwall/advent-of-code">solutions</a> to
+          <a href="https://adventofcode.com/${year}/">Advent of Code ${year}</a> in
+          the current browser using WebAssembly.`;
+
+    const yearSelect = document.getElementById("year");
+    yearSelect.value = year;
+    yearSelect.addEventListener("change", () => {
+      document.getElementById("form").submit();
+    });
+
     const tests = await (
       await fetch("https://fornwall.net/aoc/tests.json")
     ).json();
-    const year2022Days = tests.years.find((y) => y.year == 2022).days;
+    const yearDays = tests.years.find((y) => y.year == year).days;
     const tbody = document.querySelector("tbody");
 
     const worker = new Worker("../worker-wasm.js", {
@@ -115,9 +157,10 @@
             tbody.appendChild(tr);
           }
 
+          const yearLabel = `${year}`;
           const data = {
             type: "sunburst",
-            labels: ["2022"],
+            labels: [yearLabel],
             parents: [""],
             values: [totalTime],
             outsidetextfont: { size: 20, color: "#fff" },
@@ -132,7 +175,7 @@
               .map((d) => d.executionTime)
               .reduce((a, b) => a + b, 0);
             data.labels.push(dayLabel);
-            data.parents.push("2022");
+            data.parents.push(yearLabel);
             data.values.push(dayTime);
             for (let part = 1; part <= 2; part++) {
               if (day === 25 && part === 2) continue;
@@ -162,14 +205,13 @@
         }
       };
 
-      const year = 2022;
       const input = "hello";
-      for (const day of year2022Days) {
+      for (const day of yearDays) {
         const input = day.input;
         for (let part = 1; part < 3; part++) {
           if (!(day.day == 25 && part == 2)) {
             const partAnswer = day["part" + part];
-            worker.postMessage({ year: 2022, day: day.day, part, input });
+            worker.postMessage({ year, day: day.day, part, input });
           }
         }
       }
