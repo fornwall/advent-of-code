@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+import subprocess
+
 last_day = None
 total_day_time = 0
 days = []
 
-# cargo bench --bench benchmark -- --output-format=bencher 2022 > output.txt
-for line in open("output.txt"):
+p = subprocess.run(['cargo', 'bench', '--bench', 'benchmark', '--', '--output-format=bencher', '2022'], capture_output=True)
+
+for line in p.stdout.decode("utf-8").splitlines():
     line = line.strip()
     if not line: continue
 
@@ -27,6 +30,7 @@ days.append((last_day, total_day_time))
 total_time = sum(t for (d,t) in days)
 for (d,t) in days:
     percentage = (t / total_time) * 100
-    print(f"Day {d:02}: {t:0.2f}   ({percentage:0.2f} %)")
+    print(f"Day {d:>2}: {t:>5.2f} ms {percentage:>5.2f} %")
 print("")
 print(f"Total: {total_time:0.2f} ms")
+
