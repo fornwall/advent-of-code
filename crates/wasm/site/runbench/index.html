@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Advent of Code Solver</title>
+    <meta name="description" content="A solver of Advent of Code problems" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="shortcut icon" href="favicon_1.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.2/css/bootstrap.min.css"
+      integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.2.2/superhero/bootstrap.min.css"
+      integrity="sha512-UC/dbG+JEcbIRSRegI9jx/I0DOG4GjzsonWz5SmBiq910BGqB89C1owvX323kMufc2h4JwoKWW5uG76ViLr/3A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+  </head>
+
+  <body>
+    <main class="container" style="max-width: 720px">
+        <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Day-Part</th>
+      <th scope="col">Time (ms)</th>
+      <th scope="col">Time (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+
+  <script>
+    const tbody = document.querySelector('tbody');
+    console.log(tbody);
+
+    const worker = new Worker("../worker-wasm.js", { name: "wasm-runner", type:"module" });
+    worker.onmessage = (e) => {
+        if (!e.data.wasmWorking) {
+            alert('WASM not working');
+            return;
+        }
+        worker.onmessage = (e) => {
+            console.log('Message from worker', e.data);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${e.data.day}-${e.data.part}</td><td>${e.data.executionTime.toFixed(2)}</td><td></td>`;
+            tbody.appendChild(tr);
+
+        }
+
+        const year = 2022;
+        const input = "hello";
+        for (let day = 1; day < 26; day++) {
+            for (let part = 1; part < 3; part++) {
+                worker.postMessage({ year, day, part, input });
+            }
+        }
+    };
+  </script>
+</table>
+
+</html>
