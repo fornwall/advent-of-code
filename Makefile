@@ -77,7 +77,8 @@ site-wasm:
 site-pack: site-wasm
 	cd crates/wasm/site && \
 		rm -Rf dist && \
-		npm i && npm run webpack -- --mode=production
+		npm i && npm run webpack -- --mode=production && \
+		cd runbench && npm i && npm run webpack -- --mode=production
 
 wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-wasm && \
@@ -144,7 +145,7 @@ deploy-site:
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
 		cp -Rf ../site/show/ show/ && \
-		cp -Rf ../site/runbench/ runbench/ && \
+		cp -Rf ../site/runbench/dist/ runbench/ && \
 		cp -Rf ../site/release/ release/ && \
 		cp -Rf ../site/api/ api/ && \
 		cp -Rf ../site/benchmark/ benchmark/ && \
