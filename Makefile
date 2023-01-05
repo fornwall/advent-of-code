@@ -84,13 +84,16 @@ wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-wasm && \
 	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
+--pack-runbench-continously:
+	cd crates/wasm/site/runbench && NODE_ENV=development npx webpack -- --watch
+
 --run-devserver:
 	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type https
 
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell '$(MAKE) site-wasm'
 
-serve-site: --run-devserver --watch-and-build-wasm ;
+serve-site: --run-devserver --pack-runbench-continously --watch-and-build-wasm ;
 
 node-package:
 	cd crates/wasm && ./build-package.sh

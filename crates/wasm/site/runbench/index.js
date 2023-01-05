@@ -47,6 +47,16 @@ async function main() {
     const times = [];
     worker.onmessage = (e) => {
       times.push(e.data);
+
+      const expectedAnswer = yearDays.find((d) => d.day == e.data.day)[
+        "part" + e.data.part
+      ];
+      if (expectedAnswer != e.data.output) {
+        const message = `Error for ${year}-${e.data.day}-${e.data.part}: Expected "${expectedAnswer}, was "${e.data.output}"`;
+        console.error(message);
+        alert(message);
+      }
+
       if (e.data.day == 25) {
         const totalTime = times
           .map((d) => d.executionTime)
@@ -115,12 +125,10 @@ async function main() {
       }
     };
 
-    const input = "hello";
     for (const day of yearDays) {
       const input = day.input;
       for (let part = 1; part < 3; part++) {
         if (!(day.day == 25 && part == 2)) {
-          const partAnswer = day["part" + part];
           worker.postMessage({ year, day: day.day, part, input });
         }
       }
