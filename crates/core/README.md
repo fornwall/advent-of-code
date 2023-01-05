@@ -13,6 +13,14 @@ $ echo 14 | cargo run -q 2019 1 1
 2
 ```
 
+## Installing from homebrew
+The command-line tool can be installed as a brew tap:
+
+```sh
+$ brew install fornwall/tap/advent-of-code
+$ echo 14 | advent-of-code 2019 1 1
+```
+
 ## Published crate
 This crate is published to [crates.io/crates/advent-of-code](https://crates.io/crates/advent-of-code).
 
