@@ -1,0 +1,43 @@
+#!/bin/sh
+set -e -u
+
+CPU_CORE_TO_USE=15
+
+# Disable SMT on core if necessary - https://www.baeldung.com/linux/disable-hyperthreading
+if [ -d "/sys/devices/system/cpu/cpu${CPU_CORE_TO_USE}/topology" ] && grep -q ',' "/sys/devices/system/cpu/cpu${CPU_CORE_TO_USE}/topology/thread_siblings_list"; then
+    THREAD_SIBLING_TO_DISABLE=$(cat /sys/devices/system/cpu/cpu${CPU_CORE_TO_USE}/topology/thread_siblings_list | cut -d ',' -f 2)
+    echo "❌ Need to disable SMT - running: sudo sh -c 'echo 0 > /sys/devices/system/cpu/cpu${THREAD_SIBLING_TO_DISABLE}/online'"
+    sudo sh -c "echo 0 > /sys/devices/system/cpu/cpu${THREAD_SIBLING_TO_DISABLE}/online"
+else
+    echo "✅ SMT already disabled"
+fi
+
+# Scaling governors - https://wiki.archlinux.org/title/CPU_frequency_scaling#Scaling_governors
+CURRENT_SCALING=$(cat /sys/devices/system/cpu/cpu${CPU_CORE_TO_USE}/cpufreq/scaling_governor)
+if [ "${CURRENT_SCALING}" = "performance" ]; then
+    echo "✅ Scaling governer is 'performance'"
+else
+    echo "❌ Current scaling governor is '${CURRENT_SCALING}' - running: sudo sh -c 'echo performance > /sys/devices/system/cpu/cpu${CPU_CORE_TO_USE}/cpufreq/scaling_governor'"
+    sudo sh -c "echo performance > /sys/devices/system/cpu/cpu${CPU_CORE_TO_USE}/cpufreq/scaling_governor"
+fi
+
+# CPU boosting - https://juliaci.github.io/BenchmarkTools.jl/dev/linuxtips/
+if [ `cat /sys/devices/system/cpu/cpufreq/boost` = "0" ]; then
+    echo "✅ CPU boosting disabled"
+else
+    echo "❌ CPU boosting is not disabled - running: sudo sh -c 'echo 0 > /sys/devices/system/cpu/cpufreq/boost'"
+    sudo sh -c "echo 0 > /sys/devices/system/cpu/cpufreq/boost"
+fi
+
+# TODO: irqbalance
+#
+
+# export RUSTFLAGS='-C target-cpu=native'
+
+# To run chrt as non-root: sudo setcap cap_sys_nice=ep `which chrt`
+numactl --physcpubind="${CPU_CORE_TO_USE}" --localalloc \
+    chrt -f 99 \
+        setarch --addr-no-randomize \
+         cargo bench --bench benchmark "$@"
+         #bash -c 'chrt -p $$'
+         #bash -c 'awk "{print \$39}" /proc/$$/stat'
