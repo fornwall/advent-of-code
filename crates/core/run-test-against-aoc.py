@@ -18,6 +18,8 @@ with open(sessions_file) as f:
 # Prevent webbrowser.open, which aocd calls, from opening a browser:
 os.environ["BROWSER"] = "true"
 
+verbose = "AOC_VERBOSE" in os.environ
+
 if "AOC_YEAR" in os.environ:
     years_string = os.environ["AOC_YEAR"]
     if "-" in years_string:
@@ -51,6 +53,7 @@ else:
 for year in years:
     for day in days:
         cached_inputs = {}
+        print(f"# Year {year}, Day {day}")
         for session in SESSIONS:
             session_cookie = session["cookie"]
             session_description = session["description"]
@@ -59,12 +62,14 @@ for year in years:
 
             user = User(session_cookie)
 
-            print(f"# Year {year}, Day {day} - {session_description}")
+            if verbose:
+                print(f"# Year {year}, Day {day} - {session_description}")
             puzzle = Puzzle(year=year, day=day, user=user)
             input_data = puzzle.input_data
 
             if input_data in cached_inputs:
-                print("Skipping - input already seen for " + cached_inputs[input_data])
+                if verbose:
+                    print("Skipping - input already seen for " + cached_inputs[input_data])
                 continue
             cached_inputs[input_data] = session_description
 
