@@ -54,7 +54,7 @@ impl Grid {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let grid = Grid::parse(input.text)?;
     let mut distances: HashMap<(usize, usize), usize> = HashMap::new();
 

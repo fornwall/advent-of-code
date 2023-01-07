@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut syntax_error_score = 0;
     let mut autocomplete_scores = Vec::new();
 

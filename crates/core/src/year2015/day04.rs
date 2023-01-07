@@ -2,7 +2,7 @@ use crate::common::int_to_ascii::IntToAsciiContext;
 use crate::common::md5::Context;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_INDEX: u32 = 100_000_000;
 
     let mut ascii_bytes_context = IntToAsciiContext::new();

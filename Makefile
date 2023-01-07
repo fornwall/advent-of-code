@@ -68,8 +68,8 @@ site-wasm:
 	cd site/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm && \
 	cd ../.. && \
-	RUSTFLAGS="-C target-feature=+atomics,$(WASM_TARGET_FEATURES)" rustup run $(NIGHTLY_TOOLCHAIN) \
-		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization -Z build-std=std,panic_abort && \
+	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" \
+		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization && \
 	$(WASM_BINDGEN) --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
@@ -78,7 +78,8 @@ site-pack: site-wasm
 	cd crates/wasm/site && \
 		rm -Rf dist && \
 		npm i && npm run webpack -- --mode=production && \
-		cd runbench && npm i && npm run webpack -- --mode=production
+		cd runbench && npm i && npm run webpack -- --mode=production && \
+		cd ../show && npm i && npm run webpack -- --mode=production
 
 wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-wasm && \
@@ -87,13 +88,16 @@ wasm-size:
 --pack-runbench-continously:
 	cd crates/wasm/site/runbench && NODE_ENV=development npx webpack -- --watch
 
+--pack-show-continously:
+	cd crates/wasm/site/show && NODE_ENV=development npx webpack -- --watch
+
 --run-devserver:
 	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type https
 
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell '$(MAKE) site-wasm'
 
-serve-site: --run-devserver --pack-runbench-continously --watch-and-build-wasm ;
+serve-site: --run-devserver --pack-show-continously --pack-runbench-continously --watch-and-build-wasm ;
 
 node-package:
 	cd crates/wasm && ./build-package.sh
@@ -147,7 +151,7 @@ deploy-site:
 		cd aoc.fornwall.net && \
 		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
-		cp -Rf ../site/show/ show/ && \
+		cp -Rf ../site/show/dist/ show/ && \
 		cp -Rf ../site/runbench/dist/ runbench/ && \
 		cp -Rf ../site/release/ release/ && \
 		cp -Rf ../site/api/ api/ && \

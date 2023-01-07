@@ -1,0 +1,19 @@
+[package]
+name = "svgplot"
+authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
+description = "Utilities for SVG generation"
+categories = ["multimedia::images"]
+keywords = ["advent-of-code"]
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dev-dependencies]
+svg = "0.13.0"
+
+[lib]
+name = "svgplot"

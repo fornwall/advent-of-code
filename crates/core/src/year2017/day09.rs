@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut result = 0;
     let mut stack = Vec::new();
     let mut ignore_next = false;

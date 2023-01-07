@@ -1,7 +1,7 @@
 use crate::common::parser::parse_lines;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     Ok(parse_lines::<u32>(input.text)?
         .windows(input.part_values(2, 4))
         .filter(|data| data.last() > data.first())

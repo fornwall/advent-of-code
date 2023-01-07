@@ -59,7 +59,7 @@ fn highest_score(
     max_score
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let error_mapper = |_| "Invalid number";
 
     let mut ingredients = Vec::new();

@@ -8,7 +8,7 @@ fn factorial(num: Word) -> Word {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<Word, String> {
+pub fn solve(input: &Input) -> Result<Word, String> {
     let mut computer = Computer::parse(input.text)?;
     let register_a_value = input.part_values(7, 12);
     if computer.instructions.len() > 20 {

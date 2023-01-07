@@ -96,7 +96,7 @@ fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), C
     Ok(painted)
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let painted = run(input.text, input.part_values(Color::Black, Color::White))?;
 
     if input.is_part_one() {

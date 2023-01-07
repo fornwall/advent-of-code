@@ -3,7 +3,7 @@ use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let actor_1_remaining_minutes = input.part_values(30, 26);
     let actor_2_remaining_minutes = input.part_values(0, 26);
 

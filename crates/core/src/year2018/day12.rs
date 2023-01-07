@@ -85,7 +85,7 @@ impl Tunnel {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i64, String> {
+pub fn solve(input: &Input) -> Result<i64, String> {
     let max_steps = input.part_values(20, 1000);
 
     let mut tunnel = Tunnel::parse(input.text, max_steps)?;

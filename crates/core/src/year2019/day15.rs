@@ -76,7 +76,7 @@ where
     Ok(())
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     if input.is_part_one() {
         let mut distance_to_oxygen = -1;
         search_space_ship(input.text, |_, is_oxygen, distance| {

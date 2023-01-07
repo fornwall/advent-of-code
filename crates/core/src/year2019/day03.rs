@@ -186,7 +186,7 @@ fn input_lines(input_string: &str) -> Result<(&str, &str), String> {
     Ok((lines[0], lines[1]))
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let (first_line, second_line) = input_lines(input.text)?;
     let first_wire_segments: Vec<LineSegment> =
         parse_wire_points(first_line).collect::<Result<_, _>>()?;
@@ -208,135 +208,6 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     };
                     best = cmp::min(best, intersection_value);
                 }
-            }
-        }
-    }
-
-    #[cfg(feature = "visualization")]
-    {
-        use crate::painter::PainterRef;
-        let mut min_x = std::i32::MAX;
-        let mut max_x = std::i32::MIN;
-        let mut min_y = std::i32::MAX;
-        let mut max_y = std::i32::MIN;
-
-        let second_wire_segments: Vec<LineSegment> =
-            parse_wire_points(second_line).collect::<Result<_, _>>()?;
-
-        for line_segment in first_wire_segments
-            .iter()
-            .chain(second_wire_segments.iter())
-        {
-            min_x = std::cmp::min(min_x, line_segment.top_left.x);
-            max_x = std::cmp::max(max_x, line_segment.end_point().x);
-            min_y = std::cmp::min(min_y, line_segment.top_left.y);
-            max_y = std::cmp::max(max_y, line_segment.end_point().y);
-        }
-
-        min_x -= 500;
-        min_y -= 500;
-        max_x += 500;
-        max_y += 500;
-
-        let grid_width = (max_x - min_x) as i32;
-        let grid_height = (max_y - min_y) as i32;
-        input.painter.set_aspect_ratio(grid_width, grid_height);
-
-        let grid_display_width = 1.0 / f64::from(grid_width);
-        let grid_display_height = (1.0 / f64::from(grid_height)) / input.painter.aspect_ratio();
-
-        // Mark origin:
-        input.painter.fill_style_rgb(255, 255, 0);
-        input.painter.fill_circle(
-            -f64::from(min_x) * grid_display_width,
-            -f64::from(min_y) * grid_display_height,
-            grid_display_width * 200.,
-        );
-
-        let mut drawn_lines1: Vec<LineSegment> = Vec::new();
-        let mut drawn_lines2: Vec<LineSegment> = Vec::new();
-
-        let draw_line = |painter: &mut PainterRef, line_segment: &LineSegment, r, g, b| {
-            let start_x = f64::from(line_segment.top_left.x - min_x) * grid_display_width;
-            let start_y = f64::from(line_segment.top_left.y - min_y) * grid_display_height;
-            let mut end_x = start_x;
-            let mut end_y = start_y;
-            if line_segment.horizontal {
-                end_x += f64::from(line_segment.length) * grid_display_width
-            } else {
-                end_y += f64::from(line_segment.length) * grid_display_height
-            }
-
-            painter.line_width(grid_display_width * 30.);
-            painter.stroke_style_rgb(r, g, b);
-            painter.begin_path();
-            painter.move_to(start_x, start_y);
-            painter.line_to(end_x, end_y);
-            painter.stroke();
-        };
-
-        let mut first = true;
-        let mut last_notified_intersection_count = 0;
-        for (l1, l2) in first_wire_segments.iter().zip(second_wire_segments.iter()) {
-            draw_line(&mut input.painter, l1, 255, 0, 0);
-            draw_line(&mut input.painter, l2, 0x5b, 0xce, 0xf3);
-
-            drawn_lines1.push(*l1);
-            drawn_lines2.push(*l2);
-
-            let mut intersection_count = 0;
-            let mut current_best = std::u32::MAX;
-            for d1 in &drawn_lines1 {
-                for d2 in &drawn_lines2 {
-                    if let Some(intersection) = d1.intersection_with(*d2) {
-                        let is_best = if intersection.point == origin {
-                            false
-                        } else {
-                            let intersection_value = if input.is_part_one() {
-                                intersection.point.distance_from(origin)
-                            } else {
-                                intersection.combined_steps
-                            };
-                            current_best = std::cmp::min(current_best, intersection_value);
-                            intersection_value == best
-                        };
-
-                        intersection_count += 1;
-
-                        input
-                            .painter
-                            .line_width(grid_display_width * if is_best { 60. } else { 10. });
-                        input.painter.stroke_style_rgb(255, 255, 255);
-                        input.painter.stroke_circle(
-                            f64::from(intersection.point.x - min_x) * grid_display_width,
-                            f64::from(intersection.point.y - min_y) * grid_display_height,
-                            grid_display_width * 100. * if is_best { 2. } else { 1. },
-                        );
-                    }
-                }
-            }
-
-            if intersection_count != last_notified_intersection_count {
-                input.painter.play_sound(0);
-                last_notified_intersection_count = intersection_count;
-            }
-
-            input.painter.status_text(&format!(
-                "Line segments: {: >3}   Intersections: {: >2}   Best: {: >5}",
-                drawn_lines1.len(),
-                intersection_count,
-                if current_best == std::u32::MAX {
-                    "".to_string()
-                } else {
-                    current_best.to_string()
-                },
-            ));
-
-            if first {
-                first = false;
-                input.painter.end_frame();
-            } else {
-                input.painter.meta_delay(100);
             }
         }
     }

@@ -2,7 +2,7 @@ use crate::common::permutation::all_permutations;
 use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut places = HashSet::new();
     let mut distances = HashMap::new();
     for line in input.text.lines() {

@@ -178,7 +178,7 @@ impl Tile4 {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     #![allow(clippy::unusual_byte_groupings, clippy::unreadable_literal)]
     let mut from_2_to_3 = [Tile3 { bits: 0 }; 16];
     let mut from_3_to_4 = [Tile4 { bits: 0 }; 512];

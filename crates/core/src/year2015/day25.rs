@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let words = input.text.split(' ').collect::<Vec<_>>();
     if words.len() != 19 || words[16].is_empty() || words[18].is_empty() {
         return Err("Invalid input - not expected structure".to_string());

@@ -92,7 +92,7 @@ impl ProblemInput {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let problem_input = ProblemInput::parse(input.text)?;
 
     let all_opcodes = [

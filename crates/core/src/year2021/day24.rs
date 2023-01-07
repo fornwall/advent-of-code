@@ -2,7 +2,7 @@ use crate::input::Input;
 
 const NUM_DIGITS_IN_MODEL_NUMBER: usize = 14;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let instructions = input
         .text
         .lines()

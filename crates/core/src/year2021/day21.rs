@@ -3,7 +3,7 @@ use crate::input::Input;
 const MAX_POSITION: u64 = 10;
 const SCORE_REQUIRED_PART_2: u8 = 21;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut game = Game::parse(input.text)?;
     if input.is_part_one() {
         let mut die_roll_count = 0_u64;

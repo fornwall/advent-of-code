@@ -26,7 +26,7 @@ where
     None
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     const PREAMBLE_LENGTH: usize = 25;
 
     let numbers = parse_lines::<u64>(input.text)?;

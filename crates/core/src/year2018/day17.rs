@@ -234,7 +234,7 @@ impl Grid {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let mut grid = Grid::from(input.text)?;
     #[cfg(feature = "debug-output")]
     grid.print("Initial");

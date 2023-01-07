@@ -61,7 +61,7 @@ fn sizes<'a, I: Iterator<Item = &'a str>>(lines: &mut I, stack: &mut Stack) -> R
     Ok(dir_size)
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut dir_stack = Stack::new();
     sizes(&mut input.text.lines().skip(1), &mut dir_stack)?;
     if input.is_part_one() {

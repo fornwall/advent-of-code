@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<i64, String> {
+pub fn solve(input: &Input) -> Result<i64, String> {
     let iterations = input.part_values(1, 10);
     let input_multiplier = input.part_values(1, 811_589_153);
 

@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let transmission = input.text.as_bytes();
     let marker_len = input.part_values(4, 14);
 

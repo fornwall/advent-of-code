@@ -116,7 +116,7 @@ impl PartialEq for Work {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     const WORKERS: usize = 5;
     const STEP_DURATION_BASE: i32 = 60;
 

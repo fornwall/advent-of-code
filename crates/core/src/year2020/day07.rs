@@ -55,7 +55,7 @@ fn count_total_bags<'a>(
         })
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut reactions: HashMap<&str, Vec<BagEntry>> = HashMap::new();
     let mut child_to_parent: HashMap<&str, Vec<&str>> = HashMap::new();
 

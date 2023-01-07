@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::ops::RangeInclusive;
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let trench = Trench::parse(input.text).ok_or_else(|| "Unable to parse trench".to_string())?;
 
     let mut max_y = 0;

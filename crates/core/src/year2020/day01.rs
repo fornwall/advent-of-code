@@ -1,5 +1,3 @@
-#[cfg(feature = "visualization")]
-use super::day01_renderer::{render_part_one, render_part_two};
 use crate::common::parser::parse_lines;
 use crate::input::Input;
 use core::cmp::Ordering::{Equal, Greater, Less};
@@ -31,19 +29,15 @@ fn subsequence_summing_to(sorted_sequence: &[u32], desired_sum: u32) -> Option<u
     None
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const DESIRED_SUM: u32 = 2020;
 
     let mut expenses = parse_lines::<u32>(input.text)?;
     expenses.sort_unstable();
 
     let result = if input.is_part_one() {
-        #[cfg(feature = "visualization")]
-        render_part_one(&mut expenses, &mut input.painter);
         subsequence_summing_to(&expenses, DESIRED_SUM)
     } else {
-        #[cfg(feature = "visualization")]
-        render_part_two(&mut expenses, &mut input.painter);
         expenses
             .iter()
             .enumerate()

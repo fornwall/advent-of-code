@@ -1,8 +1,6 @@
-#[cfg(feature = "visualization")]
-use super::day11_renderer::Renderer;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     const MAX_ITERATIONS: u32 = 10_000;
 
     let leave_when_seeing = input.part_values(4, 5);
@@ -23,9 +21,6 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         ));
     }
 
-    #[cfg(feature = "visualization")]
-    let mut renderer = Renderer::new(&mut input.painter, cols, rows);
-
     let data: Vec<u8> = input.text.bytes().filter(|&c| c != b'\n').collect();
 
     let mut data_pos_to_seat_idx = vec![0; data.len()];
@@ -35,9 +30,6 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             return Err("Invalid input - only 'L', '.' and '\n' expected".to_string());
         }
         data_pos_to_seat_idx[idx] = seats_counter as u16;
-
-        #[cfg(feature = "visualization")]
-        renderer.add_idx_mapping(seats_counter, idx as i32 % cols, idx as i32 / cols);
 
         seats_counter += 1;
     }
@@ -110,9 +102,6 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
             seats[change_idx as usize] = !seats[change_idx as usize];
             false
         });
-
-        #[cfg(feature = "visualization")]
-        renderer.render(iteration, &seats[0..seats.len() - 1]);
 
         if to_visit.is_empty() {
             return Ok(seats.iter().filter(|&&occupied| occupied).count());

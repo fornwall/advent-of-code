@@ -2,7 +2,7 @@ use super::int_code::Program;
 use super::int_code::Word;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<Word, String> {
+pub fn solve(input: &Input) -> Result<Word, String> {
     const DESIRED_OUTPUT: Word = 19_690_720;
 
     let initial_program = Program::parse(input.text)?;

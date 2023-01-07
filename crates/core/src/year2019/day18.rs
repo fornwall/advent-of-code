@@ -2,8 +2,6 @@ use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 use crate::input::Input;
-#[cfg(feature = "visualization")]
-use crate::painter::PainterRef;
 
 const DIRECTIONS: [(i32, i32); 4] = [(0, 1), (0, -1), (-1, 0), (1, 0)];
 
@@ -33,23 +31,9 @@ struct Edge {
     steps: usize,
     /// The keys needed to traverse this path.
     needed_keys: KeyBitset,
-    #[cfg(feature = "visualization")]
-    x: i32,
-    #[cfg(feature = "visualization")]
-    y: i32,
 }
 
-pub fn steps_to_gather_all_keys(
-    input_string: &str,
-    #[cfg(feature = "visualization")] painter: &mut PainterRef,
-    #[cfg(feature = "visualization")] map_x_offset: usize,
-    #[cfg(feature = "visualization")] map_y_offset: usize,
-    #[cfg(feature = "visualization")] mut global_cols: usize,
-    #[cfg(feature = "visualization")] mut global_rows: usize,
-) -> Result<usize, String> {
-    #[cfg(feature = "visualization")]
-    painter.fill_style_rgb(255, 0, 0);
-
+pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
     let rows = input_string.lines().count();
     let cols = input_string.lines().next().ok_or("Empty input")?.len();
     let mut map = vec![b'#'; rows * cols];
@@ -57,14 +41,6 @@ pub fn steps_to_gather_all_keys(
     let mut all_keys_bitset = 0_u32;
 
     let index_of = |x, y| x + y * cols;
-
-    #[cfg(feature = "visualization")]
-    {
-        if global_rows == 0 {
-            global_rows = rows;
-            global_cols = cols;
-        }
-    }
 
     for (y, line) in input_string.lines().enumerate() {
         if line.len() != cols {
@@ -74,28 +50,10 @@ pub fn steps_to_gather_all_keys(
             let byte = c as u8;
             let current_position = (x as i32, y as i32);
 
-            #[cfg(feature = "visualization")]
-            let canvas_x = (x + map_x_offset) as f64 / global_cols as f64;
-            #[cfg(feature = "visualization")]
-            let canvas_y = (y + map_y_offset) as f64 / global_rows as f64;
-            #[cfg(feature = "visualization")]
-            let draw_width = 0.95 / global_cols as f64;
-            #[cfg(feature = "visualization")]
-            let draw_height = 0.95 / global_rows as f64;
-            #[cfg(feature = "visualization")]
-            let draw = |drawer: &mut PainterRef| {
-                drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
-            };
-
             let char_to_insert = match c {
                 '@' => {
                     // The single entrance.
                     found_keys.insert(Key::new(b'@'), current_position);
-                    #[cfg(feature = "visualization")]
-                    {
-                        painter.fill_style_rgb(0, 0, 255);
-                        draw(painter);
-                    }
                     b'.'
                 }
                 'a'..='z' => {
@@ -103,39 +61,17 @@ pub fn steps_to_gather_all_keys(
                     let found_key = Key::new(byte);
                     all_keys_bitset |= found_key.bit_mask();
                     found_keys.insert(found_key, current_position);
-                    #[cfg(feature = "visualization")]
-                    {
-                        painter.fill_style_rgb(0, 255, 0);
-                        draw(painter);
-                    }
                     byte
                 }
                 '#' => {
-                    #[cfg(feature = "visualization")]
-                    {
-                        painter.fill_style_rgb(255, 0, 0);
-                        draw(painter);
-                    }
                     // Stone wall.
                     return;
                 }
-                _ => {
-                    #[cfg(feature = "visualization")]
-                    {
-                        if ('A'..='Z').contains(&c) {
-                            painter.fill_style_rgb(0, 255, 255);
-                            draw(painter);
-                        }
-                    }
-                    byte
-                }
+                _ => byte,
             };
             map[index_of(x, y)] = char_to_insert;
         });
     }
-
-    #[cfg(feature = "visualization")]
-    painter.end_frame();
 
     if !found_keys.contains_key(&Key::new(b'@')) {
         return Err("No entrance ('@') found".to_string());
@@ -200,10 +136,6 @@ pub fn steps_to_gather_all_keys(
                                 steps: new_steps as usize,
                                 needed_keys: new_needed_keys,
                                 target_key,
-                                #[cfg(feature = "visualization")]
-                                x: new_position.0,
-                                #[cfg(feature = "visualization")]
-                                y: new_position.1,
                             });
                     },
                 );
@@ -211,41 +143,16 @@ pub fn steps_to_gather_all_keys(
         }
     }
 
-    shortest_path(
-        &adjacency_list,
-        all_keys_bitset,
-        #[cfg(feature = "visualization")]
-        painter,
-        #[cfg(feature = "visualization")]
-        map_x_offset,
-        #[cfg(feature = "visualization")]
-        map_y_offset,
-        #[cfg(feature = "visualization")]
-        global_cols,
-        #[cfg(feature = "visualization")]
-        global_rows,
-    )
-    .ok_or_else(|| "Not possible to gather all keys".to_string())
+    shortest_path(&adjacency_list, all_keys_bitset)
+        .ok_or_else(|| "Not possible to gather all keys".to_string())
 }
 
-fn shortest_path(
-    adjacency_list: &HashMap<Key, Vec<Edge>>,
-    all_keys: KeyBitset,
-    #[cfg(feature = "visualization")] drawer: &mut PainterRef,
-    #[cfg(feature = "visualization")] map_x_offset: usize,
-    #[cfg(feature = "visualization")] map_y_offset: usize,
-    #[cfg(feature = "visualization")] global_cols: usize,
-    #[cfg(feature = "visualization")] global_rows: usize,
-) -> Option<usize> {
+fn shortest_path(adjacency_list: &HashMap<Key, Vec<Edge>>, all_keys: KeyBitset) -> Option<usize> {
     #[derive(Copy, Clone, Eq, PartialEq)]
     struct Vertex {
         at_key: Key,
         steps: usize,
         gathered_keys: KeyBitset,
-        #[cfg(feature = "visualization")]
-        x: i32,
-        #[cfg(feature = "visualization")]
-        y: i32,
     }
 
     impl Ord for Vertex {
@@ -268,35 +175,15 @@ fn shortest_path(
     let mut cost_for_keys: HashMap<(Key, KeyBitset), usize> = HashMap::new();
     let mut to_visit = BinaryHeap::new();
 
-    #[cfg(feature = "visualization")]
-    let mut visited_locations = HashSet::new();
-
     to_visit.push(Vertex {
         at_key: Key::new(b'@'),
         steps: 0,
         gathered_keys: 0,
-        #[cfg(feature = "visualization")]
-        x: 0,
-        #[cfg(feature = "visualization")]
-        y: 0,
     });
 
     while let Some(current) = to_visit.pop() {
         if current.gathered_keys == all_keys {
             return Some(current.steps);
-        }
-
-        #[cfg(feature = "visualization")]
-        {
-            if visited_locations.insert((current.x, current.y)) && current.at_key.value != b'@' {
-                let canvas_x = f64::from(current.x + map_x_offset as i32) / global_cols as f64;
-                let canvas_y = f64::from(current.y + map_y_offset as i32) / global_rows as f64;
-                let draw_width = 0.95 / global_cols as f64;
-                let draw_height = 0.95 / global_rows as f64;
-                drawer.fill_style_rgb(80, 0, 80);
-                drawer.fill_rect(canvas_x, canvas_y, draw_width, draw_height);
-                drawer.meta_delay(50);
-            }
         }
 
         for edge in adjacency_list.get(&current.at_key)? {
@@ -310,10 +197,6 @@ fn shortest_path(
                 steps: current.steps + edge.steps,
                 at_key: edge.target_key,
                 gathered_keys: current.gathered_keys | edge.target_key.bit_mask(),
-                #[cfg(feature = "visualization")]
-                x: edge.x,
-                #[cfg(feature = "visualization")]
-                y: edge.y,
             };
 
             let current_cost = cost_for_keys
@@ -330,21 +213,9 @@ fn shortest_path(
     None
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     if input.is_part_one() {
-        return steps_to_gather_all_keys(
-            input.text,
-            #[cfg(feature = "visualization")]
-            &mut input.painter,
-            #[cfg(feature = "visualization")]
-            0,
-            #[cfg(feature = "visualization")]
-            0,
-            #[cfg(feature = "visualization")]
-            0,
-            #[cfg(feature = "visualization")]
-            0,
-        );
+        return steps_to_gather_all_keys(input.text);
     }
 
     let mut map_top_left = String::new();
@@ -396,66 +267,10 @@ pub fn solve(input: &mut Input) -> Result<usize, String> {
         return Err("Invalid input (not surrounded by '#')".to_string());
     }
 
-    let s1 = steps_to_gather_all_keys(
-        &map_top_left,
-        #[cfg(feature = "visualization")]
-        &mut input.painter,
-        #[cfg(feature = "visualization")]
-        0,
-        #[cfg(feature = "visualization")]
-        0,
-        #[cfg(feature = "visualization")]
-        num_columns,
-        #[cfg(feature = "visualization")]
-        num_rows,
-    )?;
-    let s2 = steps_to_gather_all_keys(
-        &map_top_right,
-        #[cfg(feature = "visualization")]
-        &mut input.painter,
-        #[cfg(feature = "visualization")]
-        {
-            center_x + 1
-        },
-        #[cfg(feature = "visualization")]
-        0,
-        #[cfg(feature = "visualization")]
-        num_columns,
-        #[cfg(feature = "visualization")]
-        num_rows,
-    )?;
-    let s3 = steps_to_gather_all_keys(
-        &map_bottom_left,
-        #[cfg(feature = "visualization")]
-        &mut input.painter,
-        #[cfg(feature = "visualization")]
-        0,
-        #[cfg(feature = "visualization")]
-        {
-            center_y + 1
-        },
-        #[cfg(feature = "visualization")]
-        num_columns,
-        #[cfg(feature = "visualization")]
-        num_rows,
-    )?;
-    let s4 = steps_to_gather_all_keys(
-        &map_bottom_right,
-        #[cfg(feature = "visualization")]
-        &mut input.painter,
-        #[cfg(feature = "visualization")]
-        {
-            center_x + 1
-        },
-        #[cfg(feature = "visualization")]
-        {
-            center_y + 1
-        },
-        #[cfg(feature = "visualization")]
-        num_columns,
-        #[cfg(feature = "visualization")]
-        num_rows,
-    )?;
+    let s1 = steps_to_gather_all_keys(&map_top_left)?;
+    let s2 = steps_to_gather_all_keys(&map_top_right)?;
+    let s3 = steps_to_gather_all_keys(&map_bottom_left)?;
+    let s4 = steps_to_gather_all_keys(&map_bottom_right)?;
     Ok(s1 + s2 + s3 + s4)
 }
 

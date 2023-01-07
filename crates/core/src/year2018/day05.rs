@@ -6,7 +6,7 @@ const fn destroys_each_other(a: PolymerUnit, b: PolymerUnit) -> bool {
     a.eq_ignore_ascii_case(&b) && a != b
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let input_polymer = input.text.as_bytes();
     let mut new_polymer = Vec::<PolymerUnit>::with_capacity(input_polymer.len());
 

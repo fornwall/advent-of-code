@@ -106,7 +106,7 @@ fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> Chemi
     needed[reactions.ore_id]
 }
 
-pub fn solve(input: &mut Input) -> Result<ChemicalAmount, String> {
+pub fn solve(input: &Input) -> Result<ChemicalAmount, String> {
     const AVAILABLE_ORE: i64 = 1_000_000_000_000;
     let reactions = Reactions::parse(input.text)?;
 

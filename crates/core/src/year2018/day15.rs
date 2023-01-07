@@ -272,7 +272,7 @@ impl Board {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     const MAX_ROUNDS: u16 = 500;
 
     let mut attack_strength = input.part_values(3, 4);

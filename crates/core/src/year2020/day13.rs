@@ -102,7 +102,7 @@ fn chinese_remainder(remainders: &[i128], divisors: &[i128]) -> Option<i128> {
     Some(sum % all_divisors_multiplied)
 }
 
-pub fn solve(input: &mut Input) -> Result<i128, String> {
+pub fn solve(input: &Input) -> Result<i128, String> {
     let mut lines = input.text.lines();
 
     let not_until = lines

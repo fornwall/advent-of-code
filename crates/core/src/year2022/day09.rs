@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let snake_len = input.part_values(2, 10);
     let mut snake = vec![(0_i32, 0_i32); snake_len];
     let mut visited = Vec::with_capacity(input.text.len());

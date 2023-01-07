@@ -15,7 +15,7 @@ fn person_answers_to_bit_set(answers: &str) -> AnswersBitSet {
         .sum::<AnswersBitSet>()
 }
 
-pub fn solve(input: &mut Input) -> Result<AnswersBitSet, String> {
+pub fn solve(input: &Input) -> Result<AnswersBitSet, String> {
     const GROUP_SEPARATOR: &str = "\n\n";
 
     if !input

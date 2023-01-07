@@ -122,7 +122,7 @@ fn sum_json_value(value: &JsonValue, part2: bool) -> i32 {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut current_idx = 0_usize;
     let json_value = parse(input.text.as_bytes(), &mut current_idx)?;
     let sum = sum_json_value(&json_value, input.is_part_two());

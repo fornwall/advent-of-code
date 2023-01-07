@@ -37,7 +37,7 @@ where
     visit_subset_internal(input, &mut output, 0, 0, on_subsete);
 }
 
-pub fn solve(input: &mut Input) -> Result<u128, String> {
+pub fn solve(input: &Input) -> Result<u128, String> {
     let weights = parse_lines::<u8>(input.text)?;
 
     let sum: u32 = weights.iter().map(|&w| u32::from(w)).sum();

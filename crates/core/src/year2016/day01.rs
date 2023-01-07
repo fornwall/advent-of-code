@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashSet;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const fn turn(direction: (i32, i32), right: bool) -> (i32, i32) {
         if right {
             (-direction.1, direction.0)

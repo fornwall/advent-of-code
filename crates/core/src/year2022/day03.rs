@@ -1,7 +1,7 @@
 use crate::common::chunk_iterator::ChunkIteratorExt;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let lines = input.text.lines();
     Ok(if input.is_part_one() {
         lines

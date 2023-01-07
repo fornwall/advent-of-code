@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let (direction_str, mut cube) =
         Cube::parse(input.text, input.is_part_two()).ok_or("Invalid input")?;
 

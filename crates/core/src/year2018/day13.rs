@@ -216,7 +216,7 @@ impl Track {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut track = Track::parse(input.text)?;
     let position = track.find_position(input.is_part_one())?;
     Ok(format!("{},{}", position.x, position.y))

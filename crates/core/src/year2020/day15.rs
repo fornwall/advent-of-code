@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const NEVER_SEEN: u32 = 0;
 
     let target_turn: u32 = input.part_values(2020, 30_000_000);

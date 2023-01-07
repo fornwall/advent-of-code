@@ -26,7 +26,7 @@ fn is_valid(password: &[u8]) -> bool {
     pairs.len() > 1
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let bytes = input.text.as_bytes();
     if bytes.len() != 8 || bytes.iter().any(|b| !b.is_ascii_lowercase()) {
         return Err("Invalid current password (not 8 lower ASCII characters)".to_string());

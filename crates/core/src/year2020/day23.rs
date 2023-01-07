@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashSet;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let number_of_cups = input.part_values(9, 1_000_000);
     let max_cup_value = number_of_cups;
     let crab_moves = input.part_values(100, 10_000_000);

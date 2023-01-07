@@ -1,12 +1,10 @@
-#[cfg(feature = "visualization")]
-use super::day12_renderer::Renderer;
 use crate::input::Input;
 
 pub const SHIP_POSITION_ENTITY_IDX: usize = 0;
 pub const SHIP_DIRECTION_ENTITY_IDX: usize = 1;
 pub const WAYPOINT_ENTITY_IDX: usize = 2;
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let ship_position = (0, 0);
     let ship_direction = (1, 0);
     let waypoint = (10, -1);
@@ -20,13 +18,6 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
         (-1, 0, 0, -1), // R180 / L180
         (0, 1, -1, 0),  // R270 /  L90
     ];
-
-    #[cfg(feature = "visualization")]
-    let is_part_one = input.is_part_one();
-    #[cfg(feature = "visualization")]
-    let mut renderer = Renderer::new(&mut input.painter);
-    #[cfg(feature = "visualization")]
-    renderer.save_entities(entities);
 
     for (line_idx, line) in input.text.lines().enumerate() {
         let on_error = || {
@@ -84,13 +75,7 @@ pub fn solve(input: &mut Input) -> Result<i32, String> {
                 return Err(on_error());
             }
         }
-
-        #[cfg(feature = "visualization")]
-        renderer.save_entities(entities);
     }
-
-    #[cfg(feature = "visualization")]
-    renderer.render(is_part_one);
 
     let position = entities[SHIP_POSITION_ENTITY_IDX];
     Ok(position.0.abs() + position.1.abs())

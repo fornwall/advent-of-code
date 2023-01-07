@@ -38,6 +38,6 @@ fi
 numactl --physcpubind="${CPU_CORE_TO_USE}" --localalloc \
     chrt -f 99 \
         setarch --addr-no-randomize \
-         cargo bench --bench benchmark "$@"
+         cargo bench --profile=release-quickbuild --bench benchmark "$@"
          #bash -c 'chrt -p $$'
          #bash -c 'awk "{print \$39}" /proc/$$/stat'

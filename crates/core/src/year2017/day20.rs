@@ -17,7 +17,7 @@ fn parse_vector(input: &str) -> Option<(i32, i32, i32)> {
     None
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut particles = Vec::new();
 
     for (line_idx, line) in input.text.lines().enumerate() {

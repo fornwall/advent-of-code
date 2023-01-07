@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     const DIRECTIONS: [(i16, i16); 8] = [
         // NW, N, NE
         (-1, 1),

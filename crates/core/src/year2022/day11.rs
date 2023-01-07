@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let rounds = input.part_values(20, 10000);
     let use_cache = input.part_values(false, true);
 

@@ -93,7 +93,7 @@ pub fn part1_nth(input_string: &str, n: usize) -> Result<u64, String> {
     Ok(moons.total_energy())
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     if input.is_part_one() {
         part1_nth(input.text, 1000)
     } else {

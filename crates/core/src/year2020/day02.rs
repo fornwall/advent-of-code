@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut valid_passwords = 0;
 
     for (line_index, line) in input.text.lines().enumerate() {

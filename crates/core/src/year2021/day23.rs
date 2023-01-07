@@ -8,7 +8,7 @@ use Amphipod::{Amber, Bronze, Copper, Desert};
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     (if input.is_part_one() {
         SearchState::<2>::parse(input.text)?.least_total_energy_to_organize()
     } else {

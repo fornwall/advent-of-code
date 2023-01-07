@@ -14,7 +14,7 @@ fn compute_checksum(input: &str) -> String {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let disk_length = input.part_values(272, 35_651_584);
 
     let mut a = input.text.to_string();

@@ -12,7 +12,7 @@ fn parse_frequency_changes(
     })
 }
 
-pub fn solve(input: &mut Input) -> Result<Frequency, String> {
+pub fn solve(input: &Input) -> Result<Frequency, String> {
     const MAX_ITERATIONS: usize = 1_000_000;
     let change_iterator = parse_frequency_changes(input.text);
 

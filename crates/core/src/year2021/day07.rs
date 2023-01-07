@@ -10,7 +10,7 @@ const fn part_2_fuel_consumption(distance: i32) -> i32 {
     (distance * (distance + 1)) / 2
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut positions = input
         .text
         .split(',')

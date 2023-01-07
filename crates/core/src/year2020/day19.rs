@@ -119,7 +119,7 @@ impl Rules {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let on_error = || "Invalid input".to_string();
     let map_error = |_| on_error();
 

@@ -95,7 +95,7 @@ impl Grid {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut grid = Grid::parse(input.text)?;
     let w_range = input.part_values(0, 1);
 

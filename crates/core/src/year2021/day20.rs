@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let (algorithm, image) = parse(input.text)?;
     let enhancement_steps = input.part_values(2, 50);
     let lit_pixels = algorithm.enhance(&image, enhancement_steps);

@@ -24,11 +24,12 @@ name = "advent_of_code"
 
 [features]
 debug-output = []
-visualization = []
+visualization = ["svgplot"]
 count-allocations = ["allocation-counter"]
 
 [dependencies]
 allocation-counter = { version = "0", optional = true }
+svgplot = { path = "../svgplot", optional = true }
 
 [dev-dependencies]
 iai = "0"

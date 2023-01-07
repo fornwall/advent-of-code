@@ -13,7 +13,7 @@ fn parse_seat_specifier(specifier: &str) -> SeatId {
         .sum()
 }
 
-pub fn solve(input: &mut Input) -> Result<SeatId, String> {
+pub fn solve(input: &Input) -> Result<SeatId, String> {
     if let Some(invalid_line_idx) = input.text.lines().enumerate().find_map(|(line_idx, line)| {
         if line.len() != 10
             || !line[0..7].chars().all(|c| matches!(c, 'F' | 'B'))

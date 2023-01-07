@@ -1,5 +1,3 @@
-#[cfg(feature = "visualization")]
-use super::day03_renderer::render;
 use crate::input::Input;
 
 pub struct Map {
@@ -33,12 +31,9 @@ impl Map {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let map = Map::parse(input.text)?;
     let slopes = input.part_values(vec![(3, 1)], vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]);
-
-    #[cfg(feature = "visualization")]
-    render(&map, &slopes, &mut input.painter);
 
     Ok(slopes.iter().fold(1, |acc, slope| {
         let initial_position = (0, 0);

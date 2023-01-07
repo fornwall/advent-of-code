@@ -23,7 +23,7 @@ fn read_string(s: &[u8]) -> Vec<u8> {
     result
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     if input.text.len() >= 16 {
         return Err("Too long input - max length is 16".to_string());
     } else if !input.text.chars().all(|c| c.is_ascii_digit()) {

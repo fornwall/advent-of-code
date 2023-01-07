@@ -5,7 +5,7 @@ struct Disc {
     initial_position: u32,
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_TIME: u32 = 10_000_000;
 
     let mut discs = input

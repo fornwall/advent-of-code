@@ -9,7 +9,7 @@ struct Point {
     y_speed: i32,
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut points: Vec<Point> = input
         .text
         .lines()

@@ -50,7 +50,7 @@ fn supports_ssl(ip: &&str) -> bool {
     abas.intersection(&babs).count() > 0
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     Ok(input
         .text
         .lines()

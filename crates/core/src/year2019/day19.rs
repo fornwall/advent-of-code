@@ -14,7 +14,7 @@ fn affected_by_beam(program: &Program, x: i32, y: i32) -> Result<bool, String> {
     Ok(output[0] == 1)
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_COORDINATE: i32 = 10_000;
     let program = Program::parse(input.text)?;
 

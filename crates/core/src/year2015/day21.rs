@@ -56,7 +56,7 @@ fn player_wins(player: &Stats, boss: &Stats) -> bool {
     player_rounds_to_win <= boss_rounds_to_win
 }
 
-pub fn solve(input: &mut Input) -> Result<u16, String> {
+pub fn solve(input: &Input) -> Result<u16, String> {
     let boss_stats = Stats::parse(input.text)?;
 
     let weapons = [

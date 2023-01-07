@@ -35,7 +35,7 @@ impl<const NUM: usize> FromIterator<u64> for HighestValues<NUM> {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     if input.is_part_one() {
         solve_part::<1>(input)
     } else {
@@ -43,7 +43,7 @@ pub fn solve(input: &mut Input) -> Result<u64, String> {
     }
 }
 
-pub fn solve_part<const NUM: usize>(input: &mut Input) -> Result<u64, String> {
+pub fn solve_part<const NUM: usize>(input: &Input) -> Result<u64, String> {
     Ok(input
         .text
         .split("\n\n")

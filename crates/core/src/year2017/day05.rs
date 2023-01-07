@@ -1,7 +1,7 @@
 use crate::common::parser::parse_lines;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let jump_change_computer = |offset| {
         if input.is_part_one() || offset < 3 {
             1

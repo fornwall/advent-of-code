@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     const SIZE: usize = 256;
     let mut list: Vec<u8> = (0..SIZE).map(|i| i as u8).collect();
 

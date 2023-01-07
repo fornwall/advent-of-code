@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let target_rocks_count = input.part_values(2022, 1_000_000_000_000_u64);
     let mut grid = Grid::new();
 

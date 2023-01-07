@@ -2,7 +2,7 @@ use super::int_code::{Program, Word};
 use crate::input::Input;
 use std::collections::VecDeque;
 
-pub fn solve(input: &mut Input) -> Result<Word, String> {
+pub fn solve(input: &Input) -> Result<Word, String> {
     let program = Program::parse(input.text)?;
     let mut programs = vec![program; 50];
     let mut input_queues = vec![VecDeque::<(Word, Word)>::new(); 50];

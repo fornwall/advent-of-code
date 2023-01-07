@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::VecDeque;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let n = u32::from(
         input
             .text

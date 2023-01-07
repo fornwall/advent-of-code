@@ -15,7 +15,7 @@ fn parse_digits(input_string: &str) -> Result<Vec<i32>, String> {
     Ok(result)
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut digits = parse_digits(input.text)?;
 
     if input.is_part_one() {

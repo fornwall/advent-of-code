@@ -2,9 +2,6 @@ use crate::input::Input;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-#[cfg(feature = "visualization")]
-use super::day15_renderer::Renderer;
-
 pub struct Graph {
     risk_levels: Vec<u8>,
     pub width: u16,
@@ -76,7 +73,7 @@ struct SearchNode {
     y: u16,
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut graph = Graph::parse(input.text, input.part_values(1, 5))?;
     let destination = (graph.width - 1, graph.height - 1);
 
@@ -89,15 +86,7 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
     }));
     graph.mark_visited(0, 0);
 
-    #[cfg(feature = "visualization")]
-    let mut renderer = Renderer::new(&mut input.painter);
-    #[cfg(feature = "visualization")]
-    renderer.render_initial(&graph);
-
     while let Some(Reverse(state)) = to_visit.pop() {
-        #[cfg(feature = "visualization")]
-        renderer.render(&graph, (state.x, state.y), state.risk);
-
         if (state.x, state.y) == destination {
             return Ok(state.risk);
         }

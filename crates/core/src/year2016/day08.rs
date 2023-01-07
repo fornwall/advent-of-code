@@ -52,7 +52,7 @@ impl Screen {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut screen = Screen::new();
     for line in input.text.lines() {
         if let Some(after) = line.strip_prefix("rect ") {

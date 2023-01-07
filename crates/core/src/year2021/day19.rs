@@ -5,7 +5,7 @@ use std::ops::{Add, Mul, Sub};
 // Based on the following nice solution:
 // - https://github.com/Mesoptier/advent-of-code-2021/blob/master/src/days/day19.rs
 // - https://www.reddit.com/r/adventofcode/comments/rjpf7f/comment/hp8btm1/?utm_source=share&utm_medium=web2x&context=3
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut unmatched_scans = Scan::parse(input.text)?;
     let mut matched_scans: Vec<Scan> = vec![unmatched_scans.remove(0)];
     let mut matched_scanner_positions = vec![Point { x: 0, y: 0, z: 0 }];

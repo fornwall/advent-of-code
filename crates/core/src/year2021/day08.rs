@@ -25,7 +25,7 @@ fn pattern_as_bitset(pattern: &str) -> u8 {
     pattern.bytes().map(|b| 1 << (b - b'a')).sum()
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut result = 0;
     for line in input.text.lines() {
         if let Some((from, to)) = line.split_once(" | ") {

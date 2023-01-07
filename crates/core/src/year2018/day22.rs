@@ -128,7 +128,7 @@ impl Grid {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut grid = Grid::parse(input.text)?;
     if input.is_part_one() {
         let mut sum = 0;

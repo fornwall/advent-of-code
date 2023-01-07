@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let map = CaveMap::parse(input.text)?;
 
     let visited_once = 1 << map.start_cave_identifier;

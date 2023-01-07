@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let mut points: Vec<(i32, i32, i32, i32, usize)> = input
         .text
         .lines()

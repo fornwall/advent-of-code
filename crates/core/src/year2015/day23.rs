@@ -108,7 +108,7 @@ impl Computer {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut computer = Computer::parse(input.text)?;
     computer.registers[0] = input.part_values(0, 1);
     computer.run();

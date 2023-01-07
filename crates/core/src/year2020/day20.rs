@@ -232,7 +232,7 @@ impl Tile {
 /// - Each tile edge is 10 bits (so max 1024 distinct values).
 /// - The composed image is square.
 /// - The outermost edges tile edges won't line up with any other tiles.
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let tiles = Tile::parse(input.text)?;
 
     if input.is_part_one() {

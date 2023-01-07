@@ -88,7 +88,7 @@ impl<'a> ProgramTree<'a> {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let tree = ProgramTree::parse(input.text)?;
     if input.is_part_one() {
         Ok(tree.nodes[tree.root_node].name.to_string())

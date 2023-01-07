@@ -19,7 +19,7 @@ impl IdAssigner {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut id_assigner = IdAssigner::new();
 
     let mut happiness_changes = Vec::new();

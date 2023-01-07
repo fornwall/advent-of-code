@@ -34,7 +34,7 @@ impl Device {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut device = Device::new();
 
     for line in input.text.lines() {
@@ -220,11 +220,11 @@ noop";
 pub fn single_to_string_memory_allocation() {
     let real_input = include_str!("day10_input.txt");
     let allocations = allocation_counter::count(|| {
-        assert!(solve(&mut Input::part_one(real_input)).is_ok());
+        assert!(solve(&Input::part_one(real_input)).is_ok());
     });
     assert_eq!(allocations, 1);
     let allocations = allocation_counter::count(|| {
-        assert!(solve(&mut Input::part_two(real_input)).is_ok());
+        assert!(solve(&Input::part_two(real_input)).is_ok());
     });
     assert_eq!(allocations, 1);
 }

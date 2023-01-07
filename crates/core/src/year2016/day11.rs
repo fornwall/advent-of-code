@@ -153,7 +153,7 @@ fn parse_input(input: &str, part2: bool) -> Result<[Floor; 4], String> {
     Ok(initial_floors)
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let initial_floors = parse_input(input.text, input.is_part_two())?;
     let mut to_visit = BinaryHeap::new();
     let mut visited_states = HashSet::new();

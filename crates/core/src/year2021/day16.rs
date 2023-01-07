@@ -198,7 +198,7 @@ impl Packet {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let hex_bytes = input.text.as_bytes();
     let mut transmission = Transmission::new(hex_bytes);
     if input.is_part_one() {

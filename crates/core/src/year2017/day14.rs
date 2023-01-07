@@ -2,10 +2,10 @@ use super::day10::solve as knot_hash;
 use super::disjoint_set::DisjointSet;
 use crate::input::{Input, Part};
 #[cfg(feature = "visualization")]
-use crate::painter::MockPainter;
+use std::cell::RefCell;
 use std::collections::BTreeMap;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     // Mapping from (x,y) coordinate of a used square to an identifier
     // constructed from a zero-based sequence to be used as set identifiers
     // in a disjoint set for part 2.
@@ -16,16 +16,13 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
         return Err("Invalid input - should contain 8 characters".to_string());
     }
 
-    #[cfg(feature = "visualization")]
-    input.painter.fill_style_rgb(255, 0, 0);
-
     for row in 0..=127 {
         let hash_input = format!("{}-{}", input.text, row);
-        let hash = knot_hash(&mut Input {
+        let hash = knot_hash(&Input {
             text: &hash_input,
             part: Part::Two,
             #[cfg(feature = "visualization")]
-            painter: Box::new(MockPainter {}),
+            rendered_svg: RefCell::new("".to_string()),
         })?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
@@ -35,22 +32,9 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                     let col = (index * 4 + bit) as i32;
                     location_to_set_identifier.insert((col, row), used_counter);
                     used_counter += 1;
-
-                    #[cfg(feature = "visualization")]
-                    {
-                        let canvas_x = index * 4 + bit;
-                        let canvas_y = row;
-                        input.painter.fill_square(
-                            canvas_x as f64 / 128.,
-                            f64::from(canvas_y) / 128.,
-                            1.0 / 128.,
-                        );
-                    }
                 }
             }
         }
-        #[cfg(feature = "visualization")]
-        input.painter.end_frame();
     }
 
     Ok(if input.is_part_one() {

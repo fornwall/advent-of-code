@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_FIELD_VALUE: u32 = 1024;
 
     let mut parts = input.text.splitn(3, "\n\n");

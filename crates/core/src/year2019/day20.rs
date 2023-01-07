@@ -140,7 +140,7 @@ impl Maze {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let maze = Maze::parse(input.text, input.is_part_one())?;
 
     let mut to_visit = VecDeque::new();

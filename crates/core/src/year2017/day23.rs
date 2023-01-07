@@ -6,7 +6,7 @@ fn is_prime(number: i32) -> bool {
     (2..=number_sqrt).all(|i| number % i != 0)
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut program = Program::parse(input.text)?;
     if input.is_part_one() {
         program.run_until_recover(None);

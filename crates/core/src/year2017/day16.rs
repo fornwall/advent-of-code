@@ -72,7 +72,7 @@ fn parse(data: &str, programs: &[u8]) -> Result<(Vec<u8>, HashMap<u8, u8>), Stri
     Ok((moves, substitutions))
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut programs = (b'a'..=b'p').collect::<Vec<u8>>();
 
     let mut rounds = input.part_values(1, 1_000_000_000);

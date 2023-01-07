@@ -2,7 +2,7 @@ use std::array;
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let minutes = input.part_values(24, 32);
     let max_blueprints = input.part_values(64, 3);
 

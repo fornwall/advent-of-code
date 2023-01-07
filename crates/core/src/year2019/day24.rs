@@ -150,7 +150,7 @@ impl Grid {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MINUTES: usize = 200;
     const MAX_LEVELS: usize = MINUTES * 2;
 

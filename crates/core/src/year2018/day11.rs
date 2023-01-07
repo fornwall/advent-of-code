@@ -58,7 +58,7 @@ const fn cell_power(x: u32, y: u32, serial_number: GridValue) -> GridValue {
     cell_power - 5
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let serial_number = input
         .text
         .parse::<GridValue>()

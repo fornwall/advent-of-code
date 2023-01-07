@@ -1,7 +1,7 @@
 use super::assembly::{NumberValue, Program};
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<NumberValue, String> {
+pub fn solve(input: &Input) -> Result<NumberValue, String> {
     let mut program_zero = Program::parse(input.text)?;
     if input.is_part_one() {
         program_zero.run_until_recover(None);

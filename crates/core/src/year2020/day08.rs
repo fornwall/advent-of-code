@@ -1,8 +1,4 @@
-#[cfg(feature = "visualization")]
-use super::day08_renderer::{render, start_rendering};
 use crate::input::Input;
-#[cfg(feature = "visualization")]
-use crate::painter::PainterRef;
 
 type Word = i32;
 
@@ -94,12 +90,7 @@ impl ComputerChecker {
         }
     }
 
-    fn check_if_exits(
-        &mut self,
-        computer: &mut Computer,
-        #[cfg(feature = "visualization")] painter: &mut PainterRef,
-        #[cfg(feature = "visualization")] switched_instruction_idx: Option<usize>,
-    ) -> Result<bool, String> {
+    fn check_if_exits(&mut self, computer: &mut Computer) -> Result<bool, String> {
         self.executed_instructions
             .iter_mut()
             .for_each(|v| *v = false);
@@ -110,31 +101,15 @@ impl ComputerChecker {
             self.executed_instructions[computer.instruction_pointer as usize] = true;
             computer.execute_instruction()?;
         }
-        #[cfg(feature = "visualization")]
-        render(
-            painter,
-            computer,
-            &self.executed_instructions,
-            switched_instruction_idx,
-        );
         Ok(computer.has_exited())
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<Word, String> {
+pub fn solve(input: &Input) -> Result<Word, String> {
     let mut computer = Computer::parse(input.text)?;
     let mut computer_checker = ComputerChecker::new(&computer);
 
-    #[cfg(feature = "visualization")]
-    start_rendering(&mut input.painter);
-
-    computer_checker.check_if_exits(
-        &mut computer,
-        #[cfg(feature = "visualization")]
-        &mut input.painter,
-        #[cfg(feature = "visualization")]
-        None,
-    )?;
+    computer_checker.check_if_exits(&mut computer)?;
 
     if input.is_part_one() {
         Ok(computer.accumulator)
@@ -156,13 +131,7 @@ pub fn solve(input: &mut Input) -> Result<Word, String> {
                         Instruction::Jmp(parameter)
                     };
 
-                    if computer_checker.check_if_exits(
-                        &mut computer,
-                        #[cfg(feature = "visualization")]
-                        &mut input.painter,
-                        #[cfg(feature = "visualization")]
-                        Some(i),
-                    )? {
+                    if computer_checker.check_if_exits(&mut computer)? {
                         return Ok(computer.accumulator);
                     }
 

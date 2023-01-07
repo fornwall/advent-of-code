@@ -18,7 +18,7 @@ const fn overlaps(a: (u8, u8), b: (u8, u8)) -> bool {
     b.0 <= a.1 && b.1 >= a.0
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let condition: fn((u8, u8), (u8, u8)) -> bool = input.part_values(contains, overlaps);
 
     input

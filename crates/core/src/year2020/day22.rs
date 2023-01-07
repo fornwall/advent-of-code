@@ -82,7 +82,7 @@ fn play(
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let on_error = || "Invalid input".to_string();
 
     let mut parts = input.text.splitn(2, "\n\n");

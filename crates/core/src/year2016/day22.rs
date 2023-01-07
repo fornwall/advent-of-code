@@ -55,7 +55,7 @@ fn dist(
     ))
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let error_mapper = |_| "Invalid input";
 
     let mut nodes = Vec::new();

@@ -1,6 +1,6 @@
 use crate::input::{Input, Part};
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut horizontal_position = 0_i32;
     let mut depth = 0_i32;
     let mut aim = 0_i32;

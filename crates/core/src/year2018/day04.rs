@@ -44,7 +44,7 @@ fn parse_input(input_string: &str) -> Result<Vec<LogEntry>, String> {
         .collect()
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let entries = parse_input(input.text)?;
 
     let mut sleepers = HashMap::new();

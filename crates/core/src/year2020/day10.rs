@@ -2,7 +2,7 @@ use crate::input::Input;
 
 type JoltageAmount = u64;
 
-pub fn solve(input: &mut Input) -> Result<JoltageAmount, String> {
+pub fn solve(input: &Input) -> Result<JoltageAmount, String> {
     // "Any given adapter can take an input 1, 2, or 3 jolts lower than
     // its rating and still produce its rated output joltage":
     const MAX_DIFF: JoltageAmount = 3;

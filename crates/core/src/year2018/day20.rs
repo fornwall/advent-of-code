@@ -117,7 +117,7 @@ where
     Ok(())
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut result = 0;
     visit_rooms(input.text, |cost| {
         if input.is_part_one() {

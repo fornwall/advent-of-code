@@ -236,7 +236,7 @@ fn execute_battle(mut groups: Vec<ArmyGroup>) -> Vec<ArmyGroup> {
     groups
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let initial_groups = ArmyGroup::parse(input.text)?;
 
     if input.is_part_one() {

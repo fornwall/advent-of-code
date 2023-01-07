@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     if input.is_part_one() {
         let picks = input.text.lines().fold((0, 0), |state, line| {
             let mut occurrences = HashMap::new();

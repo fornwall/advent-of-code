@@ -11,7 +11,7 @@ fn parse_input(input_string: &str) -> Result<(i32, i32), String> {
     Ok((from, to))
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let (from, to) = parse_input(input.text)?;
 
     let mut meeting_criteria_count: u32 = 0;

@@ -88,7 +88,7 @@ fn parse(input_string: &str) -> Result<usize, String> {
         })
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let puzzle_input = parse(input.text)?;
     if input.is_part_one() {
         Square::iter()

@@ -60,7 +60,7 @@ fn parse_point(s: &str) -> Option<(u16, u16)> {
     None
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut board = Board::new();
     for line in input.text.lines() {
         if let Some((from, to)) = line.split_once(" -> ") {

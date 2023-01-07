@@ -1,7 +1,7 @@
 use super::assembunny::{Computer, Instruction, ValueOrRegister};
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let computer = Computer::parse(input.text)?;
     if let Instruction::Copy(ValueOrRegister::Value(a), _register) = computer.instructions[1] {
         if let Instruction::Copy(ValueOrRegister::Value(b), _register) = computer.instructions[2] {

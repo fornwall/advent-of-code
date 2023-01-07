@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<i64, String> {
+pub fn solve(input: &Input) -> Result<i64, String> {
     let (root_id, human_id, mut actions) =
         MonkeyAction::parse(input.text).ok_or("Invalid input")?;
 

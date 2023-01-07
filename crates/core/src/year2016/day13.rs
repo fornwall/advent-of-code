@@ -7,7 +7,7 @@ const fn is_wall(x: i32, y: i32, magic_number: i32) -> bool {
     sum.count_ones() % 2 == 1
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const TARGET: (i32, i32) = (31, 39);
 
     let magic_number = input

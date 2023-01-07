@@ -28,7 +28,7 @@ fn check_doors(passcode: &[u8], path_so_far: &[u8]) -> [bool; 4] {
     ]
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let passcode = input.text.as_bytes();
 
     let mut to_visit = BinaryHeap::new();

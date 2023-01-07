@@ -64,7 +64,7 @@ pub fn determine_station(points: &[(usize, usize)]) -> Result<(usize, (usize, us
         .ok_or_else(|| "No points in input".to_string())
 }
 
-pub fn solve(input: &mut Input) -> Result<i64, String> {
+pub fn solve(input: &Input) -> Result<i64, String> {
     if input.is_part_one() {
         let points = parse_points(input.text)?;
         Ok(determine_station(&points)?.0 as i64)

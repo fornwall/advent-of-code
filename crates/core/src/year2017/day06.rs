@@ -2,7 +2,7 @@ use crate::input::Input;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_ITERATIONS: u32 = 1_000_000;
 
     let mut memory_banks: Vec<u32> = input

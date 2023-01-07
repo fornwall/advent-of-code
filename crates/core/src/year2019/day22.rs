@@ -1,7 +1,7 @@
 use crate::input::Input;
 use crate::mod_exp::mod_exp;
 
-pub fn solve(input: &mut Input) -> Result<i128, String> {
+pub fn solve(input: &Input) -> Result<i128, String> {
     if input.is_part_one() {
         let mut deck = Vec::new();
         for i in 0..10_007 {

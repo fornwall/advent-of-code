@@ -1,7 +1,7 @@
 use crate::input::Input;
 use crate::year2017::disjoint_set::DisjointSet;
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let num_programs = input.text.lines().count();
     let mut program_groups = DisjointSet::new(num_programs);
 

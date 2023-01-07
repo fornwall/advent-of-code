@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut desired = HashMap::new();
     desired.insert("children", 3);
     desired.insert("cats", 7);

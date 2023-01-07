@@ -1,9 +1,7 @@
 #![allow(clippy::redundant_pub_crate)]
 #![allow(unused)]
-#[cfg(all(feature = "visualization", test))]
-use crate::painter::MockPainter;
-#[cfg(feature = "visualization")]
-use crate::painter::PainterRef;
+
+use std::cell::RefCell;
 
 #[derive(Copy, Clone)]
 pub enum Part {
@@ -15,7 +13,7 @@ pub struct Input<'a> {
     pub part: Part,
     pub text: &'a str,
     #[cfg(feature = "visualization")]
-    pub painter: PainterRef,
+    pub rendered_svg: RefCell<String>,
 }
 
 impl<'a> Input<'a> {
@@ -43,7 +41,7 @@ impl<'a> Input<'a> {
             part: Part::One,
             text,
             #[cfg(feature = "visualization")]
-            painter: Box::new(MockPainter {}),
+            rendered_svg: RefCell::new("".to_string()),
         }
     }
 
@@ -54,7 +52,7 @@ impl<'a> Input<'a> {
             part: Part::Two,
             text,
             #[cfg(feature = "visualization")]
-            painter: Box::new(MockPainter {}),
+            rendered_svg: RefCell::new("".to_string()),
         }
     }
 }
@@ -62,7 +60,7 @@ impl<'a> Input<'a> {
 #[cfg(test)]
 macro_rules! test_part_one {
     ($input:tt => $expected:expr) => {
-        assert_eq!(solve(&mut Input::part_one($input)), Ok($expected));
+        assert_eq!(solve(&Input::part_one($input)), Ok($expected));
     };
 }
 #[cfg(test)]
@@ -71,7 +69,7 @@ pub(crate) use test_part_one;
 #[cfg(test)]
 macro_rules! test_part_two {
     ($input:tt => $expected:expr) => {
-        assert_eq!(solve(&mut Input::part_two($input)), Ok($expected));
+        assert_eq!(solve(&Input::part_two($input)), Ok($expected));
     };
 }
 #[cfg(test)]
@@ -80,7 +78,7 @@ pub(crate) use test_part_two;
 #[cfg(test)]
 macro_rules! test_part_one_error {
     ($input:tt => $expected:expr) => {
-        assert_eq!(Err($expected.into()), solve(&mut Input::part_one($input)));
+        assert_eq!(Err($expected.into()), solve(&Input::part_one($input)));
     };
 }
 #[cfg(test)]
@@ -89,7 +87,7 @@ pub(crate) use test_part_one_error;
 #[cfg(test)]
 macro_rules! test_part_two_error {
     ($input:tt => $expected:expr) => {
-        assert_eq!(Err($expected.into()), solve(&mut Input::part_two($input)));
+        assert_eq!(Err($expected.into()), solve(&Input::part_two($input)));
     };
 }
 #[cfg(test)]

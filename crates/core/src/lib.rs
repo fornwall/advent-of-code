@@ -24,12 +24,13 @@ assert_eq!(solution, Ok("2".to_string()));
 */
 #![crate_name = "advent_of_code"]
 
+#[cfg(feature = "visualization")]
+use std::cell::RefCell;
+
 mod common;
 #[cfg_attr(test, macro_use)]
 mod input;
 mod mod_exp;
-#[cfg(feature = "visualization")]
-pub mod painter;
 mod year2015;
 mod year2016;
 mod year2017;
@@ -39,13 +40,10 @@ mod year2020;
 mod year2021;
 mod year2022;
 
-#[cfg(feature = "visualization")]
-use painter::PainterRef;
-
 // Never inline to prevent stack size from blowing up in release builds.
 #[inline(never)]
 fn to_stringer_input<T: ToString>(
-    function: fn(&mut input::Input) -> Result<T, String>,
+    function: fn(&input::Input) -> Result<T, String>,
     input: &mut input::Input,
 ) -> Result<String, String> {
     function(input).map(|value| value.to_string())
@@ -71,7 +69,7 @@ pub fn solve(
     day: u8,
     part: u8,
     input: &str,
-    #[cfg(feature = "visualization")] painter: PainterRef,
+    #[cfg(feature = "visualization")] rendered_svg: RefCell<String>,
 ) -> Result<String, String> {
     #![allow(clippy::let_and_return)]
     use crate::input::{Input, Part};
@@ -93,7 +91,7 @@ pub fn solve(
         part: if part == 1 { Part::One } else { Part::Two },
         text: input,
         #[cfg(feature = "visualization")]
-        painter,
+        rendered_svg,
     };
 
     let result = match (year, day) {
@@ -304,11 +302,9 @@ pub fn solve(
     };
 
     #[cfg(feature = "visualization")]
-    if result.is_err() {
-        // TODO: Report error. But perhaps not, return normally, and await ack in wait_forever.
-        input.painter.shadow_blur(10);
-    }
+    return result.map(|_| input.rendered_svg.take());
 
+    #[cfg(not(feature = "visualization"))]
     result
 }
 
@@ -318,7 +314,7 @@ pub fn solve_raw(
     day: &str,
     part: &str,
     input: &str,
-    #[cfg(feature = "visualization")] painter: PainterRef,
+    #[cfg(feature = "visualization")] rendered_svg: RefCell<String>,
 ) -> Result<String, String> {
     let year = year.parse::<u16>().map_err(|_| "Invalid year")?;
     let day = day.parse::<u8>().map_err(|_| "Invalid day")?;
@@ -329,6 +325,6 @@ pub fn solve_raw(
         part,
         input,
         #[cfg(feature = "visualization")]
-        painter,
+        rendered_svg,
     )
 }

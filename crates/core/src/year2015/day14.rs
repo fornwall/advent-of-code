@@ -8,7 +8,7 @@ struct Reindeer {
     distance: i32,
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     const RACE_LENGTH_SECONDS: i32 = 2503;
 
     let mut reindeers = Vec::new();

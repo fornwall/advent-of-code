@@ -53,7 +53,7 @@ fn find_output(wire: &str, gates: &mut HashMap<&str, Gate>) -> Option<SignalValu
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<SignalValue, String> {
+pub fn solve(input: &Input) -> Result<SignalValue, String> {
     let mut gates = HashMap::new();
 
     for line in input.text.lines() {

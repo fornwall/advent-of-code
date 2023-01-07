@@ -97,7 +97,7 @@ impl Crates {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut stacks = Crates::new();
 
     for line in input.text.lines().rev() {
@@ -187,8 +187,8 @@ move 4 from 2 to 1";
 pub fn single_to_string_memory_allocation() {
     let real_input = include_str!("day05_input.txt");
     let allocations = allocation_counter::count(|| {
-        assert!(solve(&mut Input::part_one(real_input)).is_ok());
-        assert!(solve(&mut Input::part_two(real_input)).is_ok());
+        assert!(solve(&Input::part_one(real_input)).is_ok());
+        assert!(solve(&Input::part_two(real_input)).is_ok());
     });
     assert_eq!(allocations, 2);
 }

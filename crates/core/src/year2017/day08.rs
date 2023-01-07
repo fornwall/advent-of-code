@@ -2,7 +2,7 @@ use crate::input::Input;
 use std::cmp::max;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut registers: HashMap<&str, i32> = HashMap::new();
 
     let mut highest_value = 0;

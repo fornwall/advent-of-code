@@ -12,7 +12,7 @@ fn parse(input_string: &str) -> Result<Program, String> {
 
 const MAX_INSTRUCTIONS: u64 = 1_000_000;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut program = parse(input.text)?;
     if input.is_part_one() {
         // The last three instructions are (as seen with program.pretty_print()):

@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_ITERATIONS: usize = 1000;
     let mut region = Region::parse(input.text)?;
     for round in 1..MAX_ITERATIONS {

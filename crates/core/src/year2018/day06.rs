@@ -32,7 +32,7 @@ fn parse_input(input_string: &str) -> Result<Vec<Point>, String> {
         .collect::<Result<Vec<Point>, String>>()
 }
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let points = parse_input(input.text)?;
 
     let (left, top, right, bottom) = points.iter().fold(

@@ -28,7 +28,7 @@ fn contains_five_in_a_row(hash: &[u8], desired_char: u8) -> bool {
         .any(|w| w[0] == desired_char && w.windows(2).all(|adjacent| adjacent[0] == adjacent[1]))
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let salt = input.text;
     if salt.len() > 8 {
         return Err("Too long salt (max length: 8)".to_string());

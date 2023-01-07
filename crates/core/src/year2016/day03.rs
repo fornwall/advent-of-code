@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     fn is_triangle_possible(n1: u16, n2: u16, n3: u16) -> bool {
         let n1 = u32::from(n1);
         let n2 = u32::from(n2);

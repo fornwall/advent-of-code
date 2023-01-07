@@ -43,7 +43,7 @@ where
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     if input.is_part_one() {
         let input_num_recipes = input
             .text

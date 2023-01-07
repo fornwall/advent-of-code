@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_STEPS_PART_TWO: usize = 100_000;
 
     let mut board = Board::parse(input.text)?;

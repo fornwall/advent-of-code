@@ -278,7 +278,7 @@ impl Octree {
 }
 
 // https://www.forrestthewoods.com/blog/solving-advent-of-code-in-under-a-second/
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let bots = Nanobot::parse(input.text)?;
 
     if input.is_part_one() {

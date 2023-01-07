@@ -95,7 +95,7 @@ impl Direction {
 }
 
 // Solution taken from https://github.com/emlun/adventofcode-2019/blob/master/src/days/day17.rs
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut program = Program::parse(input.text)?;
 
     if input.is_part_one() {

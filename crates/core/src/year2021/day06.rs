@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::VecDeque;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     // Indexed by days left mapping to number of fishes with that many days left:
     let mut count_per_day_left = VecDeque::from([0; 9]);
 

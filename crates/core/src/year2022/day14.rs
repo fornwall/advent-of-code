@@ -89,7 +89,7 @@ impl Grid {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let mut grid = Grid::parse(input.text)?;
     if input.is_part_one() {
         grid.fill_part_1();

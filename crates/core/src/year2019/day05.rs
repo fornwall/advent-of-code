@@ -2,7 +2,7 @@ use super::int_code::Program;
 use super::int_code::Word;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<Word, String> {
+pub fn solve(input: &Input) -> Result<Word, String> {
     let mut program = Program::parse(input.text)?;
     program.input(input.part_values(1, 5));
     let output = program.run_for_output()?;

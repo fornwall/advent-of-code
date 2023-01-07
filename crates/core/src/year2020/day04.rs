@@ -26,7 +26,7 @@ fn is_valid(field_idx: usize, value: &str) -> bool {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const FIELD_NAMES: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
     let mut fields_validity = [false; 7];

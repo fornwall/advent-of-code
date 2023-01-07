@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     let mut floor = 0;
     for (idx, c) in input.text.chars().enumerate() {
         floor += match c {

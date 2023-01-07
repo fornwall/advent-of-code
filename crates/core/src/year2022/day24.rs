@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<i32, String> {
+pub fn solve(input: &Input) -> Result<i32, String> {
     const MAX_STEPS: usize = 10_000;
     let mut remaining_trips = input.part_values(1, 3);
 

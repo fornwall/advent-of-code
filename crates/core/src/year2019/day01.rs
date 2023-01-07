@@ -31,7 +31,7 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
     Ok(parts.iter().sum())
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     if input.is_part_one() {
         sum_required_fuel(input.text, |mass| mass / 3 - 2)
     } else {

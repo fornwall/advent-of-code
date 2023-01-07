@@ -27,7 +27,7 @@ impl Iterator for Generator {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let starting_values = input
         .text
         .lines()

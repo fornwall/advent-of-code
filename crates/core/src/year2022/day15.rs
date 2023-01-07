@@ -3,7 +3,7 @@ use crate::input::Input;
 
 const MAX_COORDINATE: i32 = 4_000_000;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let sensors = Sensor::parse(input.text).ok_or_else(|| "Invalid input".to_string())?;
 
     if input.is_part_one() {

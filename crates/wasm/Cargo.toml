@@ -15,12 +15,11 @@ version.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [features]
-visualization = [ "advent-of-code/visualization", "advent-of-code-painter" ]
+visualization = [ "advent-of-code/visualization" ]
 console-panic-hook = [ "console_error_panic_hook" ]
 
 [dependencies]
 advent-of-code = { path = "../core" }
-advent-of-code-painter = { path = "../painter", optional = true }
 console_error_panic_hook = { version = "*", optional = true }
 wasm-bindgen = "*"
 js-sys = "*"

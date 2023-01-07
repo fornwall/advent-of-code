@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let on_error = || "Invalid input";
 
     let mut allergen_to_idx = HashMap::with_capacity(8);

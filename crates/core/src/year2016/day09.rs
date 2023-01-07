@@ -46,7 +46,7 @@ fn uncompressed_size(text: &[u8], recursive: bool) -> Result<u64, String> {
     Ok(uncompressed_len)
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let text = input.text.as_bytes();
     uncompressed_size(text, input.is_part_two())
 }

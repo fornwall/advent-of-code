@@ -37,7 +37,7 @@ fn extend(pieces: &Vec<Piece>, last: PieceComponent, part_two: bool) -> Vec<Piec
         .unwrap_or_default()
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut pieces = Vec::new();
     for (line_idx, line) in input.text.lines().enumerate() {
         let on_error = || format!("Line {}: Invalid format", line_idx + 1);

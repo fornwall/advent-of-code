@@ -21,7 +21,7 @@ const fn reverse(direction: (i32, i32)) -> (i32, i32) {
     (-direction.0, -direction.1)
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut map = HashMap::new();
 
     let mut cols = -1;

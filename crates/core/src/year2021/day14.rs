@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut lines = input.text.lines();
 
     let template = lines.next().ok_or("No first line")?.as_bytes();

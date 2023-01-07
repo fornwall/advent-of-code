@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut counts: [HashMap<u8, u32>; 8] = [
         HashMap::new(),
         HashMap::new(),

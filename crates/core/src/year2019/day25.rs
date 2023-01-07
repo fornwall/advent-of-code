@@ -115,7 +115,7 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
     })
 }
 
-pub fn solve(input: &mut Input) -> Result<SolutionType, String> {
+pub fn solve(input: &Input) -> Result<SolutionType, String> {
     let mut program = Program::parse(input.text)?;
     let initial_room = parse_output(&mut program)?;
 

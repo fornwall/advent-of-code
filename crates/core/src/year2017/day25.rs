@@ -12,7 +12,7 @@ struct State {
     if_one_action: Action,
 }
 
-pub fn solve(input: &mut Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<usize, String> {
     let mut tape = HashSet::new();
     let mut target_steps = 0;
 

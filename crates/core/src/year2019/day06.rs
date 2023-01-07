@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::{HashMap, HashSet, VecDeque};
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     fn checksum(map: &HashMap<&str, Vec<&str>>, name: &str, depth: u32) -> u32 {
         depth
             + map.get(name).map_or(0, |list| {

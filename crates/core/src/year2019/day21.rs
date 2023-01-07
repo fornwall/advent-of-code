@@ -20,7 +20,7 @@ fn run(intcode_program_string: &str, ascii_program_string: &str) -> Result<Word,
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<Word, String> {
+pub fn solve(input: &Input) -> Result<Word, String> {
     let mut ascii_program = String::new();
 
     if input.is_part_one() {

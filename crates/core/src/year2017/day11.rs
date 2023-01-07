@@ -1,7 +1,7 @@
 use crate::input::Input;
 
 /// Using double-height coordinates - see https://www.redblobgames.com/grids/hexagons/
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     fn distance(location: (i32, i32)) -> u32 {
         location.0.unsigned_abs()
             + std::cmp::max(0, (location.1.abs() - location.0.abs()) / 2) as u32

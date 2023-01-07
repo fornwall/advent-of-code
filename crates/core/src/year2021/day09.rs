@@ -56,7 +56,7 @@ impl HeightMap {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let map = HeightMap::parse(input.text)?;
     let mut risk_level_sum = 0;
     let mut filled_map = vec![false; map.height_data.len()];

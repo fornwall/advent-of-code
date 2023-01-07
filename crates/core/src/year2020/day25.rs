@@ -57,7 +57,7 @@ fn babystep_giantstep(public_key: u32) -> Option<u32> {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     if input.is_part_two() {
         return Ok(0);
     }

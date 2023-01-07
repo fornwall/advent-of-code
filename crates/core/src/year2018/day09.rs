@@ -35,7 +35,7 @@ impl MarbleCircle {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let last_marble_multiplier = input.part_values(1, 100);
     let parts: Vec<&str> = input.text.split_whitespace().collect();
     if parts.len() != 8 {

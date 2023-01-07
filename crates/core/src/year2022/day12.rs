@@ -1,5 +1,8 @@
 use std::collections::VecDeque;
 
+#[cfg(feature = "visualization")]
+use svgplot::{SvgColor, SvgImage, SvgPath, SvgPathShape, SvgScript};
+
 use crate::input::Input;
 
 type Position = (usize, usize);
@@ -33,7 +36,7 @@ impl Graph {
                     b'z'
                 } else {
                     val
-                };
+                } - b'a';
             }
         }
         let visited = vec![false; cells.len()];
@@ -78,8 +81,70 @@ impl Graph {
     }
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let (mut start_pos, destination_pos, mut graph) = Graph::parse(input.text)?;
+
+    #[cfg(feature = "visualization")]
+    let mut svg = SvgImage::new()
+        .view_box((0, 0, graph.width as i64, graph.height as i64))
+        .style("--step: 0");
+    #[cfg(feature = "visualization")]
+    let mut current_render_step = 0;
+    #[cfg(feature = "visualization")]
+    let mut render_script = String::from("const pathsPerStep = ['");
+
+    #[cfg(feature = "visualization")]
+    {
+        for draw_height in 0..26 {
+            let mut shape = SvgPathShape::new();
+            let brightness = 17. + 0.83 * (draw_height as f64 / 0.25);
+            for x in 0..graph.width {
+                for y in 0..graph.height {
+                    let height = graph.height_at(x, y);
+                    if height == draw_height {
+                        shape = shape
+                            .move_to_absolute(x as i32, y as i32)
+                            .line_to_relative(1, 0)
+                            .line_to_relative(0, 1)
+                            .line_to_relative(-1, 0)
+                            .close();
+                    }
+                }
+            }
+            if !shape.is_empty() {
+                svg.add(SvgPath {
+                    shape,
+                    fill: Some(SvgColor::RgbPercentage(brightness, brightness, brightness)),
+                    ..Default::default()
+                });
+            }
+        }
+
+        svg.add(svgplot::Rect {
+            x: start_pos.0 as svgplot::Coordinate,
+            y: start_pos.1 as svgplot::Coordinate,
+            width: 1.,
+            height: 1.,
+            fill: Some(SvgColor::Rgb(0, 0xFF, 0)),
+            title: Some(format!(
+                "Starting position - elevation {}",
+                graph.height_at(start_pos.0, start_pos.1)
+            )),
+            ..Default::default()
+        });
+        svg.add(svgplot::Rect {
+            x: destination_pos.0 as svgplot::Coordinate,
+            y: destination_pos.1 as svgplot::Coordinate,
+            width: 1.,
+            height: 1.,
+            fill: Some(SvgColor::Rgb(0xFF, 0, 0)),
+            title: Some(format!(
+                "Destination - elevation {}",
+                graph.height_at(destination_pos.0, destination_pos.1)
+            )),
+            ..Default::default()
+        });
+    }
 
     if input.is_part_two() {
         start_pos = destination_pos;
@@ -96,9 +161,41 @@ pub fn solve(input: &mut Input) -> Result<u32, String> {
                 let at_goal = if input.is_part_one() {
                     new_pos == destination_pos
                 } else {
-                    graph.height_at(new_pos.0, new_pos.1) == b'a'
+                    graph.height_at(new_pos.0, new_pos.1) == 0
                 };
+
+                #[cfg(feature = "visualization")]
+                {
+                    if new_cost != current_render_step {
+                        render_script.push_str("', '");
+                        current_render_step = new_cost;
+                    }
+                    render_script.push_str(
+                        &SvgPathShape::at(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5)
+                            .line_to_relative(-dx as f64, -dy as f64)
+                            .data_string(),
+                    );
+                }
+
                 if at_goal {
+                    #[cfg(feature = "visualization")]
+                    {
+                        let shapes_id = svg.add_with_id(
+                            SvgPath::default()
+                                .stroke(SvgColor::Rgb(0xff, 0xc1, 0x07))
+                                .stroke_width(0.1),
+                        );
+
+                        render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
+                                                              const pathData = pathsPerStep.slice(0, step+1).join('');\n\
+                                                              document.getElementById('{}').setAttribute('d', pathData);\n\
+                                                             }}", shapes_id));
+                        svg.add(SvgScript::new(render_script));
+                        input.rendered_svg.replace(
+                            svg.data_attribute("steps".to_string(), format!("{}", new_cost))
+                                .to_svg_string(),
+                        );
+                    }
                     return Ok(new_cost);
                 }
                 to_visit.push_back((new_cost, new_pos));

@@ -1,7 +1,7 @@
 use crate::common::permutation::all_permutations;
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut password = [b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h'];
     if input.is_part_one() {
         scramble(input.text, &mut password)?;

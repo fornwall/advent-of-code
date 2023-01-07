@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::HashMap;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     let mut map = HashMap::new();
 
     let mut entrance_at_top_x = None;

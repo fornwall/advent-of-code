@@ -12,29 +12,41 @@
     <style>
       html {
         background: #0d0c1a;
+        font-family: sans-serif;
+        color: white;
       }
 
       body {
         margin: 0;
+        display: flex;
+        align-items: center;
       }
 
-      canvas {
-        height: 100vw;
-        max-width: 100vh;
-        width: 100vw;
-        max-height: 100vh;
-        margin: auto;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
+      html, body {
+        height: 100%;
+        width: 100%;
+      }
+
+      #show {
+        width: 100%;
+        text-align: center;
+      }
+
+      #progress {
+        width: calc(100% - 10px);
+        margin: 0;
+        background: #efefef;
+      }
+
+      input:focus {
+        outline: none;
       }
 
       .fade-out {
         animation: fadein 2s;
         opacity: 0.4;
       }
+
       @keyframes fadein {
         from {
           opacity: 0;
@@ -47,12 +59,11 @@
   </head>
 
   <body>
-    <canvas id="mainCanvas"></canvas>
-    <canvas
-      id="overlayCanvas"
-      style="z-index: 1; pointer-events: none"
-    ></canvas>
-    <canvas id="composed" style="display: none"></canvas>
+    <div id="show" style="display: none; vertical-align: middle;">
+      <input type="range" min="0" max="100" id="progress" value="0" autofocus />
+      <p id="stepDisplay" style="vertical-align: middle; user-select: none;">&nbsp;</p>
+      <div id="rendering" style="pointer-events: none;"> </div>
+    </div>
     <div
       style="
         display: flex;
@@ -71,7 +82,5 @@
         style="z-index: 100; max-width: 100%; max-height: 100%"
       />
     </div>
-    <!-- This is for local development - sed removes '<script' lines during build and creates generated-index.html which webpack uses as template -->
-    <script type="module" src="index.js"></script>
   </body>
 </html>

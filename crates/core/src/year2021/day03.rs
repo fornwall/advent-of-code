@@ -39,7 +39,7 @@ fn keep_one_according_to_bitset_criteria(
     Err("Bit criteria did not result in single number".to_string())
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_BITS: usize = u16::BITS as usize;
 
     let num_bits = input.text.lines().next().map(str::len).unwrap_or_default();

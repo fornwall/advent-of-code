@@ -211,7 +211,7 @@ fn solve_with_bit_mask<T: BitMask + Copy + Clone>(
     Ok(sum)
 }
 
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     if input.is_part_one() {
         solve_with_bit_mask::<BitMaskV1>(input.text, 1000)
     } else {

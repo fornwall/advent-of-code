@@ -43,7 +43,7 @@ fn process_effects(state: &mut State, effects: &[Effect]) -> Option<u8> {
     Some(effective_armor)
 }
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut boss_hit_points = 0;
     let mut boss_damage = 0;
     for line in input.text.lines() {

@@ -2,7 +2,7 @@ use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
 /// Using double-width coordinates - see https://www.redblobgames.com/grids/hexagons/
-pub fn solve(input: &mut Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut black_tiles = HashSet::new();
 
     for line_str in input.text.lines() {

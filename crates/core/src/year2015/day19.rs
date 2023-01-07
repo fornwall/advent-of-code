@@ -1,7 +1,7 @@
 use crate::input::Input;
 use std::collections::{HashMap, HashSet};
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let mut mappings = HashMap::new();
     let mut molecule = String::new();
 

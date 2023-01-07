@@ -1,7 +1,7 @@
 use crate::common::character_recognition::{recognize, CHAR_HEIGHT, CHAR_WIDTH};
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<String, String> {
+pub fn solve(input: &Input) -> Result<String, String> {
     const NUM_LETTERS: usize = 8;
     let mut dots = Vec::new();
 

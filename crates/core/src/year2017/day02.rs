@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &mut Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     let row_evaluator = if input.is_part_one() {
         |row: &[u32]| {
             let min = row.iter().min().unwrap_or(&0);
