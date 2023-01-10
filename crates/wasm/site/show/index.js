@@ -10,10 +10,10 @@ const visualizerWorker = new Worker(
 );
 
 const spinnerImage = document.getElementById("spinnerImage");
-const rendering = document.getElementById('rendering');
-const progress = document.getElementById('progress');
-const show = document.getElementById('show');
-const stepDisplay = document.getElementById('stepDisplay');
+const rendering = document.getElementById("rendering");
+const progress = document.getElementById("progress");
+const show = document.getElementById("show");
+const stepDisplay = document.getElementById("stepDisplay");
 let svg = null;
 let playInterval = null;
 
@@ -38,32 +38,38 @@ visualizerWorker.onmessage = (message) => {
     window.alert(message.data.errorMessage);
     window.location = "..";
   } else if (message.data.done) {
-    console.log("SVG size: " + new Intl.NumberFormat().format(message.data.answer.length) + ' bytes');
+    console.log(
+      "SVG size: " +
+        new Intl.NumberFormat().format(message.data.answer.length) +
+        " bytes"
+    );
 
     //document.getElementById("spinner").style.visibility = "hidden";
     const { year, day, part } = state.params;
-    document.getElementById("spinner").innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}</h1>`;
+    document.getElementById(
+      "spinner"
+    ).innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}</h1>`;
 
     async function onClick() {
-        console.log('onClick....');
-        document.getElementById("spinner").remove();
-        document.documentElement.removeEventListener('click', onClick);
-        rendering.innerHTML = message.data.answer;
+      console.log("onClick....");
+      document.getElementById("spinner").remove();
+      document.documentElement.removeEventListener("click", onClick);
+      rendering.innerHTML = message.data.answer;
 
-        svg = rendering.querySelector('svg');
-        svg.setAttribute("focusable", "false");
+      svg = rendering.querySelector("svg");
+      svg.setAttribute("focusable", "false");
 
-        progress.max = svg.dataset.steps;
+      progress.max = svg.dataset.steps;
 
-        rendering.children[0].setAttribute('width', "100%");
-        rendering.children[0].setAttribute('height', "100%");
-        rendering.querySelectorAll('script').forEach((e) => eval(e.textContent));
+      rendering.children[0].setAttribute("width", "100%");
+      rendering.children[0].setAttribute("height", "100%");
+      rendering.querySelectorAll("script").forEach((e) => eval(e.textContent));
 
-        show.style.display = 'block';
-        togglePause();
-        await toggleFullScreen();
+      show.style.display = "block";
+      togglePause();
+      await toggleFullScreen();
     }
-    document.documentElement.addEventListener('click', onClick);
+    document.documentElement.addEventListener("click", onClick);
   }
 };
 
@@ -73,19 +79,19 @@ async function toggleFullScreen() {
     // document.exitFullscreen();
   } else {
     if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
+      document.documentElement.requestFullscreen();
     } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
+      document.documentElement.webkitRequestFullscreen();
     }
     if (svg) {
-        const viewBox = svg.getAttribute("viewBox").split(' ')
-        if (parseInt(viewBox[2]) > parseInt(viewBox[3])) {
-            try {
-              await window.screen.orientation.lock("landscape-primary");
-            } catch (_e) {
-                // Silently ignore.
-            }
+      const viewBox = svg.getAttribute("viewBox").split(" ");
+      if (parseInt(viewBox[2]) > parseInt(viewBox[3])) {
+        try {
+          await window.screen.orientation.lock("landscape-primary");
+        } catch (_e) {
+          // Silently ignore.
         }
+      }
     }
   }
 }
@@ -125,38 +131,38 @@ document.body.addEventListener("keyup", async (e) => {
 });
 
 function togglePause() {
-    console.log('Start of togglePause..');
-    if (playInterval) {
-        console.log('Clearing interval...');
-        clearInterval(playInterval);
-        playInterval = null;
-    } else {
-        console.log('Starting interval...');
-        playInterval = setInterval(() => {
-            if (progress.value == progress.max) {
-                togglePause();
-            } else {
-                progress.value = parseInt(progress.value) + 1;
-                progress.dispatchEvent(new Event('input'));
-            }
-        }, 50);
-    }
+  console.log("Start of togglePause..");
+  if (playInterval) {
+    console.log("Clearing interval...");
+    clearInterval(playInterval);
+    playInterval = null;
+  } else {
+    console.log("Starting interval...");
+    playInterval = setInterval(() => {
+      if (progress.value == progress.max) {
+        togglePause();
+      } else {
+        progress.value = parseInt(progress.value) + 1;
+        progress.dispatchEvent(new Event("input"));
+      }
+    }, 50);
+  }
 }
 
-progress.addEventListener('input', () => {
-    stepDisplay.textContent = `Step ${progress.value} / ${progress.max}`;
-    svg.style.setProperty('--step', progress.value);
-    if (window.onNewStep) {
-        window.onNewStep(parseInt(progress.value));
-    }
+progress.addEventListener("input", () => {
+  stepDisplay.textContent = `Step ${progress.value} / ${progress.max}`;
+  svg.style.setProperty("--step", progress.value);
+  if (window.onNewStep) {
+    window.onNewStep(parseInt(progress.value));
+  }
 });
 
-progress.addEventListener('click', () => {
-    if (playInterval) togglePause();
+progress.addEventListener("click", () => {
+  if (playInterval) togglePause();
 });
 
-progress.addEventListener('touchstart', () => {
-    if (playInterval) togglePause();
+progress.addEventListener("touchstart", () => {
+  if (playInterval) togglePause();
 });
 
 function sendMessageToWorker() {

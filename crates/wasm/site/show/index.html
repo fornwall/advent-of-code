@@ -22,7 +22,8 @@
         align-items: center;
       }
 
-      html, body {
+      html,
+      body {
         height: 100%;
         width: 100%;
       }
@@ -59,10 +60,12 @@
   </head>
 
   <body>
-    <div id="show" style="display: none; vertical-align: middle;">
+    <div id="show" style="display: none; vertical-align: middle">
       <input type="range" min="0" max="100" id="progress" value="0" autofocus />
-      <p id="stepDisplay" style="vertical-align: middle; user-select: none;">&nbsp;</p>
-      <div id="rendering" style="pointer-events: none;"> </div>
+      <p id="stepDisplay" style="vertical-align: middle; user-select: none">
+        &nbsp;
+      </p>
+      <div id="rendering" style="pointer-events: none"></div>
     </div>
     <div
       style="
