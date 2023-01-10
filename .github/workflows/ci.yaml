@@ -124,9 +124,9 @@ jobs:
     - name: Install bump2version
       run: pip install bump2version
     - name: Bump version and commit
-      run: "bump2version --commit patch"
+      run: bump2version patch
     - name: Push changes to git
-      run: git push
+      run: git push --tags
 
   benchmark:
     strategy:
