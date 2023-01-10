@@ -415,35 +415,6 @@ jobs:
         name: ${{ matrix.tested-commit }}-benchmark
         path: crates/core/${{ matrix.tested-commit }}-baseline.json
 
-  compare-benchmarks:
-    needs: [benchmark]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Download new benchmark
-      uses: actions/download-artifact@v3
-      with:
-        name: new-benchmark
-    - name: Download old benchmark
-      uses: actions/download-artifact@v3
-      with:
-        name: old-benchmark
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: Format commit comment
-      id: get-comment-body
-      run: |
-        body=$(./.github/workflows/compare-iai.py old-baseline.json new-baseline.json)
-        delimiter="$(openssl rand -hex 8)"
-        echo "body<<$delimiter" >> $GITHUB_OUTPUT
-        echo "$body" >> $GITHUB_OUTPUT
-        echo "$delimiter" >> $GITHUB_OUTPUT
-    - name: Post commit comment
-      uses: peter-evans/commit-comment@v2
-      with:
-        body: ${{ steps.get-comment-body.outputs.body }}
-
   gist-mapping:
     runs-on: ubuntu-latest
     steps:
