@@ -14,22 +14,18 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             })
             .sum())
     } else {
-        let packets = input
+        let (packets_1_idx, packets_2_idx) = input
             .text
             .lines()
             .filter(|line| !line.is_empty())
-            .collect::<Vec<_>>();
-
-        // Add 1 since indexing in the problem is one based:
-        let packets_1_idx = 1 + packets
-            .iter()
-            .filter(|&packet| is_correctly_ordered(packet, "2"))
-            .count();
-        // Add 2 - once from one based indexing, and one from "[[6]]" being after "[[2]]" in the list:
-        let packets_2_idx = 2 + packets
-            .iter()
-            .filter(|&packet| is_correctly_ordered(packet, "6"))
-            .count();
+            // "2": Add 1 since indexing in the problem is one based.
+            // "6": Add 2 - once from one based indexing, and one from "[[6]]" being after "[[2]]" in the list.
+            .fold((1, 2), |acc, packet| {
+                (
+                    acc.0 + usize::from(is_correctly_ordered(packet, "2")),
+                    acc.1 + usize::from(is_correctly_ordered(packet, "6")),
+                )
+            });
         Ok(packets_1_idx * packets_2_idx)
     }
 }
@@ -199,12 +195,12 @@ pub fn troublesome_packet() {
 
 #[cfg(feature = "count-allocations")]
 #[test]
-pub fn limited_memory_allocations() {
+pub fn no_memory_allocations() {
     use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day13_input.txt");
     let allocations = allocation_counter::count(|| {
         test_part_one!(real_input => 4821);
         test_part_two!(real_input => 21_890);
     });
-    assert_eq!(allocations, 8);
+    assert_eq!(allocations, 0);
 }
