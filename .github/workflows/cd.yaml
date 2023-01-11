@@ -359,6 +359,7 @@ jobs:
         path: advent-of-code-mac-aarch64.tar.xz
 
   publish-to-maven-central:
+    needs: [build-jni-libraries]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
