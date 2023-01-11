@@ -499,7 +499,7 @@ jobs:
 
   publish-homebrew:
     runs-on: ubuntu-latest
-    needs: [deploy-site]
+    needs: [github-release]
     steps:
     - name: Check out source code
       uses: actions/checkout@v3
