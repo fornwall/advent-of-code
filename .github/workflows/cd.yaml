@@ -515,7 +515,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: mac-x86_64-binary
-          path: artifacts/
       - uses: actions/download-artifact@v3
         with:
           name: mac-aarch64-binary
