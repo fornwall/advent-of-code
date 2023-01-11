@@ -126,7 +126,7 @@ jobs:
     - name: Bump version and commit
       run: bump2version patch
     - name: Push changes to git
-      run: git push --tags
+      run: git push --tags && git push
 
   benchmark:
     strategy:
