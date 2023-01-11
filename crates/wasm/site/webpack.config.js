@@ -1,20 +1,20 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
-      "home": "./index.js",
-      "runbench": "./runbench/index.js",
-      "show": "./show/index.js",
+    home: "./index.js",
+    runbench: "./runbench/index.js",
+    show: "./show/index.js",
   },
   output: {
     publicPath: "/",
-    filename: function(pathData) {
-        if (pathData.chunk.name === 'visualizer') {
-            return 'show/[name].[contenthash].js';
-        }
-        return "[name]/[name].[contenthash].js";
-    }
+    filename: function (pathData) {
+      if (pathData.chunk.name === "visualizer") {
+        return "show/[name].[contenthash].js";
+      }
+      return "[name]/[name].[contenthash].js";
+    },
   },
   devServer: {
     static: __dirname,
@@ -30,7 +30,7 @@ module.exports = {
       chunks: ["home"],
       metadata: {
         baseUrl: "/",
-      }
+      },
     }),
     new HtmlWebpackPlugin({
       filename: "show/index.html",
@@ -39,7 +39,7 @@ module.exports = {
       publicPath: "/",
       metadata: {
         baseUrl: "/show/",
-      }
+      },
     }),
     new HtmlWebpackPlugin({
       filename: "runbench/index.html",
@@ -47,7 +47,7 @@ module.exports = {
       chunks: ["runbench"],
     }),
     new CopyWebpackPlugin({
-        patterns: [ { from: 'static', to: 'static' } ],
-    })
+      patterns: [{ from: "static", to: "static" }],
+    }),
   ],
 };
