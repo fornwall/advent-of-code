@@ -77,9 +77,7 @@ site-wasm:
 site-pack: site-wasm
 	cd crates/wasm/site && \
 		rm -Rf dist && \
-		npm i && npm run webpack -- --mode=production && \
-		cd runbench && npm i && npm run webpack -- --mode=production && \
-		cd ../show && npm i && npm run webpack -- --mode=production
+		npm i && npm run webpack -- --mode=production
 
 wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-wasm && \
@@ -97,7 +95,7 @@ wasm-size:
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell '$(MAKE) site-wasm'
 
-serve-site: --run-devserver --pack-show-continously --pack-runbench-continously --watch-and-build-wasm ;
+serve-site: --run-devserver --watch-and-build-wasm ;
 
 node-package:
 	cd crates/wasm && ./build-package.sh

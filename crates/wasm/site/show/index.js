@@ -9,7 +9,6 @@ const visualizerWorker = new Worker(
   }
 );
 
-const spinnerImage = document.getElementById("spinnerImage");
 const rendering = document.getElementById("rendering");
 const progress = document.getElementById("progress");
 const show = document.getElementById("show");
@@ -17,19 +16,14 @@ const stepDisplay = document.getElementById("stepDisplay");
 let svg = null;
 let playInterval = null;
 
-const PHASE_PAGE_LOAD = "pageload";
-const PHASE_SHOWING_START_SCREEN = "showingstartscreen";
-const PHASE_START_SCREEN_CLICKED = "startscreenclicked";
-
 const state = {
-  phase: PHASE_PAGE_LOAD,
   params: {},
   audioPlayer: new AudioPlayer("bounce.mp4", "pop.mp4"),
 };
 
-let hash = location.hash.substring(1);
-for (let part of hash.split("&")) {
-  let [key, value] = part.split("=");
+const hash = location.hash.substring(1);
+for (const part of hash.split("&")) {
+  const [key, value] = part.split("=");
   state.params[key] = decodeURIComponent(value);
 }
 
@@ -44,7 +38,6 @@ visualizerWorker.onmessage = (message) => {
         " bytes"
     );
 
-    //document.getElementById("spinner").style.visibility = "hidden";
     const { year, day, part } = state.params;
     document.getElementById(
       "spinner"
