@@ -1,2 +1,2 @@
 # svgplot
-Utilities for SVG generation.
+Utility library for programmatic SVG generation.

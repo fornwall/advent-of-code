@@ -12,8 +12,5 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
-[dev-dependencies]
-svg = "0.13.0"
-
 [lib]
 name = "svgplot"
