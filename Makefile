@@ -26,9 +26,6 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::unseparated-literal-suffix \
 	-W clippy::unwrap_used
 
-# Until https://github.com/rust-lang/rust-clippy/issues/8629 is fixed
-CLIPPY_PARAMS += -A clippy::only_used_in_recursion
-
 ifeq ($(NIGHTLY),1)
   CARGO_COMMAND += +$(NIGHTLY_TOOLCHAIN)
 endif
