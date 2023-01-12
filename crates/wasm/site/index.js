@@ -284,9 +284,9 @@ document.getElementById("open-playground").addEventListener("click", () => {
   }
 });
 
-document.documentElement.draggable = true;
+outputElement.draggable = true;
 
-document.documentElement.addEventListener("dragstart", (dragEvent) => {
+outputElement.addEventListener("dragstart", (dragEvent) => {
   if (dragEvent.target.tagName == "TEXTAREA") {
     return;
   }
