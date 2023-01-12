@@ -108,26 +108,6 @@ jobs:
     - name: Test with Node ${{ matrix.node-version }}
       run: make node-package
 
-  bump-version:
-    needs: [actionlint, check-js, test-rust, test-python, test-wasm, test-c-and-cxx-bindings]
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-    - name: Setup git for commit
-      run: |
-        git config --global user.name 'Bump version workflow'
-        git config --global user.email 'bumpversion@users.noreply.github.com'
-    - name: Install bump2version
-      run: pip install bump2version
-    - name: Bump version and commit
-      run: bump2version patch
-    - name: Push changes to git
-      run: git push && git push --tags
-
   benchmark:
     strategy:
       matrix:

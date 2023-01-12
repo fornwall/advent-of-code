@@ -6,15 +6,17 @@ jobs:
   tag-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Extract current version
-        run: echo "current_version=$(./.github/workflows/current-version)" >> $GITHUB_ENV
-      - name: Create tag
-        uses: actions/github-script@v6
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/v$${ env.current_version }}',
-              sha: context.sha
-            })
+          python-version: '3.x'
+      - name: Setup git for commit
+        run: |
+          git config --global user.name 'Bump version workflow'
+          git config --global user.email 'bumpversion@users.noreply.github.com'
+      - name: Install bump2version
+        run: pip install bump2version
+      - name: Bump version and commit
+        run: bump2version patch
+      - name: Push changes to git
+        run: git push && git push --tags
