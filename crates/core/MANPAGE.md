@@ -1,4 +1,4 @@
-% ADVENT-OF-CODE(1) Version 2022.0.41
+% ADVENT-OF-CODE(1) Version 2022.0.42
 
 NAME
 ====
