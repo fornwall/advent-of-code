@@ -218,7 +218,9 @@ jobs:
       run: cargo login ${CRATES_API_TOKEN}
       env:
         CRATES_API_TOKEN: ${{secrets.CRATES_API_TOKEN}}
-    - name: Publish crate
+    - name: Publish svgplot crate
+      run: cd crates/svgplot && cargo publish
+    - name: Publish core crate
       run: cd crates/core && cargo publish
 
   release-pypi-package:
