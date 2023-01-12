@@ -1,0 +1,20 @@
+name: CD
+
+on: workflow_dispatch
+
+jobs:
+  tag-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract current version
+        run: echo "current_version=$(./.github/workflows/current-version)" >> $GITHUB_ENV
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v$${ env.current_version }}',
+              sha: context.sha
+            })
