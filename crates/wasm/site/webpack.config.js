@@ -1,7 +1,7 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 
-module.exports = {
+export default {
   entry: {
     home: "./index.js",
     runbench: "./runbench/index.js",
@@ -17,7 +17,7 @@ module.exports = {
     },
   },
   devServer: {
-    static: __dirname,
+    static: ".",
     headers: {
       "Cross-Origin-Embedder-Policy": "require-corp",
       "Cross-Origin-Opener-Policy": "same-origin",
