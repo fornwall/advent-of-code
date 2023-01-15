@@ -19,7 +19,7 @@ async function main() {
     new URLSearchParams(window.location.search).get("year") || "2022"
   );
   document.getElementById("description").innerHTML = `Benchmark running
-          <a href="https://github.com/fornwall/advent-of-code">solutions</a> to
+          <a href="/">solutions</a> to
           <a href="https://adventofcode.com/${year}/">Advent of Code ${year}</a> in
           the current browser using WebAssembly.`;
 
@@ -69,9 +69,11 @@ async function main() {
         for (const data of times) {
           const tr = document.createElement("tr");
           const percentageTime = (data.executionTime * 100) / totalTime;
-          tr.innerHTML = `<td class="text-end">${data.day}-${
+          let link = `https://adventofcode.com/${data.year}/day/${data.day}`;
+          if (data.part == 2) link += '#part2';
+          tr.innerHTML = `<td class="text-end"><a href="${link}">${data.day}-${
             data.part
-          }</td><td class="text-end">${data.executionTime.toFixed(
+          }</a></td><td class="text-end">${data.executionTime.toFixed(
             2
           )}</td><td class="text-end">${percentageTime.toFixed(2)}</td>`;
           tbody.appendChild(tr);

@@ -67,7 +67,7 @@ visualizerWorker.onmessage = (message) => {
         }
       });
 
-      svg.addEventListener("click", () => {
+      rendering.addEventListener("click", () => {
         console.log("Rendering clicked");
         togglePause();
       });
