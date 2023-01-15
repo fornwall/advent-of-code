@@ -133,7 +133,7 @@ jobs:
     - name: Run benchmark on ${{ matrix.tested-commit }} commit
       run: ./run-iai-benchmark.py > ${{ matrix.tested-commit }}-baseline.json
       working-directory: crates/core
-    - name: Upload benchmark on current commit
+    - name: Upload benchmark
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.tested-commit }}-benchmark
@@ -259,3 +259,68 @@ jobs:
       - name: Check js
         run: npm install && npm run check
         working-directory: crates/wasm
+
+  gist-mapping:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+    - name: Update gist mapping
+      run: pip install requests && ./update-gists.py && git add gist-mapping.json
+      working-directory: crates/wasm/site
+      env:
+        GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
+    - name: Upload new gist-mapping.json
+      uses: actions/upload-artifact@v3
+      with:
+        name: gist-mapping
+        path: crates/wasm/site/gist-mapping.json
+
+  deploy-site:
+    needs: [benchmark, gist-mapping]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: nightly-2022-12-11
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        registry-url: 'https://registry.npmjs.org'
+    - uses: Homebrew/actions/setup-homebrew@master
+    - name: Install wasm-opt
+      run: brew update && brew install binaryen
+    - name: Install Rust nightly
+      run: make install-nightly
+    - name: Install wasm-bindgen
+      run: make install-wasm-bindgen
+    - name: Download new gist-mapping.json
+      uses: actions/download-artifact@v3
+      with:
+        name: gist-mapping
+        path: crates/wasm/site
+    - name: Download new benchmark
+      uses: actions/download-artifact@v3
+      with:
+        name: new-benchmark
+        path: crates/wasm/site/benchmark
+    - name: Deploy site
+      run: |
+        echo "${{ secrets.SITE_DEPLOY_SSH_KEY }}" | base64 --decode > /tmp/id_ed25519
+        chmod 0600 /tmp/id_ed25519
+        export GIT_SSH_COMMAND='ssh -i /tmp/id_ed25519'
+        git config --global user.email "ci@fornwall.net"
+        git config --global user.name "CI"
+        make deploy-site
+    - name: Install the Netlify CLI
+      run: npm install netlify-cli -g
+    - name: Deploy to Netlify
+      run: make netlify
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+

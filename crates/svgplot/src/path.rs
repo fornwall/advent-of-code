@@ -13,7 +13,17 @@ pub struct SvgPath {
 enum SvgPathElement {
     LineAbsolute((Coordinate, Coordinate)),
     LineRelative((Coordinate, Coordinate)),
-    ArcRelative((Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate)),
+    ArcRelative(
+        (
+            Coordinate,
+            Coordinate,
+            Coordinate,
+            Coordinate,
+            Coordinate,
+            Coordinate,
+            Coordinate,
+        ),
+    ),
     MoveAbsolute((Coordinate, Coordinate)),
     MoveRelative((Coordinate, Coordinate)),
     /// The "Close Path" command, called with Z. This command draws a straight line from the current
@@ -107,17 +117,26 @@ impl SvgShape {
         self
     }
 
-    pub fn arc_to_relative<C: Into<Coordinate>>(mut self,
-                                                radius_x: C, radius_y: C, x_axis_rotation: C, large_arc_flag: C,
-                                                sweep_flag: C,
-                                                dx: C,
-                                                dy: C) -> Self {
-        self.elements
-            .push(SvgPathElement::ArcRelative((radius_x.into(), radius_y.into(),
-                                               x_axis_rotation.into(), large_arc_flag.into(),
-                                               sweep_flag.into(),
-                                               dx.into(), dy.into()
-            )));
+    #[allow(clippy::too_many_arguments)]
+    pub fn arc_to_relative<C: Into<Coordinate>>(
+        mut self,
+        radius_x: C,
+        radius_y: C,
+        x_axis_rotation: C,
+        large_arc_flag: C,
+        sweep_flag: C,
+        dx: C,
+        dy: C,
+    ) -> Self {
+        self.elements.push(SvgPathElement::ArcRelative((
+            radius_x.into(),
+            radius_y.into(),
+            x_axis_rotation.into(),
+            large_arc_flag.into(),
+            sweep_flag.into(),
+            dx.into(),
+            dy.into(),
+        )));
         self
     }
 
@@ -182,7 +201,13 @@ impl SvgShape {
                 SvgPathElement::ArcRelative((rx, ry, x_rot, a_flag, s_flag, dx, dy)) => {
                     // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
                     writer
-                        .write_all(format!("a {} {} {} {} {} {} {}", rx, ry, x_rot, a_flag, s_flag, dx, dy).as_bytes())
+                        .write_all(
+                            format!(
+                                "a {} {} {} {} {} {} {}",
+                                rx, ry, x_rot, a_flag, s_flag, dx, dy
+                            )
+                            .as_bytes(),
+                        )
                         .unwrap();
                 }
                 SvgPathElement::Close => {

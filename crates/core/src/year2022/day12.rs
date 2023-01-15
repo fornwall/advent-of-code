@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 #[cfg(feature = "visualization")]
-use svgplot::{SvgColor, SvgImage, SvgPath, SvgShape, SvgScript};
+use svgplot::{SvgColor, SvgImage, SvgPath, SvgScript, SvgShape};
 
 use crate::input::Input;
 
@@ -62,7 +62,7 @@ impl Graph {
         !old
     }
 
-    fn can_go(&mut self, x: usize, y: usize, dx: i32, dy: i32, part_2: bool) -> Option<Position> {
+    fn can_go(&mut self, x: usize, y: usize, dx: i32, dy: i32) -> Option<Position> {
         if (dx < 0 && x == 0)
             || (dy < 0 && y == 0)
             || (dx > 0 && x + 1 == self.width)
@@ -72,28 +72,25 @@ impl Graph {
         }
         let new_x = (x as i32 + dx) as usize;
         let new_y = (y as i32 + dy) as usize;
-        let mut new_height = self.height_at(new_x, new_y);
-        let mut old_height = self.height_at(x, y);
-        if part_2 {
-            std::mem::swap(&mut new_height, &mut old_height);
-        }
-        (new_height <= old_height + 1 && self.mark_visited(new_x, new_y)).then_some((new_x, new_y))
+        let from_height = self.height_at(new_x, new_y);
+        let to_height = self.height_at(x, y);
+        (to_height <= from_height + 1 && self.mark_visited(new_x, new_y)).then_some((new_x, new_y))
     }
 }
 
 pub fn solve(input: &Input) -> Result<u32, String> {
-    let (mut start_pos, destination_pos, mut graph) = Graph::parse(input.text)?;
+    let (start_pos, destination_pos, mut graph) = Graph::parse(input.text)?;
 
     #[cfg(feature = "visualization")]
-        let mut svg = SvgImage::new()
+    let mut svg = SvgImage::new()
         .view_box((0, 0, graph.width as i64, graph.height as i64))
         .style("--step: 0");
     #[cfg(feature = "visualization")]
-        let mut current_render_step = 0;
+    let mut current_render_step = 0;
     #[cfg(feature = "visualization")]
-        let mut circles_render_script = String::from("const circlesPerStep = ['");
+    let mut circles_render_script = String::from("const circlesPerStep = ['");
     #[cfg(feature = "visualization")]
-        let mut path_render_script = String::from("const pathsPerStep = ['");
+    let mut path_render_script = String::from("const pathsPerStep = ['");
 
     #[cfg(feature = "visualization")]
     {
@@ -122,24 +119,23 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             }
         }
 
-        svg.add(svgplot::Rect {
-            x: start_pos.0 as svgplot::Coordinate,
-            y: start_pos.1 as svgplot::Coordinate,
-            width: 1.,
-            height: 1.,
-            fill: Some(SvgColor::Rgb(input.part_values(0, 0xff), input.part_values(0xFF, 0), 0)),
-            title: Some(format!(
-                "Starting position - elevation {}",
-                graph.height_at(start_pos.0, start_pos.1)
-            )),
-            ..Default::default()
-        });
+        if input.is_part_one() {
+            svg.add(svgplot::Rect {
+                x: start_pos.0 as svgplot::Coordinate,
+                y: start_pos.1 as svgplot::Coordinate,
+                width: 1.,
+                height: 1.,
+                fill: Some(SvgColor::Rgb(0, 0xFF, 0)),
+                title: Some("Starting position - elevation 0".to_string()),
+                ..Default::default()
+            });
+        }
         svg.add(svgplot::Rect {
             x: destination_pos.0 as svgplot::Coordinate,
             y: destination_pos.1 as svgplot::Coordinate,
             width: 1.,
             height: 1.,
-            fill: Some(SvgColor::Rgb(input.part_values(0xff, 0), input.part_values(0, 0xff), 0)),
+            fill: Some(SvgColor::Rgb(0xFF, 0, 0)),
             title: Some(format!(
                 "Destination - elevation {}",
                 graph.height_at(destination_pos.0, destination_pos.1)
@@ -148,20 +144,16 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         });
     }
 
-    if input.is_part_two() {
-        start_pos = destination_pos;
-    }
-
     let mut to_visit = VecDeque::with_capacity(64);
-    graph.mark_visited(start_pos.0, start_pos.1);
-    to_visit.push_back((0, start_pos));
+    graph.mark_visited(destination_pos.0, destination_pos.1);
+    to_visit.push_back((0, destination_pos));
 
     while let Some((cost, pos)) = to_visit.pop_front() {
         for (dx, dy) in [(-1, 0), (0, -1), (1, 0), (0, 1)] {
-            if let Some(new_pos) = graph.can_go(pos.0, pos.1, dx, dy, input.is_part_two()) {
+            if let Some(new_pos) = graph.can_go(pos.0, pos.1, dx, dy) {
                 let new_cost = cost + 1;
                 let at_goal = if input.is_part_one() {
-                    new_pos == destination_pos
+                    new_pos == start_pos
                 } else {
                     graph.height_at(new_pos.0, new_pos.1) == 0
                 };
@@ -174,9 +166,15 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         current_render_step = new_cost;
                     }
                     let circle_radius = 0.3;
-                    circles_render_script.push_str(&SvgShape::new()
-                        .circle_absolute(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5, circle_radius)
-                        .data_string());
+                    circles_render_script.push_str(
+                        &SvgShape::new()
+                            .circle_absolute(
+                                new_pos.0 as f64 + 0.5,
+                                new_pos.1 as f64 + 0.5,
+                                circle_radius,
+                            )
+                            .data_string(),
+                    );
                     path_render_script.push_str(
                         &SvgShape::at(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5)
                             .line_to_relative(-dx as f64, -dy as f64)
@@ -192,10 +190,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                                 .stroke(SvgColor::Rgb(0xdf, 0xa1, 0x05))
                                 .stroke_width(0.1),
                         );
-                        let circles_path_id = svg.add_with_id(
-                            SvgPath::default()
-                                .fill(SvgColor::Rgb(0xdf, 0xa1, 0x05))
-                        );
+                        let circles_path_id = svg
+                            .add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xdf, 0xa1, 0x05)));
 
                         circles_render_script.push_str("'];");
                         path_render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
@@ -203,7 +199,10 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                                                               const pathData = pathsPerStep.slice(0, step).join('');\n\
                                                               document.getElementById('{}').setAttribute('d', pathData);\n\
                                                              }}", circles_path_id, visited_path_id));
-                        svg.add(SvgScript::new(format!("{}{}", circles_render_script, path_render_script)));
+                        svg.add(SvgScript::new(format!(
+                            "{}{}",
+                            circles_render_script, path_render_script
+                        )));
                         input.rendered_svg.replace(
                             svg.data_attribute("steps".to_string(), format!("{}", new_cost))
                                 .to_svg_string(),
