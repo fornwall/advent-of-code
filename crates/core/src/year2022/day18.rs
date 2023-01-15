@@ -53,17 +53,17 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                     && (0..SIZE).contains(&adjacent.1)
                     && (0..SIZE).contains(&adjacent.2)
                 {
-                    if grid[(adjacent.0) as usize][(adjacent.1) as usize][(adjacent.2) as usize]
-                        == LAVA_VALUE
-                    {
-                        wet_sides += 1;
-                    } else if grid[(adjacent.0) as usize][(adjacent.1) as usize]
-                        [(adjacent.2) as usize]
-                        == AIR_VALUE
-                    {
-                        grid[(adjacent.0) as usize][(adjacent.1) as usize][(adjacent.2) as usize] =
-                            WATER_VALUE;
-                        points_to_fill.push(adjacent);
+                    let cell = &mut grid[(adjacent.0) as usize][(adjacent.1) as usize]
+                        [(adjacent.2) as usize];
+                    match *cell {
+                        LAVA_VALUE => {
+                            wet_sides += 1;
+                        }
+                        AIR_VALUE => {
+                            *cell = WATER_VALUE;
+                            points_to_fill.push(adjacent);
+                        }
+                        _ => {}
                     }
                 }
             }
