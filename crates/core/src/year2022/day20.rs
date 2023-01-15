@@ -67,6 +67,7 @@ pub fn solve(input: &Input) -> Result<i64, String> {
                 &buckets,
                 old_bucket_containing_idx,
                 old_offset_in_bucket + shift_at_idx,
+                numbers.len(),
             );
             buckets[new_bucket_containing_idx].insert(new_offset_in_bucket, idx_to_shift);
             idx_to_bucket[idx_to_shift] = new_bucket_containing_idx;
@@ -84,6 +85,7 @@ pub fn solve(input: &Input) -> Result<i64, String> {
             &buckets,
             bucket_containing_number,
             number_offset_in_bucket + 1000,
+            numbers.len(),
         );
         let number_idx = buckets[bucket_containing_number][number_offset_in_bucket];
         Some(numbers[number_idx])
@@ -96,15 +98,27 @@ fn find_bucket_and_offset(
     buckets: &[Vec<usize>],
     mut bucket: usize,
     mut offset_relative_to_bucket: usize,
+    len: usize,
 ) -> (usize, usize) {
     // Buckets are of different length initially as the input
     // might not split evenly into buckets, and later on we do
     // not balance buckets on insertion.
-    while offset_relative_to_bucket >= buckets[bucket].len() {
-        offset_relative_to_bucket -= buckets[bucket].len();
-        bucket = (bucket + 1) % buckets.len();
+    if offset_relative_to_bucket < len / 2
+        || (offset_relative_to_bucket > (len - 1 + buckets[bucket].len()))
+    {
+        while offset_relative_to_bucket >= buckets[bucket].len() {
+            offset_relative_to_bucket -= buckets[bucket].len();
+            bucket = (bucket + 1) % buckets.len();
+        }
+        (bucket, offset_relative_to_bucket)
+    } else {
+        offset_relative_to_bucket = len + buckets[bucket].len() - 1 - offset_relative_to_bucket;
+        while offset_relative_to_bucket >= buckets[bucket].len() {
+            offset_relative_to_bucket -= buckets[bucket].len();
+            bucket = bucket.checked_sub(1).unwrap_or(buckets.len() - 1);
+        }
+        (bucket, buckets[bucket].len() - offset_relative_to_bucket)
     }
-    (bucket, offset_relative_to_bucket)
 }
 
 const MAX_LENGTH: usize = 10_000;
