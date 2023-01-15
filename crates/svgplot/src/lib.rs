@@ -154,7 +154,7 @@ fn test() {
     }
     image.add(SvgPath {
         stroke: Some(SvgColor::Rgb(0xFF, 0xFF, 0)),
-        shape: SvgPathShape::at(10.6, 10.).close(),
+        shape: SvgShape::at(10.6, 10.).close(),
         ..Default::default()
     });
     println!("###:\n{}\n###", image.to_svg_string());

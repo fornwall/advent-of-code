@@ -4,7 +4,7 @@ use crate::{Coordinate, SvgColor, SvgElement, SvgId};
 
 #[derive(Default)]
 pub struct SvgPath {
-    pub shape: SvgPathShape,
+    pub shape: SvgShape,
     pub stroke: Option<SvgColor>,
     pub stroke_width: Option<f64>,
     pub fill: Option<SvgColor>,
@@ -13,6 +13,7 @@ pub struct SvgPath {
 enum SvgPathElement {
     LineAbsolute((Coordinate, Coordinate)),
     LineRelative((Coordinate, Coordinate)),
+    ArcRelative((Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate)),
     MoveAbsolute((Coordinate, Coordinate)),
     MoveRelative((Coordinate, Coordinate)),
     /// The "Close Path" command, called with Z. This command draws a straight line from the current
@@ -40,11 +41,19 @@ impl SvgPath {
         self
     }
 
+    pub const fn fill(mut self, color: SvgColor) -> Self {
+        self.fill = Some(color);
+        self
+    }
+
     pub(crate) fn write<W: Write>(&self, id: Option<SvgId>, writer: &mut W) {
         #![allow(clippy::unwrap_used)]
         writer.write_all(b"<path").unwrap();
         if let Some(id) = id {
             id.write(writer);
+        }
+        if let Some(fill) = &self.fill {
+            fill.write_fill(writer);
         }
         if let Some(stroke) = &self.stroke {
             stroke.write_stroke(writer);
@@ -65,20 +74,20 @@ impl SvgPath {
 }
 
 #[derive(Default)]
-pub struct SvgPathShape {
+pub struct SvgShape {
     elements: Vec<SvgPathElement>,
 }
 
-impl SvgPathShape {
+impl SvgShape {
     pub const fn new() -> Self {
         Self {
             elements: Vec::new(),
         }
     }
 
-    pub fn at(x: Coordinate, y: Coordinate) -> Self {
+    pub fn at<C: Into<Coordinate>>(x: C, y: C) -> Self {
         Self {
-            elements: vec![SvgPathElement::MoveAbsolute((x, y))],
+            elements: vec![SvgPathElement::MoveAbsolute((x.into(), y.into()))],
         }
     }
 
@@ -98,6 +107,20 @@ impl SvgPathShape {
         self
     }
 
+    pub fn arc_to_relative<C: Into<Coordinate>>(mut self,
+                                                radius_x: C, radius_y: C, x_axis_rotation: C, large_arc_flag: C,
+                                                sweep_flag: C,
+                                                dx: C,
+                                                dy: C) -> Self {
+        self.elements
+            .push(SvgPathElement::ArcRelative((radius_x.into(), radius_y.into(),
+                                               x_axis_rotation.into(), large_arc_flag.into(),
+                                               sweep_flag.into(),
+                                               dx.into(), dy.into()
+            )));
+        self
+    }
+
     pub fn move_to_absolute<C: Into<Coordinate>>(mut self, x: C, y: C) -> Self {
         self.elements
             .push(SvgPathElement::MoveAbsolute((x.into(), y.into())));
@@ -107,6 +130,17 @@ impl SvgPathShape {
     pub fn move_to_relative(mut self, x: Coordinate, y: Coordinate) -> Self {
         self.elements.push(SvgPathElement::MoveRelative((x, y)));
         self
+    }
+
+    pub fn circle_absolute<C: Into<Coordinate>>(self, center_x: C, center_y: C, radius: C) -> Self {
+        let radius = radius.into();
+        // https://www.smashingmagazine.com/2019/03/svg-circle-decomposition-paths/
+        //       M (CX - R), CY
+        //       a R,R 0 1,0 (R * 2),0
+        //       a R,R 0 1,0 -(R * 2),0
+        self.move_to_absolute(center_x.into() - radius, center_y.into())
+            .arc_to_relative(radius, radius, 0., 1., 0., radius * 2., 0.)
+            .arc_to_relative(radius, radius, 0., 1., 0., -radius * 2., 0.)
     }
 
     pub fn close(mut self) -> Self {
@@ -143,6 +177,12 @@ impl SvgPathShape {
                 SvgPathElement::LineRelative((x, y)) => {
                     writer
                         .write_all(format!("l {} {}", x, y).as_bytes())
+                        .unwrap();
+                }
+                SvgPathElement::ArcRelative((rx, ry, x_rot, a_flag, s_flag, dx, dy)) => {
+                    // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
+                    writer
+                        .write_all(format!("a {} {} {} {} {} {} {}", rx, ry, x_rot, a_flag, s_flag, dx, dy).as_bytes())
                         .unwrap();
                 }
                 SvgPathElement::Close => {

@@ -75,8 +75,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     hasher.consume(&hash_str);
                 }
             }
-            let hash: [u8; 16] = hasher.compute();
-            hash
+            hasher.compute()
         };
 
         if let Some(triplet_value) = first_triplet(&current_hash) {

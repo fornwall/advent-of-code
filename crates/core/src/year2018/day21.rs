@@ -26,8 +26,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         // Since this is the only place in the program where register 0 is referenced, we can
         // set register 0 to the value it's first compared with here to exit as soon as possible.
 
-        #[cfg(feature = "debug-output")]
-        program.pretty_print("Initial program");
         let mut loop_count = 0;
         while program.instruction_pointer()? != 29 {
             program.execute_one_instruction()?;

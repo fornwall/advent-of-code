@@ -10,11 +10,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
     program.registers.values[0] = 1;
 
-    #[cfg(feature = "debug-output")]
-    program.pretty_print("Initial");
     program.optimize();
-    #[cfg(feature = "debug-output")]
-    program.pretty_print("Optimized");
 
     if program.instructions.len() < 3 {
         return Err("Too few instructions".to_string());

@@ -83,17 +83,16 @@ impl Crates {
     }
 
     fn top_crates(&self) -> String {
-        let mut result = String::with_capacity(Self::MAX_STACKS);
-        for stack_idx in 0..Self::MAX_STACKS {
-            let stack_size = self.stack_sizes[stack_idx];
-            if stack_size > 0 {
-                result.push(
+        self.stack_sizes
+            .iter()
+            .enumerate()
+            .filter_map(|(stack_idx, &stack_size)| {
+                (stack_size > 0).then(|| {
                     self.stacks[stack_idx * Self::MAX_STACK_SIZE + usize::from(stack_size - 1)]
-                        as char,
-                );
-            }
-        }
-        result
+                        as char
+                })
+            })
+            .collect::<String>()
     }
 }
 

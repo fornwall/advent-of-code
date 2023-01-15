@@ -44,7 +44,6 @@ visualizerWorker.onmessage = (message) => {
     ).innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}</h1>`;
 
     async function onClick() {
-      console.log("onClick....");
       document.getElementById("spinner").remove();
       document.documentElement.removeEventListener("click", onClick);
       rendering.innerHTML = message.data.answer;
@@ -56,7 +55,19 @@ visualizerWorker.onmessage = (message) => {
 
       rendering.children[0].setAttribute("width", "100%");
       rendering.children[0].setAttribute("height", "100%");
-      rendering.querySelectorAll("script").forEach((e) => eval(e.textContent));
+      rendering.querySelectorAll("script").forEach((el) => {
+        try {
+            eval(el.textContent);
+        } catch (e) {
+            console.error('Error evaluating script: ' + e.message, el.textContent);
+            window.alert('Error in script - see console logs');
+        }
+      })
+
+      svg.addEventListener("click", () => {
+        console.log('Rendering clicked');
+        togglePause();
+      });
 
       show.style.display = "block";
       togglePause();
@@ -124,13 +135,10 @@ document.body.addEventListener("keyup", async (e) => {
 });
 
 function togglePause() {
-  console.log("Start of togglePause..");
   if (playInterval) {
-    console.log("Clearing interval...");
     clearInterval(playInterval);
     playInterval = null;
   } else {
-    console.log("Starting interval...");
     playInterval = setInterval(() => {
       if (progress.value == progress.max) {
         togglePause();

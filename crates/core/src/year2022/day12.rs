@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 #[cfg(feature = "visualization")]
-use svgplot::{SvgColor, SvgImage, SvgPath, SvgPathShape, SvgScript};
+use svgplot::{SvgColor, SvgImage, SvgPath, SvgShape, SvgScript};
 
 use crate::input::Input;
 
@@ -85,19 +85,21 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let (mut start_pos, destination_pos, mut graph) = Graph::parse(input.text)?;
 
     #[cfg(feature = "visualization")]
-    let mut svg = SvgImage::new()
+        let mut svg = SvgImage::new()
         .view_box((0, 0, graph.width as i64, graph.height as i64))
         .style("--step: 0");
     #[cfg(feature = "visualization")]
-    let mut current_render_step = 0;
+        let mut current_render_step = 0;
     #[cfg(feature = "visualization")]
-    let mut render_script = String::from("const pathsPerStep = ['");
+        let mut circles_render_script = String::from("const circlesPerStep = ['");
+    #[cfg(feature = "visualization")]
+        let mut path_render_script = String::from("const pathsPerStep = ['");
 
     #[cfg(feature = "visualization")]
     {
         for draw_height in 0..26 {
-            let mut shape = SvgPathShape::new();
-            let brightness = 17. + 0.83 * (draw_height as f64 / 0.25);
+            let mut shape = SvgShape::new();
+            let brightness = 7. + 0.83 * (draw_height as f64 / 0.25);
             for x in 0..graph.width {
                 for y in 0..graph.height {
                     let height = graph.height_at(x, y);
@@ -125,7 +127,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             y: start_pos.1 as svgplot::Coordinate,
             width: 1.,
             height: 1.,
-            fill: Some(SvgColor::Rgb(0, 0xFF, 0)),
+            fill: Some(SvgColor::Rgb(input.part_values(0, 0xff), input.part_values(0xFF, 0), 0)),
             title: Some(format!(
                 "Starting position - elevation {}",
                 graph.height_at(start_pos.0, start_pos.1)
@@ -137,7 +139,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             y: destination_pos.1 as svgplot::Coordinate,
             width: 1.,
             height: 1.,
-            fill: Some(SvgColor::Rgb(0xFF, 0, 0)),
+            fill: Some(SvgColor::Rgb(input.part_values(0xff, 0), input.part_values(0, 0xff), 0)),
             title: Some(format!(
                 "Destination - elevation {}",
                 graph.height_at(destination_pos.0, destination_pos.1)
@@ -167,11 +169,16 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 #[cfg(feature = "visualization")]
                 {
                     if new_cost != current_render_step {
-                        render_script.push_str("', '");
+                        path_render_script.push_str("', '");
+                        circles_render_script.push_str("', '");
                         current_render_step = new_cost;
                     }
-                    render_script.push_str(
-                        &SvgPathShape::at(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5)
+                    let circle_radius = 0.3;
+                    circles_render_script.push_str(&SvgShape::new()
+                        .circle_absolute(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5, circle_radius)
+                        .data_string());
+                    path_render_script.push_str(
+                        &SvgShape::at(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5)
                             .line_to_relative(-dx as f64, -dy as f64)
                             .data_string(),
                     );
@@ -180,17 +187,23 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 if at_goal {
                     #[cfg(feature = "visualization")]
                     {
-                        let shapes_id = svg.add_with_id(
+                        let visited_path_id = svg.add_with_id(
                             SvgPath::default()
-                                .stroke(SvgColor::Rgb(0xff, 0xc1, 0x07))
+                                .stroke(SvgColor::Rgb(0xdf, 0xa1, 0x05))
                                 .stroke_width(0.1),
                         );
+                        let circles_path_id = svg.add_with_id(
+                            SvgPath::default()
+                                .fill(SvgColor::Rgb(0xdf, 0xa1, 0x05))
+                        );
 
-                        render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
-                                                              const pathData = pathsPerStep.slice(0, step+1).join('');\n\
+                        circles_render_script.push_str("'];");
+                        path_render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
+                                                              document.getElementById('{}').setAttribute('d', circlesPerStep[step]);\n\
+                                                              const pathData = pathsPerStep.slice(0, step).join('');\n\
                                                               document.getElementById('{}').setAttribute('d', pathData);\n\
-                                                             }}", shapes_id));
-                        svg.add(SvgScript::new(render_script));
+                                                             }}", circles_path_id, visited_path_id));
+                        svg.add(SvgScript::new(format!("{}{}", circles_render_script, path_render_script)));
                         input.rendered_svg.replace(
                             svg.data_attribute("steps".to_string(), format!("{}", new_cost))
                                 .to_svg_string(),
