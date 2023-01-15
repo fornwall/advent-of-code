@@ -12,7 +12,7 @@ For learning and demonstration purposes, this repository contains additional res
   - No unsafe code.
 - [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [Tonic](https://docs.rs/tonic).
   - Deployed to [fly.io](https://fly.io/).
-- [crates/http-server](crates/http-server): Server with a HTTP API using [warp](https://github.com/seanmonstar/warp).
+- [crates/http-server](crates/http-server): Server with a HTTP API using [axum](https://docs.rs/axum/latest/axum/).
   - Deployed to [fly.io](https://fly.io/).
   - API is described by a [OpenAPI](https://www.openapis.org/) interface at [aoc.fornwall.net/api/](https://aoc.fornwall.net/api/).
 - [crates/fuzzing-afl](crates/fuzzing-afl): Fuzzing using [afl](https://lcamtuf.coredump.cx/afl/).

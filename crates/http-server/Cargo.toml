@@ -4,7 +4,7 @@ categories = ["algorithms", "rust-patterns"]
 description = "Solutions to Advent of Code written in Rust"
 edition.workspace = true
 homepage.workspace = true
-keywords = ["advent-of-code", "rust", "warp"]
+keywords = ["advent-of-code", "rust", "axum"]
 license.workspace = true
 name = "advent-of-code-server"
 readme = "README.md"
@@ -15,4 +15,4 @@ version.workspace = true
 [dependencies]
 advent-of-code = { path = "../core" }
 tokio = { version = "*", features = ["full"] }
-warp = { version = "*", default-features = false }
+axum = { version = "*" }

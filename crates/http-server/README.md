@@ -4,7 +4,7 @@
 
 A HTTP server exposing an API to solve [Advent of Code](https://adventofcode.com/) problems.
 
-Solutions are implemented in Rust in the [core crate](https://github.com/fornwall/advent-of-code/tree/master/crates/core) and this crate uses the [warp](https://github.com/seanmonstar/warp/) library to expose them over a HTTP API.
+Solutions are implemented in Rust in the [core crate](https://github.com/fornwall/advent-of-code/tree/master/crates/core) and this crate uses the [axum](https://docs.rs/axum/latest/axum/) library to expose them over a HTTP API.
 
 - Deployment URL: `https://advent.fly.dev`
 - API schema: [https://aoc.fornwall.net/api/](https://aoc.fornwall.net/api/)

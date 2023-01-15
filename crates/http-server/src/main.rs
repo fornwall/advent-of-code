@@ -1,62 +1,62 @@
+use axum::{
+    body::{Bytes, Full},
+    extract::Path,
+    http::StatusCode,
+    response::Response,
+    routing::{get, post},
+    Router,
+};
+use std::collections::HashMap;
+
 use advent_of_code::solve_raw;
-use std::convert::Infallible;
-use warp::Filter;
 
 #[tokio::main]
 async fn main() {
-    #![allow(clippy::expect_used)]
+    #![allow(clippy::unwrap_used)]
 
-    let port = 8080;
+    let app = Router::new()
+        .route("/", get(handle_get))
+        .route("/solve/:year/:day/:part", post(handle_post));
 
-    let cors = warp::cors()
-        .allow_any_origin()
-        .allow_methods(vec!["GET", "POST"]);
-
-    let post_input_route = warp::path!("solve" / String / String / String)
-        .and(warp::body::bytes())
-        .and_then(handle_post);
-
-    let get_all_route = warp::any().and_then(handle_get);
-
-    let routes = post_input_route.or(get_all_route).with(cors);
-
-    println!("Running on port {}", port);
-    warp::serve(routes).run(([0, 0, 0, 0], port)).await;
+    println!("Running on port 8080");
+    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
-async fn handle_get() -> Result<impl warp::Reply, Infallible> {
-    Ok(warp::http::response::Response::builder()
+async fn handle_get() -> Response<Full<Bytes>> {
+    #![allow(clippy::unwrap_used)]
+    Response::builder()
+        .status(StatusCode::OK)
         .header("content-type", "text/html")
-        .status(warp::http::StatusCode::OK)
-        .body("<h1>Advent of Code API</h1>\n\
-              <p>Check the <a href='https://aoc.fornwall.net/api/openapi.json'>OpenAPI document</a>.</p>"))
+        .body(Full::from(
+            "<h1>Advent of Code API</h1>\n\
+              <p>Check the <a href='https://aoc.fornwall.net/api/openapi.json'>OpenAPI document</a>.</p>"
+        ))
+        .unwrap()
 }
 
 async fn handle_post(
-    year: String,
-    day: String,
-    part: String,
-    body: warp::hyper::body::Bytes,
-) -> Result<impl warp::Reply, Infallible> {
-    let response = warp::http::response::Response::builder()
-        .header("content-type", "text/plain; charset=utf-8 ")
-        .header("cache-control", "no-cache");
-    Ok(if let Ok(input) = std::str::from_utf8(body.as_ref()) {
-        match solve_raw(&year, &day, &part, input) {
-            Ok(solution) => response
-                .status(warp::http::StatusCode::OK)
-                .header("content-length", solution.len())
-                .body(solution),
-            Err(error) => response
-                .header("content-length", error.len())
-                .status(warp::http::StatusCode::BAD_REQUEST)
-                .body(error),
-        }
-    } else {
-        let message = "Invalid utf-8".to_string();
-        response
-            .status(warp::http::StatusCode::BAD_REQUEST)
-            .header("content-length", message.len())
-            .body("Invalid utf-8".to_string())
-    })
+    Path(params): Path<HashMap<String, String>>,
+    body: String,
+) -> Response<Full<Bytes>> {
+    #![allow(clippy::unwrap_used)]
+    let year = params.get("year").unwrap();
+    let day = params.get("day").unwrap();
+    let part = params.get("part").unwrap();
+    match solve_raw(year, day, part, &body) {
+        Ok(solution) => Response::builder()
+            .status(StatusCode::OK)
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Content-Type", "text/plain")
+            .body(Full::from(solution))
+            .unwrap(),
+        Err(error) => Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .header("Access-Control-Allow-Origin", "*")
+            .header("content-type", "text/plain")
+            .body(Full::from(error))
+            .unwrap(),
+    }
 }
