@@ -187,11 +187,11 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     {
                         let visited_path_id = svg.add_with_id(
                             SvgPath::default()
-                                .stroke(SvgColor::Rgb(0xdf, 0xa1, 0x05))
+                                .stroke(SvgColor::Rgb(0xff, 0, 0))
                                 .stroke_width(0.1),
                         );
-                        let circles_path_id = svg
-                            .add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xdf, 0xa1, 0x05)));
+                        let circles_path_id =
+                            svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xff, 0, 0)));
 
                         circles_render_script.push_str("'];");
                         path_render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
