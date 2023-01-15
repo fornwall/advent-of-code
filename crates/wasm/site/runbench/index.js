@@ -70,7 +70,7 @@ async function main() {
           const tr = document.createElement("tr");
           const percentageTime = (data.executionTime * 100) / totalTime;
           let link = `https://adventofcode.com/${data.year}/day/${data.day}`;
-          if (data.part == 2) link += '#part2';
+          if (data.part == 2) link += "#part2";
           tr.innerHTML = `<td class="text-end"><a href="${link}">${data.day}-${
             data.part
           }</a></td><td class="text-end">${data.executionTime.toFixed(

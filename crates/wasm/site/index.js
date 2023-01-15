@@ -255,7 +255,7 @@ window.addEventListener("pageshow", () => {
 
 document.getElementById("open-problem").addEventListener("click", () => {
   let link = `https://adventofcode.com/${yearElement.value}/day/${dayElement.value}`;
-  if (partElement.value == 2) link += '#part2';
+  if (partElement.value == 2) link += "#part2";
   window.open(link);
 });
 
