@@ -9,12 +9,9 @@ export default {
   },
   output: {
     publicPath: "/",
-    filename: function (pathData) {
-      if (pathData.chunk.name === "visualizer") {
-        return "show/[name].[contenthash].js";
-      }
-      return "[name]/[name].[contenthash].js";
-    },
+    assetModuleFilename: "asset-[name]-[contenthash][ext]",
+    filename: "bundle-[name]-[contenthash].js",
+    chunkFilename: 'chunk-[name]-[contenthash].js',
   },
   devServer: {
     static: ".",
