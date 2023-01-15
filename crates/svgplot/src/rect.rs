@@ -1,4 +1,4 @@
-use crate::escape::escape_text;
+use crate::escape::escape_xml;
 use crate::{Coordinate, SvgColor, SvgElement, SvgId};
 use std::io::Write;
 
@@ -41,7 +41,7 @@ impl Rect {
         }
         if let Some(title) = &self.title {
             buffer
-                .write_all(format!("><title>{}</title></rect>", escape_text(title)).as_bytes())
+                .write_all(format!("><title>{}</title></rect>", escape_xml(title)).as_bytes())
                 .unwrap();
         } else {
             buffer.write_all(b"/>\n").unwrap();

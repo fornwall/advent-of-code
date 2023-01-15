@@ -1,4 +1,4 @@
-use crate::escape::escape_text;
+use crate::escape::escape_xml;
 use crate::{SvgElement, SvgId};
 use std::io::Write;
 
@@ -24,7 +24,7 @@ impl SvgScript {
             id.write(writer);
         }
         writer
-            .write_all(format!(">{}</script>\n", escape_text(&self.script)).as_bytes())
+            .write_all(format!(">{}</script>\n", escape_xml(&self.script)).as_bytes())
             .unwrap();
     }
 }

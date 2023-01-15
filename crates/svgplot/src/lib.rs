@@ -1,5 +1,6 @@
 use std::io::Write;
 
+use crate::escape::escape_xml;
 pub use circle::*;
 pub use color::*;
 use common_attributes::*;
@@ -102,9 +103,10 @@ impl SvgImage {
             buffer.write_all(s.as_bytes()).unwrap();
         }
         for (name, value) in &self.data_attributes {
-            // TODO: Escape
             buffer
-                .write_all(format!("data-{}=\"{}\"", name, value).as_bytes())
+                .write_all(
+                    format!("data-{}=\"{}\"", escape_xml(name), escape_xml(value)).as_bytes(),
+                )
                 .unwrap();
         }
         self.common_attributes.write(&mut buffer);

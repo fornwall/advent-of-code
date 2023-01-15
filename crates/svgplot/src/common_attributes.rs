@@ -14,9 +14,8 @@ impl CommonAttributes {
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
         #![allow(clippy::unwrap_used)]
         if let Some(style) = &self.style {
-            // TODO: Escape
             writer
-                .write_all(format!(" style=\"{}\"", style).as_bytes())
+                .write_all(format!(" style=\"{}\"", escape_xml(style)).as_bytes())
                 .unwrap();
         }
     }
@@ -33,4 +32,5 @@ macro_rules! define_element {
     };
 }
 
+use crate::escape::escape_xml;
 pub(crate) use define_element;
