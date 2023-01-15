@@ -57,15 +57,18 @@ visualizerWorker.onmessage = (message) => {
       rendering.children[0].setAttribute("height", "100%");
       rendering.querySelectorAll("script").forEach((el) => {
         try {
-            eval(el.textContent);
+          eval(el.textContent);
         } catch (e) {
-            console.error('Error evaluating script: ' + e.message, el.textContent);
-            window.alert('Error in script - see console logs');
+          console.error(
+            "Error evaluating script: " + e.message,
+            el.textContent
+          );
+          window.alert("Error in script - see console logs");
         }
-      })
+      });
 
       svg.addEventListener("click", () => {
-        console.log('Rendering clicked');
+        console.log("Rendering clicked");
         togglePause();
       });
 
