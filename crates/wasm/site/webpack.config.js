@@ -11,7 +11,7 @@ export default {
     publicPath: "/",
     assetModuleFilename: "asset-[name]-[contenthash][ext]",
     filename: "bundle-[name]-[contenthash].js",
-    chunkFilename: 'chunk-[name]-[contenthash].js',
+    chunkFilename: "chunk-[name]-[contenthash].js",
   },
   devServer: {
     static: ".",
