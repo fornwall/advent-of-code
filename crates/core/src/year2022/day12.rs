@@ -35,6 +35,9 @@ impl Graph {
                     destination_pos = (x, y);
                     b'z'
                 } else {
+                    if !val.is_ascii_lowercase() {
+                        return Err("Strange character in input".to_string());
+                    }
                     val
                 } - b'a';
             }
