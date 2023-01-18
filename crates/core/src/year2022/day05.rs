@@ -92,7 +92,10 @@ impl Crates {
                         as char
                 })
             })
-            .collect::<String>()
+            .fold(String::with_capacity(Self::MAX_STACKS), |mut acc, x| {
+                acc.push(x);
+                acc
+            })
     }
 }
 
