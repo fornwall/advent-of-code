@@ -86,7 +86,7 @@ def create_compiler_explorer_link(year, day, src, link_id=None):
                 "id": 1,
                 "language": "rust",
                 "source": src,
-                "compilers": [{ "id": "beta", "options": "-C opt-level=2" }],
+                "compilers": [{ "id": "beta", "options": "--edition=2021 -C opt-level=2" }],
         }]
     }
     response = requests.post('https://godbolt.org/api/shortener', json=client_state)
@@ -192,12 +192,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         if 'compiler_explorer' in gist_mapping[year_str][day_str]:
             existing_id = gist_mapping[year_str][day_str]['compiler_explorer']
             existing_code = requests.get(f'https://godbolt.org/z/{existing_id}/code/1').text
-            if existing_code == src:
-                print("Compiler explorer up to date - not modifying")
-            else:
-                print("Source has changed - updating compiler explorer")
-                print("PREVIOUS SOURCE: " + str(existing_code))
-                print("BUT CURRENT SOURCE: " + str(src))
+            if existing_code != src:
                 del gist_mapping[year_str][day_str]['compiler_explorer']
         if not 'compiler_explorer' in gist_mapping[year_str][day_str]:
             gist_mapping[year_str][day_str]['compiler_explorer'] = create_compiler_explorer_link(year, day, src)
