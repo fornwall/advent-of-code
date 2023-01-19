@@ -29,14 +29,34 @@
       }
 
       #show {
+        display: flex;
+        flex-direction: column;
         width: 100%;
+        margin-left: auto;
+        margin-right: auto;
         text-align: center;
       }
 
-      #progress {
+      #rendering,
+      svg {
+        max-height: calc(100vh - 5em);
+      }
+
+      #inputs {
+        height: 1em;
         width: calc(100% - 10px);
+        display: flex;
         margin: 0;
-        background: #efefef;
+      }
+
+      #progress {
+        flex-grow: 100;
+        vertical-align: middle;
+      }
+
+      #stepDisplay {
+        vertical-align: middle;
+        user-select: none;
       }
 
       input:focus {
@@ -60,12 +80,22 @@
   </head>
 
   <body>
-    <div id="show" style="display: none; vertical-align: middle">
-      <input type="range" min="0" max="100" id="progress" value="0" autofocus />
-      <p id="stepDisplay" style="vertical-align: middle; user-select: none">
-        &nbsp;
+    <div id="show" style="display: none">
+      <p id="inputs">
+        <input type="button" value="⏵" id="playpause" />
+        <input
+          type="range"
+          min="0"
+          max="100"
+          id="progress"
+          value="0"
+          autofocus
+        />
       </p>
-      <div id="rendering"></div>
+      <p id="stepDisplay">&nbsp;</p>
+      <div id="rendering">
+        <!-- <svg/> -->
+      </div>
     </div>
     <div
       style="
@@ -77,13 +107,6 @@
         position: fixed;
       "
       id="spinner"
-    >
-      <img
-        id="spinnerImage"
-        alt="Loading…"
-        src="/static/spinner.svg"
-        style="z-index: 100; max-width: 100%; max-height: 100%"
-      />
-    </div>
+    ></div>
   </body>
 </html>
