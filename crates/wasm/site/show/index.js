@@ -9,8 +9,10 @@ const visualizerWorker = new Worker(
   }
 );
 
+const spinner = document.getElementById("spinner");
 const rendering = document.getElementById("rendering");
 const progress = document.getElementById("progress");
+const playPause = document.getElementById("playpause");
 const show = document.getElementById("show");
 const stepDisplay = document.getElementById("stepDisplay");
 let svg = null;
@@ -21,16 +23,10 @@ const state = {
   audioPlayer: new AudioPlayer("bounce.mp4", "pop.mp4"),
 };
 
-const hash = location.hash.substring(1);
-for (const part of hash.split("&")) {
-  const [key, value] = part.split("=");
-  state.params[key] = decodeURIComponent(value);
-}
-
 visualizerWorker.onmessage = (message) => {
   if ("errorMessage" in message.data) {
-    window.alert(message.data.errorMessage);
-    window.location = "..";
+    console.error("Input error:", message.data.errorMessage);
+    spinner.innerHTML = `<h1 style="text-align: center;">Input error: ${message.data.errorMessage}</h1>`;
   } else if (message.data.done) {
     console.log(
       "SVG size: " +
@@ -39,12 +35,10 @@ visualizerWorker.onmessage = (message) => {
     );
 
     const { year, day, part } = state.params;
-    document.getElementById(
-      "spinner"
-    ).innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}</h1>`;
+    spinner.innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}</h1>`;
 
     async function onClick() {
-      document.getElementById("spinner").remove();
+      spinner.style.display = "none";
       document.documentElement.removeEventListener("click", onClick);
       rendering.innerHTML = message.data.answer;
 
@@ -53,8 +47,8 @@ visualizerWorker.onmessage = (message) => {
 
       progress.max = svg.dataset.steps;
 
-      rendering.children[0].setAttribute("width", "100%");
-      rendering.children[0].setAttribute("height", "100%");
+      //rendering.children[0].setAttribute("width", "100%");
+      //rendering.children[0].setAttribute("height", "100%");
       rendering.querySelectorAll("script").forEach((el) => {
         try {
           eval(el.textContent);
@@ -68,11 +62,18 @@ visualizerWorker.onmessage = (message) => {
       });
 
       rendering.addEventListener("click", () => {
-        console.log("Rendering clicked");
         togglePause();
       });
 
-      show.style.display = "block";
+      playPause.addEventListener("click", () => {
+        togglePause();
+      });
+
+      rendering.addEventListener("dblclick", () => {
+        toggleFullScreen();
+      });
+
+      show.style.display = "flex";
       togglePause();
       await toggleFullScreen();
     }
@@ -81,9 +82,10 @@ visualizerWorker.onmessage = (message) => {
 };
 
 async function toggleFullScreen() {
+  return;
   if (document.fullscreenElement) {
     // Do nothing.
-    // document.exitFullscreen();
+    document.exitFullscreen();
   } else {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
@@ -117,37 +119,59 @@ function downloadImage() {
   a.click();
 }
 
-document.body.addEventListener("keyup", async (e) => {
+document.body.addEventListener("keydown", async (e) => {
+  const multiplier = e.shiftKey || e.altKey || e.metaKey ? 10 : 1;
   switch (e.key) {
+    case "ArrowLeft":
+      if (playInterval) togglePause();
+      changeCurrentValue(-1 * multiplier);
+      break;
+    case "ArrowRight":
+      if (playInterval) togglePause();
+      changeCurrentValue(1 * multiplier);
+      break;
     case "f":
-    case "Enter":
       await toggleFullScreen();
       break;
-    case "d": // Download.
+    case "d":
       downloadImage();
       break;
-    case "p": // Pause.
+    case "Enter":
+    case "p":
     case " ":
       togglePause();
       break;
-    case "r": // Restart.
-      progress.value = 0;
+    case "r":
+      setCurrentStep(0);
       if (!playInterval) togglePause();
       break;
   }
 });
 
+function setCurrentStep(value) {
+  progress.value = value;
+  progress.dispatchEvent(new Event("input"));
+}
+
+function changeCurrentValue(change) {
+  setCurrentStep(parseInt(progress.value) + change);
+}
+
 function togglePause() {
   if (playInterval) {
+    playPause.value = "⏵";
     clearInterval(playInterval);
     playInterval = null;
   } else {
+    if (progress.value == progress.max) {
+      progress.value = 0;
+    }
+    playPause.value = "⏸";
     playInterval = setInterval(() => {
       if (progress.value == progress.max) {
         togglePause();
       } else {
-        progress.value = parseInt(progress.value) + 1;
-        progress.dispatchEvent(new Event("input"));
+        changeCurrentValue(1);
       }
     }, 50);
   }
@@ -169,9 +193,67 @@ progress.addEventListener("touchstart", () => {
   if (playInterval) togglePause();
 });
 
-function sendMessageToWorker() {
+document.documentElement.ondragover = (dragOverEvent) => {
+  dragOverEvent.preventDefault();
+  dragOverEvent.dataTransfer.dropEffect = Array.from(
+    dragOverEvent.dataTransfer.items
+  ).some((item) => item.type.match("^text/plain"))
+    ? "copy"
+    : "none";
+};
+
+document.documentElement.ondrop = async (dropEvent) => {
+  dropEvent.preventDefault();
+  for (const item of dropEvent.dataTransfer.items) {
+    if (item.kind == "string" && item.type.match("^text/plain")) {
+      item.getAsString((s) => sendMessageToWorker(s));
+    } else if (item.kind == "file" && item.type.match("^text/plain")) {
+      sendMessageToWorker(await item.getAsFile().text());
+    }
+  }
+};
+
+function revertDisplay() {
+  rendering.innerHTML = "";
+  progress.value = 0;
+  show.style.display = "none";
+  spinner.style.display = "flex";
+  spinner.innerHTML = `<img
+        id="spinnerImage"
+        alt="Loading…"
+        src="/static/spinner.svg"
+        style="z-index: 100; max-width: 100%; max-height: 100%"
+      />`;
+}
+
+function sendMessageToWorker(newInput) {
+  if (newInput) {
+    if (playInterval) togglePause();
+    state.params.input = newInput;
+    revertDisplay();
+  }
   const { year, day, part, input } = state.params;
   visualizerWorker.postMessage({ year, day, part, input });
 }
 
-sendMessageToWorker();
+async function onLoad() {
+  revertDisplay();
+  const hash = location.hash.substring(1);
+  for (const part of hash.split("&")) {
+    const [key, value] = part.split("=");
+    state.params[key] = decodeURIComponent(value);
+  }
+
+  if (!state.params["input"]) {
+    console.log("fetching");
+    const tests = await (
+      await fetch("https://fornwall.net/aoc/tests.json")
+    ).json();
+    state.params["input"] = tests.years
+      .find((y) => y.year == state.params["year"])
+      .days.find((d) => d.day == state.params["day"])["input"];
+  }
+  sendMessageToWorker();
+}
+
+onLoad();

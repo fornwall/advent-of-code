@@ -270,6 +270,10 @@ jobs:
       working-directory: crates/wasm/site
       env:
         GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
+    - name: Setup git for commit
+      run: |
+        git config --global user.name 'Gist Mapping Updater'
+        git config --global user.email 'gist-mapping-updater@users.noreply.github.com'
     - name: Commit and push gist mapping if updated
       run: git commit -m 'Update gist-mapping' && git push
     - name: Upload new gist-mapping.json
