@@ -13,7 +13,6 @@ MAPPING_FILE_NAME = "gist-mapping.json"
 
 dry_run = bool(os.environ.get("DRY_RUN"))
 
-
 def add_header(src, year, day):
     link_to_file = f"https://github.com/fornwall/advent-of-code/tree/master/crates/core/src/year{year}/day{str(day).rjust(2, '0')}.rs"
     header = f"// Solution to Advent of Code {year}, day {day}: https://adventofcode.com/{year}/day/{day}"
@@ -72,15 +71,35 @@ def replace_include_str(dirpath, src):
 
     return re.sub(r'include_str!\("(.*?)"\)', replace, src)
 
+def get_gist(gist_id):
+    API_TOKEN = os.environ["GIST_API_TOKEN"]
+    get_response = requests.get(f"https://api.github.com/gists/{gist_id}", headers={
+        "authorization": f"token {API_TOKEN}",
+        "accept": "application/vnd.github.v3+json",
+        "content-type": "application/json",
+    })
+    return get_response.json()
+
+def create_compiler_explorer_link(year, day, src, link_id=None):
+    client_state = {
+        "sessions": [{
+                "id": 1,
+                "language": "rust",
+                "source": src,
+                "compilers": [{ "id": "beta", "options": "-C opt-level=2" }],
+        }]
+    }
+    response = requests.post('https://godbolt.org/api/shortener', json=client_state)
+    return response.json()['url'].split('/')[-1]
 
 def set_gist(year, day, src, gist_id=None):
     API_TOKEN = os.environ["GIST_API_TOKEN"]
 
     file_name = f"year{year}_day{day}.rs"
     headers = {
-        "Authorization": f"token {API_TOKEN}",
+        "authorization": f"token {API_TOKEN}",
         "accept": "application/vnd.github.v3+json",
-        "Content-Type": "application/json",
+        "content-type": "application/json",
     }
 
     if gist_id:
@@ -104,7 +123,7 @@ def set_gist(year, day, src, gist_id=None):
         payload["public"] = False
 
     response = requests.request(gist_method, GIST_API, headers=headers, json=payload)
-    return response.json()["id"]
+    return response.json()
 
 
 with open(MAPPING_FILE_NAME, "r") as infile:
@@ -156,12 +175,32 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
             if dry_run:
                 print("Would create new!")
             else:
-                new_id = set_gist(year, day, src)
+                response_json = set_gist(year, day, src)
+                new_id = response_json['id']
+                raw_url = list(response_json['files'].values())[0]['raw_url']
                 if year_str not in gist_mapping:
                     gist_mapping[year_str] = {}
                 if day_str not in gist_mapping[year_str]:
                     gist_mapping[year_str][day_str] = {}
                 gist_mapping[year_str][day_str]['gist'] = new_id
+                gist_mapping[year_str][day_str]['raw_url'] = raw_url
+
+        if not 'raw_url' in gist_mapping[year_str][day_str]:
+            response_json = get_gist(gist_mapping[year_str][day_str]['gist'])
+            gist_mapping[year_str][day_str]['raw_url'] = list(response_json['files'].values())[0]['raw_url']
+
+        if 'compiler_explorer' in gist_mapping[year_str][day_str]:
+            existing_id = gist_mapping[year_str][day_str]['compiler_explorer']
+            existing_code = requests.get(f'https://godbolt.org/z/{existing_id}/code/1').text
+            if existing_code == src:
+                print("Compiler explorer up to date - not modifying")
+            else:
+                print("Source has changed - updating compiler explorer")
+                print("PREVIOUS SOURCE: " + str(existing_code))
+                print("BUT CURRENT SOURCE: " + str(src))
+                del gist_mapping[year_str][day_str]['compiler_explorer']
+        if not 'compiler_explorer' in gist_mapping[year_str][day_str]:
+            gist_mapping[year_str][day_str]['compiler_explorer'] = create_compiler_explorer_link(year, day, src)
 
         gist_mapping[year_str][day_str]['visualization'] = supports_visualization
 

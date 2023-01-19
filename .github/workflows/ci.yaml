@@ -270,6 +270,8 @@ jobs:
       working-directory: crates/wasm/site
       env:
         GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
+    - name: Commit and push gist mapping if updated
+      run: git commit -m 'Update gist-mapping' && git push
     - name: Upload new gist-mapping.json
       uses: actions/upload-artifact@v3
       with:
