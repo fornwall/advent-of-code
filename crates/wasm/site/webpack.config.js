@@ -6,6 +6,7 @@ export default {
     home: "./index.js",
     runbench: "./runbench/index.js",
     show: "./show/index.js",
+    code: "./code/index.js",
   },
   output: {
     publicPath: "/",
@@ -25,23 +26,21 @@ export default {
       filename: "index.html",
       template: "index.html",
       chunks: ["home"],
-      metadata: {
-        baseUrl: "/",
-      },
     }),
     new HtmlWebpackPlugin({
       filename: "show/index.html",
       template: "show/index.html",
       chunks: ["show"],
-      publicPath: "/",
-      metadata: {
-        baseUrl: "/show/",
-      },
     }),
     new HtmlWebpackPlugin({
       filename: "runbench/index.html",
       template: "runbench/index.html",
       chunks: ["runbench"],
+    }),
+    new HtmlWebpackPlugin({
+      filename: "code/index.html",
+      template: "code/index.html",
+      chunks: ["code"],
     }),
     new CopyWebpackPlugin({
       patterns: [{ from: "static", to: "static" }],

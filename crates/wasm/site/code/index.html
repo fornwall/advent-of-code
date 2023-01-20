@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"
+      integrity="sha512-R/HpMlNfZZV6DxMhNz1dYJbBaPBVSOCqX8imo3uGUurhPDHRcXrBxkEVOjawwUwTMfOqT6t1eLYYQXIjFWCX/A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nasm.min.js"
+      integrity="sha512-WLcCgsIheTle+9+48wuKvCUL/JG6VlUGti8iSxFx66ZY5Jzn6c0qODd3Ng9yUHDlDnIcGXd52/aWc3/WhY15yQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+      integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <meta charset="utf-8" />
+    <title>Advent of Code Visualizer</title>
+    <meta
+      name="description"
+      content="A visualizer of Advent of Code problems"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/favicon_1.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-vsc-dark-plus.min.css"
+      integrity="sha512-ML8rkwYTFNcblPFx+VLgFIT2boa6f8DDP6p6go4+FT0/mJ8DCbCgi6S0UdjtzB3hKCr1zhU+YVB0AHhIloZP8Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      html {
+        background: #0d0c1a;
+        font-family: sans-serif;
+        color: white;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body class="line-numbers">
+    <a href="" id="compilerExplorerLink">Open in Compiler Explorer</a>
+    <h1>Assembly</h1>
+    <div>
+      <pre><code class="language-nasm" id="assembly"></code></pre>
+    </div>
+    <h1>Source</h1>
+    <div>
+      <pre><code class="language-rust" id="code"></code></pre>
+    </div>
+  </body>
+</html>

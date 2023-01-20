@@ -1,3 +1,6 @@
+#[cfg(feature = "visualization")]
+use svgplot::{SvgColor, SvgImage, SvgPath, SvgScript};
+
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
@@ -17,17 +20,17 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     ];
 
     const RULES: [(i16, (i16, i16)); 4] = [
-        // "If there is no Elf in the N, NE, or NW adjacent positions, the Elf proposes moving north one step."
+        // "If there is no elf in the n, ne, or nw adjacent positions, the elf proposes moving north one step."
         (0b0000_0111, (0, 1)),
-        // "If there is no Elf in the S, SE, or SW adjacent positions, the Elf proposes moving south one step."
+        // "if there is no elf in the s, se, or sw adjacent positions, the elf proposes moving south one step."
         (0b0111_0000, (0, -1)),
-        // "If there is no Elf in the W, NW, or SW adjacent positions, the Elf proposes moving west one step."
+        // "if there is no elf in the w, nw, or sw adjacent positions, the elf proposes moving west one step."
         (0b1100_0001, (-1, 0)),
-        // "If there is no Elf in the E, NE, or SE adjacent positions, the Elf proposes moving east one step."
+        // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step."
         (0b0001_1100, (1, 0)),
     ];
 
-    const MAX_SIZE: usize = 512;
+    const MAX_SIZE: usize = 384;
     const MAX_ELVES: usize = 10_000;
     const OFFSET: usize = MAX_SIZE / 2;
     const NO_CHOICE: (i16, i16) = (i16::MAX, i16::MAX);
@@ -67,8 +70,37 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         elf_grid[elf.position.1 as usize * MAX_SIZE + elf.position.0 as usize] = elf_idx as u16;
     }
 
+    #[cfg(feature = "visualization")]
+    let mut max_coords = (0, 0);
+    #[cfg(feature = "visualization")]
+    let mut min_coords = (i16::MAX, i16::MAX);
+    #[cfg(feature = "visualization")]
+    let mut svg = SvgImage::new();
+    #[cfg(feature = "visualization")]
+    let mut elf_positions = String::from("const elfPositions = [");
+    #[cfg(feature = "visualization")]
+    {
+        elf_positions.push('[');
+        for (idx, elf) in elves.iter().enumerate() {
+            if idx > 0 {
+                elf_positions.push(',');
+            }
+            min_coords.0 = elf.position.0.min(min_coords.0);
+            min_coords.1 = elf.position.0.min(min_coords.1);
+            max_coords.0 = elf.position.0.max(max_coords.0);
+            max_coords.1 = elf.position.0.max(max_coords.1);
+            elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
+        }
+        elf_positions.push(']');
+    }
+
     for round in 0..input.part_values(10, 10000) {
         let mut num_moves = 0;
+
+        #[cfg(feature = "visualization")]
+        {
+            elf_positions.push_str(",[");
+        }
 
         for elf in elves.iter_mut() {
             let adjacent_bitmask = DIRECTIONS
@@ -97,6 +129,9 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 }
             }
         }
+
+        #[cfg(feature = "visualization")]
+        let mut first_elf = true;
 
         for elf_idx in 0..elves.len() {
             let elf = &mut elves[elf_idx];
@@ -132,6 +167,50 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                     num_moves -= 1;
                 }
             }
+            #[cfg(feature = "visualization")]
+            {
+                if first_elf {
+                    first_elf = false;
+                } else {
+                    elf_positions.push(',');
+                }
+                let elf = elves[elf_idx];
+                min_coords.0 = elf.position.0.min(min_coords.0);
+                min_coords.1 = elf.position.1.min(min_coords.1);
+                max_coords.0 = elf.position.0.max(max_coords.0);
+                max_coords.1 = elf.position.1.max(max_coords.1);
+                elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
+            }
+        }
+
+        #[cfg(feature = "visualization")]
+        elf_positions.push(']');
+
+        #[cfg(feature = "visualization")]
+        if num_moves == 0 || (input.is_part_one() && round == 9) {
+            let new_elves_id = svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xff, 0, 0)));
+            elf_positions.push_str("];");
+            elf_positions.push_str(&format!(
+                "window.onNewStep = (step) => {{\n\
+                        const pathData = elfPositions[step].map((e) => \n\
+                               `M ${{e[0]}} ${{e[1]}} l 1 0 l 0 1 l-1 0 Z`\
+                            ).join(' ');\n\
+                        document.getElementById(\"{}\").setAttribute('d', pathData);\n\
+                }};",
+                new_elves_id
+            ));
+            svg.add(SvgScript::new(elf_positions));
+            input.rendered_svg.replace(
+                svg.view_box((
+                    min_coords.0 as i64,
+                    min_coords.1 as i64,
+                    (max_coords.0 - min_coords.0) as i64,
+                    (max_coords.1 - min_coords.1) as i64,
+                ))
+                .data_attribute("steps".to_string(), format!("{}", round + 1))
+                .to_svg_string(),
+            );
+            return Ok(0);
         }
 
         if num_moves == 0 {
@@ -151,6 +230,11 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 )
             });
     let rectangle_size = ((max_x + 1 - min_x) * (max_y + 1 - min_y)) as usize;
+    #[cfg(feature = "visualization")]
+    input.rendered_svg.replace(
+        svg.data_attribute("steps".to_string(), "10".to_string())
+            .to_svg_string(),
+    );
     Ok(rectangle_size - elves.len())
 }
 

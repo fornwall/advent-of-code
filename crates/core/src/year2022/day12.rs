@@ -85,9 +85,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let (start_pos, destination_pos, mut graph) = Graph::parse(input.text)?;
 
     #[cfg(feature = "visualization")]
-    let mut svg = SvgImage::new()
-        .view_box((0, 0, graph.width as i64, graph.height as i64))
-        .style("--step: 0");
+    let mut svg = SvgImage::new().view_box((0, 0, graph.width as i64, graph.height as i64));
     #[cfg(feature = "visualization")]
     let mut current_render_step = 0;
     #[cfg(feature = "visualization")]
@@ -168,7 +166,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         circles_render_script.push_str("', '");
                         current_render_step = new_cost;
                     }
-                    let circle_radius = 0.3;
+                    let circle_radius = 0.4;
                     circles_render_script.push_str(
                         &SvgShape::new()
                             .circle_absolute(
@@ -191,7 +189,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         let visited_path_id = svg.add_with_id(
                             SvgPath::default()
                                 .stroke(SvgColor::Rgb(0xff, 0, 0))
-                                .stroke_width(0.1),
+                                .stroke_width(0.2),
                         );
                         let circles_path_id =
                             svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xff, 0, 0)));
@@ -199,7 +197,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         circles_render_script.push_str("'];");
                         path_render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
                                                               document.getElementById('{}').setAttribute('d', circlesPerStep[step]);\n\
-                                                              const pathData = pathsPerStep.slice(0, step).join('');\n\
+                                                              const pathData = pathsPerStep.slice(0, step+1).join('');\n\
                                                               document.getElementById('{}').setAttribute('d', pathData);\n\
                                                              }}", circles_path_id, visited_path_id));
                         svg.add(SvgScript::new(format!(

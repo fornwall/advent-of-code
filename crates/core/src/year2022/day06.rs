@@ -34,4 +34,13 @@ pub fn tests() {
 
     test_part_one_error!("abc" => "No solution found");
     test_part_one_error!("abcc" => "No solution found");
+
+    #[cfg(feature = "count-allocations")]
+    {
+        let allocations = allocation_counter::count(|| {
+            test_part_one!(real_input => 1109);
+            test_part_two!(real_input => 3965);
+        });
+        assert_eq!(allocations, 0);
+    }
 }

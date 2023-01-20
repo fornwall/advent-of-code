@@ -82,7 +82,6 @@ visualizerWorker.onmessage = (message) => {
 };
 
 async function toggleFullScreen() {
-  return;
   if (document.fullscreenElement) {
     // Do nothing.
     document.exitFullscreen();
@@ -178,7 +177,7 @@ function togglePause() {
 }
 
 progress.addEventListener("input", () => {
-  stepDisplay.textContent = `Step ${progress.value} / ${progress.max}`;
+  stepDisplay.textContent = `${progress.value} / ${progress.max}`;
   svg.style.setProperty("--step", progress.value);
   if (window.onNewStep) {
     window.onNewStep(parseInt(progress.value));
@@ -245,7 +244,6 @@ async function onLoad() {
   }
 
   if (!state.params["input"]) {
-    console.log("fetching");
     const tests = await (
       await fetch("https://fornwall.net/aoc/tests.json")
     ).json();

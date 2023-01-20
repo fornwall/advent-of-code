@@ -1102,7 +1102,7 @@
     },
     "23": {
       "gist": "59833250f615c41fe040e4d5cdfed0cd",
-      "visualization": false,
+      "visualization": true,
       "raw_url": "https://gist.githubusercontent.com/fornwall/59833250f615c41fe040e4d5cdfed0cd/raw/c59142b9ed6d3388b00bd016bbafa042e0c061c9/year2022_day23.rs",
       "compiler_explorer": "rbb5aeczY"
     },
