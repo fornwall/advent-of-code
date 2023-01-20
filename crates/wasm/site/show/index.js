@@ -12,7 +12,6 @@ const visualizerWorker = new Worker(
 const spinner = document.getElementById("spinner");
 const rendering = document.getElementById("rendering");
 const progress = document.getElementById("progress");
-const playPause = document.getElementById("playpause");
 const show = document.getElementById("show");
 const stepDisplay = document.getElementById("stepDisplay");
 let svg = null;
@@ -46,6 +45,7 @@ visualizerWorker.onmessage = (message) => {
       svg.setAttribute("focusable", "false");
 
       progress.max = svg.dataset.steps;
+      state.stepDuration = parseInt(svg.dataset.stepDuration);
 
       rendering.querySelectorAll("script").forEach((el) => {
         try {
@@ -63,10 +63,6 @@ visualizerWorker.onmessage = (message) => {
         togglePause();
       });
 
-      playPause.addEventListener("click", () => {
-        togglePause();
-      });
-
       rendering.addEventListener("dblclick", () => {
         toggleFullScreen();
       });
@@ -75,7 +71,7 @@ visualizerWorker.onmessage = (message) => {
       setCurrentStep(0);
       setTimeout(() => {
         if (!playInterval) togglePause();
-      }, 2000);
+      }, 1000);
       await toggleFullScreen();
     }
     document.documentElement.addEventListener("click", onClick);
@@ -159,21 +155,19 @@ function changeCurrentValue(change) {
 
 function togglePause() {
   if (playInterval) {
-    playPause.value = "⏵";
     clearInterval(playInterval);
     playInterval = null;
   } else {
     if (progress.value == progress.max) {
       setCurrentStep(0);
     }
-    playPause.value = "⏸";
     playInterval = setInterval(() => {
       if (progress.value == progress.max) {
         togglePause();
       } else {
         changeCurrentValue(1);
       }
-    }, 50);
+    }, state.stepDuration);
   }
 }
 

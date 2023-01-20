@@ -1,20 +1,20 @@
 use crate::{Coordinate, SvgColor, SvgElement, SvgId};
 use std::io::Write;
 
-pub struct Circle {
+pub struct SvgCircle {
     pub cx: Coordinate,
     pub cy: Coordinate,
     pub r: Coordinate,
     pub fill: Option<SvgColor>,
 }
 
-impl From<Circle> for SvgElement {
-    fn from(value: Circle) -> Self {
+impl From<SvgCircle> for SvgElement {
+    fn from(value: SvgCircle) -> Self {
         Self::Circle(value)
     }
 }
 
-impl Circle {
+impl SvgCircle {
     pub(crate) fn write<W: Write>(&self, id: Option<SvgId>, writer: &mut W) {
         #![allow(clippy::unwrap_used)]
         writer

@@ -11,6 +11,7 @@ pub use path::*;
 pub use rect::*;
 pub use script::*;
 pub use stroke::*;
+pub use style::*;
 pub use symbol::*;
 pub use view_box::*;
 
@@ -25,6 +26,7 @@ pub mod path;
 pub mod rect;
 pub mod script;
 pub mod stroke;
+pub mod style;
 pub mod symbol;
 pub mod view_box;
 
@@ -134,15 +136,12 @@ fn test() {
         (0, 0, (0xFF, 0xFF, 0xFF)),
     ] {
         let id = image.add_with_id(
-            SvgGroup::with_elements(vec![Rect {
-                x: Coordinate::from(offset_x),
-                y: Coordinate::from(offset_y),
-                width: 100.,
-                height: 100.,
-                fill: Some(SvgColor::Rgb(color.0, color.1, color.2)),
-                title: None,
-                class: None,
-            }])
+            SvgGroup::with_elements(vec![SvgRect::default()
+                .x(offset_x)
+                .y(offset_y)
+                .width(100)
+                .height(100)
+                .fill(SvgColor::Rgb(color.0, color.1, color.2))])
             .style("opacity: 0"),
         );
         if color.0 == 0xff {

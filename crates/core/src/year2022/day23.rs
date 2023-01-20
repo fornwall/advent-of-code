@@ -1,5 +1,5 @@
 #[cfg(feature = "visualization")]
-use svgplot::{SvgColor, SvgImage, SvgPath, SvgScript};
+use svgplot::{Coordinate, SvgColor, SvgImage, SvgPath, SvgRect, SvgScript, SvgStyle};
 
 use crate::input::Input;
 
@@ -75,11 +75,11 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     #[cfg(feature = "visualization")]
     let mut min_coords = (i16::MAX, i16::MAX);
     #[cfg(feature = "visualization")]
-    let mut stable_elf_positions = String::from("const stableElfPositions = [");
+    let mut stable_elf_positions = String::from("const elfPositions = [");
     #[cfg(feature = "visualization")]
-    let mut moving_elf_positions = String::from("const movingElfPositions = [");
+    let mut elf_initial_positions = Vec::new();
     #[cfg(feature = "visualization")]
-    let mut last_elf_positions = Vec::new();
+    let mut elf_position_rect_ids = Vec::new();
     #[cfg(feature = "visualization")]
     {
         stable_elf_positions.push('[');
@@ -91,21 +91,14 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             min_coords.1 = elf.position.0.min(min_coords.1);
             max_coords.0 = elf.position.0.max(max_coords.0);
             max_coords.1 = elf.position.0.max(max_coords.1);
+            elf_initial_positions.push(elf.position);
             stable_elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
-            last_elf_positions.push(elf.position);
         }
         stable_elf_positions.push(']');
-        moving_elf_positions.push_str("[]");
     }
 
     for round in 0..input.part_values(10, 10000) {
         let mut num_moves = 0;
-
-        #[cfg(feature = "visualization")]
-        {
-            stable_elf_positions.push_str(",[");
-            moving_elf_positions.push_str(",[");
-        }
 
         for elf in elves.iter_mut() {
             let adjacent_bitmask = DIRECTIONS
@@ -134,11 +127,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 }
             }
         }
-
-        #[cfg(feature = "visualization")]
-        let mut first_stable_elf = true;
-        #[cfg(feature = "visualization")]
-        let mut first_moving_elf = true;
 
         for elf_idx in 0..elves.len() {
             let elf = &mut elves[elf_idx];
@@ -177,66 +165,71 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         }
 
         #[cfg(feature = "visualization")]
-        for (last_elf_pos, elf) in last_elf_positions.iter_mut().zip(elves.iter()) {
-            if *last_elf_pos == elf.position {
-                if first_stable_elf {
-                    first_stable_elf = false;
-                } else {
+        {
+            stable_elf_positions.push_str(",[");
+            for (idx, elf) in elves.iter().enumerate() {
+                if idx > 0 {
                     stable_elf_positions.push(',');
                 }
                 stable_elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
-            } else {
-                *last_elf_pos = elf.position;
-                if first_moving_elf {
-                    first_moving_elf = false;
-                } else {
-                    moving_elf_positions.push(',');
-                }
-                moving_elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
+                min_coords.0 = elf.position.0.min(min_coords.0);
+                min_coords.1 = elf.position.1.min(min_coords.1);
+                max_coords.0 = elf.position.0.max(max_coords.0);
+                max_coords.1 = elf.position.1.max(max_coords.1);
             }
-            min_coords.0 = elf.position.0.min(min_coords.0);
-            min_coords.1 = elf.position.1.min(min_coords.1);
-            max_coords.0 = elf.position.0.max(max_coords.0);
-            max_coords.1 = elf.position.1.max(max_coords.1);
-        }
-
-        #[cfg(feature = "visualization")]
-        {
-            moving_elf_positions.push(']');
             stable_elf_positions.push(']');
-        }
 
-        #[cfg(feature = "visualization")]
-        if num_moves == 0 || (input.is_part_one() && round == 9) {
-            let mut svg = SvgImage::new();
-            let stable_elves_id =
-                svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0, 0xff, 0)));
-            let moving_elves_id =
-                svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xff, 0, 0)));
-            moving_elf_positions.push_str("];");
-            stable_elf_positions.push_str("];");
-            svg.add(SvgScript::new(format!("{}{}{}", moving_elf_positions, stable_elf_positions, format!(
-                "window.onNewStep = (step) => {{\n\
-                        document.getElementById(\"{}\").setAttribute('d', stableElfPositions[step].map((e) => \n\
-                               `M ${{e[0]}} ${{e[1]}} l 1 0 l 0 1 l-1 0 Z`\
-                            ).join(' '));\n\
-                        document.getElementById(\"{}\").setAttribute('d', movingElfPositions[step].map((e) => \n\
-                               `M ${{e[0]}} ${{e[1]}} l 1 0 l 0 1 l-1 0 Z`\
-                            ).join(' '));\n\
+            if num_moves == 0 || (input.is_part_one() && round == 9) {
+                let mut svg = SvgImage::new();
+                let step_duration_ms = 300;
+                let animation_duration_ms = step_duration_ms - 100;
+                svg.add(SvgStyle::new(format!("\n\
+                    rect {{ fill: #00B1D2; transition: x {}ms, y {}ms, fill {}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
+                ", animation_duration_ms, animation_duration_ms, animation_duration_ms)));
+                for initial_pos in elf_initial_positions.iter() {
+                    elf_position_rect_ids.push(
+                        svg.add_with_id(
+                            SvgRect::default()
+                                .x(initial_pos.0 as Coordinate)
+                                .y(initial_pos.1 as Coordinate)
+                                .width(1)
+                                .height(1),
+                        ),
+                    );
+                }
+
+                stable_elf_positions.push_str("];");
+                svg.add(SvgScript::new(format!("{}{}", stable_elf_positions, format!(
+                    "\nconst elfRects = document.querySelectorAll('rect');\n\
+                window.onNewStep = (step) => {{\n\
+                        const prevPos = (step == 0) ? null : elfPositions[step-1];\n\
+                        const pos = elfPositions[step];\n\
+                        for (let i = 0; i < {}; i++) {{\n\
+                            const e = elfRects[i];
+                            e.setAttribute('x', pos[i][0]);\n\
+                            e.setAttribute('y', pos[i][1]);\n\
+                            if (prevPos === null || (prevPos[i][0] === pos[i][0] && prevPos[i][1] === pos[i][1])) {{\n\
+                               e.classList.remove('moving');\n\
+                            }} else {{\n\
+                               e.classList.add('moving');\n\
+                            }}\n\
+                        }}\n\
                 }};",
-                stable_elves_id,
-                moving_elves_id,
-            ))));
-            input.rendered_svg.replace(
-                svg.view_box((
-                    min_coords.0 as i64,
-                    min_coords.1 as i64,
-                    (max_coords.0 - min_coords.0) as i64,
-                    (max_coords.1 - min_coords.1) as i64,
-                ))
-                .data_attribute("steps".to_string(), format!("{}", round + 1))
-                .to_svg_string(),
-            );
+                    elves.len(),
+                ))));
+                input.rendered_svg.replace(
+                    svg.view_box((
+                        min_coords.0 as i64,
+                        min_coords.1 as i64,
+                        (max_coords.0 - min_coords.0) as i64,
+                        (max_coords.1 - min_coords.1) as i64,
+                    ))
+                    .style("background: black;")
+                    .data_attribute("steps".to_string(), format!("{}", round + 1))
+                    .data_attribute("step-duration".to_string(), format!("{}", step_duration_ms))
+                    .to_svg_string(),
+                );
+            }
         }
 
         if num_moves == 0 {

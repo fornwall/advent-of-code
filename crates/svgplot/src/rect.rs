@@ -1,9 +1,10 @@
+use crate::common_attributes::CommonAttributes;
 use crate::escape::escape_xml;
 use crate::{Coordinate, SvgColor, SvgElement, SvgId};
 use std::io::Write;
 
 #[derive(Default)]
-pub struct Rect {
+pub struct SvgRect {
     /// The left edge of the rectangle.
     pub x: Coordinate,
     /// The top edge of the rectangle.
@@ -12,16 +13,43 @@ pub struct Rect {
     pub height: Coordinate,
     pub fill: Option<SvgColor>,
     pub title: Option<String>,
-    pub class: Option<String>,
+    common_attributes: CommonAttributes,
 }
 
-impl From<Rect> for SvgElement {
-    fn from(value: Rect) -> Self {
+impl From<SvgRect> for SvgElement {
+    fn from(value: SvgRect) -> Self {
         Self::Rect(value)
     }
 }
 
-impl Rect {
+impl SvgRect {
+    pub fn x<C: Into<Coordinate>>(mut self, x: C) -> Self {
+        self.x = x.into();
+        self
+    }
+    pub fn y<C: Into<Coordinate>>(mut self, y: C) -> Self {
+        self.y = y.into();
+        self
+    }
+    pub fn width<C: Into<Coordinate>>(mut self, width: C) -> Self {
+        self.width = width.into();
+        self
+    }
+    pub fn height<C: Into<Coordinate>>(mut self, height: C) -> Self {
+        self.height = height.into();
+        self
+    }
+    pub const fn fill(mut self, fill: SvgColor) -> Self {
+        self.fill = Some(fill);
+        self
+    }
+
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn title(mut self, title: String) -> Self {
+        self.title = Some(title);
+        self
+    }
+
     pub(crate) fn write<W: Write>(&self, id: Option<SvgId>, buffer: &mut W) {
         #![allow(clippy::unwrap_used)]
         buffer
@@ -39,6 +67,7 @@ impl Rect {
         if let Some(fill) = &self.fill {
             fill.write_fill(buffer);
         }
+        self.common_attributes.write(buffer);
         if let Some(title) = &self.title {
             buffer
                 .write_all(format!("><title>{}</title></rect>", escape_xml(title)).as_bytes())

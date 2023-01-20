@@ -1,12 +1,13 @@
-use crate::{Circle, Rect, SvgGroup, SvgId, SvgPath, SvgScript};
+use crate::{SvgCircle, SvgGroup, SvgId, SvgPath, SvgRect, SvgScript, SvgStyle};
 use std::io::Write;
 
 pub enum SvgElement {
-    Rect(Rect),
-    Circle(Circle),
+    Rect(SvgRect),
+    Circle(SvgCircle),
     Script(SvgScript),
     Group(SvgGroup),
     Path(SvgPath),
+    Style(SvgStyle),
 }
 
 impl SvgElement {
@@ -26,6 +27,9 @@ impl SvgElement {
             }
             Self::Path(path) => {
                 path.write(id, writer);
+            }
+            Self::Style(style) => {
+                style.write(id, writer);
             }
         }
     }

@@ -9,11 +9,13 @@
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="/favicon_1.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="range.css" />
     <style>
       html {
-        background: #0d0c1a;
+        background: black;
         font-family: sans-serif;
         color: white;
+        user-select: none;
       }
 
       body {
@@ -60,7 +62,6 @@
         justify-content: flex-end;
 
         text-align: right;
-        user-select: none;
       }
 
       input:focus {
@@ -86,7 +87,6 @@
   <body>
     <div id="show" style="display: none">
       <p id="inputs">
-        <input type="button" value="⏵" id="playpause" />
         <input
           type="range"
           min="0"

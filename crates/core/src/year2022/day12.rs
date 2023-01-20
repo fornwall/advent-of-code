@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 #[cfg(feature = "visualization")]
-use svgplot::{SvgColor, SvgImage, SvgPath, SvgScript, SvgShape};
+use svgplot::{Coordinate, SvgColor, SvgImage, SvgPath, SvgScript, SvgShape};
 
 use crate::input::Input;
 
@@ -121,28 +121,28 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
 
         if input.is_part_one() {
-            svg.add(svgplot::Rect {
-                x: start_pos.0 as svgplot::Coordinate,
-                y: start_pos.1 as svgplot::Coordinate,
-                width: 1.,
-                height: 1.,
-                fill: Some(SvgColor::Rgb(0, 0xFF, 0)),
-                title: Some("Starting position - elevation 0".to_string()),
-                ..Default::default()
-            });
+            svg.add(
+                svgplot::SvgRect::default()
+                    .x(start_pos.0 as Coordinate)
+                    .y(start_pos.1 as Coordinate)
+                    .width(1)
+                    .height(1)
+                    .fill(SvgColor::Rgb(0, 0xff, 0))
+                    .title("Starting position - elevation 0".to_string()),
+            );
         }
-        svg.add(svgplot::Rect {
-            x: destination_pos.0 as svgplot::Coordinate,
-            y: destination_pos.1 as svgplot::Coordinate,
-            width: 1.,
-            height: 1.,
-            fill: Some(SvgColor::Rgb(0xFF, 0, 0)),
-            title: Some(format!(
-                "Destination - elevation {}",
-                graph.height_at(destination_pos.0, destination_pos.1)
-            )),
-            ..Default::default()
-        });
+        svg.add(
+            svgplot::SvgRect::default()
+                .x(destination_pos.0 as Coordinate)
+                .y(destination_pos.1 as Coordinate)
+                .width(1)
+                .height(1)
+                .fill(SvgColor::Rgb(0xff, 0, 0))
+                .title(format!(
+                    "Destination - elevation {}",
+                    graph.height_at(destination_pos.0, destination_pos.1)
+                )),
+        );
     }
 
     let mut to_visit = VecDeque::with_capacity(64);
@@ -206,6 +206,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         )));
                         input.rendered_svg.replace(
                             svg.data_attribute("steps".to_string(), format!("{}", new_cost))
+                                .data_attribute("step-duration".to_string(), format!("{}", 100))
                                 .to_svg_string(),
                         );
                     }
