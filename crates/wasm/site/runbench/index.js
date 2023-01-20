@@ -75,11 +75,16 @@ async function main() {
           let problemLink = `https://adventofcode.com/${data.year}/day/${data.day}`;
           if (data.part == 2) problemLink += "#part2";
 
-          const gistLink = 'https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=' +
-                gistMapping[data.year][data.day]['gist'];
-          const compilerExplorerLink = 'https://godbolt.org/z/' + gistMapping[data.year][data.day]['compiler_explorer'];
+          const gistLink =
+            "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=" +
+            gistMapping[data.year][data.day]["gist"];
+          const compilerExplorerLink =
+            "https://godbolt.org/z/" +
+            gistMapping[data.year][data.day]["compiler_explorer"];
 
-          tr.innerHTML = `<td class="text-end"><a href="${problemLink}">${data.day}-${
+          tr.innerHTML = `<td class="text-end"><a href="${problemLink}">${
+            data.day
+          }-${
             data.part
           }</a></td><td class="text-end">${data.executionTime.toFixed(
             2

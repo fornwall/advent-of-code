@@ -77,6 +77,8 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     #[cfg(feature = "visualization")]
     let mut svg = SvgImage::new();
     #[cfg(feature = "visualization")]
+        let mut stable_elf_positions = String::from("const stableElfPositions = [");
+    #[cfg(feature = "visualization")]
     let mut elf_positions = String::from("const elfPositions = [");
     #[cfg(feature = "visualization")]
     {
@@ -92,6 +94,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
         }
         elf_positions.push(']');
+        stable_elf_positions.push_str("[]");
     }
 
     for round in 0..input.part_values(10, 10000) {
@@ -99,6 +102,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
         #[cfg(feature = "visualization")]
         {
+            stable_elf_positions.push_str(",[");
             elf_positions.push_str(",[");
         }
 
@@ -184,12 +188,16 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         }
 
         #[cfg(feature = "visualization")]
-        elf_positions.push(']');
+        {
+            elf_positions.push(']');
+            stable_elf_positions.push(']');
+        }
 
         #[cfg(feature = "visualization")]
         if num_moves == 0 || (input.is_part_one() && round == 9) {
             let new_elves_id = svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xff, 0, 0)));
             elf_positions.push_str("];");
+            stable_elf_positions.push_str("];");
             elf_positions.push_str(&format!(
                 "window.onNewStep = (step) => {{\n\
                         const pathData = elfPositions[step].map((e) => \n\
