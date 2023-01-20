@@ -35,7 +35,7 @@ visualizerWorker.onmessage = (message) => {
     );
 
     const { year, day, part } = state.params;
-    spinner.innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}</h1>`;
+    spinner.innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>Click to start</h1>`;
 
     async function onClick() {
       spinner.style.display = "none";
@@ -47,8 +47,6 @@ visualizerWorker.onmessage = (message) => {
 
       progress.max = svg.dataset.steps;
 
-      //rendering.children[0].setAttribute("width", "100%");
-      //rendering.children[0].setAttribute("height", "100%");
       rendering.querySelectorAll("script").forEach((el) => {
         try {
           eval(el.textContent);
@@ -74,7 +72,10 @@ visualizerWorker.onmessage = (message) => {
       });
 
       show.style.display = "flex";
-      togglePause();
+      setCurrentStep(0);
+      setTimeout(() => {
+        if (!playInterval) togglePause();
+      }, 2000);
       await toggleFullScreen();
     }
     document.documentElement.addEventListener("click", onClick);
@@ -163,7 +164,7 @@ function togglePause() {
     playInterval = null;
   } else {
     if (progress.value == progress.max) {
-      progress.value = 0;
+      setCurrentStep(0);
     }
     playPause.value = "⏸";
     playInterval = setInterval(() => {
@@ -177,7 +178,9 @@ function togglePause() {
 }
 
 progress.addEventListener("input", () => {
-  stepDisplay.textContent = `${progress.value} / ${progress.max}`;
+  stepDisplay.innerHTML =
+    "&nbsp;".repeat(progress.max.length - progress.value.length) +
+    `${progress.value}/${progress.max}`;
   svg.style.setProperty("--step", progress.value);
   if (window.onNewStep) {
     window.onNewStep(parseInt(progress.value));
@@ -237,9 +240,9 @@ function sendMessageToWorker(newInput) {
 
 async function onLoad() {
   revertDisplay();
-  const hash = location.hash.substring(1);
-  for (const part of hash.split("&")) {
-    const [key, value] = part.split("=");
+
+  const searchParams = new URLSearchParams(window.location.search);
+  for (const [key, value] of searchParams) {
     state.params[key] = decodeURIComponent(value);
   }
 

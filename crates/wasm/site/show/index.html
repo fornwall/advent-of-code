@@ -39,11 +39,11 @@
 
       #rendering,
       svg {
-        max-height: calc(100vh - 5em);
+        max-height: calc(100vh - 2em);
       }
 
       #inputs {
-        width: calc(100% - 10px);
+        width: 100%;
         display: flex;
         margin: 0;
       }
@@ -54,7 +54,12 @@
       }
 
       #stepDisplay {
-        vertical-align: middle;
+        font-family: monospace;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        text-align: right;
         user-select: none;
       }
 
@@ -90,8 +95,8 @@
           value="0"
           autofocus
         />
+        <span id="stepDisplay">&nbsp;</span>
       </p>
-      <p id="stepDisplay">&nbsp;</p>
       <div id="rendering">
         <!-- <svg/> -->
       </div>

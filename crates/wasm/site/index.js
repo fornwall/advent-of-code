@@ -170,9 +170,8 @@ function visualize() {
     partElement.value,
     inputElement.value,
   ];
-  const visualizerUrl = `/show/#year=${year}&day=${day}&part=${part}&input=${encodeURIComponent(
-    input
-  )}`;
+  const inputParam = input ? `&input=${encodeURIComponent(input)}` : "";
+  const visualizerUrl = `/show/?year=${year}&day=${day}&part=${part}${inputParam}`;
   window.location = visualizerUrl;
 }
 
