@@ -1,5 +1,5 @@
 #[cfg(feature = "visualization")]
-use svgplot::{Coordinate, SvgColor, SvgImage, SvgPath, SvgRect, SvgScript, SvgStyle};
+use svgplot::{Coordinate, SvgImage, SvgRect, SvgScript, SvgStyle};
 
 use crate::input::Input;
 
@@ -69,31 +69,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     let mut elf_moves = Vec::with_capacity(elves.len());
 
     #[cfg(feature = "visualization")]
-    let mut max_coords = (0, 0);
-    #[cfg(feature = "visualization")]
-    let mut min_coords = (i16::MAX, i16::MAX);
-    #[cfg(feature = "visualization")]
-    let mut stable_elf_positions = String::from("const elfPositions = [");
-    #[cfg(feature = "visualization")]
-    let mut elf_initial_positions = Vec::new();
-    #[cfg(feature = "visualization")]
-    let mut elf_position_rect_ids = Vec::new();
-    #[cfg(feature = "visualization")]
-    {
-        stable_elf_positions.push('[');
-        for (idx, elf) in elves.iter().enumerate() {
-            if idx > 0 {
-                stable_elf_positions.push(',');
-            }
-            min_coords.0 = elf.position.0.min(min_coords.0);
-            min_coords.1 = elf.position.0.min(min_coords.1);
-            max_coords.0 = elf.position.0.max(max_coords.0);
-            max_coords.1 = elf.position.0.max(max_coords.1);
-            elf_initial_positions.push(elf.position);
-            stable_elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
-        }
-        stable_elf_positions.push(']');
-    }
+    let mut elf_positions_per_step = vec![elves.clone()];
 
     for round in 0..input.part_values(10, 10000) {
         let mut num_moves = 0;
@@ -157,40 +133,54 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
         #[cfg(feature = "visualization")]
         {
-            stable_elf_positions.push_str(",[");
-            for (idx, elf) in elves.iter().enumerate() {
-                if idx > 0 {
-                    stable_elf_positions.push(',');
-                }
-                stable_elf_positions.push_str(&format!("[{},{}]", elf.position.0, elf.position.1));
-                min_coords.0 = elf.position.0.min(min_coords.0);
-                min_coords.1 = elf.position.1.min(min_coords.1);
-                max_coords.0 = elf.position.0.max(max_coords.0);
-                max_coords.1 = elf.position.1.max(max_coords.1);
+            let mut svg = SvgImage::new();
+            let mut elf_position_rect_ids = Vec::new();
+            for elf in elf_positions_per_step[0].iter() {
+                elf_position_rect_ids.push(
+                    svg.add_with_id(
+                        SvgRect::default()
+                            .x(elf.0 as Coordinate)
+                            .y(elf.1 as Coordinate)
+                            .width(1)
+                            .height(1),
+                    ),
+                );
             }
-            stable_elf_positions.push(']');
+
+            let (max_coords, min_coords) = elf_positions_per_step.iter().flatten().fold(
+                ((0, 0), (i16::MAX, i16::MAX)),
+                |(max, min), elf| {
+                    (
+                        (elf.0.max(max.0), elf.1.max(max.1)),
+                        (elf.0.min(min.0), elf.1.min(min.1)),
+                    )
+                },
+            );
+            elf_positions_per_step.push(elves.clone());
 
             if num_moves == 0 || (input.is_part_one() && round == 9) {
-                let mut svg = SvgImage::new();
                 let step_duration_ms = 300;
                 let animation_duration_ms = step_duration_ms - 100;
                 svg.add(SvgStyle::new(format!("\n\
                     rect {{ fill: #00B1D2; transition: x {}ms, y {}ms, fill {}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
                 ", animation_duration_ms, animation_duration_ms, animation_duration_ms)));
-                for initial_pos in elf_initial_positions.iter() {
-                    elf_position_rect_ids.push(
-                        svg.add_with_id(
-                            SvgRect::default()
-                                .x(initial_pos.0 as Coordinate)
-                                .y(initial_pos.1 as Coordinate)
-                                .width(1)
-                                .height(1),
-                        ),
-                    );
-                }
 
-                stable_elf_positions.push_str("];");
-                svg.add(SvgScript::new(format!("{}{}", stable_elf_positions, format!(
+                let array_declaration = format!(
+                    "const elfPositions = [{}];",
+                    elf_positions_per_step
+                        .iter()
+                        .map(|positions| format!(
+                            "[{}]",
+                            positions
+                                .iter()
+                                .map(|p| format!("[{},{}]", p.0, p.1))
+                                .collect::<Vec<_>>()
+                                .join(",")
+                        ))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                );
+                svg.add(SvgScript::new(format!("{}{}", array_declaration, format!(
                     "\nconst elfRects = document.querySelectorAll('rect');\n\
                 window.onNewStep = (step) => {{\n\
                         const prevPos = (step == 0) ? null : elfPositions[step-1];\n\
