@@ -121,10 +121,12 @@ document.body.addEventListener("keydown", async (e) => {
     case "ArrowLeft":
       if (playInterval) togglePause();
       changeCurrentValue(-1 * multiplier);
+      e.preventDefault();
       break;
     case "ArrowRight":
       if (playInterval) togglePause();
       changeCurrentValue(1 * multiplier);
+      e.preventDefault();
       break;
     case "f":
       await toggleFullScreen();
