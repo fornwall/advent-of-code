@@ -14,7 +14,8 @@ pub fn solve(input: &Input) -> Result<i32, String> {
     #[cfg(feature = "visualization")]
     let mut reachable_per_step = vec![(reachable.clone(), true)];
     #[cfg(feature = "visualization")]
-    let mut svg = SvgImage::new();
+    let mut svg = SvgImage::new()
+        .style("background:black");
     #[cfg(feature = "visualization")]
     let mut blizzard_svg_ids = Vec::new();
     #[cfg(feature = "visualization")]

@@ -11,7 +11,7 @@ pub enum SvgTransform {
 impl SvgTransform {
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
         #![allow(clippy::unwrap_used)]
-        writer.write_all(b" \"transform\"=\"").unwrap();
+        writer.write_all(b" transform=\"").unwrap();
         match self {
             Self::Translate(x, y) => {
                 writer
