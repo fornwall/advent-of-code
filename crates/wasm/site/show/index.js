@@ -35,7 +35,8 @@ visualizerWorker.onmessage = (message) => {
     );
 
     const { year, day, part } = state.params;
-    spinner.innerHTML = `<h1 style="text-align: center; cursor:pointer;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>Press anywhere to start</h1>`;
+    spinner.innerHTML = `<h1 style="text-align: center; cursor:pointer;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>
+        Press anywhere to start</h1>`;
 
     async function onClick() {
       spinner.style.display = "none";
@@ -246,7 +247,7 @@ async function onLoad() {
   revertDisplay();
 
   const searchParams = new URLSearchParams(window.location.search);
-  state.params['part'] = 2;
+  state.params["part"] = 2;
   for (const [key, value] of searchParams) {
     state.params[key] = decodeURIComponent(value);
   }
