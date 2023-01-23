@@ -68,6 +68,10 @@
         outline: none;
       }
 
+      #playPause {
+        cursor:pointer;
+      }
+
       .fade-out {
         animation: fadein 2s;
         opacity: 0.4;
@@ -87,6 +91,7 @@
   <body>
     <div id="show" style="display: none">
       <p id="inputs">
+        <img id="playPause" src="/static/pause.svg"/>
         <input
           type="range"
           min="0"

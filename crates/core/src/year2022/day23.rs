@@ -6,24 +6,24 @@ use crate::input::Input;
 pub fn solve(input: &Input) -> Result<usize, String> {
     const DIRECTIONS: [(i16, i16); 8] = [
         // NW, N, NE
-        (-1, 1),
-        (0, 1),
-        (1, 1),
+        (-1, -1),
+        (0, -1),
+        (1, -1),
         // E, SE
         (1, 0),
-        (1, -1),
+        (1, 1),
         // S, SW
-        (0, -1),
-        (-1, -1),
+        (0, 1),
+        (-1, 1),
         // W
         (-1, 0),
     ];
 
     const RULES: [(i16, (i16, i16)); 4] = [
         // "If there is no elf in the n, ne, or nw adjacent positions, the elf proposes moving north one step."
-        (0b0000_0111, (0, 1)),
+        (0b0000_0111, (0, -1)),
         // "if there is no elf in the s, se, or sw adjacent positions, the elf proposes moving south one step."
-        (0b0111_0000, (0, -1)),
+        (0b0111_0000, (0, 1)),
         // "if there is no elf in the w, nw, or sw adjacent positions, the elf proposes moving west one step."
         (0b1100_0001, (-1, 0)),
         // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step."
@@ -45,7 +45,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     let mut elves = input
         .text
         .lines()
-        .rev()
         .enumerate()
         .flat_map(|(y, line)| {
             line.bytes().enumerate().filter_map(move |(x, c)| {

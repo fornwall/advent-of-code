@@ -107,6 +107,9 @@ impl Monkey {
         lines.next()?;
         // Sample: "  Starting items: 90, 79, 97, 52, 90, 94, 71, 70":
         let operation_line = lines.next()?;
+        if operation_line.len() < 19 {
+            return None;
+        }
         for item_str in operation_line[18..].split(", ") {
             items.push(Item {
                 owner_idx: monkey_idx,

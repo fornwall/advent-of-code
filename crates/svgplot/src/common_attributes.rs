@@ -6,9 +6,10 @@ use crate::escape::escape_xml;
 ///
 /// https://oreillymedia.github.io/Using_SVG/guide/markup.html#common-attributes
 #[derive(Default)]
-pub(crate) struct CommonAttributes {
+pub struct CommonAttributes {
     pub(crate) style: Option<String>,
     pub(crate) classes: Vec<String>,
+    pub(crate) transform: Option<SvgTransform>,
 }
 
 impl CommonAttributes {
@@ -16,6 +17,7 @@ impl CommonAttributes {
         Self {
             style: None,
             classes: Vec::new(),
+            transform: None,
         }
     }
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
@@ -24,6 +26,9 @@ impl CommonAttributes {
             writer
                 .write_all(format!(" style=\"{}\"", escape_xml(style)).as_bytes())
                 .unwrap();
+        }
+        if let Some(transform) = &self.transform {
+            transform.write(writer);
         }
         if !self.classes.is_empty() {
             writer.write_all(b" class=\"").unwrap();
@@ -37,15 +42,24 @@ impl CommonAttributes {
     }
 }
 
-macro_rules! define_element {
+macro_rules! implement_common_attributes {
     ($element_name:ident) => {
         impl $element_name {
             pub fn style<S: ToString>(mut self, style: S) -> Self {
                 self.common_attributes.style = Some(style.to_string());
                 self
             }
+            pub fn class<S: ToString>(mut self, class: S) -> Self {
+                self.common_attributes.classes.push(class.to_string());
+                self
+            }
+            pub const fn transform(mut self, transform: SvgTransform) -> Self {
+                self.common_attributes.transform = Some(transform);
+                self
+            }
         }
     };
 }
 
-pub(crate) use define_element;
+use crate::SvgTransform;
+pub(crate) use implement_common_attributes;

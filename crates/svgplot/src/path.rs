@@ -1,6 +1,7 @@
 use std::io::Write;
 
-use crate::{Coordinate, SvgColor, SvgElement, SvgId};
+use crate::common_attributes::{implement_common_attributes, CommonAttributes};
+use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgTransform};
 
 #[derive(Default)]
 pub struct SvgPath {
@@ -8,7 +9,10 @@ pub struct SvgPath {
     pub stroke: Option<SvgColor>,
     pub stroke_width: Option<f64>,
     pub fill: Option<SvgColor>,
+    pub common_attributes: CommonAttributes,
 }
+
+implement_common_attributes!(SvgPath);
 
 enum SvgPathElement {
     LineAbsolute((Coordinate, Coordinate)),
@@ -41,6 +45,12 @@ impl From<SvgPath> for SvgElement {
 }
 
 impl SvgPath {
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn shape(mut self, shape: SvgShape) -> Self {
+        self.shape = shape;
+        self
+    }
+
     pub const fn stroke_width(mut self, width: f64) -> Self {
         self.stroke_width = Some(width);
         self
@@ -68,6 +78,7 @@ impl SvgPath {
         if let Some(stroke) = &self.stroke {
             stroke.write_stroke(writer);
         }
+        self.common_attributes.write(writer);
         if let Some(stroke_width) = &self.stroke_width {
             writer
                 .write_all(format!(" stroke-width=\"{}\"", stroke_width).as_bytes())

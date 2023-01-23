@@ -14,6 +14,7 @@ const rendering = document.getElementById("rendering");
 const progress = document.getElementById("progress");
 const show = document.getElementById("show");
 const stepDisplay = document.getElementById("stepDisplay");
+const playPause = document.getElementById("playPause");
 let svg = null;
 let playInterval = null;
 
@@ -34,7 +35,7 @@ visualizerWorker.onmessage = (message) => {
     );
 
     const { year, day, part } = state.params;
-    spinner.innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>Click to start</h1>`;
+    spinner.innerHTML = `<h1 style="text-align: center; cursor:pointer;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>Press anywhere to start</h1>`;
 
     async function onClick() {
       spinner.style.display = "none";
@@ -157,12 +158,15 @@ function changeCurrentValue(change) {
 
 function togglePause() {
   if (playInterval) {
+    playPause.src = "/static/play.svg";
     clearInterval(playInterval);
     playInterval = null;
   } else {
+    playPause.src = "/static/pause.svg";
     if (progress.value == progress.max) {
       setCurrentStep(0);
     }
+    changeCurrentValue(1);
     playInterval = setInterval(() => {
       if (progress.value == progress.max) {
         togglePause();
@@ -185,6 +189,10 @@ progress.addEventListener("input", () => {
 
 progress.addEventListener("click", () => {
   if (playInterval) togglePause();
+});
+
+playPause.addEventListener("click", () => {
+  togglePause();
 });
 
 progress.addEventListener("touchstart", () => {
@@ -238,6 +246,7 @@ async function onLoad() {
   revertDisplay();
 
   const searchParams = new URLSearchParams(window.location.search);
+  state.params['part'] = 2;
   for (const [key, value] of searchParams) {
     state.params[key] = decodeURIComponent(value);
   }

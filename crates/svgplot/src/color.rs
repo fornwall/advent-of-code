@@ -5,6 +5,7 @@ use std::io::Write;
 /// - RGB and RGBa colors — Rgb(255, 158, 44) and Rgba(255, 158, 44, .5)
 /// - HSL and HSLa colors — hsl(32, 100%, 59%) and hsla(32, 100%, 59%, .5)
 /// - References to SVG patterns: url(#pattern-id)
+#[derive(Copy, Clone)]
 pub enum SvgColor {
     Rgb(u8, u8, u8),
     Rgba(u8, u8, u8, f64),

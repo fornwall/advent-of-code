@@ -1,7 +1,7 @@
 use std::io::Write;
 
-use crate::common_attributes::{define_element, CommonAttributes};
-use crate::{SvgElement, SvgId};
+use crate::common_attributes::{implement_common_attributes, CommonAttributes};
+use crate::{SvgElement, SvgId, SvgTransform};
 
 pub struct SvgGroup {
     pub(crate) elements: Vec<SvgElement>,
@@ -14,7 +14,7 @@ impl From<SvgGroup> for SvgElement {
     }
 }
 
-define_element!(SvgGroup);
+implement_common_attributes!(SvgGroup);
 
 impl SvgGroup {
     pub const fn new() -> Self {

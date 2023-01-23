@@ -13,6 +13,7 @@ pub use script::*;
 pub use stroke::*;
 pub use style::*;
 pub use symbol::*;
+pub use transform::*;
 pub use view_box::*;
 
 pub mod circle;
@@ -28,6 +29,7 @@ pub mod script;
 pub mod stroke;
 pub mod style;
 pub mod symbol;
+pub mod transform;
 pub mod view_box;
 
 pub type Coordinate = f64;
@@ -43,7 +45,7 @@ pub struct SvgImage {
     common_attributes: CommonAttributes,
 }
 
-define_element!(SvgImage);
+implement_common_attributes!(SvgImage);
 
 impl SvgImage {
     pub const fn new() -> Self {
