@@ -20,6 +20,7 @@ let playInterval = null;
 
 const state = {
   params: {},
+  ready: false,
   audioPlayer: new AudioPlayer("bounce.mp4", "pop.mp4"),
 };
 
@@ -70,10 +71,21 @@ visualizerWorker.onmessage = (message) => {
       });
 
       show.style.display = "flex";
-      setCurrentStep(0);
-      setTimeout(() => {
-        if (!playInterval) togglePause();
-      }, 1000);
+      let step = 0;
+      try {
+        let stepFromParam = parseInt(state.params['step']);
+        if (stepFromParam >= 0 && stepFromParam <= svg.dataset.steps) {
+            step = stepFromParam;
+        }
+      } catch (e) {}
+
+      state.ready = true;
+      setCurrentStep(step);
+      if (step == 0) {
+          setTimeout(() => {
+            if (!playInterval) togglePause();
+          }, 1000);
+      }
       await toggleFullScreen();
     }
     document.documentElement.addEventListener("click", onClick);
@@ -145,10 +157,17 @@ document.body.addEventListener("keydown", async (e) => {
       setCurrentStep(0);
       if (!playInterval) togglePause();
       break;
+    case "s":
+      if (state.ready) {
+          window.history.replaceState(null, "", `?year=${state.params.year}&day=${state.params.day}&part=${state.params.part}&step=${progress.value}`);
+          await navigator.clipboard.writeText(`Advent of Code ${state.params.year}, day ${state.params.day}:\n${location.href}`);
+      }
+      break;
   }
 });
 
 function setCurrentStep(value) {
+  if (!state.ready) return;
   progress.value = value;
   progress.dispatchEvent(new Event("input"));
 }
@@ -158,6 +177,7 @@ function changeCurrentValue(change) {
 }
 
 function togglePause() {
+  if (!state.ready) return;
   if (playInterval) {
     playPause.src = "/static/play.svg";
     clearInterval(playInterval);
@@ -179,6 +199,7 @@ function togglePause() {
 }
 
 progress.addEventListener("input", () => {
+  if (!state.ready) return;
   stepDisplay.innerHTML =
     "&nbsp;".repeat(progress.max.length - progress.value.length) +
     `${progress.value}/${progress.max}`;
