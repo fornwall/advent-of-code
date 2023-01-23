@@ -226,10 +226,6 @@ playPause.addEventListener("click", () => {
   togglePause();
 });
 
-progress.addEventListener("touchstart", () => {
-  if (playInterval) togglePause();
-});
-
 document.documentElement.ondragover = (dragOverEvent) => {
   dragOverEvent.preventDefault();
   dragOverEvent.dataTransfer.dropEffect = Array.from(
