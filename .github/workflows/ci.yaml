@@ -275,7 +275,7 @@ jobs:
         git config --global user.name 'Gist Mapping Updater'
         git config --global user.email 'gist-mapping-updater@users.noreply.github.com'
     - name: Commit and push gist mapping if updated
-      run: git commit -m 'Update gist-mapping' && git push
+      run: git commit -m 'Update gist-mapping' && git push || true
     - name: Upload new gist-mapping.json
       uses: actions/upload-artifact@v3
       with:
