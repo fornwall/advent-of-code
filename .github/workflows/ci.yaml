@@ -1,10 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - 'master'
-  pull_request:
+on: push
 
 jobs:
   test-rust:
@@ -126,7 +122,7 @@ jobs:
       if: matrix.tested-commit == 'old' && github.event_name == 'pull_request'
     - name: Checkout previous commit
       run: git checkout HEAD~1
-      if: matrix.tested-commit == 'old' && github.ref == 'refs/heads/master'
+      if: matrix.tested-commit == 'old' && github.ref == 'refs/heads/main'
     - uses: dtolnay/rust-toolchain@stable
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install valgrind
@@ -261,6 +257,7 @@ jobs:
         working-directory: crates/wasm
 
   gist-mapping:
+    if: github.ref == 'refs/heads/main'  
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -283,6 +280,7 @@ jobs:
         path: crates/wasm/site/gist-mapping.json
 
   deploy-site:
+    if: github.ref == 'refs/heads/main'
     needs: [benchmark, gist-mapping]
     runs-on: ubuntu-latest
     steps:
