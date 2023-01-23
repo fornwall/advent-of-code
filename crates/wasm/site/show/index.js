@@ -36,11 +36,13 @@ visualizerWorker.onmessage = (message) => {
     );
 
     const { year, day, part } = state.params;
-    spinner.innerHTML = `<h1 style="text-align: center; cursor:pointer;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>
+    document.documentElement.style.cursor = "pointer";
+    spinner.innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>
         Press anywhere to start</h1>`;
 
     async function onClick() {
       spinner.style.display = "none";
+      document.documentElement.style.cursor = "";
       document.documentElement.removeEventListener("click", onClick);
       rendering.innerHTML = message.data.answer;
 
@@ -186,15 +188,20 @@ function togglePause() {
   if (!state.ready) return;
   if (playInterval) {
     playPause.src = "/static/play.svg";
+    playPause.alt = "Play";
     clearInterval(playInterval);
     playInterval = null;
   } else {
     playPause.src = "/static/pause.svg";
+    playPause.alt = "Pause";
     if (progress.value == progress.max) {
       setCurrentStep(0);
+    } else {
+      // Give quick visual feedback (step rate might be slow):
+      changeCurrentValue(1);
     }
-    changeCurrentValue(1);
     playInterval = setInterval(() => {
+      if (document.querySelector("#progress:active")) return;
       if (progress.value == progress.max) {
         togglePause();
       } else {
@@ -213,10 +220,6 @@ progress.addEventListener("input", () => {
   if (window.onNewStep) {
     window.onNewStep(parseInt(progress.value));
   }
-});
-
-progress.addEventListener("click", () => {
-  if (playInterval) togglePause();
 });
 
 playPause.addEventListener("click", () => {
