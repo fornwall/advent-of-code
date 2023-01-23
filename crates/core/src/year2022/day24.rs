@@ -213,22 +213,22 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                             }}\n\
                             for (let [idx, el] of leftBlizzards.entries()) {{\n\
                                 let amount = mod((idx - step), width);\n\
-                                if (amount === 0 || amount === width -1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
+                                if (amount === width -1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
                                 el.style.transform = `translate(${{amount}}px,0px)`;\n\
                             }}\n\
                             for (let [idx, el] of rightBlizzards.entries()) {{\n\
                                 let amount = mod((idx + step), width);\n\
-                                if (amount === 0 || amount === width -1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
+                                if (amount === 0) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
                                 el.style.transform = `translate(${{amount}}px,0px)`;\n\
                             }}\n\
                             for (let [idx, el] of upBlizzards.entries()) {{\n\
                                 let amount = mod((idx - step), height);\n\
-                                if (amount === 0 || amount === height - 1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
+                                if (amount === height - 1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
                                 el.style.transform = `translate(0px,${{amount}}px)`;\n\
                             }}\n\
                             for (let [idx, el] of downBlizzards.entries()) {{\n\
                                 let amount = mod((idx + step), height);\n\
-                                if (amount === 0 || amount === height - 1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
+                                if (amount === 0) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
                                 el.style.transform = `translate(0px,${{amount}}px)`;\n\
                             }}\n\
                         }};\n",
