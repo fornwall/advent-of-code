@@ -73,7 +73,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     } else {
         let root_dir_size = dir_stack.data().last().copied().unwrap_or_default();
         // 70_000_000 - root_dir_size + delete_bigger_than >= 30_000_000 =>:
-        let delete_bigger_than = root_dir_size - 40_000_000;
+        let delete_bigger_than = root_dir_size.checked_sub(40_000_000).unwrap_or_default();
         Ok(dir_stack
             .data()
             .iter()
