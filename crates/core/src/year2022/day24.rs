@@ -14,8 +14,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
     #[cfg(feature = "visualization")]
     let mut reachable_per_step = vec![(reachable.clone(), true)];
     #[cfg(feature = "visualization")]
-    let mut svg = SvgImage::new()
-        .style("background:black");
+    let mut svg = SvgImage::new().style("background:black");
     #[cfg(feature = "visualization")]
     let mut blizzard_svg_ids = Vec::new();
     #[cfg(feature = "visualization")]
@@ -168,12 +167,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                                             y as Coordinate + 0.5,
                                             0.25,
                                         )
-                                        /*
-                                        .move_to_absolute(x as Coordinate, y as Coordinate)
-                                        .line_to_relative(1, 0)
-                                        .line_to_relative(0, 1)
-                                        .line_to_relative(-1, 0)
-                                         */
                                         .close();
                                 }
                             }
@@ -221,22 +214,22 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                             for (let [idx, el] of leftBlizzards.entries()) {{\n\
                                 let amount = mod((idx - step), width);\n\
                                 if (amount === 0 || amount === width -1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
-                                el.setAttribute('transform', `translate(${{amount}}, 0)`);\n\
+                                el.style.transform = `translate(${{amount}}px,0px)`;\n\
                             }}\n\
                             for (let [idx, el] of rightBlizzards.entries()) {{\n\
                                 let amount = mod((idx + step), width);\n\
-                                if (amount === 0 || amount === width - 1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
-                                el.setAttribute('transform', `translate(${{amount}}, 0)`);\n\
+                                if (amount === 0 || amount === width -1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
+                                el.style.transform = `translate(${{amount}}px,0px)`;\n\
                             }}\n\
                             for (let [idx, el] of upBlizzards.entries()) {{\n\
                                 let amount = mod((idx - step), height);\n\
                                 if (amount === 0 || amount === height - 1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
-                                el.setAttribute('transform', `translate(0, ${{amount}})`);\n\
+                                el.style.transform = `translate(0px,${{amount}}px)`;\n\
                             }}\n\
                             for (let [idx, el] of downBlizzards.entries()) {{\n\
                                 let amount = mod((idx + step), height);\n\
                                 if (amount === 0 || amount === height - 1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
-                                el.setAttribute('transform', `translate(0, ${{amount}})`);\n\
+                                el.style.transform = `translate(0px,${{amount}}px)`;\n\
                             }}\n\
                         }};\n",
                         reachable_array, reachable_even_path_id, reachable_odd_path_id, valley.width, valley.height

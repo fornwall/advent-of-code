@@ -11,16 +11,17 @@ pub enum SvgTransform {
 impl SvgTransform {
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
         #![allow(clippy::unwrap_used)]
-        writer.write_all(b" transform=\"").unwrap();
+        // TODO: Co exist with styling
+        writer.write_all(b" style=\"transform:").unwrap();
         match self {
             Self::Translate(x, y) => {
                 writer
-                    .write_all(format!("translate({} {})\"", x, y).as_bytes())
+                    .write_all(format!("translate({}px,{}px)\"", x, y).as_bytes())
                     .unwrap();
             }
             Self::Scale(x, y) => {
                 writer
-                    .write_all(format!("scale({} {})\"", x, y).as_bytes())
+                    .write_all(format!("scale({}px,{}px)\"", x, y).as_bytes())
                     .unwrap();
             }
         }
