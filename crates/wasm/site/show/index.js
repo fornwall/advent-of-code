@@ -73,18 +73,18 @@ visualizerWorker.onmessage = (message) => {
       show.style.display = "flex";
       let step = 0;
       try {
-        let stepFromParam = parseInt(state.params['step']);
+        let stepFromParam = parseInt(state.params["step"]);
         if (stepFromParam >= 0 && stepFromParam <= svg.dataset.steps) {
-            step = stepFromParam;
+          step = stepFromParam;
         }
       } catch (e) {}
 
       state.ready = true;
       setCurrentStep(step);
       if (step == 0) {
-          setTimeout(() => {
-            if (!playInterval) togglePause();
-          }, 1000);
+        setTimeout(() => {
+          if (!playInterval) togglePause();
+        }, 1000);
       }
       await toggleFullScreen();
     }
@@ -159,8 +159,14 @@ document.body.addEventListener("keydown", async (e) => {
       break;
     case "s":
       if (state.ready) {
-          window.history.replaceState(null, "", `?year=${state.params.year}&day=${state.params.day}&part=${state.params.part}&step=${progress.value}`);
-          await navigator.clipboard.writeText(`Advent of Code ${state.params.year}, day ${state.params.day}:\n${location.href}`);
+        window.history.replaceState(
+          null,
+          "",
+          `?year=${state.params.year}&day=${state.params.day}&part=${state.params.part}&step=${progress.value}`
+        );
+        await navigator.clipboard.writeText(
+          `Advent of Code ${state.params.year}, day ${state.params.day}:\n${location.href}`
+        );
       }
       break;
   }
