@@ -25,8 +25,8 @@ const visualizerWorker = new Worker(
 
 visualizerWorker.onmessage = (message) => {
   if ("errorMessage" in message.data) {
-    console.error("Input error:", message.data.errorMessage);
-    spinner.innerHTML = `<h1 style="text-align: center;">Input error: ${message.data.errorMessage}</h1>`;
+    console.error("Error from worker", message.data.errorMessage);
+    spinner.innerHTML = `<h1>Error: ${message.data.errorMessage}</h1>`;
   } else if (message.data.done) {
     console.log(
       "SVG size: " +
