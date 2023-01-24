@@ -1,18 +1,21 @@
-use crate::input::Input;
 use std::collections::HashMap;
 
+use crate::input::Input;
+
 pub fn solve(input: &Input) -> Result<u32, String> {
-    let mut desired = HashMap::new();
-    desired.insert("children", 3);
-    desired.insert("cats", 7);
-    desired.insert("samoyeds", 2);
-    desired.insert("pomeranians", 3);
-    desired.insert("akitas", 0);
-    desired.insert("vizslas", 0);
-    desired.insert("goldfish", 5);
-    desired.insert("trees", 3);
-    desired.insert("cars", 2);
-    desired.insert("perfumes", 1);
+    let desired: HashMap<&str, i32> = [
+        ("children", 3),
+        ("cats", 7),
+        ("samoyeds", 2),
+        ("pomeranians", 3),
+        ("akitas", 0),
+        ("vizslas", 0),
+        ("goldfish", 5),
+        ("trees", 3),
+        ("cars", 2),
+        ("perfumes", 1),
+    ]
+    .into();
 
     'outer: for (line_idx, line) in input.text.lines().enumerate() {
         let error = || format!("Line {}: Invalid format", line_idx + 1);
