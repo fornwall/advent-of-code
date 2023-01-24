@@ -16,6 +16,7 @@
         font-family: sans-serif;
         color: white;
         user-select: none;
+        -webkit-tap-highlight-color: transparent !important;
       }
 
       body {
@@ -48,6 +49,20 @@
         max-height: calc(100vh - 2em);
       }
 
+      #spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: 100%;
+        position: fixed;
+        text-align: center;
+      }
+
+      #spinner img {
+          max-width: 100%;
+          max-height: 100%
+      }
       #inputs {
         width: 100%;
         display: flex;
@@ -110,16 +125,6 @@
         <!-- <svg/> -->
       </div>
     </div>
-    <div
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100vw;
-        height: 100%;
-        position: fixed;
-      "
-      id="spinner"
-    ></div>
+    <div id="spinner"></div>
   </body>
 </html>

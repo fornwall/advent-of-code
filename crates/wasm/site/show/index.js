@@ -1,13 +1,4 @@
 import { AudioPlayer } from "./audio-player.js";
-// import CanvasRecorder from "./CanvasRecorder-mp4wasm.js";
-
-const visualizerWorker = new Worker(
-  new URL("./worker-visualizer.js", import.meta.url),
-  {
-    name: "visualizer",
-    type: "module",
-  }
-);
 
 const spinner = document.getElementById("spinner");
 const rendering = document.getElementById("rendering");
@@ -24,6 +15,14 @@ const state = {
   audioPlayer: new AudioPlayer("bounce.mp4", "pop.mp4"),
 };
 
+const visualizerWorker = new Worker(
+  new URL("./worker-visualizer.js", import.meta.url),
+  {
+    name: "visualizer",
+    type: "module",
+  }
+);
+
 visualizerWorker.onmessage = (message) => {
   if ("errorMessage" in message.data) {
     console.error("Input error:", message.data.errorMessage);
@@ -37,13 +36,13 @@ visualizerWorker.onmessage = (message) => {
 
     const { year, day, part } = state.params;
     document.documentElement.style.cursor = "pointer";
-    spinner.innerHTML = `<h1 style="text-align: center;">Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>
+    spinner.innerHTML = `<h1>Advent of Code ${year}<br/>Day ${day}, part ${part}<br/><br/>
         Press anywhere to start</h1>`;
 
-    async function onClick() {
-      spinner.style.display = "none";
-      document.documentElement.style.cursor = "";
+    const onClick = () => {
       document.documentElement.removeEventListener("click", onClick);
+      document.documentElement.style.cursor = "";
+      spinner.style.display = "none";
       rendering.innerHTML = message.data.answer;
 
       svg = rendering.querySelector("svg");
@@ -75,11 +74,13 @@ visualizerWorker.onmessage = (message) => {
       show.style.display = "flex";
       let step = 0;
       try {
-        let stepFromParam = parseInt(state.params["step"]);
+        const stepFromParam = parseInt(state.params["step"]);
         if (stepFromParam >= 0 && stepFromParam <= svg.dataset.steps) {
           step = stepFromParam;
         }
-      } catch (e) {}
+      } catch (_e) {
+        // Ignore.
+      }
 
       state.ready = true;
       setCurrentStep(step);
@@ -88,27 +89,28 @@ visualizerWorker.onmessage = (message) => {
           if (!playInterval) togglePause();
         }, 1000);
       }
-      await toggleFullScreen();
-    }
+      toggleFullScreen();
+    };
     document.documentElement.addEventListener("click", onClick);
   }
 };
 
-async function toggleFullScreen() {
+function toggleFullScreen() {
   if (document.fullscreenElement) {
-    // Do nothing.
     document.exitFullscreen();
   } else {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
     } else if (document.documentElement.webkitRequestFullscreen) {
       document.documentElement.webkitRequestFullscreen();
+    } else {
+      return;
     }
     if (svg) {
       const viewBox = svg.getAttribute("viewBox").split(" ");
       if (parseInt(viewBox[2]) > parseInt(viewBox[3])) {
         try {
-          await window.screen.orientation.lock("landscape-primary");
+          window.screen.orientation.lock("landscape-primary");
         } catch (_e) {
           // Silently ignore.
         }
@@ -131,35 +133,44 @@ function downloadImage() {
   a.click();
 }
 
+function ifReady(then) {
+  if (state.ready) then();
+}
+
 document.body.addEventListener("keydown", async (e) => {
   const multiplier = e.shiftKey || e.altKey || e.metaKey ? 10 : 1;
   switch (e.key) {
     case "ArrowLeft":
       if (playInterval) togglePause();
       changeCurrentValue(-1 * multiplier);
-      e.preventDefault();
+      //e.preventDefault();
       break;
     case "ArrowRight":
       if (playInterval) togglePause();
       changeCurrentValue(1 * multiplier);
-      e.preventDefault();
-      break;
-    case "f":
-      await toggleFullScreen();
+      //e.preventDefault();
       break;
     case "d":
-      downloadImage();
+      // Download current image.
+      ifReady(downloadImage);
+      break;
+    case "f":
+      // Full screen.
+      ifReady(toggleFullScreen);
       break;
     case "Enter":
     case "p":
     case " ":
+      // Pause.
       togglePause();
       break;
     case "r":
+      // Restart.
       setCurrentStep(0);
       if (!playInterval) togglePause();
       break;
     case "s":
+      // Share URL including step.
       if (state.ready) {
         window.history.replaceState(
           null,
@@ -251,12 +262,7 @@ function revertDisplay() {
   progress.value = 0;
   show.style.display = "none";
   spinner.style.display = "flex";
-  spinner.innerHTML = `<img
-        id="spinnerImage"
-        alt="Loading…"
-        src="/static/spinner.svg"
-        style="z-index: 100; max-width: 100%; max-height: 100%"
-      />`;
+  spinner.innerHTML = `<img alt="Loading…" src="/static/spinner.svg" />`;
 }
 
 function sendMessageToWorker(newInput) {
