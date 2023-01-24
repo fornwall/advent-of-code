@@ -17,6 +17,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         Ok(answers[TARGET_SIZE as usize])
     } else {
         let all_bits = u32::MAX >> (32 - container_sizes.len());
+
         for containers_to_use in 1..=container_sizes.len() {
             let possible_combinations = (1..=all_bits)
                 .filter(|bit_mask| {
@@ -25,10 +26,10 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     }
                     let total_size: u32 = container_sizes
                         .iter()
-                        .map(|&size| u32::from(size))
                         .enumerate()
-                        .filter(|&(idx, _size)| ((1 << idx) & bit_mask) > 0)
-                        .map(|(_idx, size)| size)
+                        .filter_map(|(idx, &size)| {
+                            (((1 << idx) & bit_mask) != 0).then_some(u32::from(size))
+                        })
                         .sum();
                     total_size == u32::from(TARGET_SIZE)
                 })
