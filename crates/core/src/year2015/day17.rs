@@ -16,14 +16,13 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
         Ok(answers[TARGET_SIZE as usize])
     } else {
-        let mut all_bits = 0_u32;
-        for i in 0..container_sizes.len() {
-            all_bits |= 1 << i;
-        }
+        let all_bits = u32::MAX >> (32 - container_sizes.len());
         for containers_to_use in 1..=container_sizes.len() {
-            let mut possible_combinations = 0;
-            for bit_mask in 1..=all_bits {
-                if bit_mask.count_ones() == containers_to_use as u32 {
+            let possible_combinations = (1..=all_bits)
+                .filter(|bit_mask| {
+                    if bit_mask.count_ones() != containers_to_use as u32 {
+                        return false;
+                    }
                     let total_size: u32 = container_sizes
                         .iter()
                         .map(|&size| u32::from(size))
@@ -31,13 +30,11 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         .filter(|&(idx, _size)| ((1 << idx) & bit_mask) > 0)
                         .map(|(_idx, size)| size)
                         .sum();
-                    if total_size == u32::from(TARGET_SIZE) {
-                        possible_combinations += 1;
-                    }
-                }
-            }
+                    total_size == u32::from(TARGET_SIZE)
+                })
+                .count();
             if possible_combinations != 0 {
-                return Ok(possible_combinations);
+                return Ok(possible_combinations as u32);
             }
         }
 
