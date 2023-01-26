@@ -44,9 +44,7 @@ impl Board {
 }
 
 pub fn solve(input: &Input) -> Result<u32, String> {
-    let mut lines = input.text.lines();
-
-    let drawn_numbers = lines
+    let drawn_numbers = input.text.lines()
         .next()
         .unwrap_or_default()
         .split(',')

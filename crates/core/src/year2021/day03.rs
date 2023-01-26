@@ -64,8 +64,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         let gamma: u16 = set_bits_at_position
             .iter()
             .enumerate()
-            .filter(|(_bit_idx, &count)| count >= 0)
-            .map(|(bit_idx, _count)| 1 << bit_idx)
+            .filter_map(|(bit_idx, &count)| (count >= 0).then_some(1 << bit_idx))
             .sum();
         let epsilon = !gamma & set_lowest_bits(num_bits as u8);
         Ok(u32::from(gamma) * u32::from(epsilon))
