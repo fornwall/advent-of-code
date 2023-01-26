@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable, nightly-2022-12-11]
+        rust: [stable, nightly]
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
@@ -25,9 +25,9 @@ jobs:
       if: matrix.rust == 'stable'
     - name: Test and check (nightly)
       run: |
-        rustup component add clippy rustfmt --toolchain nightly-2022-12-11
+        rustup component add clippy rustfmt --toolchain nightly
         make NIGHTLY=1 check
-      if: matrix.rust == 'nightly-2022-12-11'
+      if: matrix.rust == 'nightly'
       continue-on-error: true
 
   test-rust-32-bits:
@@ -189,7 +189,7 @@ jobs:
       uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
       with:
-        toolchain: nightly-2022-12-11
+        toolchain: nightly
     - name: Fuzz with libfuzzer
       run: timeout 1800s make fuzz-libfuzzer
       continue-on-error: true
@@ -226,11 +226,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: nightly-2022-12-11
     - name: Generate code coverage
-      # What about -all-features and --workspace?
-      run: cargo +nightly-2022-12-11 tarpaulin --verbose --timeout 720 --out Xml
+      run: cargo tarpaulin --verbose --timeout 720 --out Xml
       working-directory: crates/core
     - name: Upload to codecov.io
       uses: codecov/codecov-action@v3
@@ -289,8 +286,6 @@ jobs:
       with:
         python-version: '3.x'
     - uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: nightly-2022-12-11
     - uses: actions/setup-node@v3
       with:
         node-version: '18.x'
@@ -298,8 +293,6 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
-    - name: Install Rust nightly
-      run: make install-nightly
     - name: Install wasm-bindgen
       run: make install-wasm-bindgen
     - name: Download new gist-mapping.json

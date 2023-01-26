@@ -1,5 +1,4 @@
-NIGHTLY_DATE = 2022-12-11 # Update versions in .github/workflows as well.
-NIGHTLY_TOOLCHAIN = nightly-${NIGHTLY_DATE}
+NIGHTLY_TOOLCHAIN ?= nightly
 
 CARGO_COMMAND = cargo
 CLIPPY_PARAMS = --all-targets -- \
