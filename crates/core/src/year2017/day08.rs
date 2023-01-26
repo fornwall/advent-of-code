@@ -28,7 +28,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             "<=" => condition_value <= compared_with,
             "!=" => condition_value != compared_with,
             _ => {
-                return Err(format!("Unknown comparison {}", comparison));
+                return Err(format!("Unknown comparison {comparison}"));
             }
         } {
             let target_register = parts[0];

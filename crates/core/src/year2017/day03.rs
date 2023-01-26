@@ -78,7 +78,7 @@ impl Iterator for SquareIterator {
 fn parse(input_string: &str) -> Result<usize, String> {
     input_string
         .parse::<usize>()
-        .map_err(|e| format!("Invalid input - {}", e))
+        .map_err(|e| format!("Invalid input - {e}"))
         .and_then(|value| {
             if value == 0 {
                 Err("Invalid input 0".to_string())

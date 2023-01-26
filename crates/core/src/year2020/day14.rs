@@ -100,8 +100,7 @@ impl BitMask for BitMaskV2 {
 
         if memory.len() >= MEMORY_LIMIT {
             return Err(format!(
-                "Aborting due to memory usage (refusing to go above {} stored addresses)",
-                MEMORY_LIMIT
+                "Aborting due to memory usage (refusing to go above {MEMORY_LIMIT} stored addresses)"
             ));
         }
 

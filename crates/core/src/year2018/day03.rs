@@ -74,8 +74,7 @@ fn parse_input(input_string: &str) -> Result<Vec<Claim>, String> {
             };
             if claim.x + claim.width > SQUARE_WIDTH || claim.y + claim.height > SQUARE_WIDTH {
                 return Err(format!(
-                    "Claim outside {} by {} square",
-                    SQUARE_WIDTH, SQUARE_WIDTH
+                    "Claim outside {SQUARE_WIDTH} by {SQUARE_WIDTH} square"
                 ));
             }
             Ok(claim)

@@ -32,7 +32,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
             loop_count += 1;
             if loop_count > MAX_INSTRUCTIONS {
-                return Err(format!("Aborted after {} instructions", loop_count));
+                return Err(format!("Aborted after {loop_count} instructions"));
             }
         }
         Ok(program.registers.values[program.instructions[28].a as usize])
@@ -59,7 +59,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
             loop_count += 1;
             if loop_count > MAX_INSTRUCTIONS {
-                return Err(format!("Aborted after {} instructions", loop_count));
+                return Err(format!("Aborted after {loop_count} instructions"));
             }
         }
     }

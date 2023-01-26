@@ -43,7 +43,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             while !affected_by_beam(&program, left_edge, bottom_edge)? {
                 left_edge += 1;
                 if left_edge >= MAX_COORDINATE {
-                    return Err(format!("Aborting after reaching x={}", MAX_COORDINATE));
+                    return Err(format!("Aborting after reaching x={MAX_COORDINATE}"));
                 }
             }
 
@@ -55,7 +55,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             }
         }
 
-        Err(format!("Aborting after reaching y={}", MAX_COORDINATE))
+        Err(format!("Aborting after reaching y={MAX_COORDINATE}"))
     }
 }
 

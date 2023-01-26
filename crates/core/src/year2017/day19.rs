@@ -28,7 +28,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
     'outer_loop: loop {
         packet_steps += 1;
         if packet_steps >= 100_000 {
-            return Err(format!("Aborting after {} steps", packet_steps));
+            return Err(format!("Aborting after {packet_steps} steps"));
         }
         current_position = (
             current_position.0 + direction.0,

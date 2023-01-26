@@ -98,7 +98,7 @@ impl Vector {
             'D' => Self::new(0, 1),
             'L' => Self::new(-1, 0),
             _ => {
-                return Err(format!("Invalid direction: {}", specifier));
+                return Err(format!("Invalid direction: {specifier}"));
             }
         })
     }

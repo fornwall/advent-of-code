@@ -20,7 +20,7 @@ fn parse(data: &str, programs: &[u8]) -> Result<(Vec<u8>, HashMap<u8, u8>), Stri
                 args.next()
                     .ok_or("Spin not followed by argument")?
                     .parse::<u8>()
-                    .map_err(|e| format!("Unable to parse Spin argument: {}", e))?,
+                    .map_err(|e| format!("Unable to parse Spin argument: {e}"))?,
             );
             if arg_1 > moves.len() {
                 return Err(format!(
@@ -36,12 +36,12 @@ fn parse(data: &str, programs: &[u8]) -> Result<(Vec<u8>, HashMap<u8, u8>), Stri
                 .next()
                 .ok_or_else(|| "Exchange not followed by two arguments".to_string())?
                 .parse::<u8>()
-                .map_err(|e| format!("Unable to parse Exchange argument: {}", e))?;
+                .map_err(|e| format!("Unable to parse Exchange argument: {e}"))?;
             let arg_2 = args
                 .next()
                 .ok_or_else(|| "Exchange not followed by two arguments".to_string())?
                 .parse::<u8>()
-                .map_err(|e| format!("Unable to parse Exchange argument: {}", e))?;
+                .map_err(|e| format!("Unable to parse Exchange argument: {e}"))?;
             moves.swap(arg_1 as usize, arg_2 as usize);
         } else if dance_move.starts_with('p') {
             // "Partner, written pA/B, makes the programs named A and B swap places."

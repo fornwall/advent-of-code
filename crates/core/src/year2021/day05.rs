@@ -74,8 +74,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         match (is_straight_line, is_diagonal, input.is_part_two()) {
                             (false, false, _) => {
                                 return Err(format!(
-                                    "Line is neither straight nor diagonal: {},{} -> {},{}",
-                                    from_x, from_y, to_x, to_y
+                                    "Line is neither straight nor diagonal: {from_x},{from_y} -> {to_x},{to_y}"
                                 ));
                             }
                             (true, _, _) | (_, true, true) => {

@@ -47,7 +47,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 current_position == 0
             })
         })
-        .ok_or_else(|| format!("No solution within {} seconds found", MAX_TIME))
+        .ok_or_else(|| format!("No solution within {MAX_TIME} seconds found"))
 }
 
 #[test]

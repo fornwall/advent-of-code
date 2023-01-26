@@ -51,11 +51,10 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 .map_err(map_error)?;
 
             if range_start >= range_end {
-                return Err(format!("Invalid range: {}-{}", range_start, range_end));
+                return Err(format!("Invalid range: {range_start}-{range_end}"));
             } else if range_end > MAX_FIELD_VALUE {
                 return Err(format!(
-                    "Too high field range (max: {}): {}",
-                    MAX_FIELD_VALUE, range_end,
+                    "Too high field range (max: {MAX_FIELD_VALUE}): {range_end}",
                 ));
             }
 
@@ -88,7 +87,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         'outer: for (field_position, value_str) in line.split(',').enumerate() {
             let value = value_str.parse::<u32>().map_err(map_error)?;
             if value > MAX_FIELD_VALUE {
-                return Err(format!("Invalid field value: {}", value));
+                return Err(format!("Invalid field value: {value}"));
             }
             let valid_ticket = field_ranges.iter().any(|range| range[value as usize]);
             if valid_ticket {

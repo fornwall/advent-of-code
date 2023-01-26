@@ -86,7 +86,7 @@ impl Grid {
                         }
                     }
                     _ => {
-                        return Err(format!("Unhandled cell value: {}", cell_value));
+                        return Err(format!("Unhandled cell value: {cell_value}"));
                     }
                 }
             }

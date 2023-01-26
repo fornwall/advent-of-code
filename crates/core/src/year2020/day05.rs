@@ -25,8 +25,7 @@ pub fn solve(input: &Input) -> Result<SeatId, String> {
         }
     }) {
         return Err(format!(
-            "Line {}: Not expected format (7 'F' or 'B' characters followed by 3 'L' or 'R' ones)",
-            invalid_line_idx
+            "Line {invalid_line_idx}: Not expected format (7 'F' or 'B' characters followed by 3 'L' or 'R' ones)"
         ));
     }
 

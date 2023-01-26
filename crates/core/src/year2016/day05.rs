@@ -40,7 +40,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
                 // "Use only the first result for each position, and ignore invalid positions.":
                 if position < 8 && password[position as usize] == ' ' {
                     password[position as usize] =
-                        format!("{:x?}", character).chars().next().unwrap_or('_');
+                        format!("{character:x?}").chars().next().unwrap_or('_');
                     if !password.contains(&' ') {
                         return Ok(String::from_iter(password));
                     }
@@ -49,7 +49,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         }
     }
 
-    Err(format!("Aborting after {} iterations", MAX_INDEX))
+    Err(format!("Aborting after {MAX_INDEX} iterations"))
 }
 
 #[test]

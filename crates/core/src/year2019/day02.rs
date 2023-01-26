@@ -22,10 +22,7 @@ pub fn solve(input: &Input) -> Result<Word, String> {
         }
     }
 
-    Err(format!(
-        "Desired output {} is never produced",
-        DESIRED_OUTPUT
-    ))
+    Err(format!("Desired output {DESIRED_OUTPUT} is never produced"))
 }
 
 #[test]

@@ -17,8 +17,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
     if input.is_part_two() {
         return Err(format!(
-            "No simultaneous flash within {} steps",
-            MAX_STEPS_PART_TWO
+            "No simultaneous flash within {MAX_STEPS_PART_TWO} steps"
         ));
     }
 

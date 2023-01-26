@@ -13,13 +13,13 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         .split(',')
         .map(|s| {
             s.parse::<u32>()
-                .map_err(|error| format!("Invalid input: {}", error))
+                .map_err(|error| format!("Invalid input: {error}"))
         })
         .enumerate()
     {
         let starting_number = parsed_starting_number?;
         if starting_number > target_turn {
-            return Err(format!("Too high starting number: {}", starting_number));
+            return Err(format!("Too high starting number: {starting_number}"));
         }
         next_number = starting_number;
         value_to_turn[next_number as usize] = (idx + 1) as u32;
@@ -28,7 +28,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
     while turn != target_turn {
         if next_number >= target_turn {
-            return Err(format!("Too big number: {}", next_number));
+            return Err(format!("Too big number: {next_number}"));
         }
 
         let last_spoken_turn = std::mem::replace(&mut value_to_turn[next_number as usize], turn);

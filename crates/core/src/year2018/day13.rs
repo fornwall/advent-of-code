@@ -161,7 +161,7 @@ impl Track {
                         // Ignore
                     }
                     _ => {
-                        return Err(format!("Invalid char: {}", c));
+                        return Err(format!("Invalid char: {c}"));
                     }
                 }
 

@@ -53,7 +53,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
     }
 
-    Err(format!("Aborting after {} iterations", MAX_ITERATIONS))
+    Err(format!("Aborting after {MAX_ITERATIONS} iterations"))
 }
 
 #[test]

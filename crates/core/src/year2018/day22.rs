@@ -122,7 +122,7 @@ impl Grid {
             1 => RegionType::Wet,
             2 => RegionType::Narrow,
             other => {
-                return Err(format!("Invalid risk level: {}", other));
+                return Err(format!("Invalid risk level: {other}"));
             }
         })
     }

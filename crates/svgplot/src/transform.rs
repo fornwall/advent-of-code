@@ -16,12 +16,12 @@ impl SvgTransform {
         match self {
             Self::Translate(x, y) => {
                 writer
-                    .write_all(format!("translate({}px,{}px)\"", x, y).as_bytes())
+                    .write_all(format!("translate({x}px,{y}px)\"").as_bytes())
                     .unwrap();
             }
             Self::Scale(x, y) => {
                 writer
-                    .write_all(format!("scale({}px,{}px)\"", x, y).as_bytes())
+                    .write_all(format!("scale({x}px,{y}px)\"").as_bytes())
                     .unwrap();
             }
         }

@@ -30,12 +30,12 @@ impl SvgColor {
         match self {
             Self::Rgb(r, g, b) => {
                 writer
-                    .write_all(format!(" {}=\"rgb({}, {}, {})\"", what, r, g, b).as_bytes())
+                    .write_all(format!(" {what}=\"rgb({r}, {g}, {b})\"").as_bytes())
                     .unwrap();
             }
             Self::RgbPercentage(r, g, b) => {
                 writer
-                    .write_all(format!(" {}=\"rgb({}%, {}%, {}%)\"", what, r, g, b).as_bytes())
+                    .write_all(format!(" {what}=\"rgb({r}%, {g}%, {b}%)\"").as_bytes())
                     .unwrap();
             }
             _ => {

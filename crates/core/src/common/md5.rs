@@ -124,7 +124,7 @@ fn lower_hex(data: &[u8]) -> String {
     use std::fmt::Write;
     let mut buf = String::new();
     for value in data {
-        write!(buf, "{:02x}", value).unwrap();
+        write!(buf, "{value:02x}").unwrap();
         //buf.write_fmt("{:02x}", value);
     }
     buf

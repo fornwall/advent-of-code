@@ -27,7 +27,7 @@ impl Program {
                     memory.push(value);
                 }
                 Err(error) => {
-                    return Err(format!("Unable to parse program word ({})", error));
+                    return Err(format!("Unable to parse program word ({error})"));
                 }
             }
         }
@@ -59,7 +59,7 @@ impl Program {
 
             current_instruction += 1;
             if current_instruction == max_instructions {
-                return Err(format!("Aborted after {} instructions", max_instructions));
+                return Err(format!("Aborted after {max_instructions} instructions"));
             }
         }
         Ok(())
@@ -187,7 +187,7 @@ impl Program {
                 self.halted = true;
             }
             _ => {
-                return Err(format!("Invalid opcode: {}", opcode));
+                return Err(format!("Invalid opcode: {opcode}"));
             }
         }
 

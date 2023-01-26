@@ -88,7 +88,7 @@ impl Parser {
                 Ok(())
             }
             b' ' => Ok(()),
-            _ => Err(format!("Invalid char: {}", char)),
+            _ => Err(format!("Invalid char: {char}")),
         }
     }
 

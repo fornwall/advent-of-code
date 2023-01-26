@@ -6,7 +6,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         input
             .text
             .parse::<std::num::NonZeroU32>()
-            .map_err(|e| format!("Invalid number of elves: {}", e))?,
+            .map_err(|e| format!("Invalid number of elves: {e}"))?,
     );
 
     if input.is_part_one() {

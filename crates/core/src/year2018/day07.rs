@@ -50,16 +50,16 @@ fn parse_input(input_string: &str) -> Result<ParsedInput, String> {
         let line_number = line_index + 1;
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() != 10 {
-            return Err(format!("Invalid line: {}", line_number));
+            return Err(format!("Invalid line: {line_number}"));
         }
         let step_name = parts[7]
             .chars()
             .next()
-            .ok_or(format!("Invalid line: {}", line_number))?;
+            .ok_or(format!("Invalid line: {line_number}"))?;
         let depends_on = parts[1]
             .chars()
             .next()
-            .ok_or(format!("Invalid line: {}", line_number))?;
+            .ok_or(format!("Invalid line: {line_number}"))?;
 
         let step = step_map
             .entry(step_name)

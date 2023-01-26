@@ -59,7 +59,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 );
                 count += 1;
             } else {
-                return Err(format!("Stuck after {} steps", count));
+                return Err(format!("Stuck after {count} steps"));
             }
         }
 

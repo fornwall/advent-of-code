@@ -31,8 +31,7 @@ pub fn solve(input: &Input) -> Result<Frequency, String> {
         }
 
         Err(format!(
-            "Frequency not repeated after {} iterations",
-            MAX_ITERATIONS
+            "Frequency not repeated after {MAX_ITERATIONS} iterations"
         ))
     }
 }

@@ -19,7 +19,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             "sw" => (-1, -1),
             "nw" => (-1, 1),
             _ => {
-                return Err(format!("Invalid step: {}", step));
+                return Err(format!("Invalid step: {step}"));
             }
         };
 

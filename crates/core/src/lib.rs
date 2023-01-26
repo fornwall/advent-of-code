@@ -82,9 +82,9 @@ pub fn solve(
     } else if !input.is_ascii() {
         return Err("Non-ASCII input".to_string());
     } else if !matches!(day, 1..=25) {
-        return Err(format!("Invalid day {} - must be 1-25", day));
+        return Err(format!("Invalid day {day} - must be 1-25"));
     } else if !matches!(part, 1 | 2) {
-        return Err(format!("Invalid part {} - must be 1-2", part));
+        return Err(format!("Invalid part {part} - must be 1-2"));
     }
 
     let input = Input {
@@ -295,10 +295,7 @@ pub fn solve(
         (2022, 23) => to_stringer_input(year2022::day23::solve, &input),
         (2022, 24) => to_stringer_input(year2022::day24::solve, &input),
         (2022, 25) => to_stringer_input(year2022::day25::solve, &input),
-        _ => Err(format!(
-            "Unsupported year={}, day={}, part={}",
-            year, day, part
-        )),
+        _ => Err(format!("Unsupported year={year}, day={day}, part={part}")),
     };
 
     #[cfg(feature = "visualization")]

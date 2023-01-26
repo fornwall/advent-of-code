@@ -10,11 +10,10 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             let parts: Vec<&str> = line.split(',').collect();
             if parts.len() != 4 {
                 return Err(format!(
-                    "Invalid input at line {} - not 4 comma-separated values",
-                    line_number
+                    "Invalid input at line {line_number} - not 4 comma-separated values"
                 ));
             }
-            let error = |e| format!("Invalid input at line {}: {}", line_number, e);
+            let error = |e| format!("Invalid input at line {line_number}: {e}");
             Ok((
                 parts[0].parse::<i32>().map_err(error)?,
                 parts[1].parse::<i32>().map_err(error)?,

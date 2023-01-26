@@ -8,10 +8,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             return Ok(round as u32);
         }
     }
-    Err(format!(
-        "Did not stabilize in {} iterations",
-        MAX_ITERATIONS
-    ))
+    Err(format!("Did not stabilize in {MAX_ITERATIONS} iterations"))
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]

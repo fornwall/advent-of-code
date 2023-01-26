@@ -17,7 +17,7 @@ impl Color {
             0 => Self::Black,
             1 => Self::White,
             _ => {
-                return Err(format!("Invalid color value: {}", value));
+                return Err(format!("Invalid color value: {value}"));
             }
         })
     }
@@ -81,7 +81,7 @@ fn run(input_string: &str, initial_color: Color) -> Result<HashMap<(i32, i32), C
             0 => current_direction.turn_left(),
             1 => current_direction.turn_right(),
             _ => {
-                return Err(format!("Invalid direction: {}", turn_direction));
+                return Err(format!("Invalid direction: {turn_direction}"));
             }
         };
 

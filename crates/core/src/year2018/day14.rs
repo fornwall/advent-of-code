@@ -38,7 +38,7 @@ where
 
         loop_count += 1;
         if loop_count > MAX_ITERATIONS {
-            return Err(format!("Aborted after {} iterations", MAX_ITERATIONS));
+            return Err(format!("Aborted after {MAX_ITERATIONS} iterations"));
         }
     }
 }
@@ -48,7 +48,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         let input_num_recipes = input
             .text
             .parse::<u32>()
-            .map_err(|error| format!("Invalid input: {}", error))?
+            .map_err(|error| format!("Invalid input: {error}"))?
             as usize;
         let num_recipes_after = 10;
         let desired_length = input_num_recipes + num_recipes_after;

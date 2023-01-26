@@ -47,7 +47,7 @@ impl Program {
         while self.execute_one_instruction()? {
             loop_count += 1;
             if loop_count > max_instructions {
-                return Err(format!("Aborting after {} instructions", max_instructions));
+                return Err(format!("Aborting after {max_instructions} instructions"));
             }
         }
         Ok(self.registers.values[0])
@@ -154,7 +154,7 @@ fn opcode_from_str(name: &str) -> Result<Opcode, String> {
         "eqri" => Opcode::Eqri,
         "eqrr" => Opcode::Eqrr,
         _ => {
-            return Err(format!("No matching opcode: {}", name));
+            return Err(format!("No matching opcode: {name}"));
         }
     })
 }

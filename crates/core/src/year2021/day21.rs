@@ -61,8 +61,7 @@ impl Game {
             && valid_positions.contains(&player_2_position))
         {
             return Err(format!(
-                "Positions must be in the interval [1,{}]",
-                MAX_POSITION
+                "Positions must be in the interval [1,{MAX_POSITION}]"
             ));
         }
         Ok(Self {

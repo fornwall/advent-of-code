@@ -49,7 +49,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     );
     let max_players = 999;
     if num_players > max_players {
-        return Err(format!("Too many players (max: {})", max_players));
+        return Err(format!("Too many players (max: {max_players})"));
     }
 
     let last_marble_points = parts[6]
@@ -58,8 +58,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let max_last_marble_points = 100_000;
     if last_marble_points > max_last_marble_points {
         return Err(format!(
-            "Too high last marble value (max: {})",
-            max_last_marble_points
+            "Too high last marble value (max: {max_last_marble_points})"
         ));
     }
     let num_marbles = (last_marble_points) * last_marble_multiplier;

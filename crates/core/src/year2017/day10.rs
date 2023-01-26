@@ -14,7 +14,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
             .map(|length| {
                 length
                     .parse::<u8>()
-                    .map_err(|e| format!("Invalid length: {}", e))
+                    .map_err(|e| format!("Invalid length: {e}"))
             })
             .collect::<Result<Vec<_>, _>>()?
     } else {
@@ -51,7 +51,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
     } else {
         list.chunks(16)
             .map(|block| block.iter().fold(0, |acc, x| acc ^ x))
-            .map(|number| format!("{:02x}", number))
+            .map(|number| format!("{number:02x}"))
             .collect()
     })
 }

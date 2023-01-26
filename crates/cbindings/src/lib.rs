@@ -41,7 +41,7 @@ pub extern "C" fn advent_of_code_solve(
         Ok(value) => value,
         Err(error) => {
             unsafe { *ok = false };
-            let c_str_result = CString::new(format!("Invalid UTF-8 input: {}", error)).unwrap();
+            let c_str_result = CString::new(format!("Invalid UTF-8 input: {error}")).unwrap();
             return c_str_result.into_raw();
         }
     };

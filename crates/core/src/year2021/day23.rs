@@ -75,8 +75,7 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     fn get_at_hallway(self, hallway_idx: usize) -> Option<Amphipod> {
         debug_assert!(
             hallway_idx < Self::HALLWAY_SPACES,
-            "Hallway idx={}",
-            hallway_idx
+            "Hallway idx={hallway_idx}"
         );
         let bit_idx = Self::ALL_ROOM_BITS + Self::BITS_PER_HALLWAY * hallway_idx;
         if self.storage & (1 << (bit_idx + 2)) == 0 {
@@ -86,11 +85,7 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     }
 
     fn set_at_hallway(&mut self, hallway_idx: usize, amphipod: Option<Amphipod>) {
-        debug_assert!(
-            hallway_idx <= 6,
-            "Max hallway_idx is 6 (was {})",
-            hallway_idx
-        );
+        debug_assert!(hallway_idx <= 6, "Max hallway_idx is 6 (was {hallway_idx})");
         let bit_idx = Self::ALL_ROOM_BITS + Self::BITS_PER_HALLWAY * hallway_idx;
         match amphipod {
             None => {

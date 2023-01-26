@@ -109,7 +109,7 @@ pub fn solve(input: &Input) -> Result<i128, String> {
         .next()
         .ok_or("Not two lines")?
         .parse::<u32>()
-        .map_err(|error| format!("Line 1: Cannot parse number - {}", error))?;
+        .map_err(|error| format!("Line 1: Cannot parse number - {error}"))?;
 
     let bus_ids = lines
         .next()

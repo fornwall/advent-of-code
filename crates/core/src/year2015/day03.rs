@@ -29,7 +29,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 mover.1 += 1;
             }
             _ => {
-                return Err(format!("Invalid input char '{}'", c));
+                return Err(format!("Invalid input char '{c}'"));
             }
         }
 

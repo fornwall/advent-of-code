@@ -21,7 +21,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
     }
 
-    Err(format!("Aborting after {} iterations", MAX_INDEX))
+    Err(format!("Aborting after {MAX_INDEX} iterations"))
 }
 
 #[test]

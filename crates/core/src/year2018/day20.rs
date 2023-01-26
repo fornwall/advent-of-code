@@ -92,7 +92,7 @@ where
                 positions_at_start_of_branch.pop();
             }
             _ => {
-                return Err(format!("Invalid map tile: {}", char));
+                return Err(format!("Invalid map tile: {char}"));
             }
         }
     }

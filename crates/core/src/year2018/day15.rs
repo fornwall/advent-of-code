@@ -59,7 +59,7 @@ impl Board {
                         }
                     }
                     _ => {
-                        return Err(format!("Unrecognized cell: {}", c));
+                        return Err(format!("Unrecognized cell: {c}"));
                     }
                 });
             }
@@ -282,7 +282,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
         loop {
             if board.round > MAX_ROUNDS {
-                return Err(format!("No solution found in {} rounds", MAX_ROUNDS));
+                return Err(format!("No solution found in {MAX_ROUNDS} rounds"));
             }
 
             board.perform_round();

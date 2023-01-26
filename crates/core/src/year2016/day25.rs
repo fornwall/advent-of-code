@@ -8,7 +8,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             let start_value = a * b;
             for initial_value in 1..1000 {
                 let value = start_value + initial_value;
-                if format!("{:b}", value).replace("10", "").is_empty() {
+                if format!("{value:b}").replace("10", "").is_empty() {
                     return Ok(initial_value as u32);
                 }
             }

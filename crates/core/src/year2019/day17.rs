@@ -79,7 +79,7 @@ impl Direction {
         } else if self.turn_left() == target {
             Ok('L')
         } else {
-            Err(format!("Cannot turn from {:?} to {:?}", self, target))
+            Err(format!("Cannot turn from {self:?} to {target:?}"))
         }
     }
 

@@ -14,15 +14,14 @@ pub const fn gcd(mut a: i64, mut b: i64) -> i64 {
 pub fn parse_points(input_string: &str) -> Result<Vec<(usize, usize)>, String> {
     for c in input_string.chars() {
         if !(c == '#' || c == '.' || c == '\n') {
-            return Err(format!("Invalid character: {}", c));
+            return Err(format!("Invalid character: {c}"));
         }
     }
 
     let num_asteroides = input_string.chars().filter(|&c| c == '#').count();
     if num_asteroides < 201 {
         return Err(format!(
-            "Too few asteroids - expected at least 201, got {}",
-            num_asteroides
+            "Too few asteroids - expected at least 201, got {num_asteroides}"
         ));
     }
 

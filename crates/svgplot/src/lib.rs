@@ -96,7 +96,7 @@ impl SvgImage {
             .unwrap();
         if let Some((x, y)) = &self.dimensions {
             buffer
-                .write_all(format!(" x=\"{}\" y=\"{}\"", x, y).as_bytes())
+                .write_all(format!(" x=\"{x}\" y=\"{y}\"").as_bytes())
                 .unwrap();
         }
         if let Some(view_box) = &self.view_box {
@@ -148,8 +148,7 @@ fn test() {
         );
         if color.0 == 0xff {
             image.add(SvgScript::new(format!(
-                "setTimeout(() => {{ document.getElementById('{}').remove(); }}, 1000);",
-                id
+                "setTimeout(() => {{ document.getElementById('{id}').remove(); }}, 1000);"
             )));
         }
     }

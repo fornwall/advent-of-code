@@ -45,8 +45,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let num_bits = input.text.lines().next().map(str::len).unwrap_or_default();
     if num_bits == 0 || num_bits > MAX_BITS {
         return Err(format!(
-            "Invalid number of bits - must be between 1 and {}",
-            MAX_BITS
+            "Invalid number of bits - must be between 1 and {MAX_BITS}"
         ));
     }
 

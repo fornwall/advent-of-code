@@ -108,7 +108,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         } else {
             iteration += 1;
             if iteration >= MAX_ITERATIONS {
-                return Err(format!("Aborting after {} iterations", iteration));
+                return Err(format!("Aborting after {iteration} iterations"));
             }
         }
     }

@@ -4,7 +4,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let steps = input
         .text
         .parse::<u32>()
-        .map_err(|e| format!("Unable to parse input - {}", e))?;
+        .map_err(|e| format!("Unable to parse input - {e}"))?;
 
     // "It starts with a circular buffer containing only the value 0":
     let mut circular_buffer = vec![0];

@@ -13,7 +13,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let magic_number = input
         .text
         .parse::<i32>()
-        .map_err(|e| format!("Invalid magic number: {}", e))?;
+        .map_err(|e| format!("Invalid magic number: {e}"))?;
 
     let mut to_visit = BinaryHeap::new();
     let mut visited_states = HashSet::new();

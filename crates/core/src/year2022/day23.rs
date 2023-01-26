@@ -105,8 +105,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             let new_position = (elf.0 + to_move.0, elf.1 + to_move.1);
             if is_outside_max(new_position) {
                 return Err(format!(
-                    "Elf tried to moved outside of [0,{}): {:?}",
-                    MAX_SIZE, new_position
+                    "Elf tried to moved outside of [0,{MAX_SIZE}): {new_position:?}"
                 ));
             }
 

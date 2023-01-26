@@ -49,10 +49,7 @@ fn dist(
         }
     }
 
-    Err(format!(
-        "No path found from {:?} to {:?}",
-        start, destination
-    ))
+    Err(format!("No path found from {start:?} to {destination:?}"))
 }
 
 pub fn solve(input: &Input) -> Result<u32, String> {

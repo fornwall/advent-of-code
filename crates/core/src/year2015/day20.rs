@@ -4,7 +4,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let target_presents = input
         .text
         .parse::<u32>()
-        .map_err(|e| format!("Could not parse house number: {}", e))?;
+        .map_err(|e| format!("Could not parse house number: {e}"))?;
 
     let present_multiplier = input.part_values(10, 11);
     let max_visits = input.part_values(usize::MAX, 50);

@@ -16,8 +16,7 @@ fn insert_ancestors<'a>(
 ) -> Result<(), String> {
     if height > MAX_DEPTH {
         return Err(format!(
-            "Too deep tree (possibly recursive) - bailing at depth {}",
-            MAX_DEPTH
+            "Too deep tree (possibly recursive) - bailing at depth {MAX_DEPTH}"
         ));
     }
 
@@ -37,8 +36,7 @@ fn count_total_bags<'a>(
 ) -> Result<u32, String> {
     if depth > MAX_DEPTH {
         return Err(format!(
-            "Too deep tree (possibly recursive) - bailing at depth {}",
-            MAX_DEPTH
+            "Too deep tree (possibly recursive) - bailing at depth {MAX_DEPTH}"
         ));
     }
 

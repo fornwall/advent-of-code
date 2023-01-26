@@ -105,13 +105,13 @@ fn identify_char(input: &str) -> Result<char, String> {
         "#....#\n#....#\n.#..#.\n.#..#.\n..##..\n..##..\n.#..#.\n.#..#.\n#....#\n#....#\n" => 'X',
         "######\n.....#\n.....#\n....#.\n...#..\n..#...\n.#....\n#.....\n#.....\n######\n" => 'Z',
         _ => {
-            println!("###Unrecognized string:\n{}###", input);
+            println!("###Unrecognized string:\n{input}###");
             let mut shower = String::new();
             shower.push('"');
             shower.push_str(&input.replace('\n', "\\n"));
             shower.push_str("\" => '?',");
-            println!("Shower:\n{}", shower);
-            return Err(format!("Unrecognized char: {}", input));
+            println!("Shower:\n{shower}");
+            return Err(format!("Unrecognized char: {input}"));
         }
     })
 }

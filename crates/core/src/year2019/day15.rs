@@ -67,7 +67,7 @@ where
                     to_visit.push_back((new_position, new_distance, updated_program.clone()));
                 }
                 other => {
-                    return Err(format!("Invalid output: {}", other));
+                    return Err(format!("Invalid output: {other}"));
                 }
             }
         }

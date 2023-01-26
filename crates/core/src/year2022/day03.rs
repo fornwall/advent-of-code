@@ -24,15 +24,14 @@ fn common_item_priority<const N: usize>(item_groups: [&str; N]) -> u32 {
 }
 
 fn items_bitset(items: &str) -> u64 {
-    items
-        .bytes()
-        .fold(0, |acc, item_char| {
-            acc | 1 << u64::from(match item_char {
+    items.bytes().fold(0, |acc, item_char| {
+        acc | 1
+            << u64::from(match item_char {
                 b'a'..=b'z' => item_char - b'a' + 1,
                 b'A'..=b'Z' => item_char - b'A' + 27,
                 _ => 0,
             })
-        })
+    })
 }
 
 #[test]

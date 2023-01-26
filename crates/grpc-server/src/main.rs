@@ -64,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .register_encoded_file_descriptor_set(tonic::include_file_descriptor_set!("advent"))
         .build()?;
 
-    println!("Server listening on {}", addr);
+    println!("Server listening on {addr}");
     Server::builder()
         .add_service(solver_service)
         .add_service(reflection_service)

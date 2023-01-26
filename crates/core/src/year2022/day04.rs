@@ -27,7 +27,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         .enumerate()
         .map(|(line_idx, line)| {
             let intervals = parse_intervals(line).ok_or_else(|| {
-                format!("Line {}: Invalid input - expected 'u8-u8,u8-u8'", line_idx)
+                format!("Line {line_idx}: Invalid input - expected 'u8-u8,u8-u8'")
             })?;
             Ok(usize::from(condition(intervals.0, intervals.1)))
         })

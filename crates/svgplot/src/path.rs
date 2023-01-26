@@ -81,7 +81,7 @@ impl SvgPath {
         self.common_attributes.write(writer);
         if let Some(stroke_width) = &self.stroke_width {
             writer
-                .write_all(format!(" stroke-width=\"{}\"", stroke_width).as_bytes())
+                .write_all(format!(" stroke-width=\"{stroke_width}\"").as_bytes())
                 .unwrap();
         }
         if let Some(fill) = &self.fill {
@@ -190,34 +190,22 @@ impl SvgShape {
         for element in &self.elements {
             match element {
                 SvgPathElement::MoveAbsolute((x, y)) => {
-                    writer
-                        .write_all(format!("M {} {}", x, y).as_bytes())
-                        .unwrap();
+                    writer.write_all(format!("M {x} {y}").as_bytes()).unwrap();
                 }
                 SvgPathElement::MoveRelative((x, y)) => {
-                    writer
-                        .write_all(format!("m {} {}", x, y).as_bytes())
-                        .unwrap();
+                    writer.write_all(format!("m {x} {y}").as_bytes()).unwrap();
                 }
                 SvgPathElement::LineAbsolute((x, y)) => {
-                    writer
-                        .write_all(format!("L {} {}", x, y).as_bytes())
-                        .unwrap();
+                    writer.write_all(format!("L {x} {y}").as_bytes()).unwrap();
                 }
                 SvgPathElement::LineRelative((x, y)) => {
-                    writer
-                        .write_all(format!("l {} {}", x, y).as_bytes())
-                        .unwrap();
+                    writer.write_all(format!("l {x} {y}").as_bytes()).unwrap();
                 }
                 SvgPathElement::ArcRelative((rx, ry, x_rot, a_flag, s_flag, dx, dy)) => {
                     // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
                     writer
                         .write_all(
-                            format!(
-                                "a {} {} {} {} {} {} {}",
-                                rx, ry, x_rot, a_flag, s_flag, dx, dy
-                            )
-                            .as_bytes(),
+                            format!("a {rx} {ry} {x_rot} {a_flag} {s_flag} {dx} {dy}").as_bytes(),
                         )
                         .unwrap();
                 }

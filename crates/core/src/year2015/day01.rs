@@ -7,7 +7,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             '(' => 1,
             ')' => -1,
             _ => {
-                return Err(format!("Invalid char at offset {}: '{}'", idx, c));
+                return Err(format!("Invalid char at offset {idx}: '{c}'"));
             }
         };
         if input.is_part_two() && floor == -1 {

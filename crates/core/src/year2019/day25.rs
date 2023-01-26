@@ -62,10 +62,10 @@ fn execute_command(program: &mut Program, command: Command) -> Result<Room, Stri
             program.input_string(&format!("{}\n", direction.as_str()));
         }
         Command::Take(item) => {
-            program.input_string(&format!("take {}\n", item));
+            program.input_string(&format!("take {item}\n"));
         }
         Command::Drop(item) => {
-            program.input_string(&format!("drop {}\n", item));
+            program.input_string(&format!("drop {item}\n"));
         }
     }
 

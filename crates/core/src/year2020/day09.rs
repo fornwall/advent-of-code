@@ -64,7 +64,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 });
             min + max
         })
-        .ok_or_else(|| format!("No contiguous set summing to {}", invalid_number))
+        .ok_or_else(|| format!("No contiguous set summing to {invalid_number}"))
 }
 
 #[test]

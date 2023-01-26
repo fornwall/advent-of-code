@@ -39,8 +39,8 @@ pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
 
 fn convert_params(year: i32, day: i32, part: i32) -> Result<(u16, u8, u8), String> {
     Ok((
-        u16::try_from(year).map_err(|_| format!("Invalid year: {}", year))?,
-        u8::try_from(day).map_err(|_| format!("Invalid day: {}", day))?,
-        u8::try_from(part).map_err(|_| format!("Invalid part: {}", part))?,
+        u16::try_from(year).map_err(|_| format!("Invalid year: {year}"))?,
+        u8::try_from(day).map_err(|_| format!("Invalid day: {day}"))?,
+        u8::try_from(part).map_err(|_| format!("Invalid part: {part}"))?,
     ))
 }
