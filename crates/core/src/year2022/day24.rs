@@ -16,8 +16,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
     #[cfg(feature = "visualization")]
     let mut svg = SvgImage::new().style("background:black");
     #[cfg(feature = "visualization")]
-    let mut blizzard_svg_ids = Vec::new();
-    #[cfg(feature = "visualization")]
     {
         let blizzard_fill = SvgColor::Rgb(0x00, 0xB1, 0xD2);
         for (blizzard, dx0, dy0, dx1, dy1, dx2, dy2, dir) in [
@@ -44,14 +42,12 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                             .close();
                     }
                 }
-                blizzard_svg_ids.push(
-                    svg.add_with_id(
-                        SvgPath::default()
-                            .transform(SvgTransform::Translate(0., y as f64))
-                            .class(format!("blizzard blizzard-{}", dir))
-                            .shape(shape)
-                            .fill(blizzard_fill),
-                    ),
+                svg.add(
+                    SvgPath::default()
+                        .transform(SvgTransform::Translate(0., y as f64))
+                        .class(format!("blizzard blizzard-{}", dir))
+                        .shape(shape)
+                        .fill(blizzard_fill),
                 );
             }
         }
@@ -88,14 +84,12 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                             .close();
                     }
                 }
-                blizzard_svg_ids.push(
-                    svg.add_with_id(
-                        SvgPath::default()
-                            .transform(SvgTransform::Translate(x as f64, 0.))
-                            .class(format!("blizzard blizzard-{}", dir))
-                            .shape(shape)
-                            .fill(blizzard_fill),
-                    ),
+                svg.add(
+                    SvgPath::default()
+                        .transform(SvgTransform::Translate(x as f64, 0.))
+                        .class(format!("blizzard blizzard-{}", dir))
+                        .shape(shape)
+                        .fill(blizzard_fill),
                 );
             }
         }
