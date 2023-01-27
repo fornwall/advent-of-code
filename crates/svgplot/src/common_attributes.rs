@@ -10,6 +10,7 @@ pub struct CommonAttributes {
     pub(crate) style: Option<String>,
     pub(crate) classes: Vec<String>,
     pub(crate) transform: Option<SvgTransform>,
+    pub(crate) fill: Option<SvgColor>,
 }
 
 impl CommonAttributes {
@@ -18,6 +19,7 @@ impl CommonAttributes {
             style: None,
             classes: Vec::new(),
             transform: None,
+            fill: None,
         }
     }
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
@@ -26,6 +28,9 @@ impl CommonAttributes {
             writer
                 .write_all(format!(" style=\"{}\"", escape_xml(style)).as_bytes())
                 .unwrap();
+        }
+        if let Some(fill) = &self.fill {
+            fill.write_fill(writer);
         }
         if let Some(transform) = &self.transform {
             transform.write(writer);
@@ -57,9 +62,13 @@ macro_rules! implement_common_attributes {
                 self.common_attributes.transform = Some(transform);
                 self
             }
+            pub const fn fill(mut self, color: SvgColor) -> Self {
+                self.common_attributes.fill = Some(color);
+                self
+            }
         }
     };
 }
 
-use crate::SvgTransform;
+use crate::{SvgColor, SvgTransform};
 pub(crate) use implement_common_attributes;

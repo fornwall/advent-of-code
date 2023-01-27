@@ -112,11 +112,13 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 }
             }
             if !shape.is_empty() {
-                svg.add(SvgPath {
-                    shape,
-                    fill: Some(SvgColor::RgbPercentage(brightness, brightness, brightness)),
-                    ..Default::default()
-                });
+                svg.add(
+                    SvgPath {
+                        shape,
+                        ..Default::default()
+                    }
+                    .fill(SvgColor::RgbPercentage(brightness, brightness, brightness)),
+                );
             }
         }
 

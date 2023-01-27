@@ -1,6 +1,7 @@
 #[cfg(feature = "visualization")]
 use svgplot::{
-    Coordinate, SvgColor, SvgImage, SvgPath, SvgScript, SvgShape, SvgStyle, SvgTransform,
+    SvgCircle, SvgColor, SvgGroup, SvgImage, SvgPath, SvgScript, SvgShape, SvgStyle, SvgTransform,
+    SvgUse,
 };
 
 use crate::input::Input;
@@ -17,80 +18,62 @@ pub fn solve(input: &Input) -> Result<i32, String> {
     let mut svg = SvgImage::new().style("background:black");
     #[cfg(feature = "visualization")]
     {
-        let blizzard_fill = SvgColor::Rgb(0x00, 0xB1, 0xD2);
-        for (blizzard, dx0, dy0, dx1, dy1, dx2, dy2, dir) in [
-            (&valley.blizzards_up, 0.5, 0.25, 0.25, 0.5, -0.5, 0., "up"),
-            (
-                &valley.blizzards_down,
-                0.5,
-                0.75,
-                -0.25,
-                -0.5,
-                0.5,
-                0.,
-                "down",
-            ),
+        let blizzard_def_id = svg.define(
+            SvgPath::default()
+                .shape(
+                    SvgShape::new()
+                        .move_to_absolute(0.5, 0.25)
+                        .line_to_relative(0.25, 0.5)
+                        .line_to_relative(-0.5, 0.0)
+                        .close(),
+                )
+                .fill(SvgColor::Rgb(0x00, 0xB1, 0xD2)),
+        );
+
+        for (blizzard, a, d, dy, dir) in [
+            (&valley.blizzards_up, 1., 1., 0., "up"),
+            (&valley.blizzards_down, 1., -1., 1., "down"),
         ] {
             for y in 0..valley.height {
-                let mut shape = SvgShape::new();
+                let mut group = SvgGroup::new().class(format!("blizzard blizzard-{}", dir));
                 for (x, col) in blizzard.iter().enumerate() {
                     if (col & (1 << y)) == 0 {
-                        shape = shape
-                            .move_to_absolute(x as f64 + dx0, dy0)
-                            .line_to_relative(dx1, dy1)
-                            .line_to_relative(dx2, dy2)
-                            .close();
+                        group.add(
+                            SvgUse::new(blizzard_def_id).transform(SvgTransform::Matrix {
+                                a,
+                                b: 0.,
+                                c: 0.,
+                                d,
+                                dx: x as f64,
+                                dy,
+                            }),
+                        );
                     }
                 }
-                svg.add(
-                    SvgPath::default()
-                        .transform(SvgTransform::Translate(0., y as f64))
-                        .class(format!("blizzard blizzard-{}", dir))
-                        .shape(shape)
-                        .fill(blizzard_fill),
-                );
+                svg.add(group);
             }
         }
-        for (blizzard, dx0, dy0, dx1, dy1, dx2, dy2, dir) in [
-            (
-                &valley.blizzards_right,
-                0.75_f64,
-                0.5,
-                -0.5,
-                0.25,
-                0.,
-                -0.5,
-                "right",
-            ),
-            (
-                &valley.blizzards_left,
-                0.25,
-                0.5,
-                0.5,
-                -0.25,
-                0.,
-                0.5,
-                "left",
-            ),
+        for (blizzard, b, c, dx, dir) in [
+            (&valley.blizzards_right, -1., -1., 1., "right"),
+            (&valley.blizzards_left, 1., 1., 0., "left"),
         ] {
-            for (x, col) in blizzard.iter().enumerate() {
-                let mut shape = SvgShape::new();
+            for (_x, col) in blizzard.iter().enumerate() {
+                let mut group = SvgGroup::new().class(format!("blizzard blizzard-{}", dir));
                 for y in 0..valley.height {
                     if (col & (1 << y)) == 0 {
-                        shape = shape
-                            .move_to_absolute(dx0, y as f64 + dy0)
-                            .line_to_relative(dx1, dy1)
-                            .line_to_relative(dx2, dy2)
-                            .close();
+                        group.add(
+                            SvgUse::new(blizzard_def_id).transform(SvgTransform::Matrix {
+                                a: 0.,
+                                b,
+                                c,
+                                d: 0.,
+                                dx,
+                                dy: y as f64 + dx,
+                            }),
+                        );
                     }
                 }
-                svg.add(
-                    SvgPath::default()
-                        .transform(SvgTransform::Translate(x as f64, 0.))
-                        .class(format!("blizzard blizzard-{}", dir))
-                        .shape(shape)
-                        .fill(blizzard_fill),
-                );
+                svg.add(group);
             }
         }
     }
@@ -138,54 +121,50 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
                     svg.add(SvgStyle::new(format!(".blizzard {{ transition: transform {}ms; }} .elf {{ transition: fill-opacity {}ms ease-in-out; }}", animation_duration, animation_duration)));
 
-                    let mut reachable_array = String::from("const reachablePerStep = [");
-                    for (idx, (reachable, heading_down)) in reachable_per_step.iter().enumerate() {
-                        let mut shape = SvgShape::new();
-                        if *heading_down {
-                            shape = shape.circle_absolute(0.5, -0.5, 0.25).close();
+                    let mut reachable_array = Vec::new();
+                    for (reachable, heading_down) in reachable_per_step.iter() {
+                        let mut this_reachable = Vec::new();
+                        this_reachable.push(if *heading_down {
+                            (0_i32, -1_i32)
                         } else {
-                            shape = shape
-                                .circle_absolute(
-                                    (valley.width as f64) - 0.5,
-                                    valley.height as f64 + 0.5,
-                                    0.25,
-                                )
-                                .close();
-                        }
+                            ((valley.width - 1) as i32, valley.height as i32)
+                        });
                         for (x, col) in reachable.iter().enumerate() {
                             for y in 0..valley.height {
                                 if col & (1 << y) > 0 {
-                                    shape = shape
-                                        .circle_absolute(
-                                            x as Coordinate + 0.5,
-                                            y as Coordinate + 0.5,
-                                            0.25,
-                                        )
-                                        .close();
+                                    this_reachable.push((x as i32, y as i32));
                                 }
                             }
                         }
-                        if idx > 0 {
-                            reachable_array.push(',');
-                        }
-                        reachable_array.push('\'');
-                        reachable_array.push_str(&shape.data_string());
-                        reachable_array.push('\'');
+                        reachable_array.push(this_reachable);
                     }
-                    reachable_array.push_str("];");
 
-                    let reachable_even_path_id = svg.add_with_id(
-                        SvgPath::default()
-                            .fill(SvgColor::Rgb(0xfd, 0xdb, 0x27))
-                            .class("elf"),
-                    );
-                    let reachable_odd_path_id = svg.add_with_id(
-                        SvgPath::default()
-                            .fill(SvgColor::Rgb(0xfd, 0xdb, 0x27))
-                            .class("elf"),
-                    );
+                    let mut reachable_array_js = String::from("const reachablePerStep = [");
+                    for (arr_idx, arr) in reachable_array.iter().enumerate() {
+                        if arr_idx > 0 {
+                            reachable_array_js.push(',');
+                        }
+                        reachable_array_js.push('[');
+                        for (idx, (x, y)) in arr.iter().enumerate() {
+                            if idx > 0 {
+                                reachable_array_js.push(',');
+                            }
+                            reachable_array_js.push_str(&format!("[{},{}]", x, y));
+                        }
+                        reachable_array_js.push(']');
+                    }
+                    reachable_array_js.push(']');
+                    let reachable_circle_id = svg.define(SvgCircle {
+                        cx: 0.5,
+                        cy: 0.5,
+                        r: 0.25,
+                        fill: Some(SvgColor::Rgb(0xfd, 0xdb, 0x27)),
+                    });
+
+                    let reachable_even_path_id = svg.add_with_id(SvgGroup::new().class("elf"));
+                    let reachable_odd_path_id = svg.add_with_id(SvgGroup::new().class("elf"));
                     svg.add(SvgScript::new(format!(
-                        "{}\n\
+                        "{};\n\
                         const leftBlizzards = document.querySelectorAll('.blizzard-left');\n\
                         const rightBlizzards = document.querySelectorAll('.blizzard-right');\n\
                         const upBlizzards = document.querySelectorAll('.blizzard-up');\n\
@@ -196,15 +175,17 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                         const height = {};\n\
                         const mod = (n, m) => (n % m + m) % m;\n\
                         window.onNewStep = (step) => {{\n\
-                            if (step % 2 == 0) {{\n\
-                              evenPath.setAttribute('fill-opacity', 1);
-                              oddPath.setAttribute('fill-opacity', 0);
-                              evenPath.setAttribute('d', reachablePerStep[step]);\n\
-                            }} else {{\n\
-                              evenPath.setAttribute('fill-opacity', 0);
-                              oddPath.setAttribute('fill-opacity', 1);
-                              oddPath.setAttribute('d', reachablePerStep[step]);\n\
-                            }}\n\
+                            const newCircles = reachablePerStep[step].map(a => {{\n\
+                                const c = document.createElementNS('http://www.w3.org/2000/svg', 'use');\n\
+                                c.setAttribute('href', '#{}');\n\
+                                c.setAttribute('x', a[0]);\n\
+                                c.setAttribute('y', a[1]);\n\
+                                return c;\n
+                            }});\n\
+                            const [oldPath, newPath] = (step % 2 == 0) ? [oddPath, evenPath] : [evenPath, oddPath];\n\
+                            oldPath.setAttribute('fill-opacity', 0);\n\
+                            newPath.setAttribute('fill-opacity', 1);\n\
+                            newPath.replaceChildren(...newCircles);\n\
                             for (let [idx, el] of leftBlizzards.entries()) {{\n\
                                 let amount = mod((idx - step), width);\n\
                                 if (amount === width -1) {{ el.style.transition = 'none'; }} else {{ el.style.transition = ''; }}\n\
@@ -226,7 +207,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                                 el.style.transform = `translate(0px,${{amount}}px)`;\n\
                             }}\n\
                         }};\n",
-                        reachable_array, reachable_even_path_id, reachable_odd_path_id, valley.width, valley.height
+                        reachable_array_js, reachable_even_path_id, reachable_odd_path_id, valley.width, valley.height, reachable_circle_id
                     )));
                     svg.add(
                         SvgPath::default()

@@ -109,11 +109,9 @@ function toggleFullScreen() {
     if (svg) {
       const viewBox = svg.getAttribute("viewBox").split(" ");
       if (parseInt(viewBox[2]) > parseInt(viewBox[3])) {
-        try {
-          window.screen.orientation.lock("landscape-primary");
-        } catch (_e) {
+        window.screen.orientation.lock("landscape-primary").catch((_error) => {
           // Silently ignore.
-        }
+        });
       }
     }
   }
@@ -142,12 +140,12 @@ document.body.addEventListener("keydown", async (e) => {
   switch (e.key) {
     case "ArrowLeft":
       if (playInterval) togglePause();
-      changeCurrentValue(-1 * multiplier);
+      if (e.target != progress) changeCurrentValue(-1 * multiplier);
       //e.preventDefault();
       break;
     case "ArrowRight":
       if (playInterval) togglePause();
-      changeCurrentValue(1 * multiplier);
+      if (e.target != progress) changeCurrentValue(1 * multiplier);
       //e.preventDefault();
       break;
     case "d":

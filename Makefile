@@ -46,6 +46,12 @@ else
   WASM_OPT += -O0
 endif
 
+ifeq ($(RENDER_ONLY),1)
+  WASM_MAKE_TARGET = site-renderer-wasm
+else
+  WASM_MAKE_TARGET = site-compute-wasm site-renderer-wasm
+endif
+
 check:
 	$(CARGO_COMMAND) fmt --all
 	$(CARGO_COMMAND) clippy --tests $(CLIPPY_PARAMS)
@@ -56,27 +62,29 @@ check:
 check-site:
 	cd crates/wasm && npx prettier --write . && npx eslint . --ext .js && npx prettier --check .
 
-site-wasm:
+site-compute-wasm:
 	cd crates/wasm && \
 	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
 	rm -Rf site/generated && \
 	$(WASM_BINDGEN) --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/generated && \
-	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm && \
-	cd ../.. && \
+	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
+
+site-renderer-wasm:
+	cd crates/wasm && \
 	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" \
 		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization && \
 	$(WASM_BINDGEN) --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
-site-pack: site-wasm
+site-pack: site-compute-wasm site-renderer-wasm
 	cd crates/wasm/site && \
 		rm -Rf dist && \
 		npm i && npm run webpack -- --mode=production
 
 wasm-size:
-	$(MAKE) WASM_RELEASE=1 site-wasm && \
+	$(MAKE) WASM_RELEASE=1 site-compute-wasm && \
 	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
 --pack-runbench-continously:
@@ -89,7 +97,7 @@ wasm-size:
 	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type https
 
 --watch-and-build-wasm:
-	cargo watch --ignore crates/wasm/site --shell '$(MAKE) site-wasm'
+	cargo watch --ignore crates/wasm/site --shell '$(MAKE) $(WASM_MAKE_TARGET)'
 
 serve-site: --run-devserver --watch-and-build-wasm ;
 
@@ -160,4 +168,4 @@ man-page:
 	mkdir -p target/man
 	pandoc --standalone --to man crates/core/MANPAGE.md -o target/man/advent-of-code.1
 
-.PHONY: check install-cargo-deps site-wasm site-pack wasm-size --run-devserver --watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify deploy-site test-cbindings manpage
+.PHONY: check install-cargo-deps site-compute-wasm site-renderer-wasm site-pack wasm-size --run-devserver --watch-and-build-wasm serve-site node-package npm-publish test-python install-wasm-bindgen fuzz-afl fuzz-hfuzz fuzz-libfuzzer install-nightly netlify deploy-site test-cbindings manpage

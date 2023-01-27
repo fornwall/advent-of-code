@@ -12,6 +12,7 @@ pub use rect::*;
 pub use script::*;
 pub use stroke::*;
 pub use style::*;
+pub use svg_use::*;
 pub use symbol::*;
 pub use transform::*;
 pub use view_box::*;
@@ -28,6 +29,7 @@ pub mod rect;
 pub mod script;
 pub mod stroke;
 pub mod style;
+pub mod svg_use;
 pub mod symbol;
 pub mod transform;
 pub mod view_box;
@@ -36,11 +38,17 @@ pub type Coordinate = f64;
 
 pub type SvgInteger = i64;
 
+enum OptionalSvgId {
+    None,
+    Some(SvgId),
+    Def(SvgId),
+}
+
 pub struct SvgImage {
     id_sequence: u32,
     dimensions: Option<(SvgInteger, SvgInteger)>,
     view_box: Option<ViewBox>,
-    elements: Vec<(Option<SvgId>, SvgElement)>,
+    elements: Vec<(OptionalSvgId, SvgElement)>,
     data_attributes: Vec<(String, String)>,
     common_attributes: CommonAttributes,
 }
@@ -75,7 +83,7 @@ impl SvgImage {
     }
 
     pub fn add<E: Into<SvgElement>>(&mut self, element: E) -> &mut Self {
-        self.elements.push((None, element.into()));
+        self.elements.push((OptionalSvgId::None, element.into()));
         self
     }
 
@@ -84,7 +92,18 @@ impl SvgImage {
             value: self.id_sequence,
         };
         self.id_sequence += 1;
-        self.elements.push((Some(new_id), element.into()));
+        self.elements
+            .push((OptionalSvgId::Some(new_id), element.into()));
+        new_id
+    }
+
+    pub fn define<E: Into<SvgElement>>(&mut self, element: E) -> SvgId {
+        let new_id = SvgId {
+            value: self.id_sequence,
+        };
+        self.id_sequence += 1;
+        self.elements
+            .push((OptionalSvgId::Def(new_id), element.into()));
         new_id
     }
 
@@ -116,8 +135,30 @@ impl SvgImage {
         self.common_attributes.write(&mut buffer);
         buffer.write_all(&[b'>', b'\n']).unwrap();
 
+        let mut first = true;
         for (id, element) in &self.elements {
-            element.write(*id, &mut buffer);
+            if let OptionalSvgId::Def(id) = id {
+                if first {
+                    first = false;
+                    buffer.write_all(b"<defs>").unwrap();
+                }
+                element.write(Some(*id), &mut buffer);
+            }
+        }
+        if !first {
+            buffer.write_all(b"</defs>").unwrap();
+        }
+
+        for (id, element) in &self.elements {
+            match id {
+                OptionalSvgId::None => {
+                    element.write(None, &mut buffer);
+                }
+                OptionalSvgId::Some(id) => {
+                    element.write(Some(*id), &mut buffer);
+                }
+                OptionalSvgId::Def(_) => {}
+            }
         }
 
         buffer.write_all(b"</svg>").unwrap();

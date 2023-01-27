@@ -8,7 +8,6 @@ pub struct SvgPath {
     pub shape: SvgShape,
     pub stroke: Option<SvgColor>,
     pub stroke_width: Option<f64>,
-    pub fill: Option<SvgColor>,
     pub common_attributes: CommonAttributes,
 }
 
@@ -61,19 +60,11 @@ impl SvgPath {
         self
     }
 
-    pub const fn fill(mut self, color: SvgColor) -> Self {
-        self.fill = Some(color);
-        self
-    }
-
     pub(crate) fn write<W: Write>(&self, id: Option<SvgId>, writer: &mut W) {
         #![allow(clippy::unwrap_used)]
         writer.write_all(b"<path").unwrap();
         if let Some(id) = id {
             id.write(writer);
-        }
-        if let Some(fill) = &self.fill {
-            fill.write_fill(writer);
         }
         if let Some(stroke) = &self.stroke {
             stroke.write_stroke(writer);
@@ -83,9 +74,6 @@ impl SvgPath {
             writer
                 .write_all(format!(" stroke-width=\"{stroke_width}\"").as_bytes())
                 .unwrap();
-        }
-        if let Some(fill) = &self.fill {
-            fill.write_fill(writer);
         }
         writer.write_all(b" d=\"").unwrap();
         self.shape.write(writer);
