@@ -18,10 +18,10 @@ impl Value {
         })
     }
 
-    fn parse_register(input: &str) -> Option<RegisterSpecifier> {
+    const fn parse_register(input: &str) -> Option<RegisterSpecifier> {
         if input.len() == 1 {
             let c = input.as_bytes()[0];
-            if (b'a'..=b'z').contains(&c) {
+            if c.is_ascii_lowercase() {
                 return Some(c - b'a');
             }
         }

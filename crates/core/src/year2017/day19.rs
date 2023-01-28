@@ -54,7 +54,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
                     }
                 }
             }
-            Some(c) if (b'A'..=b'Z').contains(c) => {
+            Some(c) if c.is_ascii_uppercase() => {
                 seen_letters.push(*c as char);
             }
             Some(&c) if c == b'-' || c == b'|' => {

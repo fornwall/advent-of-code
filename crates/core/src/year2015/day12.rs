@@ -84,7 +84,7 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> Result<JsonValue<'a>, 
             let mut idx = *current_idx;
             loop {
                 let read_char = if idx == input.len() { b' ' } else { input[idx] };
-                if (b'0'..=b'9').contains(&read_char) {
+                if read_char.is_ascii_digit() {
                     string.push(read_char as char);
                 } else {
                     *current_idx = idx;

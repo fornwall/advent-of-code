@@ -64,7 +64,7 @@ impl Maze {
                 maze.tile_at(x, y)
             };
 
-            if (b'A'..=b'Z').contains(&tile) {
+            if tile.is_ascii_uppercase() {
                 current_string.push(tile as char);
             } else {
                 if current_string.len() == 2 {
