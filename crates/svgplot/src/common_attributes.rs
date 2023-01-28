@@ -11,6 +11,7 @@ pub struct CommonAttributes {
     pub(crate) classes: Vec<String>,
     pub(crate) transform: Option<SvgTransform>,
     pub(crate) fill: Option<SvgColor>,
+    pub(crate) stroke_linecap: Option<SvgStrokeLinecap>,
 }
 
 impl CommonAttributes {
@@ -20,6 +21,7 @@ impl CommonAttributes {
             classes: Vec::new(),
             transform: None,
             fill: None,
+            stroke_linecap: None,
         }
     }
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
@@ -34,6 +36,9 @@ impl CommonAttributes {
         }
         if let Some(transform) = &self.transform {
             transform.write(writer);
+        }
+        if let Some(stroke_linecap) = &self.stroke_linecap {
+            stroke_linecap.write(writer);
         }
         if !self.classes.is_empty() {
             writer.write_all(b" class=\"").unwrap();
@@ -66,9 +71,13 @@ macro_rules! implement_common_attributes {
                 self.common_attributes.fill = Some(color);
                 self
             }
+            pub const fn stroke_linecap(mut self, stroke_linecap: SvgStrokeLinecap) -> Self {
+                self.common_attributes.stroke_linecap = Some(stroke_linecap);
+                self
+            }
         }
     };
 }
 
-use crate::{SvgColor, SvgTransform};
+use crate::{SvgColor, SvgStrokeLinecap, SvgTransform};
 pub(crate) use implement_common_attributes;

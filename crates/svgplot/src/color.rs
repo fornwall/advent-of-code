@@ -11,6 +11,8 @@ pub enum SvgColor {
     Rgba(u8, u8, u8, f64),
     RgbPercentage(f64, f64, f64),
     RgbaPercentage(f64, f64, f64, f64),
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
+    Hsl(f64, usize, usize),
     // TODO: hue
     // TODO: pattern reference
 }
@@ -36,6 +38,13 @@ impl SvgColor {
             Self::RgbPercentage(r, g, b) => {
                 writer
                     .write_all(format!(" {what}=\"rgb({r}%, {g}%, {b}%)\"").as_bytes())
+                    .unwrap();
+            }
+            Self::Hsl(hue, saturation, lightness) => {
+                writer
+                    .write_all(
+                        format!(" {what}=\"hsl({hue} {saturation}% {lightness}%)\"").as_bytes(),
+                    )
                     .unwrap();
             }
             _ => {

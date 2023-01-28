@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 #[cfg(feature = "visualization")]
-use svgplot::{Coordinate, SvgColor, SvgImage, SvgPath, SvgScript, SvgShape};
+use svgplot::{Coordinate, SvgColor, SvgImage, SvgPath, SvgScript, SvgShape, SvgStrokeLinecap};
 
 use crate::input::Input;
 
@@ -97,7 +97,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     {
         for draw_height in 0..26 {
             let mut shape = SvgShape::new();
-            let brightness = 7. + 0.83 * (draw_height as f64 / 0.25);
+            let hue = 225. - (draw_height as f64) * 10.;
             for x in 0..graph.width {
                 for y in 0..graph.height {
                     let height = graph.height_at(x, y);
@@ -117,7 +117,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         shape,
                         ..Default::default()
                     }
-                    .fill(SvgColor::RgbPercentage(brightness, brightness, brightness)),
+                    .fill(SvgColor::Hsl(hue, 70, 40)),
                 );
             }
         }
@@ -129,7 +129,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     .y(start_pos.1 as Coordinate)
                     .width(1)
                     .height(1)
-                    .fill(SvgColor::Rgb(0, 0xff, 0))
+                    .fill(SvgColor::Rgb(255, 255, 255))
                     .title("Starting position - elevation 0".to_string()),
             );
         }
@@ -139,7 +139,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 .y(destination_pos.1 as Coordinate)
                 .width(1)
                 .height(1)
-                .fill(SvgColor::Rgb(0xff, 0, 0))
+                .fill(SvgColor::Rgb(255, 255, 255))
                 .title(format!(
                     "Destination - elevation {}",
                     graph.height_at(destination_pos.0, destination_pos.1)
@@ -190,11 +190,12 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     {
                         let visited_path_id = svg.add_with_id(
                             SvgPath::default()
-                                .stroke(SvgColor::Rgb(0xff, 0, 0))
-                                .stroke_width(0.2),
+                                .stroke(SvgColor::Rgb(255, 255, 255))
+                                .stroke_width(0.2)
+                                .stroke_linecap(SvgStrokeLinecap::Round),
                         );
                         let circles_path_id =
-                            svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(0xff, 0, 0)));
+                            svg.add_with_id(SvgPath::default().fill(SvgColor::Rgb(255, 255, 255)));
 
                         circles_render_script.push_str("'];");
                         path_render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\

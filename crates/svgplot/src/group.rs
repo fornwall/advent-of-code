@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use crate::common_attributes::{implement_common_attributes, CommonAttributes};
-use crate::{SvgColor, SvgElement, SvgId, SvgTransform};
+use crate::{SvgColor, SvgElement, SvgId, SvgStrokeLinecap, SvgTransform};
 
 pub struct SvgGroup {
     pub(crate) elements: Vec<SvgElement>,

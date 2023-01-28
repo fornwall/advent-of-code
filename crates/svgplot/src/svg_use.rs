@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use crate::common_attributes::{implement_common_attributes, CommonAttributes};
-use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgTransform};
+use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgStrokeLinecap, SvgTransform};
 
 pub struct SvgUse {
     id: SvgId,
