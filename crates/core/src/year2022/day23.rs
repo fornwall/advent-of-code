@@ -131,32 +131,32 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
         #[cfg(feature = "visualization")]
         {
-            let mut svg = SvgImage::new();
-            let mut elf_position_rect_ids = Vec::new();
-            for elf in elf_positions_per_step[0].iter() {
-                elf_position_rect_ids.push(
-                    svg.add_with_id(
-                        SvgRect::default()
-                            .x(elf.0 as Coordinate)
-                            .y(elf.1 as Coordinate)
-                            .width(1)
-                            .height(1),
-                    ),
-                );
-            }
-
-            let (max_coords, min_coords) = elf_positions_per_step.iter().flatten().fold(
-                ((0, 0), (i16::MAX, i16::MAX)),
-                |(max, min), elf| {
-                    (
-                        (elf.0.max(max.0), elf.1.max(max.1)),
-                        (elf.0.min(min.0), elf.1.min(min.1)),
-                    )
-                },
-            );
             elf_positions_per_step.push(elves.clone());
 
             if num_moves == 0 || (input.is_part_one() && round == 9) {
+                let mut svg = SvgImage::new();
+                let mut elf_position_rect_ids = Vec::new();
+                for elf in elf_positions_per_step[0].iter() {
+                    elf_position_rect_ids.push(
+                        svg.add_with_id(
+                            SvgRect::default()
+                                .x(elf.0 as Coordinate)
+                                .y(elf.1 as Coordinate)
+                                .width(1)
+                                .height(1),
+                        ),
+                    );
+                }
+
+                let (max_coords, min_coords) = elf_positions_per_step.iter().flatten().fold(
+                    ((0, 0), (i16::MAX, i16::MAX)),
+                    |(max, min), elf| {
+                        (
+                            (elf.0.max(max.0), elf.1.max(max.1)),
+                            (elf.0.min(min.0), elf.1.min(min.1)),
+                        )
+                    },
+                );
                 let step_duration_ms = 300;
                 let animation_duration_ms = step_duration_ms - 100;
                 svg.add(SvgStyle::new(format!("\n\
