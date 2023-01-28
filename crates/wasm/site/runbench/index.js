@@ -3,18 +3,7 @@ import gistMapping from "../gist-mapping.json";
 async function main() {
   addEventListener("error", (e) => {
     console.log("error", e);
-    if (
-      window.navigator.userAgent.includes("Firefox") &&
-      e.message.includes(
-        "import declarations may only appear at top level of a module"
-      )
-    ) {
-      alert(
-        "Awaiting worker modules in Firefox:\n\nhttps://bugzilla.mozilla.org/show_bug.cgi?id=1247687"
-      );
-    } else {
-      alert(e.message);
-    }
+    alert(e.message);
   });
 
   const year = parseInt(
@@ -41,104 +30,110 @@ async function main() {
     name: "wasm-runner",
     type: "module",
   });
+
   worker.onmessage = (e) => {
     if (!e.data.wasmWorking) {
       alert("WASM not working");
       return;
     }
+    // Ignore initial warmup response:
+    let initialMessageCount = 0;
     const times = [];
     worker.onmessage = (e) => {
-      times.push(e.data);
+      initialMessageCount++;
+      if (initialMessageCount > 1) {
+        times.push(e.data);
 
-      const expectedAnswer = yearDays.find((d) => d.day == e.data.day)[
-        "part" + e.data.part
-      ];
-      if (expectedAnswer != e.data.output) {
-        const message = `Error for ${year}-${e.data.day}-${e.data.part}: Expected "${expectedAnswer}, was "${e.data.output}"`;
-        console.error(message);
-        alert(message);
-      }
-
-      if (e.data.day == 25) {
-        const totalTime = times
-          .map((d) => d.executionTime)
-          .reduce((a, b) => a + b, 0);
-        document.getElementById(
-          "total-time"
-        ).textContent = `Total time: ${totalTime.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })} ms`;
-        for (const data of times) {
-          const tr = document.createElement("tr");
-          const percentageTime = (data.executionTime * 100) / totalTime;
-
-          let problemLink = `https://adventofcode.com/${data.year}/day/${data.day}`;
-          if (data.part == 2) problemLink += "#part2";
-
-          const gistLink =
-            "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=" +
-            gistMapping[data.year][data.day]["gist"];
-          const compilerExplorerLink =
-            "https://godbolt.org/z/" +
-            gistMapping[data.year][data.day]["compiler_explorer"];
-
-          tr.innerHTML = `<td class="text-end"><a href="${problemLink}">${
-            data.day
-          }-${
-            data.part
-          }</a></td><td class="text-end">${data.executionTime.toFixed(
-            2
-          )}</td><td class="text-end">${percentageTime.toFixed(2)}</td>
-          <td><a href="${gistLink}">src</a></td>
-          <td><a href="${compilerExplorerLink}">asm</a></td>`;
-          tbody.appendChild(tr);
+        const expectedAnswer = yearDays.find((d) => d.day == e.data.day)[
+          "part" + e.data.part
+        ];
+        if (expectedAnswer != e.data.output) {
+          const message = `Error for ${year}-${e.data.day}-${e.data.part}: Expected "${expectedAnswer}, was "${e.data.output}"`;
+          console.error(message);
+          alert(message);
         }
 
-        const yearLabel = `${year}`;
-        const data = {
-          type: "sunburst",
-          labels: [yearLabel],
-          parents: [""],
-          values: [totalTime],
-          outsidetextfont: { size: 20, color: "#fff" },
-          branchvalues: "total",
-          sort: false,
-        };
-
-        for (let day = 1; day < 26; day++) {
-          const dayLabel = `Day ${day}`;
-          const dayTime = times
-            .filter((d) => d.day == day)
+        if (e.data.day == 25) {
+          const totalTime = times
             .map((d) => d.executionTime)
             .reduce((a, b) => a + b, 0);
-          data.labels.push(dayLabel);
-          data.parents.push(yearLabel);
-          data.values.push(dayTime);
-          for (let part = 1; part <= 2; part++) {
-            if (day === 25 && part === 2) continue;
-            const partTime = times.filter(
-              (d) => d.day == day && d.part == part
-            )[0].executionTime;
-            data.labels.push(`Day ${day} part ${part}`);
-            data.parents.push(dayLabel);
-            data.values.push(partTime);
+          document.getElementById(
+            "total-time"
+          ).textContent = `Total time: ${totalTime.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+          })} ms`;
+          for (const data of times) {
+            const tr = document.createElement("tr");
+            const percentageTime = (data.executionTime * 100) / totalTime;
+
+            let problemLink = `https://adventofcode.com/${data.year}/day/${data.day}`;
+            if (data.part == 2) problemLink += "#part2";
+
+            const gistLink =
+              "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=" +
+              gistMapping[data.year][data.day]["gist"];
+            const compilerExplorerLink =
+              "https://godbolt.org/z/" +
+              gistMapping[data.year][data.day]["compiler_explorer"];
+
+            tr.innerHTML = `<td class="text-end"><a href="${problemLink}">${
+              data.day
+            }-${
+              data.part
+            }</a></td><td class="text-end">${data.executionTime.toFixed(
+              2
+            )}</td><td class="text-end">${percentageTime.toFixed(2)}</td>
+          <td><a href="${gistLink}">src</a></td>
+          <td><a href="${compilerExplorerLink}">asm</a></td>`;
+            tbody.appendChild(tr);
           }
+
+          const yearLabel = `${year}`;
+          const data = {
+            type: "sunburst",
+            labels: [yearLabel],
+            parents: [""],
+            values: [totalTime],
+            outsidetextfont: { size: 20, color: "#fff" },
+            branchvalues: "total",
+            sort: false,
+          };
+
+          for (let day = 1; day < 26; day++) {
+            const dayLabel = `Day ${day}`;
+            const dayTime = times
+              .filter((d) => d.day == day)
+              .map((d) => d.executionTime)
+              .reduce((a, b) => a + b, 0);
+            data.labels.push(dayLabel);
+            data.parents.push(yearLabel);
+            data.values.push(dayTime);
+            for (let part = 1; part <= 2; part++) {
+              if (day === 25 && part === 2) continue;
+              const partTime = times.filter(
+                (d) => d.day == day && d.part == part
+              )[0].executionTime;
+              data.labels.push(`Day ${day} part ${part}`);
+              data.parents.push(dayLabel);
+              data.values.push(partTime);
+            }
+          }
+
+          const layout = {
+            margin: { l: 0, r: 0, b: 0, t: 0 },
+            paper_bgcolor: "rgb(15,37,55)",
+          };
+
+          Plotly.newPlot("plot", [data], layout, {
+            displayModeBar: false,
+            displaylogo: false,
+            responsive: true,
+            scrollZoom: true,
+          });
+
+          document.getElementById("spinner").remove();
+          document.getElementById("result").classList.remove("invisible");
         }
-
-        const layout = {
-          margin: { l: 0, r: 0, b: 0, t: 0 },
-          paper_bgcolor: "rgb(15,37,55)",
-        };
-
-        Plotly.newPlot("plot", [data], layout, {
-          displayModeBar: false,
-          displaylogo: false,
-          responsive: true,
-          scrollZoom: true,
-        });
-
-        document.getElementById("spinner").remove();
-        document.getElementById("result").classList.remove("invisible");
       }
     };
 
@@ -147,6 +142,10 @@ async function main() {
       for (let part = 1; part < 3; part++) {
         if (!(day.day == 25 && part == 2)) {
           worker.postMessage({ year, day: day.day, part, input });
+          if (day.day == 1 && part == 1) {
+            worker.postMessage({ year, day: day.day, part, input });
+            // Again - initial was warmup
+          }
         }
       }
     }
