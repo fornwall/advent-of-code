@@ -2,6 +2,7 @@ use std::io::Write;
 
 use crate::common_attributes::{implement_common_attributes, CommonAttributes};
 use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgStrokeLinecap, SvgTransform};
+use crate::escape::escape_xml;
 
 #[derive(Default)]
 pub struct SvgPath {
@@ -78,7 +79,13 @@ impl SvgPath {
         writer.write_all(b" d=\"").unwrap();
         self.shape.write(writer);
         writer.write_all(b"\"").unwrap();
-        writer.write_all(b"/>\n").unwrap();
+        if let Some(title) = &self.common_attributes.title {
+            writer
+                .write_all(format!("><title>{}</title></path>", escape_xml(title)).as_bytes())
+                .unwrap();
+        } else {
+            writer.write_all(b"/>\n").unwrap();
+        }
     }
 }
 

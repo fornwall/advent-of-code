@@ -12,6 +12,7 @@ pub struct CommonAttributes {
     pub(crate) transform: Option<SvgTransform>,
     pub(crate) fill: Option<SvgColor>,
     pub(crate) stroke_linecap: Option<SvgStrokeLinecap>,
+    pub(crate) title: Option<String>,
 }
 
 impl CommonAttributes {
@@ -22,6 +23,7 @@ impl CommonAttributes {
             transform: None,
             fill: None,
             stroke_linecap: None,
+            title: None,
         }
     }
     pub(crate) fn write<W: Write>(&self, writer: &mut W) {
@@ -73,6 +75,12 @@ macro_rules! implement_common_attributes {
             }
             pub const fn stroke_linecap(mut self, stroke_linecap: SvgStrokeLinecap) -> Self {
                 self.common_attributes.stroke_linecap = Some(stroke_linecap);
+                self
+            }
+
+            #[allow(clippy::missing_const_for_fn)]
+            pub fn title(mut self, title: String) -> Self {
+                self.common_attributes.title = Some(title);
                 self
             }
         }
