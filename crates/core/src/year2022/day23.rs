@@ -1,9 +1,11 @@
+use std::simd::{SimdPartialEq, ToBitMask};
 #[cfg(feature = "visualization")]
 use svgplot::{Coordinate, SvgImage, SvgRect, SvgScript, SvgStyle};
 
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
+    #[cfg(not(feature = "simd"))]
     const DIRECTIONS: [(i16, i16); 8] = [
         // NW, N, NE
         (-1, -1),
@@ -19,18 +21,38 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         (-1, 0),
     ];
 
-    const RULES: [(i16, (i16, i16)); 4] = [
-        // "If there is no elf in the n, ne, or nw adjacent positions, the elf proposes moving north one step."
-        (0b0000_0111, (0, -1)),
-        // "if there is no elf in the s, se, or sw adjacent positions, the elf proposes moving south one step."
-        (0b0111_0000, (0, 1)),
-        // "if there is no elf in the w, nw, or sw adjacent positions, the elf proposes moving west one step."
-        (0b1100_0001, (-1, 0)),
-        // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step."
-        (0b0001_1100, (1, 0)),
+    #[cfg(feature = "simd")]
+    const NEIGHBOR_OFFSETS: [i32; 8] = [
+        // NW:
+        -(MAX_SIZE as i32) - 1,
+        // N:
+        -(MAX_SIZE as i32),
+        // NE:
+        -(MAX_SIZE as i32) + 1,
+        // W:
+        -1,
+        // E:
+        1,
+        // SW:
+        (MAX_SIZE as i32) - 1,
+        // S:
+        MAX_SIZE as i32,
+        // SE:
+        (MAX_SIZE as i32) + 1,
     ];
 
-    const MAX_SIZE: usize = 384;
+    const RULES: [(u8, (i16, i16)); 4] = [
+        // "If there is no elf in the n, ne, or nw adjacent positions, the elf proposes moving north one step"
+        (0b0000_0111, (0, -1)),
+        // "if there is no elf in the s, se, or sw adjacent positions, the elf proposes moving south one step"
+        (0b1110_0000, (0, 1)),
+        // "if there is no elf in the w, nw, or sw adjacent positions, the elf proposes moving west one step"
+        (0b0010_1001, (-1, 0)),
+        // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step"
+        (0b1001_0100, (1, 0)),
+    ];
+
+    const MAX_SIZE: usize = 256;
     const MAX_ELVES: usize = 10_000;
     const OFFSET: usize = MAX_SIZE / 2;
     const NO_ELF: u16 = u16::MAX;
@@ -68,11 +90,34 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     let mut elf_moves = Vec::with_capacity(elves.len());
 
     #[cfg(feature = "visualization")]
-    let mut elf_positions_per_step = vec![elves.clone()];
+        let mut elf_positions_per_step = vec![elves.clone()];
+
+    #[cfg(feature = "simd")]
+    let no_elf_vector = std::simd::u16x8::splat(NO_ELF);
 
     for round in 0..input.part_values(10, 10000) {
         let mut num_moves = 0;
+        #[cfg(feature = "simd")]
+        {
+            let offset = (round + 1) % 4;
+            for (elf_idx, elf) in elves.iter_mut().enumerate() {
+                let neighbors_indices = std::simd::usizex8::from(NEIGHBOR_OFFSETS.map(|v| (v + (elf.1 as i32) * (MAX_SIZE as i32) + (elf.0 as i32)) as usize));
+                let neighbors_vector = std::simd::u16x8::gather_or_default(&elf_grid, neighbors_indices);
+                let neighbors_mask = neighbors_vector.simd_ne(no_elf_vector);
+                if neighbors_mask.any() {
+                    let adjacent_bitmask = neighbors_mask.to_bitmask();
+                    for rule_offset in 0..RULES.len() {
+                        let (check_mask, to_move) = RULES[(round + rule_offset) % RULES.len()];
+                        if (check_mask & adjacent_bitmask) == 0 {
+                            elf_moves.push((elf_idx, to_move));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
+        #[cfg(not(feature = "simd"))]
         for (elf_idx, elf) in elves.iter_mut().enumerate() {
             let adjacent_bitmask = DIRECTIONS
                 .iter()
@@ -203,10 +248,10 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                         (max_coords.0 - min_coords.0) as i64,
                         (max_coords.1 - min_coords.1) as i64,
                     ))
-                    .style("background: black;")
-                    .data_attribute("steps".to_string(), format!("{}", round + 1))
-                    .data_attribute("step-duration".to_string(), format!("{}", step_duration_ms))
-                    .to_svg_string(),
+                        .style("background: black;")
+                        .data_attribute("steps".to_string(), format!("{}", round + 1))
+                        .data_attribute("step-duration".to_string(), format!("{}", step_duration_ms))
+                        .to_svg_string(),
                 );
             }
         }
