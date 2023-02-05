@@ -30,7 +30,7 @@ visualization = ["svgplot"]
 
 [dependencies]
 allocation-counter = { version = "0", optional = true }
-svgplot = { version="2022.0.47", path = "../svgplot", optional = true }
+svgplot = { version="2022.0.48", path = "../svgplot", optional = true }
 
 [dev-dependencies]
 iai = "0"
