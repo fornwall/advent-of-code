@@ -426,4 +426,4 @@ jobs:
       uses: actions/checkout@v3
     - run: |
         NEW_VERSION=$(./.github/workflows/current-version)
-        curl -X POST -H "Authorization: Bearer ${{ secrets.HOMEBREW_TAP_GITHUB_ACCESS_TOKEN }} " -H "Accept:application/vnd.github" "https://api.github.com/repos/fornwall/homebrew-tap/actions/workflows/ci.yaml/dispatches" -d "{\"ref\":\"main\", \"inputs\":{\"version\":\"$NEW_VERSION\"}}"
+        curl -X POST -H "Authorization: Bearer ${{ secrets.HOMEBREW_TAP_GITHUB_ACCESS_TOKEN }} " -H "Accept:application/vnd.github" "https://api.github.com/repos/fornwall/homebrew-tap/actions/workflows/publish.yaml/dispatches" -d "{\"ref\":\"main\", \"inputs\":{\"formula\":\"advent-of-code\",\"version\":\"$NEW_VERSION\"}}"
