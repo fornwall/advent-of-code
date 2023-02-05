@@ -1,4 +1,6 @@
+#[cfg(feature = "simd")]
 use std::simd::{SimdPartialEq, ToBitMask};
+
 #[cfg(feature = "visualization")]
 use svgplot::{Coordinate, SvgImage, SvgRect, SvgScript, SvgStyle};
 
@@ -7,18 +9,22 @@ use crate::input::Input;
 pub fn solve(input: &Input) -> Result<usize, String> {
     #[cfg(not(feature = "simd"))]
     const DIRECTIONS: [(i16, i16); 8] = [
-        // NW, N, NE
+        // NW
         (-1, -1),
+        // N
         (0, -1),
+        // NE
         (1, -1),
-        // E, SE
-        (1, 0),
-        (1, 1),
-        // S, SW
-        (0, 1),
-        (-1, 1),
         // W
         (-1, 0),
+        // E
+        (1, 0),
+        // SW
+        (-1, 1),
+        // S
+        (0, 1),
+        // SE
+        (1, 1),
     ];
 
     #[cfg(feature = "simd")]
@@ -50,6 +56,32 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         (0b0010_1001, (-1, 0)),
         // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step"
         (0b1001_0100, (1, 0)),
+    ];
+
+    #[cfg(feature = "simd")]
+    const NEIGHBORS_MASK: [u8; 7] = [
+        0b0000_0111,
+        0b1110_0000,
+        0b0010_1001,
+        0b1001_0100,
+        0b0000_0111,
+        0b1110_0000,
+        0b0010_1001,
+    ];
+
+    #[cfg(feature = "simd")]
+    const MOVEMENTS: [(i16, i16); 7] = [(0, -1), (0, 1), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 0)];
+
+    #[cfg(feature = "simd")]
+    let rules_for_mask: [(std::simd::mask16x8, (i16, i16)); 4] = [
+        // "If there is no elf in the n, ne, or nw adjacent positions, the elf proposes moving north one step"
+        (std::simd::mask16x8::from_bitmask(0b0000_0111), (0, -1)),
+        // "if there is no elf in the s, se, or sw adjacent positions, the elf proposes moving south one step"
+        (std::simd::mask16x8::from_bitmask(0b1110_0000), (0, 1)),
+        // "if there is no elf in the w, nw, or sw adjacent positions, the elf proposes moving west one step"
+        (std::simd::mask16x8::from_bitmask(0b0010_1001), (-1, 0)),
+        // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step"
+        (std::simd::mask16x8::from_bitmask(0b1001_0100), (1, 0)),
     ];
 
     const MAX_SIZE: usize = 256;
@@ -90,29 +122,60 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     let mut elf_moves = Vec::with_capacity(elves.len());
 
     #[cfg(feature = "visualization")]
-        let mut elf_positions_per_step = vec![elves.clone()];
+    let mut elf_positions_per_step = vec![elves.clone()];
 
     #[cfg(feature = "simd")]
     let no_elf_vector = std::simd::u16x8::splat(NO_ELF);
 
     for round in 0..input.part_values(10, 10000) {
         let mut num_moves = 0;
+
         #[cfg(feature = "simd")]
         {
-            let offset = (round + 1) % 4;
+            //var directionOffset = (round - 1) % 4;
+            //var masksVector = IntVector.fromArray(INT_128_SPECIES, NEIGHBORS_MASK, directionOffset);
+            let masks_vector = std::simd::u8x4::from_array([
+                NEIGHBORS_MASK[round % 4],
+                NEIGHBORS_MASK[(round + 1) % 4],
+                NEIGHBORS_MASK[(round + 2) % 4],
+                NEIGHBORS_MASK[(round + 3) % 3],
+            ]);
+
             for (elf_idx, elf) in elves.iter_mut().enumerate() {
-                let neighbors_indices = std::simd::usizex8::from(NEIGHBOR_OFFSETS.map(|v| (v + (elf.1 as i32) * (MAX_SIZE as i32) + (elf.0 as i32)) as usize));
-                let neighbors_vector = std::simd::u16x8::gather_or_default(&elf_grid, neighbors_indices);
-                let neighbors_mask = neighbors_vector.simd_ne(no_elf_vector);
-                if neighbors_mask.any() {
-                    let adjacent_bitmask = neighbors_mask.to_bitmask();
-                    for rule_offset in 0..RULES.len() {
-                        let (check_mask, to_move) = RULES[(round + rule_offset) % RULES.len()];
-                        if (check_mask & adjacent_bitmask) == 0 {
+                let neighbors_indices =
+                    std::simd::usizex8::from(NEIGHBOR_OFFSETS.map(|v| {
+                        (v + (elf.1 as i32) * (MAX_SIZE as i32) + (elf.0 as i32)) as usize
+                    }));
+                let neighbors_vector =
+                    std::simd::u16x8::gather_or_default(&elf_grid, neighbors_indices);
+                let neighbors_mask = neighbors_vector.simd_ne(no_elf_vector).to_bitmask();
+                if neighbors_mask != 0 {
+                    let neighbors_mask_repated = std::simd::u8x4::splat(neighbors_mask);
+                    for (idx, &val) in (neighbors_mask_repated & masks_vector)
+                        .as_array()
+                        .iter()
+                        .enumerate()
+                    {
+                        if val == 0 {
+                            let to_move = MOVEMENTS[match idx {
+                                0 => round % 4,
+                                1 => (round + 1) % 4,
+                                2 => (round + 2) % 4,
+                                _ => (round + 3) % 4,
+                            }];
                             elf_moves.push((elf_idx, to_move));
                             break;
                         }
                     }
+                    /*
+                    for rule_offset in 0..RULES.len() {
+                        let (check_mask, to_move) = rules_for_mask[(round + rule_offset) % RULES.len()];
+                        if !(check_mask & neighbors_mask).any() {
+                            elf_moves.push((elf_idx, to_move));
+                            break;
+                        }
+                    }
+                     */
                 }
             }
         }
@@ -205,8 +268,8 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 let step_duration_ms = 300;
                 let animation_duration_ms = step_duration_ms - 100;
                 svg.add(SvgStyle::new(format!("\n\
-                    rect {{ fill: #00B1D2; transition: x {}ms, y {}ms, fill {}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
-                ", animation_duration_ms, animation_duration_ms, animation_duration_ms)));
+    rect {{ fill: #00B1D2; transition: x {}ms, y {}ms, fill {}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
+", animation_duration_ms, animation_duration_ms, animation_duration_ms)));
 
                 let array_declaration = format!(
                     "const elfPositions = [{}];",
@@ -225,20 +288,20 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 );
                 svg.add(SvgScript::new(format!("{}{}", array_declaration, format!(
                     "\nconst elfRects = document.querySelectorAll('rect');\n\
-                window.onNewStep = (step) => {{\n\
-                        const prevPos = (step == 0) ? null : elfPositions[step-1];\n\
-                        const pos = elfPositions[step];\n\
-                        for (let i = 0; i < {}; i++) {{\n\
-                            const e = elfRects[i];
-                            e.setAttribute('x', pos[i][0]);\n\
-                            e.setAttribute('y', pos[i][1]);\n\
-                            if (prevPos === null || (prevPos[i][0] === pos[i][0] && prevPos[i][1] === pos[i][1])) {{\n\
-                               e.classList.remove('moving');\n\
-                            }} else {{\n\
-                               e.classList.add('moving');\n\
-                            }}\n\
-                        }}\n\
-                }};",
+window.onNewStep = (step) => {{\n\
+        const prevPos = (step == 0) ? null : elfPositions[step-1];\n\
+        const pos = elfPositions[step];\n\
+        for (let i = 0; i < {}; i++) {{\n\
+            const e = elfRects[i];
+            e.setAttribute('x', pos[i][0]);\n\
+            e.setAttribute('y', pos[i][1]);\n\
+            if (prevPos === null || (prevPos[i][0] === pos[i][0] && prevPos[i][1] === pos[i][1])) {{\n\
+               e.classList.remove('moving');\n\
+            }} else {{\n\
+               e.classList.add('moving');\n\
+            }}\n\
+        }}\n\
+}};",
                     elves.len(),
                 ))));
                 input.rendered_svg.replace(
@@ -248,10 +311,10 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                         (max_coords.0 - min_coords.0) as i64,
                         (max_coords.1 - min_coords.1) as i64,
                     ))
-                        .style("background: black;")
-                        .data_attribute("steps".to_string(), format!("{}", round + 1))
-                        .data_attribute("step-duration".to_string(), format!("{}", step_duration_ms))
-                        .to_svg_string(),
+                    .style("background: black;")
+                    .data_attribute("steps".to_string(), format!("{}", round + 1))
+                    .data_attribute("step-duration".to_string(), format!("{}", step_duration_ms))
+                    .to_svg_string(),
                 );
             }
         }
