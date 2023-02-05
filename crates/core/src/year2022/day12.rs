@@ -117,7 +117,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         shape,
                         ..Default::default()
                     }
-                        .title(format!("Elevation: {}", draw_height))
+                    .title(format!("Elevation: {}", draw_height))
                     .fill(SvgColor::Hsl(hue, 70, 40)),
                 );
             }

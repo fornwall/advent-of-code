@@ -1,6 +1,6 @@
-use crate::common_attributes::{CommonAttributes, implement_common_attributes};
+use crate::common_attributes::{implement_common_attributes, CommonAttributes};
 use crate::escape::escape_xml;
-use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgTransform, SvgStrokeLinecap};
+use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgStrokeLinecap, SvgTransform};
 use std::io::Write;
 
 #[derive(Default)]

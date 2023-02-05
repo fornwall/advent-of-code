@@ -1,8 +1,8 @@
 use std::io::Write;
 
 use crate::common_attributes::{implement_common_attributes, CommonAttributes};
-use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgStrokeLinecap, SvgTransform};
 use crate::escape::escape_xml;
+use crate::{Coordinate, SvgColor, SvgElement, SvgId, SvgStrokeLinecap, SvgTransform};
 
 #[derive(Default)]
 pub struct SvgPath {
