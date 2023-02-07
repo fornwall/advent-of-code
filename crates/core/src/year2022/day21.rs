@@ -19,24 +19,26 @@ pub fn solve(input: &Input) -> Result<i64, String> {
 
         setup_contains_human(&mut actions, root_id);
 
-        Ok(if actions[root_id as usize].contains_human {
-            eval_for_human_output(
-                &actions,
-                first_operand,
-                human_id,
-                eval(&actions, second_operand),
-            )
-        } else {
-            if !actions[root_id as usize].contains_human {
-                return Err("No sides of the root operation contains human output".to_string());
+        let (human_operand, other_operand) = match (
+            actions[first_operand as usize].contains_human,
+            actions[second_operand as usize].contains_human,
+        ) {
+            (true, false) => (first_operand, second_operand),
+            (false, true) => (second_operand, first_operand),
+            _ => {
+                return Err(
+                    "Root monkey operation does not contain a single side with human output"
+                        .to_string(),
+                );
             }
-            eval_for_human_output(
-                &actions,
-                second_operand,
-                human_id,
-                eval(&actions, first_operand),
-            )
-        })
+        };
+
+        Ok(eval_for_human_output(
+            &actions,
+            human_operand,
+            human_id,
+            eval(&actions, other_operand),
+        ))
     }
 }
 
