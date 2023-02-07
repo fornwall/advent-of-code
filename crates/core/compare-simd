@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+import sys
+
+what_to_bench = sys.argv[1]
+print("what_to_bench: " + what_to_bench)
+
+for simd, wasm in [(False, False), (True, False), (False, True), (True, True)]:
+    total_time = 0
+
+    new_env = os.environ.copy()
+    # See https://github.com/bytecodealliance/cargo-wasi/issues/128 for why --dir=. is necessary:
+    # new_env['CARGO_TARGET_WASM32_WASI_RUNNER'] =  'wasmtime --dir=.'
+    # new_env['CARGO_TARGET_WASM32_WASI_RUNNER'] = 'wasmer --dir=.'
+    # But use wasm-run (https://github.com/wasm3/node-wasm-run) instead:
+    new_env['CARGO_TARGET_WASM32_WASI_RUNNER'] =  'wasm-run'
+
+    if wasm:
+        new_env['RUSTFLAGS'] = '-C target-feature=+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext,+reference-types,+simd128'
+    else:
+        new_env['RUSTFLAGS'] = '-C target-cpu=native'
+
+    process_args = ['cargo', '+nightly']
+    if wasm:
+        process_args.append('wasi')
+    process_args += ['bench', '--bench', 'benchmark']
+    if simd:
+        process_args += ['--features', 'simd']
+    process_args += ['--', '--output-format=bencher', what_to_bench]
+    p = subprocess.Popen(process_args,
+                         text=True,
+                         stdout=subprocess.PIPE,
+                         env=new_env)
+
+    for line in p.stdout:
+        line = line.strip()
+        if not line: continue
+
+        # test 2022_01_1 ... bench:       23235 ns/iter (+/- 92)
+        parts = [x for x in line.split(" ") if x]
+
+        day = int(parts[1][5:7])
+        time = int(parts[4]) / 1_000_000
+
+        total_time += time
+
+    native_or = "wasm" if wasm else "native"
+    simd_or = "simd" if simd else "non-simd"
+    print(f"{native_or},{simd_or}: {total_time:>5.2f} ms")
+
