@@ -3,8 +3,6 @@ extern crate js_sys;
 extern crate wasm_bindgen;
 
 use advent_of_code::solve_raw;
-#[cfg(feature = "visualization")]
-use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
@@ -29,13 +27,5 @@ pub fn solve(
     let year = as_string(year);
     let day = as_string(day);
     let part = as_string(part);
-    solve_raw(
-        &year,
-        &day,
-        &part,
-        input,
-        #[cfg(feature = "visualization")]
-        RefCell::new(String::new()),
-    )
-    .map_err(|error| JsValue::from(js_sys::Error::new(&error)))
+    solve_raw(&year, &day, &part, input).map_err(|error| JsValue::from(js_sys::Error::new(&error)))
 }
