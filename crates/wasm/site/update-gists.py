@@ -138,7 +138,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
             continue
         if not filename.startswith("day"):
             continue
-        if filename.endswith("renderer.rs"):
+        if filename.endswith(("renderer.rs", "simd.rs")):
             continue
 
         day = int(filename[3:][:-3])
