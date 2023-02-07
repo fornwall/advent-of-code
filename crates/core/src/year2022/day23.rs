@@ -1,6 +1,6 @@
 #[cfg(feature = "visualization")]
 #[cfg(not(feature = "simd"))]
-use svgplot::{Coordinate, SvgImage, SvgRect, SvgScript, SvgStyle};
+use svgplot::{SvgImage, SvgRect, SvgScript, SvgStyle};
 
 #[cfg(not(feature = "simd"))]
 use crate::input::Input;
@@ -146,8 +146,8 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                     elf_position_rect_ids.push(
                         svg.add_with_id(
                             SvgRect::default()
-                                .x(elf.0 as Coordinate)
-                                .y(elf.1 as Coordinate)
+                                .x(f64::from(elf.0))
+                                .y(f64::from(elf.1))
                                 .width(1)
                                 .height(1),
                         ),
@@ -166,8 +166,8 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 let step_duration_ms = 300;
                 let animation_duration_ms = step_duration_ms - 100;
                 svg.add(SvgStyle::new(format!("\n\
-    rect {{ fill: #00B1D2; transition: x {}ms, y {}ms, fill {}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
-", animation_duration_ms, animation_duration_ms, animation_duration_ms)));
+    rect {{ fill: #00B1D2; transition: x {animation_duration_ms}ms, y {animation_duration_ms}ms, fill {animation_duration_ms}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
+")));
 
                 let array_declaration = format!(
                     "const elfPositions = [{}];",
@@ -184,8 +184,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                         .collect::<Vec<_>>()
                         .join(",")
                 );
-                svg.add(SvgScript::new(format!("{}{}", array_declaration, format!(
-                    "\nconst elfRects = document.querySelectorAll('rect');\n\
+                svg.add(SvgScript::new(format!("{array_declaration}\nconst elfRects = document.querySelectorAll('rect');\n\
 window.onNewStep = (step) => {{\n\
         const prevPos = (step == 0) ? null : elfPositions[step-1];\n\
         const pos = elfPositions[step];\n\
@@ -201,17 +200,17 @@ window.onNewStep = (step) => {{\n\
         }}\n\
 }};",
                     elves.len(),
-                ))));
+                )));
                 input.rendered_svg.replace(
                     svg.view_box((
-                        min_coords.0 as i64,
-                        min_coords.1 as i64,
-                        (max_coords.0 - min_coords.0) as i64,
-                        (max_coords.1 - min_coords.1) as i64,
+                        i64::from(min_coords.0),
+                        i64::from(min_coords.1),
+                        i64::from(max_coords.0 - min_coords.0),
+                        i64::from(max_coords.1 - min_coords.1),
                     ))
                     .style("background: black;")
                     .data_attribute("steps".to_string(), format!("{}", round + 1))
-                    .data_attribute("step-duration".to_string(), format!("{}", step_duration_ms))
+                    .data_attribute("step-duration".to_string(), format!("{step_duration_ms}"))
                     .to_svg_string(),
                 );
             }

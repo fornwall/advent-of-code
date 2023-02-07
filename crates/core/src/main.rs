@@ -1,9 +1,8 @@
 #![forbid(unsafe_code)]
+
 use std::env;
 use std::io::Read;
 
-#[cfg(feature = "visualization")]
-use advent_of_code::painter::MockPainter;
 use advent_of_code::solve_raw;
 
 fn main() -> Result<(), String> {
@@ -37,15 +36,8 @@ fn main() -> Result<(), String> {
             .map_err(|error| format!("Error reading input: {error}"))?;
 
         for _ in 0..repeat {
-            let solution = solve_raw(
-                year,
-                day,
-                part,
-                input.as_ref(),
-                #[cfg(feature = "visualization")]
-                Box::new(MockPainter {}),
-            )
-            .unwrap_or_else(|error| format!("Error: {error}"));
+            let solution = solve_raw(year, day, part, input.as_ref())
+                .unwrap_or_else(|error| format!("Error: {error}"));
             if repeat == 1 {
                 println!("{solution}");
             }

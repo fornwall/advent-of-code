@@ -97,7 +97,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     {
         for draw_height in 0..26 {
             let mut shape = SvgShape::new();
-            let hue = 225. - (draw_height as f64) * 10.;
+            let hue = (f64::from(draw_height)).mul_add(-10., 225.);
             for x in 0..graph.width {
                 for y in 0..graph.height {
                     let height = graph.height_at(x, y);
@@ -117,7 +117,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         shape,
                         ..Default::default()
                     }
-                    .title(format!("Elevation: {}", draw_height))
+                    .title(format!("Elevation: {draw_height}"))
                     .fill(SvgColor::Hsl(hue, 70, 40)),
                 );
             }
@@ -181,7 +181,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     );
                     path_render_script.push_str(
                         &SvgShape::at(new_pos.0 as f64 + 0.5, new_pos.1 as f64 + 0.5)
-                            .line_to_relative(-dx as f64, -dy as f64)
+                            .line_to_relative(f64::from(-dx), f64::from(-dy))
                             .data_string(),
                     );
                 }
@@ -200,16 +200,15 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
                         circles_render_script.push_str("'];");
                         path_render_script.push_str(&format!("'];\n window.onNewStep = (step) => {{\n\
-                                                              document.getElementById('{}').setAttribute('d', circlesPerStep[step]);\n\
+                                                              document.getElementById('{circles_path_id}').setAttribute('d', circlesPerStep[step]);\n\
                                                               const pathData = pathsPerStep.slice(0, step+1).join('');\n\
-                                                              document.getElementById('{}').setAttribute('d', pathData);\n\
-                                                             }}", circles_path_id, visited_path_id));
+                                                              document.getElementById('{visited_path_id}').setAttribute('d', pathData);\n\
+                                                             }}"));
                         svg.add(SvgScript::new(format!(
-                            "{}{}",
-                            circles_render_script, path_render_script
+                            "{circles_render_script}{path_render_script}"
                         )));
                         input.rendered_svg.replace(
-                            svg.data_attribute("steps".to_string(), format!("{}", new_cost))
+                            svg.data_attribute("steps".to_string(), format!("{new_cost}"))
                                 .data_attribute("step-duration".to_string(), format!("{}", 100))
                                 .to_svg_string(),
                         );

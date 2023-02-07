@@ -10,9 +10,9 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn new(reachable: &Vec<u64>, valley: &Valley) -> Self {
+    pub fn new(reachable: &[u64], valley: &Valley) -> Self {
         let mut svg = SvgImage::new().style("background:black");
-        let reachable_per_step = vec![(reachable.clone(), true)];
+        let reachable_per_step = vec![(reachable.to_vec(), true)];
 
         let blizzard_def_id = svg.define(
             SvgPath::default()
@@ -31,7 +31,7 @@ impl Renderer {
             (&valley.blizzards_down, 1., -1., 1., "down"),
         ] {
             for y in 0..valley.height {
-                let mut group = SvgGroup::new().class(format!("blizzard blizzard-{}", dir));
+                let mut group = SvgGroup::new().class(format!("blizzard blizzard-{dir}"));
                 for (x, col) in blizzard.iter().enumerate() {
                     if (col & (1 << y)) == 0 {
                         group.add(
@@ -55,7 +55,7 @@ impl Renderer {
             (&valley.blizzards_left, 1., 1., 0., "left"),
         ] {
             for (_x, col) in blizzard.iter().enumerate() {
-                let mut group = SvgGroup::new().class(format!("blizzard blizzard-{}", dir));
+                let mut group = SvgGroup::new().class(format!("blizzard blizzard-{dir}"));
                 for y in 0..valley.height {
                     if (col & (1 << y)) == 0 {
                         group.add(
@@ -87,10 +87,10 @@ impl Renderer {
         self.svg = self
             .svg
             .data_attribute("steps".to_string(), format!("{}", minute + 1))
-            .data_attribute("step-duration".to_string(), format!("{}", step_duration))
+            .data_attribute("step-duration".to_string(), format!("{step_duration}"))
             .view_box((-1, -1, valley.width as i64 + 2, valley.height as i64 + 2));
 
-        self.svg.add(SvgStyle::new(format!(".blizzard {{ transition: transform {}ms; }} .elf {{ transition: fill-opacity {}ms ease-in-out; }}", animation_duration, animation_duration)));
+        self.svg.add(SvgStyle::new(format!(".blizzard {{ transition: transform {animation_duration}ms; }} .elf {{ transition: fill-opacity {animation_duration}ms ease-in-out; }}")));
 
         let mut reachable_array = Vec::new();
         for (reachable, heading_down) in self.reachable_per_step.iter() {
@@ -120,7 +120,7 @@ impl Renderer {
                 if idx > 0 {
                     reachable_array_js.push(',');
                 }
-                reachable_array_js.push_str(&format!("[{},{}]", x, y));
+                reachable_array_js.push_str(&format!("[{x},{y}]"));
             }
             reachable_array_js.push(']');
         }
