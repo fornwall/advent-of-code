@@ -5,6 +5,7 @@ use std::array;
 use std::collections::VecDeque;
 use std::ops::Range;
 use std::simd::u8x32;
+use crate::chain;
 
 use crate::input::Input;
 
@@ -28,27 +29,13 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     }
 }
 
-macro_rules! chain {
-    ($first:expr $(, $rest:expr )* $(,)?) => {
-        {
-            let iter = core::iter::IntoIterator::into_iter($first);
-            $(
-                let iter =
-                    core::iter::Iterator::chain(
-                        iter,
-                        core::iter::IntoIterator::into_iter($rest));
-            )*
-            iter
-        }
-    };
-}
+type ElfGridRow = u8x32;
 
-#[derive(Clone, PartialEq, Eq)]
 struct ElfGrid {
-    bit_rows: [u8x32; 160],
+    bit_rows: [ElfGridRow; 160],
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 enum Direction {
     North,
     South,
@@ -59,7 +46,7 @@ enum Direction {
 impl ElfGrid {
     fn new() -> Self {
         Self {
-            bit_rows: [Default::default(); 160],
+            bit_rows: [ElfGridRow::splat(0); 160],
         }
     }
 
@@ -71,12 +58,12 @@ impl ElfGrid {
         self.bit_rows[row][col / 8] & (1 << (col % 8)) != 0
     }
 
-    fn shift_west(&row: &u8x32) -> u8x32 {
-        (row >> u8x32::splat(1)) | (row.rotate_lanes_left::<1>() << u8x32::splat(7))
+    fn shift_west(&row: &ElfGridRow) -> ElfGridRow {
+        (row >> ElfGridRow::splat(1)) | (row.rotate_lanes_left::<1>() << ElfGridRow::splat(7))
     }
 
-    fn shift_east(&row: &u8x32) -> u8x32 {
-        (row << u8x32::splat(1)) | (row.rotate_lanes_right::<1>() >> u8x32::splat(7))
+    fn shift_east(&row: &ElfGridRow) -> ElfGridRow {
+        (row << ElfGridRow::splat(1)) | (row.rotate_lanes_right::<1>() >> ElfGridRow::splat(7))
     }
 
     fn run_simulation(&mut self, max_rounds: usize) -> Option<usize> {
@@ -87,9 +74,7 @@ impl ElfGrid {
             Direction::East,
         ];
         for round in 0..max_rounds {
-            let moved;
-            (*self, moved) = self.play_round(directions);
-            if !moved {
+            if !self.play_round(directions) {
                 return Some(round + 1);
             }
             directions.rotate_left(1);
@@ -97,13 +82,13 @@ impl ElfGrid {
         None
     }
 
-    fn play_round(&self, priority: [Direction; 4]) -> (Self, bool) {
+    fn play_round(&mut self, priority: [Direction; 4]) -> bool {
         fn propose(
-            [nw, n, ne]: &[u8x32; 3],
-            [w, cur, e]: &[u8x32; 3],
-            [sw, s, se]: &[u8x32; 3],
+            [nw, n, ne]: &[ElfGridRow; 3],
+            [w, cur, e]: &[ElfGridRow; 3],
+            [sw, s, se]: &[ElfGridRow; 3],
             directions: [Direction; 4],
-        ) -> [u8x32; 4] {
+        ) -> [ElfGridRow; 4] {
             let mut propositions = [*cur; 4];
             let mut not_chosen = nw | n | ne | w | e | sw | s | se;
             for d in directions {
@@ -120,10 +105,10 @@ impl ElfGrid {
         }
 
         fn collide_proposals(
-            [_, south, _, _]: &[u8x32; 4],
-            [_, _, west, east]: &[u8x32; 4],
-            [north, _, _, _]: &[u8x32; 4],
-        ) -> [u8x32; 4] {
+            [_, south, _, _]: &[ElfGridRow; 4],
+            [_, _, west, east]: &[ElfGridRow; 4],
+            [north, _, _, _]: &[ElfGridRow; 4],
+        ) -> [ElfGridRow; 4] {
             [
                 north & !*south,
                 south & !*north,
@@ -132,9 +117,9 @@ impl ElfGrid {
             ]
         }
 
-        let mut new_self = self.clone();
+        let mut new_bit_rows = self.bit_rows;
         let mut moved = false;
-        let empty_row = [Default::default(); 2];
+        let empty_row = [ElfGridRow::splat(0); 2];
 
         chain!(&empty_row, &self.bit_rows, &empty_row)
             .map(|row| [Self::shift_east(row), *row, Self::shift_west(row)])
@@ -143,25 +128,26 @@ impl ElfGrid {
             .enumerate()
             .for_each(|(i, [from_south, from_north, from_east, from_west])| {
                 let destinations = from_north | from_south | from_west | from_east;
-                if destinations == u8x32::splat(0) {
-                    return;
+                if destinations != ElfGridRow::splat(0) {
+                    moved = true;
+                    new_bit_rows[i + 1] &= !from_south;
+                    new_bit_rows[i - 1] &= !from_north;
+                    new_bit_rows[i] &= !Self::shift_west(&from_west);
+                    new_bit_rows[i] &= !Self::shift_east(&from_east);
+                    new_bit_rows[i] |= destinations;
                 }
-                moved = true;
-                new_self.bit_rows[i + 1] &= !from_south;
-                new_self.bit_rows[i - 1] &= !from_north;
-                new_self.bit_rows[i] &= !Self::shift_west(&from_west);
-                new_self.bit_rows[i] &= !Self::shift_east(&from_east);
-                new_self.bit_rows[i] |= destinations;
             });
 
-        (new_self, moved)
+        self.bit_rows = new_bit_rows;
+        moved
     }
+
     fn bounds(&self) -> (Range<usize>, Range<usize>) {
         let mut min_row = usize::MAX;
         let mut max_row = usize::MIN;
         let mut min_col = usize::MAX;
         let mut max_col = usize::MIN;
-        for row in 0..160 {
+        for row in 0..self.bit_rows.len() {
             for col in 0..256 {
                 if self.is_elf_at(row, col) {
                     min_row = min_row.min(row);
@@ -184,8 +170,8 @@ impl ElfGrid {
 }
 
 struct MapWindows<I: Iterator, F, T, const N: usize>
-where
-    F: FnMut([&I::Item; N]) -> T,
+    where
+        F: FnMut([&I::Item; N]) -> T,
 {
     iter: I,
     f: F,
@@ -193,8 +179,8 @@ where
 }
 
 impl<I: Iterator, F, T, const N: usize> MapWindows<I, F, T, N>
-where
-    F: FnMut([&I::Item; N]) -> T,
+    where
+        F: FnMut([&I::Item; N]) -> T,
 {
     fn new(mut iter: I, f: F) -> Self {
         let buf = iter.by_ref().take(N - 1).collect();
@@ -203,8 +189,8 @@ where
 }
 
 impl<I: Iterator, F, T, const N: usize> Iterator for MapWindows<I, F, T, N>
-where
-    F: FnMut([&I::Item; N]) -> T,
+    where
+        F: FnMut([&I::Item; N]) -> T,
 {
     type Item = T;
 
@@ -220,9 +206,9 @@ where
 
 trait MapWindowsIterator: Iterator {
     fn map_windows<T, F, const N: usize>(self, f: F) -> MapWindows<Self, F, T, N>
-    where
-        Self: Sized,
-        F: FnMut([&Self::Item; N]) -> T,
+        where
+            Self: Sized,
+            F: FnMut([&Self::Item; N]) -> T,
     {
         MapWindows::new(self, f)
     }
