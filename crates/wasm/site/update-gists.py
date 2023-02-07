@@ -152,8 +152,9 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         # may contain 'feature = "visualization"':
         supports_visualization = '#[cfg(feature = "visualization")]' in src
 
-        # Strip away use of visualization packages - they just bloat up gist
+        # Strip away use of simd & visualization packages - they just bloat up gist
         # with unrelated code and may contain transitive imports:
+        src = re.sub('^#\\[cfg\\(feature = "simd"[^;]*;', '', src, flags=re.MULTILINE)
         src = re.sub('^#\\[cfg\\(feature = "visualization"[^;]*;', '', src, flags=re.MULTILINE)
 
         src = add_header(src, year, day)
