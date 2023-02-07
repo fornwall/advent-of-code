@@ -14,7 +14,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     input.text.lines().enumerate().for_each(|(row, line)| {
         for (col, b) in line.bytes().enumerate() {
             if b == b'#' {
-                grid.set_elf_at(row + 24, col + 72);
+                grid.set_elf_at(row + ELF_GRID_ROW_OFFSET, col + ELF_GRID_COL_OFFSET);
             }
         }
     });
@@ -30,9 +30,12 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 }
 
 type ElfGridRow = u8x32;
+const ELF_GRID_NUM_ROWS: usize = 160;
+const ELF_GRID_ROW_OFFSET: usize = 24;
+const ELF_GRID_COL_OFFSET: usize = 72;
 
 struct ElfGrid {
-    bit_rows: [ElfGridRow; 160],
+    bit_rows: [ElfGridRow; ELF_GRID_NUM_ROWS],
 }
 
 #[derive(Clone, Copy)]
@@ -46,7 +49,7 @@ enum Direction {
 impl ElfGrid {
     fn new() -> Self {
         Self {
-            bit_rows: [ElfGridRow::splat(0); 160],
+            bit_rows: [ElfGridRow::splat(0); ELF_GRID_NUM_ROWS],
         }
     }
 
