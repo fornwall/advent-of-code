@@ -55,9 +55,14 @@ endif
 check:
 	$(CARGO_COMMAND) fmt --all
 	$(CARGO_COMMAND) clippy --tests $(CLIPPY_PARAMS)
-	cd crates/core $(CARGO_COMMAND) --features visualization clippy --tests $(CLIPPY_PARAMS)
+	cd crates/core; $(CARGO_COMMAND) --features visualization clippy --tests $(CLIPPY_PARAMS)
 	$(CARGO_COMMAND) clippy --lib --bins $(CLIPPY_PARAMS) -D clippy::panic
 	if [ -n "${COUNT_ALLOCATIONS}" ]; then $(CARGO_COMMAND) test --features count-allocations; else $(CARGO_COMMAND) test; fi
+
+check-simd:
+	cd crates/core && \
+		cargo +nightly clippy --features simd --lib --bins --tests $(CLIPPY_PARAMS) && \
+		cargo +nightly test --features simd
 
 check-site:
 	cd crates/wasm && npx prettier --write . && npx eslint . --ext .js && npx prettier --check .

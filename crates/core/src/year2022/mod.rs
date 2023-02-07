@@ -21,6 +21,8 @@ pub mod day20;
 pub mod day21;
 pub mod day22;
 pub mod day23;
+#[cfg(feature = "simd")]
+pub mod day23_simd;
 pub mod day24;
 #[cfg(feature = "visualization")]
 pub mod day24_renderer;
