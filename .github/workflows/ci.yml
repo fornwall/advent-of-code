@@ -27,6 +27,7 @@ jobs:
       run: |
         rustup component add clippy rustfmt --toolchain nightly
         make NIGHTLY=1 check
+        make check-simd
       if: matrix.rust == 'nightly'
       continue-on-error: true
 
