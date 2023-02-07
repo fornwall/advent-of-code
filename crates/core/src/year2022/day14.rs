@@ -14,7 +14,7 @@ impl Grid {
         let mut highest_y_coordinate = 0;
         let mut data = vec![false; Self::SQUARE_WIDTH * Self::SQUARE_WIDTH];
         for line in input.lines() {
-            for (from_str, to_str) in line.split(" -> ").tuple_chunk() {
+            for (from_str, to_str) in line.split(" -> ").tuple_windows() {
                 let mut from_it = from_str.split(',');
                 let mut to_it = to_str.split(',');
                 if let (Some(from_x), Some(from_y), Some(to_x), Some(to_y)) = (

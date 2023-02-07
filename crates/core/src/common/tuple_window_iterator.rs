@@ -46,7 +46,7 @@ where
 }
 
 pub trait TupleWindowIteratorExt: Iterator {
-    fn tuple_chunk(self) -> TupleWindowIterator<Self, Self::Item>
+    fn tuple_windows(self) -> TupleWindowIterator<Self, Self::Item>
     where
         Self::Item: Copy,
         Self: Sized,
@@ -63,7 +63,7 @@ impl<I: Iterator> TupleWindowIteratorExt for I {}
 #[test]
 fn test() {
     let a = [1, 2, 3, 4, 5, 6];
-    let mut it = a.into_iter().tuple_chunk();
+    let mut it = a.into_iter().tuple_windows();
     assert_eq!(it.len(), 5);
     assert_eq!(it.next(), Some((1, 2)));
     assert_eq!(it.len(), 4);
