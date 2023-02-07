@@ -5,7 +5,6 @@ use std::array;
 use std::collections::VecDeque;
 use std::simd::u8x32;
 
-use crate::chain;
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
@@ -173,39 +172,53 @@ impl ElfGrid {
 
         let mut new_bit_rows = self.bit_rows;
         let mut moved = false;
-        let two_empty_rows = [ElfGridRow::splat(0); 2];
 
-        chain!(&two_empty_rows, &self.bit_rows, &two_empty_rows)
+        self.bit_rows
+            .iter()
             .map(|row| [Self::shift_cols_east(row), *row, Self::shift_cols_west(row)])
-            .map_windows(|[above, cur, below]| bitset_per_direction_excluding_collisions(above, cur, below, ordered_directions))
+            .map_windows(|[above, cur, below]| {
+                bitset_per_direction_excluding_collisions(above, cur, below, ordered_directions)
+            })
             .map_windows(|[above, cur, below]| collide_proposals(above, cur, below))
             .enumerate()
-            .for_each(|(row_idx, [from_south, from_north, from_east, from_west])| {
-                let destinations = from_north | from_south | from_west | from_east;
-                if destinations != ElfGridRow::splat(0) {
-                    moved = true;
-                    new_bit_rows[row_idx + 1] &= !from_south;
-                    new_bit_rows[row_idx - 1] &= !from_north;
-                    new_bit_rows[row_idx] &= !Self::shift_cols_west(&from_west);
-                    new_bit_rows[row_idx] &= !Self::shift_cols_east(&from_east);
-                    new_bit_rows[row_idx] |= destinations;
-                }
-            });
+            .for_each(
+                |(row_idx, [from_south, from_north, from_east, from_west])| {
+                    // Offset two for the two uses of map_windows() with an array size of 3:
+                    let row_idx = row_idx + 2;
+                    let destinations = from_north | from_south | from_west | from_east;
+                    if destinations != ElfGridRow::splat(0) {
+                        moved = true;
+                        new_bit_rows[row_idx + 1] &= !from_south;
+                        new_bit_rows[row_idx - 1] &= !from_north;
+                        new_bit_rows[row_idx] &= !Self::shift_cols_west(&from_west);
+                        new_bit_rows[row_idx] &= !Self::shift_cols_east(&from_east);
+                        new_bit_rows[row_idx] |= destinations;
+                    }
+                },
+            );
 
         self.bit_rows = new_bit_rows;
         moved
     }
 
     fn populated_rect_size(&self) -> usize {
-        let bounds = (0..self.bit_rows.len()).flat_map(|row|
-            (0..ELF_GRID_NUM_COLS).map(move |col| (row, col))
-        ).fold((usize::MAX, usize::MIN, usize::MAX, usize::MIN), |acc, (row, col)| {
-            if self.is_elf_at(row, col) {
-                (acc.0.min(row), acc.1.max(row), acc.2.min(col), acc.3.max(col))
-            } else {
-                acc
-            }
-        });
+        let bounds = (0..self.bit_rows.len())
+            .flat_map(|row| (0..ELF_GRID_NUM_COLS).map(move |col| (row, col)))
+            .fold(
+                (usize::MAX, usize::MIN, usize::MAX, usize::MIN),
+                |acc, (row, col)| {
+                    if self.is_elf_at(row, col) {
+                        (
+                            acc.0.min(row),
+                            acc.1.max(row),
+                            acc.2.min(col),
+                            acc.3.max(col),
+                        )
+                    } else {
+                        acc
+                    }
+                },
+            );
         (bounds.1 + 1 - bounds.0) * (bounds.3 + 1 - bounds.2)
     }
 
@@ -219,8 +232,8 @@ impl ElfGrid {
 }
 
 struct MapWindows<I: Iterator, F, T, const N: usize>
-    where
-        F: FnMut([&I::Item; N]) -> T,
+where
+    F: FnMut([&I::Item; N]) -> T,
 {
     iter: I,
     f: F,
@@ -228,8 +241,8 @@ struct MapWindows<I: Iterator, F, T, const N: usize>
 }
 
 impl<I: Iterator, F, T, const N: usize> MapWindows<I, F, T, N>
-    where
-        F: FnMut([&I::Item; N]) -> T,
+where
+    F: FnMut([&I::Item; N]) -> T,
 {
     fn new(mut iter: I, f: F) -> Self {
         let buf: VecDeque<_> = iter.by_ref().take(N - 1).collect();
@@ -238,8 +251,8 @@ impl<I: Iterator, F, T, const N: usize> MapWindows<I, F, T, N>
 }
 
 impl<I: Iterator, F, T, const N: usize> Iterator for MapWindows<I, F, T, N>
-    where
-        F: FnMut([&I::Item; N]) -> T,
+where
+    F: FnMut([&I::Item; N]) -> T,
 {
     type Item = T;
 
@@ -255,9 +268,9 @@ impl<I: Iterator, F, T, const N: usize> Iterator for MapWindows<I, F, T, N>
 
 trait MapWindowsIterator: Iterator {
     fn map_windows<T, F, const N: usize>(self, f: F) -> MapWindows<Self, F, T, N>
-        where
-            Self: Sized,
-            F: FnMut([&Self::Item; N]) -> T,
+    where
+        Self: Sized,
+        F: FnMut([&Self::Item; N]) -> T,
     {
         MapWindows::new(self, f)
     }
@@ -267,11 +280,20 @@ impl<I: Iterator> MapWindowsIterator for I {}
 
 #[test]
 fn test_iterator() {
-    let v = [1, 2, 3, 4].iter().map_windows(|[a, b]| (**a, **b)).collect::<Vec<_>>();
+    let v = [1, 2, 3, 4]
+        .iter()
+        .map_windows(|[a, b]| (**a, **b))
+        .collect::<Vec<_>>();
     assert_eq!(vec![(1, 2), (2, 3), (3, 4)], v);
 
-    let v = [1, 2, 3, 4].iter().map_windows(|[a, b, c]| (**a, **b, **c)).collect::<Vec<_>>();
+    let v = [1, 2, 3, 4]
+        .iter()
+        .map_windows(|[a, b, c]| (**a, **b, **c))
+        .collect::<Vec<_>>();
     assert_eq!(vec![(1, 2, 3), (2, 3, 4)], v);
-    let v = [1, 2, 3, 4].iter().map_windows(|[a, b, c, d, e]| (**a, **b, **c, **d, **e)).next();
+    let v = [1, 2, 3, 4]
+        .iter()
+        .map_windows(|[a, b, c, d, e]| (**a, **b, **c, **d, **e))
+        .next();
     assert_eq!(None, v);
 }
