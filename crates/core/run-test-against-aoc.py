@@ -19,6 +19,7 @@ with open(sessions_file) as f:
 os.environ["BROWSER"] = "true"
 
 verbose = "AOC_VERBOSE" in os.environ
+simd = "AOC_SIMD" in os.environ
 
 if "AOC_YEAR" in os.environ:
     years_string = os.environ["AOC_YEAR"]
@@ -81,7 +82,12 @@ for year in years:
                 if api_to_use:
                     fork_command = f"../../post-input {api_to_use} {year} {day} {part}"
                 else:
-                    fork_command = f"cargo run --release -q {year} {day} {part}"
+                    perhaps_nightly = "+nightly" if simd else ""
+                    perhaps_simd = "--features simd" if simd else ""
+                    fork_command = f"cargo {perhaps_nightly} run {perhaps_simd} --release -q {year} {day} {part}"
+
+                if verbose:
+                    print(f"Running: {fork_command}")
 
                 try:
                     forked_process = subprocess.run(
