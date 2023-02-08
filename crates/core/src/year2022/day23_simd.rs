@@ -109,7 +109,7 @@ impl ElfGrid {
         None
     }
 
-    fn play_round(&mut self, ordered_directions: [Direction; 4]) -> bool {
+    fn play_round(&mut self, directions: [Direction; 4]) -> bool {
         // Given 9 rows:
         // - The above row:   [shifted-east, unmodified, shifted-west]
         // - The current row: [shifted-east, unmodified, shifted-west]
@@ -121,28 +121,35 @@ impl ElfGrid {
         //
         // Note that e.g. "the above row, shifted-east" is actually "nw" in the function signature.
         // That is since it contains the bits shifted east, so shows the population to the west.
-        fn bitset_per_direction_excluding_collisions(
+        fn propose_movements(
             [nw, n, ne]: &[ElfGridRow; 3],
             [w, cur, e]: &[ElfGridRow; 3],
             [sw, s, se]: &[ElfGridRow; 3],
             ordered_directions: [Direction; 4],
         ) -> [ElfGridRow; 4] {
             let mut propositions = [*cur; 4];
-            // Setup available (unclaimed bit sets):
-            let mut not_chosen = nw | n | ne | w | e | sw | s | se;
+
+            // Keep track of elves who can still move.
+            // Start by requiring an adjacent elf -
+            // "During the first half of each round, each Elf considers the eight
+            // positions adjacent to themself. If no other Elves are in one of those
+            // eight positions, the Elf does not do anything during this round":
+            let mut available_to_move = nw | n | ne | w | e | sw | s | se;
+
             for d in ordered_directions {
-                let (row, direction_occupied) = match d {
-                    Direction::North => (&mut propositions[0], (ne | n | nw)),
-                    Direction::South => (&mut propositions[1], (se | s | sw)),
-                    Direction::West => (&mut propositions[2], (nw | w | sw)),
-                    Direction::East => (&mut propositions[3], (ne | e | se)),
+                let direction_occupied = match d {
+                    Direction::North => ne | n | nw,
+                    Direction::South => se | s | sw,
+                    Direction::West => nw | w | sw,
+                    Direction::East => ne | e | se,
                 };
-                // Starting from current bit, only keep if
-                // - All three relevant directions are unoccupied
-                // -
-                *row &= !direction_occupied & not_chosen;
-                // Only keep not bits if the direction was occupied:
-                not_chosen &= direction_occupied;
+
+                // Move the elf if the three adjacent positions in the direction
+                // are unoccupied, and elf have not already moved in another direction:
+                propositions[d as usize] &= !direction_occupied & available_to_move;
+
+                // Clear elves who have already moved:
+                available_to_move &= direction_occupied;
             }
             propositions
         }
@@ -176,9 +183,7 @@ impl ElfGrid {
         self.bit_rows
             .iter()
             .map(|row| [Self::shift_cols_east(row), *row, Self::shift_cols_west(row)])
-            .map_windows(|[above, cur, below]| {
-                bitset_per_direction_excluding_collisions(above, cur, below, ordered_directions)
-            })
+            .map_windows(|[above, cur, below]| propose_movements(above, cur, below, directions))
             .map_windows(|[above, cur, below]| collide_proposals(above, cur, below))
             .enumerate()
             .for_each(
@@ -292,6 +297,11 @@ fn test_iterator() {
         .collect::<Vec<_>>();
     assert_eq!(vec![(1, 2, 3), (2, 3, 4)], v);
     let v = [1, 2, 3, 4]
+        .iter()
+        .map_windows(|[a, b, c, d, e]| (**a, **b, **c, **d, **e))
+        .next();
+    assert_eq!(None, v);
+    let v = [1, 2, 3]
         .iter()
         .map_windows(|[a, b, c, d, e]| (**a, **b, **c, **d, **e))
         .next();
