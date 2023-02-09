@@ -1,9 +1,10 @@
 use crate::input::Input;
-use std::collections::VecDeque;
 
 pub fn solve(input: &Input) -> Result<u64, String> {
+    const MAX_DAYS: usize = 9;
+
     // Indexed by days left mapping to number of fishes with that many days left:
-    let mut count_per_day_left = VecDeque::from([0; 9]);
+    let mut count_per_day_left = [0; MAX_DAYS];
 
     for day_left_str in input.text.split(',') {
         match day_left_str.parse::<u8>() {
@@ -18,11 +19,10 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         }
     }
 
-    for _day in 0..input.part_values(80, 256) {
-        count_per_day_left.rotate_left(1);
+    for day in 0..input.part_values(80, 256) {
         // Those with 0 days left have given birth to new ones with 8 days
         // left - but we need to also add them back (reset to 6 days left):
-        count_per_day_left[6] += count_per_day_left[8];
+        count_per_day_left[(7 + day) % MAX_DAYS] += count_per_day_left[day % MAX_DAYS];
     }
 
     Ok(count_per_day_left.iter().sum())
