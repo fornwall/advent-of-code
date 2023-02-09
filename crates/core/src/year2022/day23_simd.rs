@@ -1,4 +1,4 @@
-/// Solutions to Advent of Code, day 23 in 2022.
+/// Solution to Advent of Code, day 23 in 2022.
 /// Using portable simd in rust.
 /// Taken from https://github.com/Crazytieguy/advent-of-code/blob/master/2022/src/bin/day23/main.rs
 use std::array;
@@ -19,23 +19,14 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     }
 }
 
+/// Each row is represented as a bitset.
+/// - Bit 0 in lane 0 is for col 0
+/// - [...]
+/// - Bit 1 in lane 0 is for col 1
+/// - Bit 7 in lane 0 is for col 7
+/// - Bit 0 in lane 1 is for col 8
+/// - [...]
 type ElfGridRow = u8x32;
-
-const ELF_GRID_NUM_ROWS: usize = 160;
-const ELF_GRID_NUM_COLS: usize = 256;
-const ELF_GRID_ROW_OFFSET: usize = 24;
-const ELF_GRID_COL_OFFSET: usize = 72;
-
-struct ElfGrid {
-    /// Each row is represented as a bitset.
-    /// - Bit 0 in lane 0 is for col 0
-    /// - [...]
-    /// - Bit 1 in lane 0 is for col 1
-    /// - Bit 7 in lane 0 is for col 7
-    /// - Bit 0 in lane 1 is for col 8
-    /// - [...]
-    bit_rows: [ElfGridRow; ELF_GRID_NUM_ROWS],
-}
 
 #[derive(Clone, Copy)]
 enum Direction {
@@ -45,17 +36,27 @@ enum Direction {
     East,
 }
 
+struct ElfGrid {
+    bit_rows: [ElfGridRow; Self::NUM_ROWS],
+}
+
 impl ElfGrid {
+    // Values big enough to solve official advent of code inputs:
+    const NUM_ROWS: usize = 160;
+    const NUM_COLS: usize = 256;
+    const ROW_OFFSET: usize = 24;
+    const COL_OFFSET: usize = 72;
+
     fn parse(input: &str) -> Result<Self, String> {
         let mut grid = Self {
-            bit_rows: [ElfGridRow::splat(0); ELF_GRID_NUM_ROWS],
+            bit_rows: [ElfGridRow::splat(0); Self::NUM_ROWS],
         };
         for (row, line) in input.lines().enumerate() {
             for (col, b) in line.bytes().enumerate() {
                 if b == b'#' {
-                    let storage_row = row + ELF_GRID_ROW_OFFSET;
-                    let storage_col = col + ELF_GRID_COL_OFFSET;
-                    if storage_row >= ELF_GRID_NUM_ROWS || storage_col >= ELF_GRID_NUM_COLS {
+                    let storage_row = row + Self::ROW_OFFSET;
+                    let storage_col = col + Self::COL_OFFSET;
+                    if storage_row >= Self::NUM_ROWS || storage_col >= Self::NUM_COLS {
                         return Err("Elves does not fit into optimised grid".to_string());
                     }
                     grid.set_elf_at(storage_row, storage_col);
@@ -129,24 +130,31 @@ impl ElfGrid {
         ) -> [ElfGridRow; 4] {
             let mut propositions = [*cur; 4];
 
-            // Keep track of elves who can still move.
-            // Start by requiring an adjacent elf -
+            // Keep track of elves who can still move. Start by require adjacent elf:
             // "During the first half of each round, each Elf considers the eight
             // positions adjacent to themself. If no other Elves are in one of those
             // eight positions, the Elf does not do anything during this round":
             let mut available_to_move = nw | n | ne | w | e | sw | s | se;
 
-            for d in ordered_directions {
-                let direction_occupied = match d {
+            for direction in ordered_directions {
+                let direction_occupied = match direction {
+                    // "If there is no Elf in the N, NE, or NW adjacent positions,
+                    // the Elf proposes moving north one step"
                     Direction::North => ne | n | nw,
+                    // "If there is no Elf in the S, SE, or SW adjacent positions,
+                    // the Elf proposes moving south one step"
                     Direction::South => se | s | sw,
+                    // "If there is no Elf in the W, NW, or SW adjacent positions,
+                    // the Elf proposes moving west one step"
                     Direction::West => nw | w | sw,
+                    // "If there is no Elf in the E, NE, or SE adjacent positions,
+                    // the Elf proposes moving east one step"
                     Direction::East => ne | e | se,
                 };
 
                 // Move the elf if the three adjacent positions in the direction
                 // are unoccupied, and elf have not already moved in another direction:
-                propositions[d as usize] &= !direction_occupied & available_to_move;
+                propositions[direction as usize] &= !direction_occupied & available_to_move;
 
                 // Clear elves who have already moved:
                 available_to_move &= direction_occupied;
@@ -154,10 +162,10 @@ impl ElfGrid {
             propositions
         }
 
-        // Given 3 results from bitset_per_direction_excluding_collisions() above
-        // - How the above row would move [N, S, W, E]
+        // Given 3 results from bitset_per_direction_excluding_collisions() above:
+        // - How the above row would move   [N, S, W, E]
         // - How the current row would move [N, S, W, E]
-        // - How the below row would move [N, S, W, E]
+        // - How the below row would move   [N, S, W, E],
         // if there were no collisions, this function computes how the current row
         // will be populated by elves moving from the north, south, weast and east.
         //
@@ -208,7 +216,7 @@ impl ElfGrid {
 
     fn populated_rect_size(&self) -> usize {
         let bounds = (0..self.bit_rows.len())
-            .flat_map(|row| (0..ELF_GRID_NUM_COLS).map(move |col| (row, col)))
+            .flat_map(|row| (0..Self::NUM_COLS).map(move |col| (row, col)))
             .fold(
                 (usize::MAX, usize::MIN, usize::MAX, usize::MIN),
                 |acc, (row, col)| {
