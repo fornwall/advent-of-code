@@ -173,6 +173,8 @@ jobs:
     - name: Check out source code
       uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: '1.67.0'
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install llvm
     - name: Fuzz with AFL
