@@ -173,6 +173,7 @@ jobs:
     - name: Check out source code
       uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
+    - run: sudo apt-get install llvm
     - name: Fuzz with AFL
       run: AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
     - name: Upload crashes found by fuzzing
