@@ -4,9 +4,14 @@ pub fn solve(input: &Input) -> Result<String, String> {
     let sum = input
         .text
         .lines()
-        .filter(|line| line.len() < 32)
-        .map(snafu_to_decimal)
-        .sum();
+        .map(|line| {
+            if line.len() < 24 {
+                Ok(snafu_to_decimal(line))
+            } else {
+                Err("Too long line in input")
+            }
+        })
+        .sum::<Result<_, _>>()?;
     Ok(decimal_to_snafu(sum))
 }
 
