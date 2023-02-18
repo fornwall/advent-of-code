@@ -1,6 +1,8 @@
-use super::int_code::Program;
-use crate::input::Input;
 use std::collections::{HashSet, VecDeque};
+
+use crate::input::Input;
+
+use super::int_code::Program;
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 enum Direction {
@@ -51,10 +53,17 @@ struct Room {
     id: String,
     directions: Vec<Direction>,
     items: Vec<String>,
-    solution: Option<SolutionType>,
+    solution: ResultFromPressureSensor,
 }
 
 type SolutionType = i64;
+
+enum ResultFromPressureSensor {
+    None,
+    Solution(SolutionType),
+    TooLight,
+    TooHeavy,
+}
 
 fn execute_command(program: &mut Program, command: Command) -> Result<Room, String> {
     match command {
@@ -80,12 +89,18 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
     let mut directions = Vec::new();
     let mut items = Vec::new();
     let mut room_id = "";
-    let mut solution = None;
+    let mut solution = ResultFromPressureSensor::None;
 
     for line in output.lines() {
         if line.starts_with("== ") {
             // This takes the second if bounced from "Pressure-Sensitive Floor".
             room_id = line;
+        } else if line.starts_with("A loud") {
+            solution = if line.contains("lighter") {
+                ResultFromPressureSensor::TooHeavy
+            } else {
+                ResultFromPressureSensor::TooLight
+            };
         } else if let Some(item) = line.strip_prefix("- ") {
             Direction::from_str(item).map_or_else(
                 || {
@@ -97,7 +112,7 @@ fn parse_output(program: &mut Program) -> Result<Room, String> {
             );
         } else if line.starts_with("\"Oh, hello! You should be able to get in by typing") {
             let error_message = "Unable to parse typing instruction";
-            solution = Some(
+            solution = ResultFromPressureSensor::Solution(
                 line.split_whitespace()
                     .nth(11)
                     .ok_or(error_message)?
@@ -188,12 +203,23 @@ pub fn solve(input: &Input) -> Result<SolutionType, String> {
         execute_command(&mut program, Command::Drop(item))?;
     }
 
+    // Keep track off too light or too heavy combinations.
+    let mut too_light = Vec::new();
+    let mut too_heavy = Vec::new();
+
     // Try all combinations of items using Gray code,
     // https://en.wikipedia.org/wiki/Gray_code#Constructing_an_n-bit_Gray_code,
     // to minimize the number of take and drop commands:
     let mut latest_gray_code = 0;
     for i in 1..=(1 << carried_items.len()) {
         let gray_code = i ^ (i >> 1);
+
+        if too_heavy.iter().any(|&heavy| heavy & gray_code == heavy)
+            || too_light.iter().any(|&light| light | gray_code == light)
+        {
+            continue;
+        }
+
         for (j, item) in carried_items.iter().enumerate() {
             let bit_mask = 1 << j;
             if gray_code & bit_mask != 0 && latest_gray_code & bit_mask == 0 {
@@ -202,14 +228,26 @@ pub fn solve(input: &Input) -> Result<SolutionType, String> {
                 execute_command(&mut program, Command::Drop(item))?;
             }
         }
+
         latest_gray_code = gray_code;
 
         let new_room = execute_command(
             &mut program,
             Command::Move(direction_to_pressure_sensitive_floor),
         )?;
-        if let Some(solution) = new_room.solution {
-            return Ok(solution);
+        match new_room.solution {
+            ResultFromPressureSensor::Solution(solution) => {
+                assert!(!too_light.is_empty());
+                assert!(!too_heavy.is_empty());
+                return Ok(solution);
+            }
+            ResultFromPressureSensor::TooLight => {
+                too_light.push(gray_code);
+            }
+            ResultFromPressureSensor::TooHeavy => {
+                too_heavy.push(gray_code);
+            }
+            _ => {}
         }
     }
 
