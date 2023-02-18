@@ -1,7 +1,7 @@
+use crate::input::Input;
+
 #[cfg(feature = "visualization")]
 use super::day24_renderer::Renderer;
-
-use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<i32, String> {
     const MAX_STEPS: usize = 10_000;
@@ -93,8 +93,10 @@ fn parse(input: &str) -> Result<Valley, String> {
         .ok_or("Invalid input - not multiple lines")?
         - 2;
     let height = input.lines().count() - 2;
-    if height > 64 {
-        return Err("Too big height for input - must be less than 64".to_string());
+    if width < 3 || height < 3 {
+        return Err("Too small valley".to_string());
+    } else if height > 64 || width > 200 {
+        return Err("Too big valley".to_string());
     }
 
     let mut blizzards_up = vec![(1 << height) - 1; width];

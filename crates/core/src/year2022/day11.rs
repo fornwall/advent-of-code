@@ -118,6 +118,9 @@ impl Monkey {
         }
         // Samples: "  Operation: new = old + 2" and "  Operation: new = old + old":
         let operation_line = lines.next()?;
+        if operation_line.len() < 26 {
+            return None;
+        }
         let operation = match (
             operation_line.as_bytes()[23],
             operation_line[25..].parse::<WorryType>().ok(),

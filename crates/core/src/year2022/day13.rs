@@ -129,7 +129,9 @@ fn next_token<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mu
             }
             digit @ b'0'..=b'9' => {
                 parsing_number = true;
-                number = number * 10 + (digit - b'0');
+                if number <= 9 {
+                    number = number * 10 + (digit - b'0');
+                }
                 it.next();
             }
             b',' => {
