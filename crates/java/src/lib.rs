@@ -7,7 +7,7 @@ use jni::JNIEnv;
 
 #[no_mangle]
 pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
-    env: JNIEnv,
+    mut env: JNIEnv,
     _class: JClass,
     year: i32,
     day: i32,
@@ -15,7 +15,7 @@ pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
     input: JString,
 ) -> jstring {
     let input_str: String = env
-        .get_string(input)
+        .get_string(&input)
         .expect("Unable to get input string")
         .into();
 
