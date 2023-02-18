@@ -85,8 +85,8 @@ impl Program {
     }
 
     pub fn input_string(&mut self, input_string: &str) {
-        input_string.chars().for_each(|c| {
-            self.input(c as Word);
+        input_string.bytes().for_each(|c| {
+            self.input(Word::from(c));
         });
     }
 
