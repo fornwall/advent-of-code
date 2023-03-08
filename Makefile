@@ -92,12 +92,6 @@ wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-compute-wasm && \
 	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
---pack-runbench-continously:
-	cd crates/wasm/site/runbench && NODE_ENV=development npx webpack -- --watch
-
---pack-show-continously:
-	cd crates/wasm/site/show && NODE_ENV=development npx webpack -- --watch
-
 --run-devserver:
 	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type https
 
