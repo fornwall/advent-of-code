@@ -1,7 +1,7 @@
 use crate::common::md5::Context;
 use crate::input::Input;
 use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::BinaryHeap;
 
 #[derive(Hash, Clone, Eq, Ord, PartialOrd, PartialEq)]
 struct State {
@@ -32,7 +32,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
     let passcode = input.text.as_bytes();
 
     let mut to_visit = BinaryHeap::new();
-    let mut cost_of_states = HashMap::new();
 
     let initial_state = State {
         position: (0, 0),
@@ -40,8 +39,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         doors: check_doors(passcode, &[]),
     };
 
-    to_visit.push(Reverse((0, initial_state.clone())));
-    cost_of_states.insert(initial_state, 0);
+    to_visit.push(Reverse((0, initial_state)));
 
     let mut desired_path_length = None;
 

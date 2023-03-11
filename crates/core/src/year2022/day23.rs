@@ -141,16 +141,13 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
             if num_moves == 0 || (input.is_part_one() && round == 9) {
                 let mut svg = SvgImage::new();
-                let mut elf_position_rect_ids = Vec::new();
                 for elf in elf_positions_per_step[0].iter() {
-                    elf_position_rect_ids.push(
-                        svg.add_with_id(
-                            SvgRect::default()
-                                .x(f64::from(elf.0))
-                                .y(f64::from(elf.1))
-                                .width(1)
-                                .height(1),
-                        ),
+                    svg.add_with_id(
+                        SvgRect::default()
+                            .x(f64::from(elf.0))
+                            .y(f64::from(elf.1))
+                            .width(1)
+                            .height(1),
                     );
                 }
 

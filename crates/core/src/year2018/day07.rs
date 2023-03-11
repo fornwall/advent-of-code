@@ -171,7 +171,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
             work_queue.push(Work::new(step.name, done_at_time));
         }
 
-        let mut visited: HashSet<char> = HashSet::new();
         let mut result = String::new();
 
         let mut latest_work_done_at = 0;
@@ -179,7 +178,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
             latest_work_done_at = work_done.done_at_second;
 
             result.push(work_done.name);
-            visited.insert(work_done.name);
 
             let step = &step_map[&work_done.name];
 

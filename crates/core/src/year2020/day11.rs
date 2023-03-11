@@ -98,10 +98,10 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             }
         });
 
-        changes.retain(|&change_idx| {
+        for &change_idx in changes.iter() {
             seats[change_idx as usize] = !seats[change_idx as usize];
-            false
-        });
+        }
+        changes.clear();
 
         if to_visit.is_empty() {
             return Ok(seats.iter().filter(|&&occupied| occupied).count());
