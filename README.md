@@ -28,4 +28,4 @@ For learning and demonstration purposes, this repository contains additional res
   - Deployed to [Netlify Functions](https://www.netlify.com/products/functions/).
 - [crates/worker](crates/worker): A [Cloudflare Worker](https://workers.cloudflare.com/).
 
-All builds and deployments are done from the [CI using Github Actions](.github/workflows/github-ci.yml).
+All deployments are done using [GitHub Actions workflows](.github/workflows/).
