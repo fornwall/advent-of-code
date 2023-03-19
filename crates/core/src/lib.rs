@@ -1,7 +1,7 @@
 #![cfg_attr(feature = "simd", feature(portable_simd))]
 #![forbid(unsafe_code)]
 /*!
-This crates provides solutions for [Advent of Code](https://adventofcode.com/) problems.
+This crate provides solutions for [Advent of Code](https://adventofcode.com/) problems.
 
 # Usage
 
