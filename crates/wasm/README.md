@@ -44,11 +44,11 @@ $ echo 14 | advent-of-code-wasm 2019 1 1
 
 The [functions/](https://github.com/fornwall/advent-of-code/tree/master/crates/wasm/functions) directory contains code and configuration to deploy the WebAssembly with a JS wrapper to [Netlify Functions](https://www.netlify.com/products/functions/).
 
-- Deployment URL: https://aoc.fornwall.workers.dev
+- Deployment URL: curl -d 14 https://mystifying-blackwell-9e705f.netlify.app
 
 It implements the API described at [https://aoc.fornwall.net/api/](https://aoc.fornwall.net/api/):
 
 ```sh
-$ curl -d 14 https://aoc.fornwall.net/solve/2019/1/1
+$ curl -d 14 https://mystifying-blackwell-9e705f.netlify.app/solve/2019/1/1
 2
 ```
