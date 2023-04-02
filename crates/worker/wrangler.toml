@@ -1,9 +1,6 @@
 name = "aoc"
 main = "build/worker/shim.mjs"
-compatibility_date = "2023-03-17"
-
-[vars]
-WORKERS_RS_VERSION = "0.0.14"
+compatibility_date = "2023-04-02"
 
 [build]
 command = "cargo install -q worker-build && worker-build --release"

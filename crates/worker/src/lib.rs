@@ -48,8 +48,8 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
             headers.append("Access-Control-Allow-Origin", "*").unwrap();
             Ok(response.with_headers(headers))
         })
-        .get("/worker-version", |_, ctx| {
-            let version = ctx.var("WORKERS_RS_VERSION")?.to_string();
+        .get("/worker-version", |_, _ctx| {
+            let version = env!("CARGO_PKG_VERSION");
             Response::ok(version)
         })
         .run(req, env)
