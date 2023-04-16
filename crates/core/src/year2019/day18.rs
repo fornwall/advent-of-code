@@ -121,14 +121,14 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                 }
 
                 let new_steps = steps + 1;
-                found_key.map_or_else(
-                    || {
+                match found_key {
+                    None => {
                         if visited_positions.insert(new_position) {
                             let new_state = (new_position, new_needed_keys, new_steps);
                             to_visit.push_back(new_state);
                         }
-                    },
-                    |target_key| {
+                    }
+                    Some(target_key) => {
                         adjacency_list
                             .entry(this_key)
                             .or_insert_with(Vec::new)
@@ -137,8 +137,8 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                                 needed_keys: new_needed_keys,
                                 target_key,
                             });
-                    },
-                );
+                    }
+                };
             }
         }
     }
