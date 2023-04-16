@@ -97,7 +97,6 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     continue 'key_direction_loop;
                 }
                 let mut new_needed_keys = needed_keys;
-                let mut found_key = None;
 
                 match map.get(index_of(new_position.0 as usize, new_position.1 as usize)) {
                     Some(&char_at_position @ b'A'..=b'Z') => {
@@ -110,7 +109,15 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                         }
                     }
                     Some(&char_at_position @ b'a'..=b'z') => {
-                        found_key = Some(Key::new(char_at_position));
+                        let target_key = Key::new(char_at_position);
+                        adjacency_list
+                            .entry(this_key)
+                            .or_insert_with(Vec::new)
+                            .push(Edge {
+                                steps: (steps + 1) as usize,
+                                needed_keys: new_needed_keys,
+                                target_key,
+                            });
                     }
                     Some(b'.') => {
                         // Free to enter.
@@ -120,25 +127,10 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     }
                 }
 
-                let new_steps = steps + 1;
-                match found_key {
-                    None => {
-                        if visited_positions.insert(new_position) {
-                            let new_state = (new_position, new_needed_keys, new_steps);
-                            to_visit.push_back(new_state);
-                        }
-                    }
-                    Some(target_key) => {
-                        adjacency_list
-                            .entry(this_key)
-                            .or_insert_with(Vec::new)
-                            .push(Edge {
-                                steps: new_steps as usize,
-                                needed_keys: new_needed_keys,
-                                target_key,
-                            });
-                    }
-                };
+                if visited_positions.insert(new_position) {
+                    let new_state = (new_position, new_needed_keys, steps + 1);
+                    to_visit.push_back(new_state);
+                }
             }
         }
     }
