@@ -171,13 +171,9 @@ pub fn solve(input: &Input) -> Result<String, String> {
             work_queue.push(Work::new(step.name, done_at_time));
         }
 
-        let mut result = String::new();
-
         let mut latest_work_done_at = 0;
         while let Some(work_done) = work_queue.pop() {
             latest_work_done_at = work_done.done_at_second;
-
-            result.push(work_done.name);
 
             let step = &step_map[&work_done.name];
 
