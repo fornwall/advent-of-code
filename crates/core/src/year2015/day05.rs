@@ -2,15 +2,11 @@ use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
     fn is_nice_part_1(string: &&str) -> bool {
-        if string.contains("ab")
+        !(string.contains("ab")
             || string.contains("cd")
             || string.contains("pq")
-            || string.contains("xy")
-        {
-            return false;
-        }
-
-        string.chars().filter(|&c| "aeiou".contains(c)).count() >= 3
+            || string.contains("xy"))
+            && string.chars().filter(|&c| "aeiou".contains(c)).count() >= 3
             && string
                 .as_bytes()
                 .windows(2)
