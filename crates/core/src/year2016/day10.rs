@@ -32,7 +32,7 @@ fn receive(
     to_bot: BotId,
     part1: bool,
 ) -> Option<BotId> {
-    let mut bot = &mut bots[usize::from(to_bot)];
+    let bot = &mut bots[usize::from(to_bot)];
 
     if let Some(first_microchip) = bot.received_chip {
         let low_microchip = std::cmp::min(first_microchip, microchip);
