@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ '14.x', '19.x' ]
+        node-version: [ '14.x', 'latest' ]
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
