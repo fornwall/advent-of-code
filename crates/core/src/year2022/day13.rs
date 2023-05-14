@@ -79,11 +79,11 @@ fn is_correctly_ordered(packet_1: &str, packet_2: &str) -> bool {
                 coerced_to_list_2 += 1;
                 value_1 = next_token(&mut line_1, &mut coerced_to_list_1);
             }
-            (Token::ListEnd, Token::Number(_)) | (Token::ListEnd, Token::ListStart) => {
+            (Token::ListEnd, Token::Number(_) | Token::ListStart) => {
                 // "If the left list runs out of items first, the inputs are in the right order":
                 return true;
             }
-            (Token::Number(_), Token::ListEnd) | (Token::ListStart, Token::ListEnd) => {
+            (Token::Number(_) | Token::ListStart, Token::ListEnd) => {
                 // "If the right list runs out of items first, the inputs are not in the right order":
                 return false;
             }

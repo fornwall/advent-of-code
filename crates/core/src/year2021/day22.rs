@@ -90,10 +90,10 @@ impl Cuboid {
             on: match (self.on, other.on) {
                 // (on, on): Avoid double counting (as other whole cuboid will be added).
                 // (on, off): Turning off a turned on cuboid.
-                (true, true) | (true, false) => false,
+                (true, _) => false,
                 // (off, on): Turning on a turned off cuboid.
                 // (off, off): Turning off a turned off correction cuboid.
-                (false, true) | (false, false) => true,
+                (false, _) => true,
             },
             min_corner: Coordinate {
                 x: x_intersection.0,

@@ -23,6 +23,7 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::trivially_copy_pass_by_ref \
 	-W clippy::unreadable-literal \
 	-W clippy::unseparated-literal-suffix \
+	-W clippy::unnested_or_patterns \
 	-W clippy::unwrap_used
 
 ifeq ($(NIGHTLY),1)
