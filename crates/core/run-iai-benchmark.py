@@ -66,13 +66,5 @@ for line in result.stdout.splitlines():
         words = [word for word in line.split(' ') if word]
         if line.startswith('Instructions:'):
             current['instructions'] = int(words[1])
-        elif line.startswith('L1 Accesses:'):
-            current['l1'] = int(words[2])
-        elif line.startswith('L2 Accesses:'):
-            current['l2'] = int(words[2])
-        elif line.startswith('RAM Accesses:'):
-            current['ram'] = int(words[2])
-        elif line.startswith('Estimated Cycles:'):
-            current['cycles'] = int(words[2])
 
 print(json.dumps(output_dict, indent=2))

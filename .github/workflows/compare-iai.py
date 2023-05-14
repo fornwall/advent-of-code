@@ -19,8 +19,8 @@ for benchmark_name in old:
     old_values = old[benchmark_name]
     new_values = new[benchmark_name]
 
-    old_time = old_values["cycles"]
-    new_time = new_values["cycles"]
+    old_time = old_values["instructions"]
+    new_time = new_values["instructions"]
 
     total_time += new_time
 
@@ -47,8 +47,8 @@ print(("@@" + "Benchmark Difference".center(line_width - 2) + "@@").replace(" ",
 
 # Table title:
 title_name = "Name"
-title_new = "New (cycles)"
-title_old = "Old (cycles)"
+title_new = "New (instructions)"
+title_old = "Old (instructions)"
 desired_new_len = max_new_time_len + space_between_columns
 desired_old_len = max_old_time_len + space_between_columns
 desired_change_len = len(title_change) + space_between_columns
@@ -83,7 +83,7 @@ print("```")
 
 new_results.sort(reverse=True)
 print("")
-print("Benchmark | Cycles (count) | Cycles (%)")
+print("Benchmark | Instructions (count) | Instructions (%)")
 print("--- | --: | --:")
 for (time, name) in new_results:
     percentage_time = (100.0 * time) / total_time
