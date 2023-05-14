@@ -87,14 +87,12 @@ impl Cuboid {
         )?;
 
         Some(Self {
-            on: match (self.on, other.on) {
-                // (on, on): Avoid double counting (as other whole cuboid will be added).
-                // (on, off): Turning off a turned on cuboid.
-                (true, _) => false,
-                // (off, on): Turning on a turned off cuboid.
-                // (off, off): Turning off a turned off correction cuboid.
-                (false, _) => true,
-            },
+            // Matching on (self.on, other.on):
+            // (on, on): Avoid double counting (as other whole cuboid will be added).
+            // (on, off): Turning off a turned on cuboid.
+            // (off, on): Turning on a turned off cuboid.
+            // (off, off): Turning off a turned off correction cuboid.
+            on: !self.on,
             min_corner: Coordinate {
                 x: x_intersection.0,
                 y: y_intersection.0,
