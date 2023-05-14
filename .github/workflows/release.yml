@@ -119,10 +119,7 @@ jobs:
         mkdir -p target/linux/{arm64,amd64}
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
         cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code-server target/linux/arm64/
-        # See https://github.com/docker/buildx/issues/1533 and
-        # https://community.fly.io/t/deploying-to-fly-via-github-action-failing/10171/29?page=2
-        # about --provenance=false:
-        docker buildx build --provenance=false --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
+        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
     - name: Deploy to Fly
       uses: superfly/flyctl-actions@master
       env:
