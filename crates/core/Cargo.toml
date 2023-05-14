@@ -30,7 +30,7 @@ visualization = ["svgplot"]
 
 [dependencies]
 allocation-counter = { version = "0", optional = true }
-svgplot = { version="2022.0.53", path = "../svgplot", optional = true }
+svgplot = { version="2022.0.54", path = "../svgplot", optional = true }
 
 [dev-dependencies]
 iai = { git = "https://github.com/fornwall/iai.git" }
