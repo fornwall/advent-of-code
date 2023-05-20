@@ -53,7 +53,7 @@ pub fn solve(input: &Input) -> Result<i64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
 
     test_part_one!("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0" => 43210);
     test_part_one!("3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0"=>54321);
@@ -65,4 +65,7 @@ pub fn tests() {
     let real_input = include_str!("day07_input.txt");
     test_part_one!(real_input => 51679);
     test_part_two!(real_input => 19_539_216);
+
+    test_part_one_error!("3,-14" => "Bad address: -14");
+    test_part_two_error!("3,448552900448552866" => "Bad address: 448552900448552866");
 }

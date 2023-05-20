@@ -90,29 +90,43 @@ impl Program {
         });
     }
 
-    fn parameter_mode(&self, instruction: Word, parameter_position: u32) -> Parameter {
+    fn parameter_mode(
+        &self,
+        instruction: Word,
+        parameter_position: u32,
+    ) -> Result<Parameter, String> {
         let parameter = self.read_memory(self.instruction_pointer + parameter_position as usize);
         let divider = 10_i64.pow(parameter_position + 1);
         let mode = ((instruction / divider) % 10) as u8;
-        match mode {
-            1 => Parameter::Value(parameter),
-            2 => Parameter::Address((parameter + self.relative_base) as usize),
-            _ => Parameter::Address(parameter as usize),
+        let address = match mode {
+            1 => {
+                return Ok(Parameter::Value(parameter));
+            }
+            2 => parameter + self.relative_base,
+            _ => parameter,
+        };
+        if !(0..=10_000).contains(&address) {
+            return Err(format!("Bad address: {address}"));
         }
+        Ok(Parameter::Address(address as usize))
     }
 
     fn output_location(&self, instruction: Word, parameter_position: u32) -> Result<usize, String> {
-        if let Parameter::Address(location) = self.parameter_mode(instruction, parameter_position) {
+        if let Parameter::Address(location) =
+            self.parameter_mode(instruction, parameter_position)?
+        {
             return Ok(location);
         }
         Err("Invalid parameter mode for where to write".to_string())
     }
 
-    fn parameter_value(&self, instruction: Word, parameter_position: u32) -> Word {
-        match self.parameter_mode(instruction, parameter_position) {
-            Parameter::Value(value) => value,
-            Parameter::Address(location) => self.read_memory(location),
-        }
+    fn parameter_value(&self, instruction: Word, parameter_position: u32) -> Result<Word, String> {
+        Ok(
+            match self.parameter_mode(instruction, parameter_position)? {
+                Parameter::Value(value) => value,
+                Parameter::Address(location) => self.read_memory(location),
+            },
+        )
     }
 
     fn evaluate(&mut self) -> Result<(), String> {
@@ -121,8 +135,8 @@ impl Program {
 
         match opcode {
             1 | 2 => {
-                let parameter1 = self.parameter_value(instruction, 1);
-                let parameter2 = self.parameter_value(instruction, 2);
+                let parameter1 = self.parameter_value(instruction, 1)?;
+                let parameter2 = self.parameter_value(instruction, 2)?;
                 let output_location = self.output_location(instruction, 3)?;
                 let value = if opcode == 1 {
                     parameter1.checked_add(parameter2)
@@ -147,7 +161,7 @@ impl Program {
             4 => {
                 // Opcode 4 outputs the value of its only parameter.
                 self.output_values
-                    .push(self.parameter_value(instruction, 1));
+                    .push(self.parameter_value(instruction, 1)?);
                 self.instruction_pointer += 2;
             }
             5 | 6 => {
@@ -156,9 +170,9 @@ impl Program {
                 // Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer
                 // to the value from the second parameter. Otherwise, it does nothing.
                 let jump_if = opcode == 5;
-                let parameter_1_true = self.parameter_value(instruction, 1) != 0;
+                let parameter_1_true = self.parameter_value(instruction, 1)? != 0;
                 if parameter_1_true == jump_if {
-                    self.instruction_pointer = self.parameter_value(instruction, 2) as usize;
+                    self.instruction_pointer = self.parameter_value(instruction, 2)? as usize;
                 } else {
                     self.instruction_pointer += 3;
                 }
@@ -180,7 +194,7 @@ impl Program {
                 self.instruction_pointer += 4;
             }
             9 => {
-                self.relative_base += self.parameter_value(instruction, 1);
+                self.relative_base += self.parameter_value(instruction, 1)?;
                 self.instruction_pointer += 2;
             }
             99 => {
