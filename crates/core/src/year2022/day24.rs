@@ -91,7 +91,8 @@ fn parse(input: &str) -> Result<Valley, String> {
     let width = input
         .find('\n')
         .ok_or("Invalid input - not multiple lines")?
-        - 2;
+        .checked_sub(2)
+        .ok_or("Too small valley")?;
     let height = input.lines().count() - 2;
     if width < 3 || height < 3 {
         return Err("Too small valley".to_string());
@@ -131,7 +132,7 @@ fn parse(input: &str) -> Result<Valley, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
 
     let test_input = "#.######
 #>>.<^<#
@@ -145,4 +146,8 @@ pub fn tests() {
     let real_input = include_str!("day24_input.txt");
     test_part_one!(real_input => 242);
     test_part_two!(real_input => 720);
+
+    let test_input = "\n+88";
+    test_part_one_error!(test_input => "Too small valley");
+    test_part_two_error!(test_input => "Too small valley");
 }
