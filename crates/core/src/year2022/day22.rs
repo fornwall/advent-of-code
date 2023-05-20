@@ -118,6 +118,10 @@ impl Cube {
             }
         }
 
+        if sides.iter().any(|side| side.grid_position.0 == usize::MAX) {
+            return None;
+        }
+
         if fold_cube {
             // See https://www.reddit.com/r/adventofcode/comments/zsct8w/comment/j17s6l5/
             // for description of programmatic approach.
@@ -335,7 +339,7 @@ impl Direction {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two};
 
     let real_input = include_str!("day22_input.txt");
     test_part_one!(real_input => 89_224);
@@ -344,4 +348,6 @@ pub fn tests() {
     let real_input = include_str!("day22_input_other.txt");
     test_part_one!(real_input => 76_332);
     test_part_two!(real_input => 144_012);
+
+    test_part_one_error!("\n\n" => "Invalid input");
 }
