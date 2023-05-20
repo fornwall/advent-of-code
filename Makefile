@@ -125,7 +125,7 @@ fuzz-hfuzz:
 
 fuzz-libfuzzer:
 	cargo install cargo-fuzz
-	cd crates/fuzzing-libfuzzer/ && cargo +$(NIGHTLY_TOOLCHAIN) fuzz run fuzz_target
+	cd crates/fuzzing-libfuzzer/ && cargo +$(NIGHTLY_TOOLCHAIN) fuzz run fuzz_target -- -max_total_time=1200 -only_ascii=1 -report_slow_units=120
 
 install-cargo-deps:
 	cargo install cargo-benchcmp cargo-watch devserver
