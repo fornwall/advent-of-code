@@ -208,10 +208,10 @@ jobs:
     - name: Install honggfuzz dependencies
       run: sudo apt-get update && sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
     - name: Fuzz with honggfuzz
-      run: timeout 1800s make fuzz-hfuzz
-      continue-on-error: true
+      run: make fuzz-hfuzz
       env:
-        HFUZZ_RUN_ARGS: "-t 10 --exit_upon_crash"
+        # See https://github.com/google/honggfuzz/blob/master/docs/USAGE.md
+        HFUZZ_RUN_ARGS: "--timeout 10 --run_time 1800 --exit_upon_crash"
     - name: Upload crashes found by fuzzing
       uses: actions/upload-artifact@v3
       with:
