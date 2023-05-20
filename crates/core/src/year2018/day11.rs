@@ -64,8 +64,8 @@ pub fn solve(input: &Input) -> Result<String, String> {
         .parse::<GridValue>()
         .map_err(|error| format!("Invalid input: {error}"))?;
 
-    if serial_number >= 10_000 {
-        return Err("Too big serial number - max is 10,000".to_string());
+    if serial_number.abs() >= 10_000 {
+        return Err("Too big serial number - max magnitude is 10,000".to_string());
     }
 
     let table = SummedAreaTable::new(serial_number);
@@ -99,7 +99,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two};
 
     test_part_one!("18" => "33,45".into());
     test_part_one!("42" => "21,61".into());
@@ -109,4 +109,6 @@ fn tests() {
     let input = include_str!("day11_input.txt");
     test_part_one!(input => "21,68".into());
     test_part_two!(input => "90,201,15".into());
+
+    test_part_one_error!("-62878989" => "Too big serial number - max magnitude is 10,000");
 }

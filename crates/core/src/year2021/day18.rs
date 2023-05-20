@@ -142,6 +142,9 @@ impl SnailfishNumber {
 
     fn magnitude(&self) -> u32 {
         fn recursive_magnitude(number: &[SnailfishElement], index: &mut usize, depth: u8) -> u32 {
+            if *index >= number.len() {
+                return 0;
+            }
             let left = if number[*index].depth == depth {
                 *index += 1;
                 u32::from(number[*index - 1].value)
@@ -149,6 +152,9 @@ impl SnailfishNumber {
                 recursive_magnitude(number, index, depth + 1)
             };
 
+            if *index >= number.len() {
+                return 0;
+            }
             let right = if number[*index].depth == depth {
                 *index += 1;
                 u32::from(number[*index - 1].value)
@@ -190,4 +196,6 @@ pub fn tests() {
     let real_input = include_str!("day18_input.txt");
     test_part_one!(real_input => 3793);
     test_part_two!(real_input => 4695);
+
+    test_part_one!("[8]" => 0);
 }

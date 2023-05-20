@@ -149,10 +149,10 @@ impl Packet {
             let next_package_value = Self::parse_and_eval(transmission)?;
             match current_package.type_id {
                 0 => {
-                    current_value += next_package_value;
+                    current_value = current_value.checked_add(next_package_value)?;
                 }
                 1 => {
-                    current_value *= next_package_value;
+                    current_value = current_value.checked_mul(next_package_value)?;
                 }
                 2 => {
                     current_value = std::cmp::min(next_package_value, current_value);
@@ -305,7 +305,7 @@ pub fn test_packet_parsing() {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two, test_part_two_error};
 
     let real_input = include_str!("day16_input.txt");
 
@@ -333,4 +333,6 @@ pub fn tests() {
         });
         assert_eq!(allocations, 0);
     }
+
+    test_part_two_error!("b1/       5105 	   |" => "Unable to parse outermost package - check transmission");
 }
