@@ -50,6 +50,9 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
     let mut screen = [false; NUM_LETTERS * CHAR_HEIGHT * CHAR_WIDTH];
     for (x, y) in dots {
+        if y >= (NUM_LETTERS * CHAR_WIDTH) as u16 || y >= CHAR_HEIGHT as u16 {
+            return Err("Dot outside of range".into());
+        }
         screen[usize::from(y) * NUM_LETTERS * CHAR_WIDTH + usize::from(x)] = true;
     }
     recognize(&screen)
@@ -57,7 +60,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_one_error, test_part_two};
 
     let example = "6,10
 0,14
@@ -85,4 +88,6 @@ fold along x=5";
     let real_input = include_str!("day13_input.txt");
     test_part_one!(real_input => "763".to_string());
     test_part_two!(real_input => "RHALRCRA".to_string());
+
+    test_part_one_error!("189,403" => "Dot outside of range".to_string());
 }
