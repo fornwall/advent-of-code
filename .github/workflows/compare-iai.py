@@ -8,12 +8,17 @@ with open(sys.argv[1]) as json_file:
 with open(sys.argv[2]) as json_file:
     new = json.load(json_file)
 
+# Table titles:
+title_name = "Name"
+title_new = "New (instructions)"
+title_old = "Old (instructions)"
+
 new_results = []
 total_time = 0
 table_rows = []
 max_name_len = 0
-max_new_time_len = 0
-max_old_time_len = 0
+max_new_time_len = len(title_new)
+max_old_time_len = len(title_old)
 
 for benchmark_name in old:
     old_values = old[benchmark_name]
@@ -45,10 +50,6 @@ line_width = (
 print("```diff")
 print(("@@" + "Benchmark Difference".center(line_width - 2) + "@@").replace(" ", " "))
 
-# Table title:
-title_name = "Name"
-title_new = "New (instructions)"
-title_old = "Old (instructions)"
 desired_new_len = max_new_time_len + space_between_columns
 desired_old_len = max_old_time_len + space_between_columns
 desired_change_len = len(title_change) + space_between_columns
