@@ -39,6 +39,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             }
 
             grid.settle_rock(rock_bitmask, rock_left_x as usize, rock_bottom_y);
+            if grid.highest_rock + 4 >= Grid::MAX_HEIGHT {
+                return Err("Too high pile".to_string());
+            }
 
             if input.is_part_two() {
                 let rock_and_direction_idx =
@@ -133,7 +136,7 @@ impl Grid {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one, test_part_two, test_part_two_error};
 
     let test_input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
     test_part_one!(test_input => 3068);
@@ -142,4 +145,8 @@ pub fn tests() {
     let real_input = include_str!("day17_input.txt");
     test_part_one!(real_input => 3117);
     test_part_two!(real_input => 1_553_314_121_019);
+
+    let test_input_string = ">".repeat(6277);
+    let test_input = test_input_string.as_str();
+    test_part_two_error!(test_input => "Too high pile");
 }

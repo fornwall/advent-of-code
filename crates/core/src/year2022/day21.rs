@@ -156,7 +156,12 @@ impl MonkeyAction {
         for line in input.lines() {
             let mut words = line.split(' ');
 
-            let monkey_name = words.next().map(|w| &w[0..w.len() - 1])?;
+            let monkey_name = words.next().and_then(|w| {
+                if w.len() != 5 {
+                    return None;
+                }
+                Some(&w[0..w.len() - 1])
+            })?;
             let monkey_id = id_of(monkey_name);
             let is_human = monkey_name == "humn";
             if is_human {
@@ -283,4 +288,7 @@ cccc: 2
 humn: 5";
     test_part_one_error!(test_input => "Too deep or recursive tree");
     test_part_two_error!(test_input => "Too deep or recursive tree");
+
+    let test_input = " ";
+    test_part_one_error!(test_input => "Invalid input");
 }
