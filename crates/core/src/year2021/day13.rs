@@ -50,7 +50,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
     let mut screen = [false; NUM_LETTERS * CHAR_HEIGHT * CHAR_WIDTH];
     for (x, y) in dots {
-        if y >= (NUM_LETTERS * CHAR_WIDTH) as u16 || y >= CHAR_HEIGHT as u16 {
+        if x >= (NUM_LETTERS * CHAR_WIDTH) as u16 || y >= CHAR_HEIGHT as u16 {
             return Err("Dot outside of range".into());
         }
         screen[usize::from(y) * NUM_LETTERS * CHAR_WIDTH + usize::from(x)] = true;
@@ -90,4 +90,5 @@ fold along x=5";
     test_part_two!(real_input => "RHALRCRA".to_string());
 
     test_part_one_error!("189,403" => "Dot outside of range".to_string());
+    test_part_one_error!("189,4" => "Dot outside of range".to_string());
 }
