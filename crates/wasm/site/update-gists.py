@@ -12,6 +12,8 @@ import requests
 MAPPING_FILE_NAME = "gist-mapping.json"
 
 dry_run = bool(os.environ.get("DRY_RUN"))
+only_year = int(os.environ.get("YEAR")) if "YEAR" in os.environ else False
+only_day = int(os.environ.get("DAY")) if "DAY" in os.environ else False
 
 def add_header(src, year, day):
     link_to_file = f"https://github.com/fornwall/advent-of-code/tree/master/crates/core/src/year{year}/day{str(day).rjust(2, '0')}.rs"
@@ -143,6 +145,8 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
 
         day = int(filename[3:][:-3])
         path = os.path.join(dirpath, filename)
+        if only_year and only_day and (year, day) != (only_year, only_day):
+            continue
 
         print(f"{year} - {day}")
 
