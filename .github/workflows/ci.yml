@@ -350,7 +350,7 @@ jobs:
       working-directory: crates/worker
       run: npx wrangler publish
 
-  publish-and-deploy-http-server:
+  build-and-deploy-http-server:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -373,7 +373,7 @@ jobs:
         flyctl deploy --image ${IMAGE_WITH_VERSION}
       if: github.ref == 'refs/heads/main'
 
-  deploy-grpc-server:
+  build-and-deploy-grpc-server:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
