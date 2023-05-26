@@ -1,8 +1,5 @@
 app = "advent"
 
-[build]
-  image = "fredrikfornwall/advent-of-code-http-server:2022.0.54"
-
 [[services]]
   internal_port = 8080
   protocol = "tcp"

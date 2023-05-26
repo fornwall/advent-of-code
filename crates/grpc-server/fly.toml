@@ -1,8 +1,5 @@
 app = "advent-grpc"
 
-[build]
-  image = "fredrikfornwall/advent-of-code-grpc-server:2022.0.54"
-
 [[services]]
   internal_port = 50051
   protocol = "tcp"
