@@ -15,6 +15,24 @@ dry_run = bool(os.environ.get("DRY_RUN"))
 only_year = int(os.environ.get("YEAR")) if "YEAR" in os.environ else False
 only_day = int(os.environ.get("DAY")) if "DAY" in os.environ else False
 
+def inline_module(crate_or_super, module, year):
+    module_path = module.replace("::", "/")
+    if crate_or_super == "super":
+        path_in_repo = f"crates/core/src/year{year}/{module_path}.rs"
+    else:
+        path_in_repo = f"crates/core/src/{module_path}.rs"
+        if not os.path.isfile(f"../../../{path_in_repo}"):
+            path_in_repo = f"crates/core/src/{module_path}/mod.rs"
+    src_to_include = Path(f"../../../{path_in_repo}").read_text()
+    code = f"    // This is https://github.com/fornwall/advent-of-code/tree/master/{path_in_repo} inlined to work in the Rust Playground."
+    for line in iter(src_to_include.splitlines()):
+        if line:
+            line = line.replace("#[test]", "#[test] #[ignore]")
+            code += f"\n    {line}"
+        else:
+            code += "\n"
+    return code
+
 def add_header(src, year, day):
     link_to_file = f"https://github.com/fornwall/advent-of-code/tree/master/crates/core/src/year{year}/day{str(day).rjust(2, '0')}.rs"
     header = f"// Solution to Advent of Code {year}, day {day}: https://adventofcode.com/{year}/day/{day}"
@@ -33,29 +51,37 @@ def add_header(src, year, day):
     inlined_modules = set()
     pattern = re.compile(r"use (super|crate)::(.*)::(.*?);")
     found = False
+
+    module_nesting = {}
     for crate_or_super, module, _ in re.findall(pattern, src):
         if module in inlined_modules:
             continue
         inlined_modules.add(module)
 
-        module_path = module.replace("::", "/")
-        if crate_or_super == "super":
-            path_in_repo = f"crates/core/src/year{year}/{module_path}.rs"
+        if '::' in module:
+            parent_module = module.split('::')[0] if '::' in module else None
+            child_module = module.split('::')[1] if '::' in module else None
+            current_children = module_nesting.get(parent_module)
+            if not current_children:
+                current_children = []
+            current_children.append((crate_or_super, child_module))
+            module_nesting[parent_module] = current_children
         else:
-            path_in_repo = f"crates/core/src/{module_path}.rs"
-            if not os.path.isfile(f"../../../{path_in_repo}"):
-                path_in_repo = f"crates/core/src/{module_path}/mod.rs"
-        src_to_include = Path(f"../../../{path_in_repo}").read_text()
-        module_rust = module.replace("::", " { pub mod ")
-        suffix += f"\n\n#[allow(dead_code, unused_imports, unused_macros)]\nmod {module_rust} {{\n"
-        suffix += f"    // This is https://github.com/fornwall/advent-of-code/tree/master/{path_in_repo} inlined to work in the Rust Playground."
-        for line in iter(src_to_include.splitlines()):
-            if line:
-                suffix += f"\n    {line}"
-            else:
-                suffix += "\n"
-        suffix += "\n" + "}" * (1 + module.count("::"))
-        found = True
+            module_nesting[module] = (crate_or_super)
+
+    for parent_module, contents in module_nesting.items():
+        if isinstance(contents, list):
+            # Parent module containing multiple children:
+            suffix += f"\n\n#[allow(dead_code, unused_imports, unused_macros)]\nmod {parent_module} {{\n"
+            for crate_or_super, child_module in contents:
+                suffix += 'pub mod ' + child_module + ' {\n'
+                suffix += inline_module(crate_or_super, parent_module + '::' + child_module, year)
+                suffix += '}\n'
+            suffix += "}\n"
+        else:
+            suffix += f"\n\n#[allow(dead_code, unused_imports, unused_macros)]\nmod {parent_module} {{\n"
+            suffix += inline_module(contents, parent_module, year)
+            suffix += "}\n"
 
     src = re.sub(r"use super::(.*)?::", lambda match: f"use {match.group(1)}::", src)
     src = re.sub(r"use crate::(.*)?::", lambda match: f"use {match.group(1)}::", src)
@@ -99,7 +125,7 @@ def set_gist(year, day, src, gist_id=None):
 
     file_name = f"year{year}_day{day}.rs"
     headers = {
-        "authorization": f"token {API_TOKEN}",
+        "authorization": f"Bearer {API_TOKEN}",
         "accept": "application/vnd.github.v3+json",
         "content-type": "application/json",
     }
@@ -108,10 +134,10 @@ def set_gist(year, day, src, gist_id=None):
         gist_method = "PATCH"
         GIST_API = f"https://api.github.com/gists/{gist_id}"
         get_response = requests.get(GIST_API, headers=headers)
-        existing_src = get_response.json()["files"][file_name]["content"]
+        response_json = get_response.json()
+        existing_src = response_json["files"][file_name]["content"]
         if existing_src == src:
-            print("Unmodified")
-            return gist_id
+            return response_json
     else:
         gist_method = "POST"
         GIST_API = "https://api.github.com/gists"
@@ -125,6 +151,7 @@ def set_gist(year, day, src, gist_id=None):
         payload["public"] = False
 
     response = requests.request(gist_method, GIST_API, headers=headers, json=payload)
+    response.raise_for_status()
     return response.json()
 
 
@@ -148,7 +175,8 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         if only_year and only_day and (year, day) != (only_year, only_day):
             continue
 
-        print(f"{year} - {day}")
+        if not (only_year and only_day):
+            print(f"{year} - {day}")
 
         src = Path(path).read_text()
 
@@ -173,12 +201,20 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         if year_str in gist_mapping and day_str in gist_mapping[year_str] and 'gist' in gist_mapping[year_str][day_str]:
             existing_id = gist_mapping[year_str][day_str]['gist']
             if dry_run:
-                print(f"Would reuse existing id {existing_id}")
+                if only_year and only_day:
+                    print(src)
+                else:
+                    print(f"Would reuse existing id {existing_id}")
             else:
-                set_gist(year, day, src, existing_id)
+                response_json = set_gist(year, day, src, existing_id)
+                raw_url = list(response_json['files'].values())[0]['raw_url']
+                gist_mapping[year_str][day_str]['raw_url'] = raw_url
         else:
             if dry_run:
-                print("Would create new!")
+                if only_year and only_day:
+                    print(src)
+                else:
+                    print("Would create new!")
             else:
                 response_json = set_gist(year, day, src)
                 new_id = response_json['id']

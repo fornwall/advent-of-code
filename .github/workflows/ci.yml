@@ -266,6 +266,9 @@ jobs:
       working-directory: crates/wasm/site
       env:
         GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
+    - name: Tests gists
+      run: ./validate-gists.py
+      working-directory: crates/wasm/site
     - name: Setup git for commit
       run: |
         git config --global user.name 'Gist Mapping Updater'
