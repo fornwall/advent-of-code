@@ -1,402 +1,54 @@
-name: CI
+name: Release
 
 on:
   push:
-    branches:
-      - '**'
+    tags:
+      - "*.*.*"
 
 jobs:
-  test-rust:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        rust: [stable, nightly]
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: ${{ matrix.rust }}
-    - name: Show rust version
-      run: rustc --version
-    - uses: Homebrew/actions/setup-homebrew@master
-    - name: Install protobuf
-      run: brew install protobuf
-    - name: Test and check (stable)
-      run: |
-        make COUNT_ALLOCATIONS=1 check
-      if: matrix.rust == 'stable'
-    - name: Test and check (nightly)
-      run: |
-        rustup component add clippy rustfmt --toolchain nightly
-        make NIGHTLY=1 check
-        make check-simd
-      if: matrix.rust == 'nightly'
-      continue-on-error: true
-
-  test-rust-32-bits:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: i686-unknown-linux-musl
-    - run: rustc --version
-    - run: cargo test --target i686-unknown-linux-musl
-      working-directory: crates/core
-
-  test-rust-wasi:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: wasm32-wasi
-    - run: rustc --version
-    - uses: Homebrew/actions/setup-homebrew@master
-    - run: brew install wasmtime
-    - run: cargo install cargo-wasi
-    - run: cargo wasi test -- --nocapture
-      working-directory: crates/core
-
-  test-c-and-cxx-bindings:
+  build-python-wheels:
+    env:
+      # Note that we want to build only for a single python version
+      # since we're targeting abi3. Sync changes with setup.cfg and
+      # the "abi3-pyXX" PyO3 feature in Cargo.toml
+      CIBW_SKIP: "cp36-* cp37-* cp38-* cp310-* cp311-* pp* *i686 *win32"
+      CIBW_ARCHS_LINUX: ${{matrix.arch}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - if: ${{ matrix.os == 'ubuntu-latest' }}
-      uses: Homebrew/actions/setup-homebrew@master
-    - if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt-get update && sudo apt-get -y install libc6-dbg && brew install valgrind
-    - run: make test-c-and-cxx-bindings
-
-  test-python:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.x']
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Test with Python ${{ matrix.python-version }}
-      run: make test-python
-
-  test-wasm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ '14.x', 'latest' ]
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: 'https://registry.npmjs.org'
-    - uses: Homebrew/actions/setup-homebrew@master
-    - name: Install wasm-opt
-      run: brew update && brew install binaryen
-    - name: Install wasm-bindgen
-      run: make install-wasm-bindgen
-    - name: Test with Node ${{ matrix.node-version }}
-      run: make node-package
-
-  benchmark:
-    strategy:
-      matrix:
-        tested-commit: [new, old]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout current commit
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-      if: matrix.tested-commit == 'new' || github.event_name != 'pull_request'
-    - name: Checkout base branch (${{ github.base_ref }} of pull request
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.base_ref }}
-      if: matrix.tested-commit == 'old' && github.event_name == 'pull_request'
-    - name: Checkout previous commit
-      run: git checkout HEAD~1
-      if: matrix.tested-commit == 'old' && github.ref == 'refs/heads/main'
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: Homebrew/actions/setup-homebrew@master
-    - run: brew install valgrind
-    - name: Run benchmark on ${{ matrix.tested-commit }} commit
-      run: ./run-iai-benchmark.py > ${{ matrix.tested-commit }}-baseline.json
-      working-directory: crates/core
-    - name: Upload benchmark
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ matrix.tested-commit }}-benchmark
-        path: crates/core/${{ matrix.tested-commit }}-baseline.json
-
-  compare-benchmarks:
-    needs: [benchmark]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Download new benchmark
-      uses: actions/download-artifact@v3
-      with:
-        name: new-benchmark
-    - name: Download old benchmark
-      uses: actions/download-artifact@v3
-      with:
-        name: old-benchmark
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-    - name: Format commit comment
-      id: get-comment-body
-      run: |
-        body=$(./.github/workflows/compare-iai.py old-baseline.json new-baseline.json)
-        delimiter="$(openssl rand -hex 8)"
-        { echo "body<<$delimiter"; echo "$body"; echo "$delimiter"; } >> "$GITHUB_OUTPUT"
-    - name: Post commit comment
-      uses: peter-evans/commit-comment@v2
-      with:
-        body: ${{ steps.get-comment-body.outputs.body }}
-
-  fuzz-afl:
-    runs-on: ubuntu-latest
-    # Allow failures as LLVM is not always available for installation:
-    continue-on-error: true
-    steps:
-    - name: Check out source code
-      uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - run: sudo apt-get install llvm
-    - name: Fuzz with AFL
-      run: AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
-    - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./crates/fuzzing-afl/target/fuzz-findings/default/crashes
-        name: fuzzing-crashes-afl
-
-  fuzz-libfuzzer:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out source code
-      uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: nightly
-    - name: Fuzz with libfuzzer
-      run: timeout 1800s make fuzz-libfuzzer
-      continue-on-error: true
-    - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v3
-      with:
-        path: crates/fuzzing-libfuzzer/fuzz/artifacts/fuzz_target/
-        name: fuzzing-crashes-libfuzzer
-
-  fuzz-honggfuzz:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out source code
-      uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - name: Install honggfuzz dependencies
-      run: sudo apt-get update && sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
-    - name: Fuzz with honggfuzz
-      run: make fuzz-hfuzz
-      env:
-        # See https://github.com/google/honggfuzz/blob/master/docs/USAGE.md
-        HFUZZ_RUN_ARGS: "--timeout 10 --run_time 1800 --exit_upon_crash"
-    - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v3
-      with:
-        path: crates/fuzzing-hfuzz/hfuzz_workspace/advent-of-code-fuzzing-hfuzz/*.fuzz
-        name: fuzzing-crashes-honggfuzz
-
-  coverage:
-    runs-on: ubuntu-latest
-    container:
-      image: xd009642/tarpaulin
-      options: --security-opt seccomp=unconfined
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - name: Generate code coverage
-      run: cargo tarpaulin --verbose --timeout 720 --out Xml
-      working-directory: crates/core
-    - name: Upload to codecov.io
-      uses: codecov/codecov-action@v3
-      with:
-        directory: crates/core
-
-  actionlint:
-    runs-on: ubuntu-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        arch: [x86_64, aarch64]
+        exclude:
+          - os: ubuntu-latest
+            arch: aarch64
+          - os: macos-latest
+            arch: aarch64
+          - os: windows-latest
+            arch: aarch64
     steps:
       - uses: actions/checkout@v3
-      - name: Download actionlint
-        id: get_actionlint
-        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-      - name: Check workflow files
-        run: ${{ steps.get_actionlint.outputs.executable }} -color
-
-  check-js:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v4
+        name: Setup python
         with:
-          node-version: 'lts/*'
-      - name: Check js
-        run: npm install && npm run check
-        working-directory: crates/wasm
-
-  gist-mapping:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
           python-version: '3.x'
-    - name: Update gist mapping
-      run: pip install requests && ./update-gists.py && git add gist-mapping.json
-      working-directory: crates/wasm/site
-      env:
-        GIST_API_TOKEN: ${{ secrets.GIST_API_TOKEN }}
-    - name: Tests gists
-      run: ./validate-gists.py
-      working-directory: crates/wasm/site
-    - name: Commit and push gist mapping if updated
-      run: |
-        if [ -n "$(git status --untracked-files=no --porcelain)" ]; then
-          git config --global user.name 'Gist Mapping Updater'
-          git config --global user.email 'gist-mapping-updater@users.noreply.github.com'
-          git commit -m 'Update gist-mapping'
-          git push
-        fi
-    - name: Upload new gist-mapping.json
-      uses: actions/upload-artifact@v3
-      with:
-        name: gist-mapping
-        path: crates/wasm/site/gist-mapping.json
-
-  deploy-site:
-    if: github.ref == 'refs/heads/main'
-    needs: [benchmark, gist-mapping]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 'lts/*'
-        registry-url: 'https://registry.npmjs.org'
-    - uses: Homebrew/actions/setup-homebrew@master
-    - name: Install wasm-opt
-      run: brew update && brew install binaryen
-    - name: Install wasm-bindgen
-      run: make install-wasm-bindgen
-    - name: Download new gist-mapping.json
-      uses: actions/download-artifact@v3
-      with:
-        name: gist-mapping
-        path: crates/wasm/site
-    - name: Download new benchmark
-      uses: actions/download-artifact@v3
-      with:
-        name: new-benchmark
-        path: crates/wasm/site/benchmark
-    - name: Deploy site
-      run: |
-        echo "${{ secrets.SITE_DEPLOY_SSH_KEY }}" | base64 --decode > /tmp/id_ed25519
-        chmod 0600 /tmp/id_ed25519
-        export GIT_SSH_COMMAND='ssh -i /tmp/id_ed25519'
-        git config --global user.email "ci@fornwall.net"
-        git config --global user.name "CI"
-        make deploy-site
-    - name: Install the Netlify CLI
-      run: npm install netlify-cli -g
-    - name: Deploy to Netlify
-      run: make netlify
-      env:
-        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
-        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-  deploy-cloudflare-worker:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 'lts/*'
-        registry-url: 'https://registry.npmjs.org'
-    - uses: Homebrew/actions/setup-homebrew@master
-    - name: Install wasm-opt
-      run: brew update && brew install binaryen
-    - name: Work around https://github.com/rustwasm/wasm-pack/issues/1263
-      run: |
-        mkdir /home/linuxbrew/.linuxbrew/bin/bin
-        cp /home/linuxbrew/.linuxbrew/bin/wasm-opt /home/linuxbrew/.linuxbrew/bin/bin/wasm-opt
-    - name: Deploy to Cloudflare
-      env:
-        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        CLOUDFLARE_ACCOUNT_ID: c494646a87f38a82ce35ea24edaada52
-      working-directory: crates/worker
-      run: npx wrangler publish
-
-  build-and-deploy-http-server:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - run: cargo install cross
-    - uses: superfly/flyctl-actions/setup-flyctl@master
-    - name: Build and deploy docker image
-      working-directory: crates/http-server
-      env:
-        DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-http-server
-        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        FLY_PROJECT_PATH: crates/grpc-server
-      run: |
-        cross build --release --target x86_64-unknown-linux-musl
-        strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server
-        IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${GITHUB_SHA}
-        mkdir -p target/linux/amd64
-        cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
-        docker buildx build --tag "${IMAGE_WITH_VERSION}" .
-        flyctl deploy --image "${IMAGE_WITH_VERSION}"
-      if: github.ref == 'refs/heads/main'
-
-  build-and-deploy-grpc-server:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@stable
-    - run: cargo install cross
-    - uses: superfly/flyctl-actions/setup-flyctl@master
-    - name: Build and deploy docker image
-      working-directory: crates/grpc-server
-      env:
-        DOCKER_IMAGE_NAME: fredrikfornwall/advent-of-code-grpc-server
-        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        FLY_PROJECT_PATH: crates/grpc-server
-      run: |
-        cross build --release --target x86_64-unknown-linux-musl
-        strip -s ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server
-        IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${GITHUB_SHA}
-        mkdir -p target/linux/amd64
-        cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/amd64/
-        docker buildx build --tag "${IMAGE_WITH_VERSION}" .
-        flyctl deploy --image "${IMAGE_WITH_VERSION}"
-      if: github.ref == 'refs/heads/main'
+      - uses: docker/setup-qemu-action@v2
+        if: ${{ matrix.arch == 'aarch64' }}
+        name: Set up QEMU
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel setuptools_rust
+      - name: Build wheels on Linux and macOS
+        if: runner.os != 'Windows'
+        run: |
+          export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
+          if [ "$(uname)" = Darwin ]; then
+            export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin"
+            export CIBW_ARCHS_MACOS="universal2"
+          fi
+          python -m cibuildwheel --output-dir wheelhouse crates/python
+      - name: Build wheels on Windows
+        if: runner.os == 'Windows'
+        env:
+          CIBW_BEFORE_BUILD: "python3 -m pip install setuptools_rust"
+        run: |
+          python3 -m cibuildwheel --output-dir wheelhouse crates/python
