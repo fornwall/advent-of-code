@@ -155,7 +155,7 @@ impl SnailfishNumber {
             if *index >= number.len() {
                 return 0;
             }
-            let right = if number[*index].depth == depth {
+            let right = if number[*index].depth <= depth {
                 *index += 1;
                 u32::from(number[*index - 1].value)
             } else {
@@ -198,4 +198,5 @@ pub fn tests() {
     test_part_two!(real_input => 4695);
 
     test_part_one!("[8]" => 0);
+    test_part_one!("[[0],0]" => 0);
 }
