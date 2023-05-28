@@ -1,6 +1,9 @@
 name: CI
 
-on: push
+on:
+  push:
+    tags-ignore:
+      - '**'
 
 jobs:
   test-rust:
@@ -157,9 +160,7 @@ jobs:
       run: |
         body=$(./.github/workflows/compare-iai.py old-baseline.json new-baseline.json)
         delimiter="$(openssl rand -hex 8)"
-        echo "body<<$delimiter" >> $GITHUB_OUTPUT
-        echo "$body" >> $GITHUB_OUTPUT
-        echo "$delimiter" >> $GITHUB_OUTPUT
+        { echo "body<<$delimiter"; echo "$body"; echo "$delimiter"; } >> "$GITHUB_OUTPUT"
     - name: Post commit comment
       uses: peter-evans/commit-comment@v2
       with:
@@ -242,13 +243,15 @@ jobs:
         id: get_actionlint
         run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
       - name: Check workflow files
-        run: ${{ steps.get_actionlint.outputs.executable }} -color -ignore shellcheck
+        run: ${{ steps.get_actionlint.outputs.executable }} -color
 
   check-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
+        with:
+          node-version: 'lts'
       - name: Check js
         run: npm install && npm run check
         working-directory: crates/wasm
@@ -269,12 +272,14 @@ jobs:
     - name: Tests gists
       run: ./validate-gists.py
       working-directory: crates/wasm/site
-    - name: Setup git for commit
-      run: |
-        git config --global user.name 'Gist Mapping Updater'
-        git config --global user.email 'gist-mapping-updater@users.noreply.github.com'
     - name: Commit and push gist mapping if updated
-      run: git commit -m 'Update gist-mapping' && git push || true
+      run: |
+        if [ -n "$(git status --untracked-files=no --porcelain)" ]; then
+          git config --global user.name 'Gist Mapping Updater'
+          git config --global user.email 'gist-mapping-updater@users.noreply.github.com'
+          git commit -m 'Update gist-mapping'
+          git push
+        fi
     - name: Upload new gist-mapping.json
       uses: actions/upload-artifact@v3
       with:
@@ -293,7 +298,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: 'lts'
         registry-url: 'https://registry.npmjs.org'
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
@@ -334,7 +339,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: 'lts'
         registry-url: 'https://registry.npmjs.org'
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
@@ -369,8 +374,8 @@ jobs:
         IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${GITHUB_SHA}
         mkdir -p target/linux/amd64
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
-        docker buildx build --tag ${IMAGE_WITH_VERSION} .
-        flyctl deploy --image ${IMAGE_WITH_VERSION}
+        docker buildx build --tag "${IMAGE_WITH_VERSION}" .
+        flyctl deploy --image "${IMAGE_WITH_VERSION}"
       if: github.ref == 'refs/heads/main'
 
   build-and-deploy-grpc-server:
@@ -392,6 +397,6 @@ jobs:
         IMAGE_WITH_VERSION=${DOCKER_IMAGE_NAME}:${GITHUB_SHA}
         mkdir -p target/linux/amd64
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/amd64/
-        docker buildx build --tag ${IMAGE_WITH_VERSION} .
-        flyctl deploy --image ${IMAGE_WITH_VERSION}
+        docker buildx build --tag "${IMAGE_WITH_VERSION}" .
+        flyctl deploy --image "${IMAGE_WITH_VERSION}"
       if: github.ref == 'refs/heads/main'

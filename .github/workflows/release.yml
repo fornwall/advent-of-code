@@ -41,8 +41,11 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           export CIBW_BEFORE_BUILD='pip install setuptools-rust && curl -o /tmp/rustup.sh https://sh.rustup.rs && sh /tmp/rustup.sh -y'
-          export CIBW_ENVIRONMENT='PATH=$HOME/.cargo/bin:$PATH'
-          if [ `uname` = Darwin ]; then export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin"; export CIBW_ARCHS_MACOS="universal2"; fi
+          export CIBW_ENVIRONMENT=PATH="$HOME"/.cargo/bin:"$PATH"
+          if [ "$(uname)" = Darwin ]; then
+            export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin"
+            export CIBW_ARCHS_MACOS="universal2"
+          fi
           python -m cibuildwheel --output-dir wheelhouse crates/python
       - name: Build wheels on Windows
         if: runner.os == 'Windows'
@@ -66,7 +69,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to docker hub
-      run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
+      run: docker login -u fredrikfornwall -p "$DOCKER_ACCESS_TOKEN"
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Install aarch64 strip
@@ -86,7 +89,7 @@ jobs:
         mkdir -p target/linux/{arm64,amd64}
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code target/linux/amd64/
         cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code target/linux/arm64/
-        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
+        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag "${IMAGE_WITH_VERSION}" --tag "${IMAGE_WITH_LATEST}" .
 
   release-npm-packages:
     runs-on: ubuntu-latest
@@ -95,7 +98,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: 'lts'
         registry-url: 'https://registry.npmjs.org'
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
@@ -103,7 +106,7 @@ jobs:
     - name: Publish npm packages
       run: |
         make install-wasm-bindgen
-        . ${HOME}/.cargo/env
+        . "${HOME}"/.cargo/env
         make npm-publish
       env:
         # It needs to be named 'NODE_AUTH_TOKEN' as it's referenced
@@ -116,7 +119,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
     - name: Login to cargo
-      run: cargo login ${CRATES_API_TOKEN}
+      run: cargo login "${CRATES_API_TOKEN}"
       env:
         CRATES_API_TOKEN: ${{secrets.CRATES_API_TOKEN}}
     - name: Publish svgplot crate
@@ -212,8 +215,8 @@ jobs:
         aarch64-linux-gnu-strip -s ../../target/aarch64-unknown-linux-musl/release/advent-of-code
         cp advent-of-code.1 ../../target/x86_64-unknown-linux-musl/release
         cp advent-of-code.1 ../../target/aarch64-unknown-linux-musl/release
-        cd ../../target/x86_64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-x86_64.tar.xz advent-of-code advent-of-code.1 && mv *.tar.xz ../../../
-        cd ../../aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code advent-of-code.1 && mv *.tar.xz ../../../
+        cd ../../target/x86_64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-x86_64.tar.xz advent-of-code advent-of-code.1 && mv ./*.tar.xz ../../../
+        cd ../../aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code advent-of-code.1 && mv ./*.tar.xz ../../../
       working-directory: crates/core
     - name: Upload Linux x86_64 binary
       uses: actions/upload-artifact@v3
@@ -242,7 +245,7 @@ jobs:
     - run: rustup target add aarch64-apple-darwin
     - run: |
         cargo build --release
-        SDKROOT=`xcrun -sdk $MACOS_SDK --show-sdk-path` MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $MACOS_SDK --show-sdk-platform-version) cargo build --release --target=aarch64-apple-darwin
+        SDKROOT=$(xcrun -sdk "$MACOS_SDK" --show-sdk-path) MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk "$MACOS_SDK" --show-sdk-platform-version) cargo build --release --target=aarch64-apple-darwin
         strip ../../target/release/advent-of-code
         strip ../../target/aarch64-apple-darwin/release/advent-of-code
         cp advent-of-code.1 ../../target/release
@@ -334,7 +337,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to docker hub
-      run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
+      run: docker login -u fredrikfornwall -p "$DOCKER_ACCESS_TOKEN"
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Install aarch64 strip
@@ -354,7 +357,7 @@ jobs:
         mkdir -p target/linux/{arm64,amd64}
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/amd64/
         cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/arm64/
-        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
+        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag "${IMAGE_WITH_VERSION}" --tag "${IMAGE_WITH_LATEST}" .
 
   publish-http-server:
     runs-on: ubuntu-latest
@@ -367,7 +370,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to docker hub
-      run: docker login -u fredrikfornwall -p $DOCKER_ACCESS_TOKEN
+      run: docker login -u fredrikfornwall -p "$DOCKER_ACCESS_TOKEN"
       env:
         DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Install aarch64 strip
@@ -387,4 +390,4 @@ jobs:
         mkdir -p target/linux/{arm64,amd64}
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
         cp ../../target/aarch64-unknown-linux-musl/release/advent-of-code-server target/linux/arm64/
-        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ${IMAGE_WITH_VERSION} --tag ${IMAGE_WITH_LATEST} .
+        docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag "${IMAGE_WITH_VERSION}" --tag "${IMAGE_WITH_LATEST}" .
