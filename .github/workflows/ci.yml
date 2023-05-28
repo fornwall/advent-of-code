@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - "*.*.*"
+    branches:
+      - '**'
 
 jobs:
   build-python-wheels:
