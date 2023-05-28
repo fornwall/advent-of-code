@@ -251,7 +251,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 'lts'
+          node-version: 'lts/*'
       - name: Check js
         run: npm install && npm run check
         working-directory: crates/wasm
@@ -298,7 +298,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
-        node-version: 'lts'
+        node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
@@ -339,7 +339,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
-        node-version: 'lts'
+        node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
