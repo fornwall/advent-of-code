@@ -235,7 +235,7 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
                 while current_hallway_idx != end_idx {
                     let from_hallway_idx = current_hallway_idx;
                     current_hallway_idx = ((current_hallway_idx as i32) + direction) as usize;
-                    if !matches!(self.get_at_hallway(current_hallway_idx), None) {
+                    if self.get_at_hallway(current_hallway_idx).is_some() {
                         continue 'hallway_loop;
                     }
 

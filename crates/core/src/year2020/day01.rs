@@ -42,10 +42,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             .iter()
             .enumerate()
             .find_map(|(left_index, &left_value)| {
-                if left_value > DESIRED_SUM {
-                    return None;
-                }
-                let desired_sub_sum = DESIRED_SUM - left_value;
+                let desired_sub_sum = DESIRED_SUM.checked_sub(left_value)?;
                 subsequence_summing_to(&expenses[(left_index + 1)..], desired_sub_sum)
                     .map(|value| value * left_value)
             })
