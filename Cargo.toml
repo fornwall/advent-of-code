@@ -1,6 +1,7 @@
 [workspace]
 members = [ "crates/*" ]
 exclude = [ "crates/painter", "crates/fuzzing-afl" ]
+resolver = "2"
 
 [workspace.package]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
