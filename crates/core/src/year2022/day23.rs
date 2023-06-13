@@ -202,8 +202,8 @@ window.onNewStep = (step) => {{\n\
                     svg.view_box((
                         i64::from(min_coords.0),
                         i64::from(min_coords.1),
-                        i64::from(max_coords.0 - min_coords.0),
-                        i64::from(max_coords.1 - min_coords.1),
+                        i64::from(max_coords.0 - min_coords.0 + 1),
+                        i64::from(max_coords.1 - min_coords.1 + 1),
                     ))
                     .style("background: black;")
                     .data_attribute("steps".to_string(), format!("{}", round + 1))
