@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+# Small utility on top of cargo bloat.
+
+import json
+import subprocess
+import sys
+import os
+
+command = sys.argv[1]
+
+BASELINE_FILE = "bloaty.log"
+
+def run_cargo_bloat():
+    completed = subprocess.run("cargo bloat --release --message-format json -n 0", shell=True, check=True, capture_output=True)
+    if completed.returncode != 0:
+        sys.exit(completed.stderr)
+    baseline = json.loads(completed.stdout)
+    data = {}
+    for f in baseline["functions"]:
+        name = f["name"]
+        size = f["size"]
+        if name in baseline:
+            data[name] += size
+        else:
+            data[name] = size
+    return {"functions":data}
+
+def read_baseline():
+    if os.path.isfile(BASELINE_FILE):
+        with open(BASELINE_FILE, "r") as infile:
+            return json.load(infile)
+    else:
+        sys.exit("No baseline - run: bloaty save <description>")
+
+if command == "save":
+    data = run_cargo_bloat()
+    data["bloatydescription"] = ' '.join(sys.argv[2:])
+    with open(BASELINE_FILE, "w") as outfile:
+        json_object = json.dumps(data, indent=4)
+        outfile.write(json_object)
+elif command == "show":
+    baseline = read_baseline()
+    print(baseline["bloatydescription"])
+elif command == "diff":
+    baseline = read_baseline()
+    print("# Comparing with " + baseline["bloatydescription"])
+    current = run_cargo_bloat()
+    total_diff_bytes = 0
+    for (name, current_size) in current["functions"].items():
+        if name in baseline["functions"]:
+            old_size = baseline["functions"][name]
+            diff_bytes = current_size - old_size
+            if diff_bytes != 0:
+                total_diff_bytes += diff_bytes
+                print(f"{name}: {diff_bytes} - old={old_size}, new={current_size}")
+        else:
+            print(f"New function: {name}, size={current_size}")
+    print(f"Total: {total_diff_bytes}")
+else:
+    sys.exit(f"Unknown command: {command} - use save/show/diff")
