@@ -187,21 +187,6 @@ function storeForm() {
   );
 }
 
-async function clipboardReadMayWork() {
-  if (navigator.clipboard && navigator.clipboard.readText) {
-    if (navigator.permissions) {
-      const permission = await navigator.permissions.query({
-        name: "clipboard-read",
-      });
-      return permission.state !== "denied";
-    } else {
-      return true;
-    }
-  } else {
-    return false;
-  }
-}
-
 function setInputText(input) {
   inputElement.value = input.trim();
   storeForm();
@@ -263,16 +248,14 @@ outputElement.addEventListener("click", (event) => {
   notifyOutputCopied();
 });
 
-clipboardReadMayWork().then((enabled) => {
-  const pasteButton = document.getElementById("paste");
-  if (enabled) {
-    pasteButton.addEventListener("click", async () => {
-      setInputText(await navigator.clipboard.readText());
-    });
-  } else {
-    pasteButton.disabled = true;
-  }
-});
+const pasteButton = document.getElementById("paste");
+if (navigator.clipboard.readText) {
+  pasteButton.addEventListener("click", async () => {
+    setInputText(await navigator.clipboard.readText());
+  });
+} else {
+  pasteButton.disabled = true;
+}
 
 document.getElementById("open-playground").addEventListener("click", () => {
   const gistId = gistMapping?.[yearElement.value]?.[dayElement.value]?.["gist"];
