@@ -5,7 +5,7 @@ type GridValue = i32;
 /// See https://en.wikipedia.org/wiki/Summed-area_table
 /// Note that x and y coordinates are 1-based in method parameters.
 struct SummedAreaTable {
-    storage: [GridValue; (Self::SIZE * Self::SIZE) as usize],
+    storage: Vec<GridValue>,
 }
 
 impl SummedAreaTable {
@@ -13,7 +13,7 @@ impl SummedAreaTable {
 
     fn new(serial_number: GridValue) -> Self {
         let mut result = Self {
-            storage: [0; (Self::SIZE * Self::SIZE) as usize],
+            storage: vec![0; (Self::SIZE * Self::SIZE) as usize],
         };
         for y in 1..=Self::SIZE {
             let mut row_value: GridValue = 0;

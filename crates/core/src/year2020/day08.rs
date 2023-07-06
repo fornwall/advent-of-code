@@ -55,7 +55,6 @@ impl Computer {
     }
 
     pub fn execute_instruction(&mut self) -> Result<(), String> {
-        if self.has_exited() {}
         match self.instructions.get(self.instruction_pointer as usize) {
             Some(Instruction::Acc(parameter)) => {
                 self.accumulator += parameter;

@@ -29,7 +29,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
             .map(|value| value.to_string())
             .ok_or_else(|| "Internal error: No layer".to_string())
     } else {
-        let mut image = vec![b'2'; LAYER_SIZE];
+        let mut image = [b'2'; LAYER_SIZE];
 
         input.text.as_bytes().chunks(LAYER_SIZE).for_each(|layer| {
             image
