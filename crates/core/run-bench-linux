@@ -22,7 +22,7 @@ else
 fi
 
 # CPU boosting - https://juliaci.github.io/BenchmarkTools.jl/dev/linuxtips/
-if [ `cat /sys/devices/system/cpu/cpufreq/boost` = "0" ]; then
+if [ "$(cat /sys/devices/system/cpu/cpufreq/boost)" = "0" ]; then
     echo "✅ CPU boosting disabled"
 else
     echo "❌ CPU boosting is not disabled - running: sudo sh -c 'echo 0 > /sys/devices/system/cpu/cpufreq/boost'"
