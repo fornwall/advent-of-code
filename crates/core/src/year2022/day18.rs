@@ -10,10 +10,10 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
     let mut grid = [[[AIR_VALUE; SIZE as usize]; SIZE as usize]; SIZE as usize];
 
-    let points = input
+    input
         .text
         .lines()
-        .map(|line| {
+        .try_for_each(|line| {
             fn parse_coordinate(input: &str) -> Option<i32> {
                 let num = input.parse::<i32>().ok()?;
                 (0..MAX).contains(&num).then_some(num + 1)
@@ -25,17 +25,25 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                 parse_coordinate(parts.next()?)?,
             );
             grid[point.0 as usize][point.1 as usize][point.2 as usize] = LAVA_VALUE;
-            Some(point)
+            Some(())
         })
-        .collect::<Option<Vec<_>>>()
         .ok_or_else(|| {
             format!("Invalid input - expected lines as 'N,N,N' where N is in [0,{MAX});")
         })?;
 
     if input.is_part_one() {
-        Ok(points
+        Ok(grid
             .iter()
-            .map(|&point| {
+            .enumerate()
+            .flat_map(move |(x, rx)| {
+                rx.iter().enumerate().flat_map(move |(y, ry)| {
+                    ry.iter().enumerate().flat_map(move |(z, &value)| {
+                        (value == LAVA_VALUE).then_some(Some((x as i32, y as i32, z as i32)))
+                    })
+                })
+            })
+            .flatten()
+            .map(|point| {
                 adjacent(point)
                     .filter(|p| grid[(p.0) as usize][(p.1) as usize][(p.2) as usize] != LAVA_VALUE)
                     .count()
@@ -112,4 +120,16 @@ pub fn tests() {
     let real_input = include_str!("day18_input.txt");
     test_part_one!(real_input => 3498);
     test_part_two!(real_input => 2008);
+}
+
+#[cfg(feature = "count-allocations")]
+#[test]
+pub fn no_memory_allocations() {
+    use crate::input::{test_part_one, test_part_two};
+    let real_input = include_str!("day18_input.txt");
+    let allocations = allocation_counter::count(|| {
+        test_part_one!(real_input => 3498);
+        test_part_two!(real_input => 2008);
+    });
+    assert_eq!(allocations, 1);
 }
