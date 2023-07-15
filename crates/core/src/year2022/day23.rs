@@ -1,11 +1,14 @@
 #[cfg(feature = "visualization")]
 #[cfg(not(feature = "simd"))]
+#[cfg(not(feature = "webgpu-compute"))]
 use svgplot::{SvgImage, SvgRect, SvgScript, SvgStyle};
 
 #[cfg(not(feature = "simd"))]
+#[cfg(not(feature = "webgpu-compute"))]
 use crate::input::Input;
 
 #[cfg(not(feature = "simd"))]
+#[cfg(not(feature = "webgpu-compute"))]
 pub fn solve(input: &Input) -> Result<usize, String> {
     const DIRECTIONS: [(i16, i16); 8] = [
         // NW
@@ -235,6 +238,9 @@ window.onNewStep = (step) => {{\n\
 
 #[cfg(feature = "simd")]
 pub use super::day23_simd::solve;
+
+#[cfg(feature = "webgpu-compute")]
+pub use super::day23_webgpu::solve;
 
 #[test]
 pub fn tests() {
