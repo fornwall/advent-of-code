@@ -62,11 +62,13 @@ impl ArmyGroup {
 
                 let mut weaknesses = Vec::new();
                 let mut immunities = Vec::new();
-                let units;
-                let hit_points;
                 let attack_damage;
                 let attack_type;
                 let initiative;
+
+                let before_parentheses: Vec<&str> = main_parts[0].split_whitespace().collect();
+                let units = before_parentheses[0].parse::<i32>().map_err(error)?;
+                let hit_points = before_parentheses[4].parse::<i32>().map_err(error)?;
 
                 if main_parts.len() == 1 {
                     // No parenthesis.
@@ -74,8 +76,6 @@ impl ArmyGroup {
                     if words.len() != 18 {
                         return Err("Invalid input".to_string());
                     }
-                    units = words[0].parse::<i32>().map_err(error)?;
-                    hit_points = words[4].parse::<i32>().map_err(error)?;
                     attack_damage = words[12].parse::<i32>().map_err(error)?;
                     attack_type = AttackType::new(words[13])?;
                     initiative = words[17].parse::<i32>().map_err(error)?;
@@ -83,14 +83,11 @@ impl ArmyGroup {
                     if main_parts.len() != 3 {
                         return Err("Invalid input".to_string());
                     }
-                    let before_parentheses: Vec<&str> = main_parts[0].split_whitespace().collect();
                     let after_parentheses: Vec<&str> = main_parts[2].split_whitespace().collect();
                     if before_parentheses.len() != 7 || after_parentheses.len() != 11 {
                         return Err("Invalid input".to_string());
                     }
 
-                    units = before_parentheses[0].parse::<i32>().map_err(error)?;
-                    hit_points = before_parentheses[4].parse::<i32>().map_err(error)?;
                     attack_damage = after_parentheses[5].parse::<i32>().map_err(error)?;
                     attack_type = AttackType::new(after_parentheses[6])?;
                     initiative = after_parentheses[10].parse::<i32>().map_err(error)?;
