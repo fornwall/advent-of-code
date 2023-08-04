@@ -63,13 +63,8 @@ visualizerWorker.onmessage = (message) => {
         }
       });
 
-      rendering.addEventListener("click", () => {
-        togglePause();
-      });
-
-      rendering.addEventListener("dblclick", () => {
-        toggleFullScreen();
-      });
+      rendering.addEventListener("click", togglePause);
+      rendering.addEventListener("dblclick", toggleFullScreen);
 
       show.style.display = "flex";
       let step = 0;
@@ -231,9 +226,7 @@ progress.addEventListener("input", () => {
   }
 });
 
-playPause.addEventListener("click", () => {
-  togglePause();
-});
+playPause.addEventListener("click", togglePause);
 
 document.documentElement.ondragover = (dragOverEvent) => {
   dragOverEvent.preventDefault();
