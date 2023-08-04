@@ -6,6 +6,6 @@
 		"dev": "npx wrangler dev --local"
 	},
 	"devDependencies": {
-		"wrangler": "^2.0.0"
+		"wrangler": "^3.4.0"
 	}
 }
