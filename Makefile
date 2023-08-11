@@ -136,9 +136,9 @@ install-nightly:
 
 install-wasm-bindgen:
 	rustup target add wasm32-unknown-unknown
-	# Pin to 0.2.84 until worker sdk updates:
+	# Pin to 0.2.86 until worker sdk updates:
 	# https://github.com/cloudflare/workers-rs/blob/main/worker/Cargo.toml
-	cargo install --version 0.2.84 wasm-bindgen-cli
+	cargo install --version 0.2.86 wasm-bindgen-cli
 
 netlify: node-package
 	cd crates/wasm/functions && \
