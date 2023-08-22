@@ -110,14 +110,11 @@ pub fn steps_to_gather_all_keys(input_string: &str) -> Result<usize, String> {
                     }
                     Some(&char_at_position @ b'a'..=b'z') => {
                         let target_key = Key::new(char_at_position);
-                        adjacency_list
-                            .entry(this_key)
-                            .or_insert_with(Vec::new)
-                            .push(Edge {
-                                steps: (steps + 1) as usize,
-                                needed_keys: new_needed_keys,
-                                target_key,
-                            });
+                        adjacency_list.entry(this_key).or_default().push(Edge {
+                            steps: (steps + 1) as usize,
+                            needed_keys: new_needed_keys,
+                            target_key,
+                        });
                     }
                     Some(b'.') => {
                         // Free to enter.
@@ -228,7 +225,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     input.text.lines().enumerate().for_each(|(y, line)| {
         line.chars().enumerate().for_each(|(x, c)| {
             let replaced_char = match (center_x as i32 - x as i32, center_y as i32 - y as i32) {
-                (0 | 1 | -1, 0) | (0, 1 | -1) => '#',
+                (-1..=1, 0) | (0, 1 | -1) => '#',
                 (1 | -1, 1 | -1) => '@',
                 _ => c,
             };
