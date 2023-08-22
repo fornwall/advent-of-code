@@ -51,8 +51,11 @@ pub fn solve(input: &Input) -> Result<String, String> {
     } else {
         list.chunks(16)
             .map(|block| block.iter().fold(0, |acc, x| acc ^ x))
-            .map(|number| format!("{number:02x}"))
-            .collect()
+            .fold(String::new(), |mut output, number| {
+                use std::fmt::Write;
+                let _ = write!(output, "{number:02x}");
+                output
+            })
     })
 }
 
