@@ -86,11 +86,9 @@ impl Crates {
         self.stack_sizes
             .iter()
             .enumerate()
-            .filter_map(|(stack_idx, &stack_size)| {
-                (stack_size > 0).then(|| {
-                    self.stacks[stack_idx * Self::MAX_STACK_SIZE + usize::from(stack_size - 1)]
-                        as char
-                })
+            .filter(|(_stack_idx, &stack_size)| stack_size > 0)
+            .map(|(stack_idx, &stack_size)| {
+                self.stacks[stack_idx * Self::MAX_STACK_SIZE + usize::from(stack_size - 1)] as char
             })
             .fold(String::with_capacity(Self::MAX_STACKS), |mut acc, x| {
                 acc.push(x);
