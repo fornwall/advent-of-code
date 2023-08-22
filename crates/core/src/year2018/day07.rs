@@ -67,7 +67,7 @@ fn parse_input(input_string: &str) -> Result<ParsedInput, String> {
         step.dependencies.insert(depends_on);
         remaining_dependencies
             .entry(step_name)
-            .or_insert_with(HashSet::new)
+            .or_default()
             .insert(depends_on);
 
         step_map
