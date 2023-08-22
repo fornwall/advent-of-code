@@ -83,10 +83,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             let (bag_type, _) = bag_type.rsplit_once(' ').ok_or_else(on_error)?;
 
             if input.is_part_one() {
-                child_to_parent
-                    .entry(bag_type)
-                    .or_insert_with(Vec::new)
-                    .push(from_bag);
+                child_to_parent.entry(bag_type).or_default().push(from_bag);
             } else {
                 children_entries.push(BagEntry { amount, bag_type });
             }
