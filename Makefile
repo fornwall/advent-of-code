@@ -111,7 +111,7 @@ test-python:
 	cd crates/python && ./run-tests.sh
 
 fuzz-afl:
-	cargo install afl
+	cargo install cargo-afl
 	cd crates/fuzzing-afl/ && \
 		cargo afl build && \
 		rm -Rf target/fuzz-findings && \
