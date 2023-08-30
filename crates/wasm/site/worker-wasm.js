@@ -19,7 +19,7 @@ async function solveWasm(year, day, part, input) {
     const answer = solve(year, day, part, input);
     const executionTime = performance.now() - startTime;
     console.log(
-      `Wasm ${year}-${day}-${part} solution in: ${executionTime.toFixed(2)} ms`
+      `Wasm ${year}-${day}-${part} solution in: ${executionTime.toFixed(2)} ms`,
     );
     return { answer, executionTime };
   } catch (error) {

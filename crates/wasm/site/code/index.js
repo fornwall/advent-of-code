@@ -2,7 +2,7 @@ import gistMapping from "../gist-mapping.json";
 
 const codeElement = document.getElementById("code");
 const compilerExplorerLinkElement = document.getElementById(
-  "compilerExplorerLink"
+  "compilerExplorerLink",
 );
 const assemblyElement = document.getElementById("assembly");
 
@@ -28,7 +28,7 @@ async function onLoad() {
     {
       method: "post",
       body: daySource,
-    }
+    },
   );
   const assemblyText = await assemblyResponse.text();
   assemblyElement.textContent = assemblyText;

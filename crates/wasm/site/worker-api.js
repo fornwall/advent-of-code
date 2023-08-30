@@ -13,7 +13,7 @@ async function solveApi(host, year, day, part, input) {
         method: "POST",
         headers: { "content-type": "text/plain" },
         body: input,
-      }
+      },
     );
 
     if (![200, 400].includes(response.status)) {
@@ -24,8 +24,8 @@ async function solveApi(host, year, day, part, input) {
     const executionTime = performance.now() - startTime;
     console.log(
       `API ${year}-${day}-${part} response from ${host}: ${executionTime.toFixed(
-        2
-      )} ms`
+        2,
+      )} ms`,
     );
     return {
       answer: responseText,
@@ -41,7 +41,7 @@ self.onmessage = async (message) => {
   const { year, day, part, input } = message.data;
 
   const apiPromises = API_HOSTS.map((host) =>
-    solveApi(host, year, day, part, input)
+    solveApi(host, year, day, part, input),
   );
 
   try {

@@ -7,7 +7,7 @@ import loadMP4Module, {
 export default function CanvasRecorder(
   canvas,
   audioStream,
-  videoBitsPerSecond
+  videoBitsPerSecond,
 ) {
   this.start = async () => {
     const MP4 = await loadMP4Module();

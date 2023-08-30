@@ -119,7 +119,9 @@ function onWorkerMessage(e) {
       outputElement.classList.remove("alert-danger");
     }
     outputElement.textContent =
-      (isInternalError ? "⚠ Internal Error ⚠\n\n" : "") + output + extraOutput;
+      (isInternalError ? "⚠ Internal Error ⚠\n\n" : "") +
+      output +
+      extraOutput;
     outputElement.scrollIntoView();
     outputElement.classList.add("blink");
     outputElement.focus();
@@ -130,7 +132,7 @@ function execute() {
   partElement.setCustomValidity(
     dayElement.value == 25 && partElement.value == 2
       ? "Day 25 has no second part."
-      : ""
+      : "",
   );
 
   if (document.querySelector("form").reportValidity()) {
@@ -183,7 +185,7 @@ function storeForm() {
       day: dayElement.value,
       part: partElement.value,
       input: inputElement.value,
-    })
+    }),
   );
 }
 
@@ -201,7 +203,7 @@ function notifyOutputCopied() {
   outputElement.classList.add("copied");
   savedInterval.value = setTimeout(
     () => outputElement.classList.remove("copied"),
-    2000
+    2000,
   );
 }
 
@@ -213,11 +215,11 @@ showElement.disabled = !isVisualisationEnabled();
 [yearElement, dayElement].forEach((element) =>
   element.addEventListener("change", () => {
     showElement.disabled = !isVisualisationEnabled();
-  })
+  }),
 );
 
 [yearElement, dayElement, partElement, inputElement].forEach((element) =>
-  element.addEventListener("change", storeForm)
+  element.addEventListener("change", storeForm),
 );
 
 window.addEventListener("pageshow", () => {
@@ -278,14 +280,14 @@ outputElement.addEventListener("dragstart", (dragEvent) => {
   dragEvent.dataTransfer.setDragImage(outputElement, 0, 0);
   dragEvent.dataTransfer.setData(
     "text/plain",
-    outputElement.textContent.trim()
+    outputElement.textContent.trim(),
   );
 });
 
 document.documentElement.ondragover = (dragOverEvent) => {
   dragOverEvent.preventDefault();
   dragOverEvent.dataTransfer.dropEffect = Array.from(
-    dragOverEvent.dataTransfer.items
+    dragOverEvent.dataTransfer.items,
   ).some((item) => item.type.match("^text/plain"))
     ? "copy"
     : "none";

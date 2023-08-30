@@ -7,7 +7,7 @@ async function main() {
   });
 
   const year = parseInt(
-    new URLSearchParams(window.location.search).get("year") || "2022"
+    new URLSearchParams(window.location.search).get("year") || "2022",
   );
   document.getElementById("description").innerHTML = `Benchmark running
           <a href="/">solutions</a> to
@@ -58,7 +58,7 @@ async function main() {
             .map((d) => d.executionTime)
             .reduce((a, b) => a + b, 0);
           document.getElementById(
-            "total-time"
+            "total-time",
           ).textContent = `Total time: ${totalTime.toLocaleString(undefined, {
             minimumFractionDigits: 2,
           })} ms`;
@@ -81,7 +81,7 @@ async function main() {
             }-${
               data.part
             }</a></td><td class="text-end">${data.executionTime.toFixed(
-              2
+              2,
             )}</td><td class="text-end">${percentageTime.toFixed(2)}</td>
           <td><a href="${gistLink}">src</a></td>
           <td><a href="${compilerExplorerLink}">asm</a></td>`;
@@ -111,7 +111,7 @@ async function main() {
             for (let part = 1; part <= 2; part++) {
               if (day === 25 && part === 2) continue;
               const partTime = times.filter(
-                (d) => d.day == day && d.part == part
+                (d) => d.day == day && d.part == part,
               )[0].executionTime;
               data.labels.push(`Day ${day} part ${part}`);
               data.parents.push(dayLabel);

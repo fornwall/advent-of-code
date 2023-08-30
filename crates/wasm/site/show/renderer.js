@@ -31,7 +31,7 @@ export default function Renderer(
   message,
   layers,
   onNewAspectRatio,
-  audioPlayer
+  audioPlayer,
 ) {
   const { buffer, offset, length } = message.data;
   const reader = new ReaderWithBuffer(buffer, offset, length);
@@ -54,7 +54,7 @@ export default function Renderer(
             0,
             0,
             overlayCtx.canvas.width,
-            overlayCtx.canvas.height
+            overlayCtx.canvas.height,
           );
           this.renderStatusText();
           break;
@@ -138,7 +138,7 @@ export default function Renderer(
             reader.nextFloat(),
             reader.nextFloat(),
             reader.nextFloat(),
-            reader.nextFloat()
+            reader.nextFloat(),
           );
           break;
         }
@@ -222,7 +222,7 @@ export default function Renderer(
           overlayCtx.fillText(
             text,
             overlayCtx.canvas.width * x,
-            overlayCtx.canvas.height * y
+            overlayCtx.canvas.height * y,
           );
           overlayCtx.restore();
           break;
@@ -238,7 +238,7 @@ export default function Renderer(
               ", done=" +
               this.done +
               ", buffer=" +
-              reader.toDebug()
+              reader.toDebug(),
           );
       }
     }
@@ -263,7 +263,7 @@ export default function Renderer(
       0,
       0,
       overlayCtx.canvas.width,
-      overlayCtx.canvas.height
+      overlayCtx.canvas.height,
     );
 
     const textWidth = overlayCtx.measureText(this.statusText).width;
@@ -284,7 +284,7 @@ export default function Renderer(
       this.statusText,
       overlayCtx.canvas.width / 2,
       yOffset,
-      maxWidth
+      maxWidth,
     );
 
     overlayCtx.restore();

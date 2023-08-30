@@ -20,7 +20,7 @@ const visualizerWorker = new Worker(
   {
     name: "visualizer",
     type: "module",
-  }
+  },
 );
 
 visualizerWorker.onmessage = (message) => {
@@ -31,7 +31,7 @@ visualizerWorker.onmessage = (message) => {
     console.log(
       "SVG size: " +
         new Intl.NumberFormat().format(message.data.answer.length) +
-        " bytes"
+        " bytes",
     );
 
     const { year, day, part } = state.params;
@@ -57,7 +57,7 @@ visualizerWorker.onmessage = (message) => {
         } catch (e) {
           console.error(
             "Error evaluating script: " + e.message,
-            el.textContent
+            el.textContent,
           );
           window.alert("Error in script - see console logs");
         }
@@ -168,10 +168,10 @@ document.body.addEventListener("keydown", async (e) => {
         window.history.replaceState(
           null,
           "",
-          `?year=${state.params.year}&day=${state.params.day}&part=${state.params.part}&step=${progress.value}`
+          `?year=${state.params.year}&day=${state.params.day}&part=${state.params.part}&step=${progress.value}`,
         );
         await navigator.clipboard.writeText(
-          `Advent of Code ${state.params.year}, day ${state.params.day}:\n${location.href}`
+          `Advent of Code ${state.params.year}, day ${state.params.day}:\n${location.href}`,
         );
       }
       break;
@@ -231,7 +231,7 @@ playPause.addEventListener("click", togglePause);
 document.documentElement.ondragover = (dragOverEvent) => {
   dragOverEvent.preventDefault();
   dragOverEvent.dataTransfer.dropEffect = Array.from(
-    dragOverEvent.dataTransfer.items
+    dragOverEvent.dataTransfer.items,
   ).some((item) => item.type.match("^text/plain"))
     ? "copy"
     : "none";

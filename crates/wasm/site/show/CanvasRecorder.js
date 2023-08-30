@@ -13,7 +13,7 @@
 export default function CanvasRecorder(
   canvas,
   audioStream,
-  videoBitsPerSecond
+  videoBitsPerSecond,
 ) {
   this.start = () => {
     const mimeType = [

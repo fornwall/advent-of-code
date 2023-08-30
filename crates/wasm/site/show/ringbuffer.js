@@ -10,26 +10,26 @@ const HEADER_OK_TO_EXIT_OFFSET = 3;
 export function ReaderWithBuffer(
   sharedArrayBuffer,
   sharedArrayBufferOffset,
-  length
+  length,
 ) {
   const headerBuffer = new Int32Array(
     sharedArrayBuffer,
     sharedArrayBufferOffset,
-    HEADER_ELEMENTS_LENGTH
+    HEADER_ELEMENTS_LENGTH,
   ); // FIXME: offset in bytes?
   const dataBuffer = new Int32Array(
     sharedArrayBuffer,
     sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
-    (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT
+    (length - HEADER_BYTE_LENGTH) / Int32Array.BYTES_PER_ELEMENT,
   );
   const dataByteView = new Int8Array(
     sharedArrayBuffer,
-    sharedArrayBufferOffset + HEADER_BYTE_LENGTH
+    sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
   );
   const dataFloatBuffer = new Float32Array(
     sharedArrayBuffer,
     sharedArrayBufferOffset + HEADER_BYTE_LENGTH,
-    (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT
+    (length - HEADER_BYTE_LENGTH) / Float32Array.BYTES_PER_ELEMENT,
   );
   let unflushedReads = 0;
 

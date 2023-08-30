@@ -9,7 +9,7 @@ async function updatePage() {
     "2020";
 
   document.querySelector(
-    "h1"
+    "h1",
   ).textContent = `Advent of Code ${currentYear} execution times`;
 
   const baselineJson = await baselineJsonPromise;
@@ -64,7 +64,7 @@ async function updatePage() {
   }
   const pieLayout = {
     title: `Total: ${Number(
-      Math.round(totalRuntime / 1000)
+      Math.round(totalRuntime / 1000),
     ).toLocaleString()} microseconds`,
   };
   Plotly.newPlot("secondPlot", [pieData], pieLayout);

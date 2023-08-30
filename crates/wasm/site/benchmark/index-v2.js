@@ -41,7 +41,7 @@ async function updatePage() {
   };
 
   for (const [year, yearData] of Object.entries(dataMap).sort(
-    (a, b) => a[0] < b[0]
+    (a, b) => a[0] < b[0],
   )) {
     const yearString = `${year}`;
     data.labels.push(yearString);

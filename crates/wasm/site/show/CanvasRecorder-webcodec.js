@@ -3,7 +3,7 @@ const MAX_VIDEO_SIZE_BYTES = 100 * 1000 * 1000;
 export default function CanvasRecorder(
   canvas,
   audioStream,
-  videoBitsPerSecond
+  videoBitsPerSecond,
 ) {
   this.start = async () => {
     const recorder = this;
@@ -17,7 +17,7 @@ export default function CanvasRecorder(
           if (false && metadata.decoderConfig.description) {
             this._videoFileBytes.set(
               new Uint8Array(metadata.decoderConfig.description),
-              this._videoFileOffset
+              this._videoFileOffset,
             );
             this._videoFileOffset +=
               metadata.decoderConfig.description.byteLength;
@@ -25,7 +25,7 @@ export default function CanvasRecorder(
               "_videoFileBytes=",
               this._videoFileBytes.subarray(0, 100),
               "offset=",
-              this._videoFileOffset
+              this._videoFileOffset,
             );
           }
         }
@@ -33,7 +33,7 @@ export default function CanvasRecorder(
         // actual bytes of encoded data
         const sliceToWriteTo = recorder._videoFileBytes.subarray(
           this._videoFileOffset,
-          this._videoFileOffset + chunk.byteLength
+          this._videoFileOffset + chunk.byteLength,
         );
         chunk.copyTo(sliceToWriteTo);
         this._videoFileOffset += chunk.byteLength;
