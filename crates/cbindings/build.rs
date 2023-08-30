@@ -11,10 +11,8 @@ fn main() {
     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let generated_header_path = target_dir().join("advent-of-code.h");
 
-    let config = Config {
-        cpp_compat: true,
-        ..Default::default()
-    };
+    let mut config = Config::default();
+    config.cpp_compat = true;
 
     cbindgen::Builder::new()
         .with_crate(crate_dir)
