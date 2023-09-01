@@ -1,41 +1,47 @@
+use crate::common::id_assigner::IdAssigner;
 use crate::common::permutation::all_permutations;
+use crate::common::tuple_window_iterator::TupleWindowIteratorExt;
 use crate::input::Input;
-use std::collections::{HashMap, HashSet};
+
+const MAX_LOCATIONS: u16 = 10;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
-    let mut places = HashSet::new();
-    let mut distances = HashMap::new();
+    let mut id_assigner = IdAssigner::<MAX_LOCATIONS>::new();
+
+    let mut places = Vec::with_capacity(MAX_LOCATIONS as usize);
+    let mut distances = [0; (MAX_LOCATIONS * MAX_LOCATIONS) as usize];
     for line in input.text.lines() {
         // "Faerun to Tristram = 58"
-        let parts = line.split(' ').collect::<Vec<_>>();
-        if parts.len() != 5 {
-            return Err("Invalid input - line not having 5 words".to_string());
-        }
-        let from = parts[0];
-        let to = parts[2];
-        let distance = parts[4].parse::<u32>().map_err(|_| "Invalid input")?;
+        let mut parts = line.split(' ');
+        let from = id_assigner.id_of(parts.next().ok_or("Invalid input")?)?;
+        let to = id_assigner.id_of(parts.nth(1).ok_or("Invalid input")?)?;
+        let distance = parts
+            .nth(1)
+            .ok_or("Invalid input")?
+            .parse::<u32>()
+            .map_err(|_| "Invalid input")?;
 
-        places.insert(from);
-        places.insert(to);
-        distances.insert((from, to), distance);
-        distances.insert((to, from), distance);
+        if !places.contains(&from) {
+            places.push(from);
+        }
+        if !places.contains(&to) {
+            places.push(to);
+        }
+        distances[(from + to * MAX_LOCATIONS) as usize] = distance;
+        distances[(to + from * MAX_LOCATIONS) as usize] = distance;
     }
 
     let mut best_distance = input.part_values(u32::MAX, u32::MIN);
-    let mut places = places.into_iter().collect::<Vec<_>>();
+    let comparator = input.part_values(
+        std::cmp::min as fn(_, _) -> _,
+        std::cmp::max as fn(_, _) -> _,
+    );
 
     all_permutations(&mut places, &mut |ordering| {
-        let mut this_distance = 0;
-        for pair in ordering.windows(2) {
-            this_distance += distances.get(&(pair[0], pair[1])).ok_or_else(|| {
-                "Distances between every pair of locations not specified".to_string()
-            })?;
-        }
-        best_distance = if input.is_part_one() {
-            std::cmp::min(best_distance, this_distance)
-        } else {
-            std::cmp::max(best_distance, this_distance)
-        };
+        let this_distance = ordering.iter().tuple_windows().fold(0, |acc, (p1, p2)| {
+            acc + distances[(p1 + p2 * MAX_LOCATIONS) as usize]
+        });
+        best_distance = comparator(best_distance, this_distance);
         Ok(())
     })?;
 

@@ -2,6 +2,7 @@ pub mod character_recognition;
 pub mod chunk_iterator;
 #[cfg(feature = "webgpu-compute")]
 pub mod gpu;
+pub mod id_assigner;
 pub mod int_to_ascii;
 pub mod md5;
 pub mod parser;

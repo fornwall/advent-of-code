@@ -1,26 +1,11 @@
+use crate::common::id_assigner::IdAssigner;
 use crate::common::permutation::all_permutations;
 use crate::input::Input;
-use std::collections::HashMap;
 
-struct IdAssigner {
-    id_map: HashMap<String, usize>,
-}
-
-impl IdAssigner {
-    fn new() -> Self {
-        Self {
-            id_map: HashMap::new(),
-        }
-    }
-
-    fn id_of(&mut self, name: &str) -> usize {
-        let next_id = self.id_map.len();
-        *self.id_map.entry(name.to_string()).or_insert(next_id)
-    }
-}
+const MAX_ATTENDEES: u16 = 10;
 
 pub fn solve(input: &Input) -> Result<i32, String> {
-    let mut id_assigner = IdAssigner::new();
+    let mut id_assigner = IdAssigner::<MAX_ATTENDEES>::new();
 
     let mut happiness_changes = Vec::new();
     for line in input.text.lines() {
@@ -39,8 +24,8 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             .strip_suffix('.')
             .ok_or_else(|| "Line not ending with a period".to_string())?;
 
-        let person_id = id_assigner.id_of(person_name);
-        let other_id = id_assigner.id_of(other_name);
+        let person_id = id_assigner.id_of(person_name)? as usize;
+        let other_id = id_assigner.id_of(other_name)? as usize;
 
         while person_id >= happiness_changes.len() {
             happiness_changes.push(Vec::new());

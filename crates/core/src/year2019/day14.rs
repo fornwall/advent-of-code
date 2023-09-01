@@ -1,28 +1,11 @@
+use crate::common::id_assigner::IdAssigner;
 use crate::input::Input;
-use std::collections::HashMap;
 
 type ChemicalId = usize;
 type ChemicalAmount = i64;
 
-struct ChemicalIdAssigner {
-    id_map: HashMap<String, ChemicalId>,
-}
-
-impl ChemicalIdAssigner {
-    fn new() -> Self {
-        Self {
-            id_map: HashMap::new(),
-        }
-    }
-
-    fn id_of(&mut self, chemical_name: String) -> ChemicalId {
-        let next_id = self.id_map.len() as ChemicalId;
-        *self.id_map.entry(chemical_name).or_insert(next_id)
-    }
-}
-
 struct Reactions {
-    id_assigner: ChemicalIdAssigner,
+    id_assigner: IdAssigner<100>,
     // Indexed by chemical id that is produced, contains amount produced and required.
     produced_by: Vec<(ChemicalAmount, Vec<ChemicalAmount>)>,
     fuel_id: ChemicalId,
@@ -31,7 +14,7 @@ struct Reactions {
 
 impl Reactions {
     fn parse(input_string: &str) -> Result<Self, String> {
-        let mut id_assigner = ChemicalIdAssigner::new();
+        let mut id_assigner = IdAssigner::new();
 
         // Indexed by chemical id that is produced, to amount produced and required.
         let mut reactions: Vec<(ChemicalAmount, Vec<ChemicalAmount>)> = Vec::new();
@@ -47,7 +30,7 @@ impl Reactions {
                 let (amount, name) = amount_and_name.trim().split_once(' ').ok_or_else(error)?;
 
                 let required_amount = amount.parse::<ChemicalAmount>().map_err(|_| error())?;
-                let required_id = id_assigner.id_of(name.trim().to_string());
+                let required_id = id_assigner.id_of(name.trim())? as usize;
                 if required_chemicals.len() <= required_id {
                     required_chemicals.resize(required_id + 1, 0);
                 }
@@ -57,8 +40,8 @@ impl Reactions {
             let (amount_str, name) = to.trim().split_once(' ').ok_or_else(error)?;
             let produced_chemical_amount =
                 amount_str.parse::<ChemicalAmount>().map_err(|_| error())?;
-            let produced_chemical_name = name.trim().to_string();
-            let produced_chemical_id = id_assigner.id_of(produced_chemical_name);
+            let produced_chemical_name = name.trim();
+            let produced_chemical_id = id_assigner.id_of(produced_chemical_name)? as usize;
 
             if reactions.len() <= produced_chemical_id {
                 reactions.resize_with(produced_chemical_id + 1, || (0, Vec::new()));
@@ -66,12 +49,9 @@ impl Reactions {
             reactions[produced_chemical_id] = (produced_chemical_amount, required_chemicals);
         }
 
-        let fuel_id = *id_assigner
-            .id_map
-            .get("FUEL")
-            .ok_or("No FUEL encountered")?;
+        let fuel_id = id_assigner.get_id("FUEL").ok_or("No FUEL encountered")? as usize;
 
-        let ore_id = *id_assigner.id_map.get("ORE").ok_or("No ORE encountered")?;
+        let ore_id = id_assigner.get_id("ORE").ok_or("No ORE encountered")? as usize;
 
         Ok(Self {
             id_assigner,
@@ -83,7 +63,7 @@ impl Reactions {
 }
 
 fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> ChemicalAmount {
-    let mut needed: Vec<ChemicalAmount> = vec![0; reactions.id_assigner.id_map.len()];
+    let mut needed: Vec<ChemicalAmount> = vec![0; reactions.id_assigner.len()];
     needed[reactions.fuel_id] = fuel_to_produce;
 
     while let Some((needed_id, &needed_amount)) = needed

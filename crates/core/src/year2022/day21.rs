@@ -17,7 +17,8 @@ pub fn solve(input: &Input) -> Result<i64, String> {
             lhs: first_operand,
             rhs: second_operand,
             ..
-        } = actions[root_id as usize] else {
+        } = actions[root_id as usize]
+        else {
             return Err("The root monkey does not do any action".to_string());
         };
 

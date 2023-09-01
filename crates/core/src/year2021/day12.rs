@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::common::id_assigner::IdAssigner;
 
 use crate::input::Input;
 
@@ -14,31 +14,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         map.end_cave_identifier,
         input.is_part_two(),
     ))
-}
-
-/// An assigner of sequential id:s string names to allow bit twiddling.
-struct IdAssigner<'a> {
-    id_map: HashMap<&'a str, u8>,
-}
-
-impl<'a> IdAssigner<'a> {
-    fn new() -> Self {
-        Self {
-            id_map: HashMap::new(),
-        }
-    }
-
-    fn id_of(&mut self, name: &'a str) -> Result<u8, String> {
-        let next_id = self.id_map.len() as u8;
-        let result = *self.id_map.entry(name).or_insert(next_id);
-        if usize::from(result) >= CaveMap::MAX_SIZE {
-            return Err(format!(
-                "Too many distinct nodes - only {} supported",
-                CaveMap::MAX_SIZE
-            ));
-        }
-        Ok(result)
-    }
 }
 
 struct CaveMap {
@@ -61,12 +36,12 @@ impl CaveMap {
             end_cave_identifier: u8::MAX,
         };
 
-        let mut id_assigner = IdAssigner::new();
+        let mut id_assigner = IdAssigner::<{ Self::MAX_SIZE as u16 }>::new();
 
         for line in text.lines() {
             if let Some((from, to)) = line.split_once('-') {
-                let from_id = id_assigner.id_of(from)?;
-                let to_id = id_assigner.id_of(to)?;
+                let from_id = id_assigner.id_of(from)? as u8;
+                let to_id = id_assigner.id_of(to)? as u8;
 
                 let from_bitmask = 1 << from_id;
                 let to_bitmask = 1 << to_id;
