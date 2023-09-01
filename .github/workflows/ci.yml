@@ -350,7 +350,7 @@ jobs:
       with:
         apiToken: ${{ secrets.CLOUDFLARE_PAGES_EDIT_API_TOKEN }}
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: wgpu-game-of-life-fornwall-net
+        projectName: aoc-fornwall-net
         directory: crates/wasm/aoc.fornwall.net
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
     - name: Install the Netlify CLI
