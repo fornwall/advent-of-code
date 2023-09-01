@@ -10,7 +10,7 @@ async function main() {
     new URLSearchParams(window.location.search).get("year") || "2022",
   );
   document.getElementById("description").innerHTML = `Benchmark running
-          <a href="/">solutions</a> to
+          <a href="https://github.com/fornwall/advent-of-code/tree/main/crates/core/src/year${year}">solutions</a> to
           <a href="https://adventofcode.com/${year}/">Advent of Code ${year}</a> in
           the current browser using WebAssembly.`;
 
