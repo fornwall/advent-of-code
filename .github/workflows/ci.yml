@@ -312,6 +312,12 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [benchmark, gist-mapping]
     runs-on: ubuntu-latest
+    # Permissions necessary for ${{ secrets.GITHUB_TOKEN }}
+    # to allow cloudflare/pages-action to create deployment:
+    # https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/
+    permissions:
+      contents: read
+      deployments: write
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
@@ -337,14 +343,16 @@ jobs:
       with:
         name: new-benchmark
         path: crates/wasm/site/benchmark
-    - name: Deploy site
-      run: |
-        echo "${{ secrets.SITE_DEPLOY_SSH_KEY }}" | base64 --decode > /tmp/id_ed25519
-        chmod 0600 /tmp/id_ed25519
-        export GIT_SSH_COMMAND='ssh -i /tmp/id_ed25519'
-        git config --global user.email "ci@fornwall.net"
-        git config --global user.name "CI"
-        make deploy-site
+    - name: Setup site to deploy
+      run: make deploy-site
+    - name: Deploy site to cloudflare
+      uses: cloudflare/pages-action@1
+      with:
+        apiToken: ${{ secrets.CLOUDFLARE_PAGES_EDIT_API_TOKEN }}
+        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        projectName: wgpu-game-of-life-fornwall-net
+        directory: crates/wasm/aoc.fornwall.net
+        gitHubToken: ${{ secrets.GITHUB_TOKEN }}
     - name: Install the Netlify CLI
       run: npm install netlify-cli -g
     - name: Deploy to Netlify

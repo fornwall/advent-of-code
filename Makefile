@@ -151,16 +151,12 @@ deploy-site:
 		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico && \
 		cd crates/wasm && \
 		rm -Rf aoc.fornwall.net && \
-		git clone -b site git@github.com:fornwall/aoc.fornwall.net.git && \
+		mkdir aoc.fornwall.net && \
 		cd aoc.fornwall.net && \
-		rm -Rf * && \
 		cp -Rf ../site/dist/* . && \
 		cp -Rf ../site/api/ api/ && \
 		cp -Rf ../site/benchmark/ benchmark/ && \
-		touch robots.txt && \
-		git add . && \
-		git commit -m "Update site: ${GITHUB_SHA}" && \
-		git push
+		touch robots.txt
 
 test-c-and-cxx-bindings:
 	cd crates/cbindings && ./test-example.sh
