@@ -13,7 +13,7 @@ jobs:
       matrix:
         rust: [stable, nightly]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: ${{ matrix.rust }}
@@ -35,7 +35,7 @@ jobs:
   test-webgpu:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - name: install swiftshader
       shell: bash
@@ -59,7 +59,7 @@ jobs:
   test-rust-32-bits:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
       with:
         targets: i686-unknown-linux-musl
@@ -70,7 +70,7 @@ jobs:
   test-rust-wasi:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
       with:
         targets: wasm32-wasi
@@ -87,7 +87,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - if: ${{ matrix.os == 'ubuntu-latest' }}
       uses: Homebrew/actions/setup-homebrew@master
@@ -101,7 +101,7 @@ jobs:
       matrix:
         python-version: ['3.9', '3.x']
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -116,7 +116,7 @@ jobs:
       matrix:
         node-version: [ '14.x', 'latest' ]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
@@ -137,12 +137,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout current commit
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 2
       if: matrix.tested-commit == 'new' || github.event_name != 'pull_request'
     - name: Checkout base branch (${{ github.base_ref }} of pull request
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.base_ref }}
       if: matrix.tested-commit == 'old' && github.event_name == 'pull_request'
@@ -165,7 +165,7 @@ jobs:
     needs: [benchmark]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Download new benchmark
       uses: actions/download-artifact@v3
       with:
@@ -194,7 +194,7 @@ jobs:
     continue-on-error: true
     steps:
     - name: Check out source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - run: sudo apt-get install llvm
     - name: Fuzz with AFL
@@ -209,7 +209,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: nightly
@@ -226,7 +226,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - name: Install honggfuzz dependencies
       run: sudo apt-get update && sudo apt-get -y install build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
@@ -247,7 +247,7 @@ jobs:
       image: xd009642/tarpaulin
       options: --security-opt seccomp=unconfined
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - name: Generate code coverage
       run: cargo tarpaulin --verbose --timeout 720 --out Xml
@@ -260,7 +260,7 @@ jobs:
   actionlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download actionlint
         id: get_actionlint
         run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
@@ -270,7 +270,7 @@ jobs:
   check-js:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
@@ -282,7 +282,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
           python-version: '3.x'
@@ -319,7 +319,7 @@ jobs:
       contents: read
       deployments: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
@@ -365,7 +365,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - uses: actions/setup-node@v3
       with:
@@ -388,7 +388,7 @@ jobs:
   build-and-deploy-http-server:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - run: cargo install cross
     - uses: superfly/flyctl-actions/setup-flyctl@master
@@ -411,7 +411,7 @@ jobs:
   build-and-deploy-grpc-server:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - run: cargo install cross
     - uses: superfly/flyctl-actions/setup-flyctl@master
