@@ -4,16 +4,16 @@ use crate::input::Input;
 type ChemicalId = usize;
 type ChemicalAmount = i64;
 
-struct Reactions {
-    id_assigner: IdAssigner<100>,
+struct Reactions<'a> {
+    id_assigner: IdAssigner<'a, 100>,
     // Indexed by chemical id that is produced, contains amount produced and required.
     produced_by: Vec<(ChemicalAmount, Vec<ChemicalAmount>)>,
     fuel_id: ChemicalId,
     ore_id: ChemicalId,
 }
 
-impl Reactions {
-    fn parse(input_string: &str) -> Result<Self, String> {
+impl<'a> Reactions<'a> {
+    fn parse(input_string: &'a str) -> Result<Self, String> {
         let mut id_assigner = IdAssigner::new();
 
         // Indexed by chemical id that is produced, to amount produced and required.

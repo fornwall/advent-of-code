@@ -1,27 +1,28 @@
-use std::collections::HashMap;
+use std::collections::{hash_map::Entry, HashMap};
 
-pub struct IdAssigner<const MAX_SIZE: u16> {
-    id_map: HashMap<String, u16>,
+pub struct IdAssigner<'a, const MAX_SIZE: u16> {
+    id_map: HashMap<&'a str, u16>,
 }
 
-impl<const MAX_SIZE: u16> IdAssigner<MAX_SIZE> {
+impl<'a, const MAX_SIZE: u16> IdAssigner<'a, MAX_SIZE> {
     pub fn new() -> Self {
         Self {
             id_map: HashMap::new(),
         }
     }
 
-    pub fn id_of(&mut self, name: &str) -> Result<u16, String> {
-        if let Some(&id) = self.id_map.get(name) {
-            Ok(id)
-        } else {
-            if self.len() == MAX_SIZE as usize {
-                return Err("Too many entries".to_string());
+    pub fn id_of(&mut self, name: &'a str) -> Result<u16, String> {
+        let next_id = self.id_map.len() as u16;
+        Ok(match self.id_map.entry(name) {
+            Entry::Vacant(entry) => {
+                if next_id == MAX_SIZE {
+                    return Err("Too many entries".to_string());
+                }
+                entry.insert(next_id);
+                next_id
             }
-            let next_id = self.id_map.len() as u16;
-            self.id_map.insert(name.to_string(), next_id);
-            Ok(next_id)
-        }
+            Entry::Occupied(e) => *e.get(),
+        })
     }
 
     pub fn get_id(&mut self, name: &str) -> Option<u16> {
