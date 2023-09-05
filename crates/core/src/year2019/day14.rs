@@ -4,17 +4,17 @@ use crate::input::Input;
 type ChemicalId = usize;
 type ChemicalAmount = i64;
 
-struct Reactions<'a> {
-    id_assigner: IdAssigner<'a, 100>,
+struct Reactions {
+    needed: Vec<ChemicalAmount>,
     // Indexed by chemical id that is produced, contains amount produced and required.
     produced_by: Vec<(ChemicalAmount, Vec<ChemicalAmount>)>,
     fuel_id: ChemicalId,
     ore_id: ChemicalId,
 }
 
-impl<'a> Reactions<'a> {
-    fn parse(input_string: &'a str) -> Result<Self, String> {
-        let mut id_assigner = IdAssigner::new();
+impl Reactions {
+    fn parse(input_string: &str) -> Result<Self, String> {
+        let mut id_assigner = IdAssigner::<100>::new();
 
         // Indexed by chemical id that is produced, to amount produced and required.
         let mut reactions: Vec<(ChemicalAmount, Vec<ChemicalAmount>)> = Vec::new();
@@ -50,11 +50,10 @@ impl<'a> Reactions<'a> {
         }
 
         let fuel_id = id_assigner.get_id("FUEL").ok_or("No FUEL encountered")? as usize;
-
         let ore_id = id_assigner.get_id("ORE").ok_or("No ORE encountered")? as usize;
 
         Ok(Self {
-            id_assigner,
+            needed: vec![0; id_assigner.len()],
             produced_by: reactions,
             fuel_id,
             ore_id,
@@ -62,11 +61,13 @@ impl<'a> Reactions<'a> {
     }
 }
 
-fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> ChemicalAmount {
-    let mut needed: Vec<ChemicalAmount> = vec![0; reactions.id_assigner.len()];
-    needed[reactions.fuel_id] = fuel_to_produce;
+fn required_ore(reactions: &mut Reactions, fuel_to_produce: ChemicalAmount) -> ChemicalAmount {
+    reactions.needed.fill(0);
 
-    while let Some((needed_id, &needed_amount)) = needed
+    reactions.needed[reactions.fuel_id] = fuel_to_produce;
+
+    while let Some((needed_id, &needed_amount)) = reactions
+        .needed
         .iter()
         .enumerate()
         .find(|&(chemical_id, &amount)| amount > 0 && chemical_id != reactions.ore_id)
@@ -76,22 +77,22 @@ fn required_ore(reactions: &Reactions, fuel_to_produce: ChemicalAmount) -> Chemi
         let reaction_executions =
             needed_amount / *produced_amount + i64::from(needed_amount % *produced_amount != 0);
 
-        needed[needed_id] -= reaction_executions * *produced_amount;
+        reactions.needed[needed_id] -= reaction_executions * *produced_amount;
 
         for (required_id, &required_amount) in required.iter().enumerate() {
-            needed[required_id] += reaction_executions * required_amount;
+            reactions.needed[required_id] += reaction_executions * required_amount;
         }
     }
 
-    needed[reactions.ore_id]
+    reactions.needed[reactions.ore_id]
 }
 
 pub fn solve(input: &Input) -> Result<ChemicalAmount, String> {
     const AVAILABLE_ORE: i64 = 1_000_000_000_000;
-    let reactions = Reactions::parse(input.text)?;
+    let mut reactions = Reactions::parse(input.text)?;
 
     if input.is_part_one() {
-        Ok(required_ore(&reactions, 1))
+        Ok(required_ore(&mut reactions, 1))
     } else {
         let mut min_produced_fuel = 1;
         let mut max_produced_fuel = AVAILABLE_ORE;
@@ -101,7 +102,7 @@ pub fn solve(input: &Input) -> Result<ChemicalAmount, String> {
                 return Ok(min_produced_fuel);
             }
 
-            let ore_amount = required_ore(&reactions, fuel_to_produce);
+            let ore_amount = required_ore(&mut reactions, fuel_to_produce);
 
             if ore_amount > AVAILABLE_ORE {
                 // Uses too much ore, try less ambitious fuel production.
