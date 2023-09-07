@@ -14,6 +14,8 @@ CLIPPY_PARAMS = --all-targets -- \
 	-W clippy::match_same_arms \
 	-W clippy::nursery \
 	-W clippy::option_if_let_else \
+	-W clippy::print_stdout \
+	-W clippy::print_stderr \
 	-W clippy::redundant_closure_for_method_calls \
 	-W clippy::needless_continue \
 	-W clippy::needless_pass_by_value \

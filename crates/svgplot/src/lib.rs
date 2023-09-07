@@ -198,8 +198,4 @@ fn test() {
         shape: SvgShape::at(10.6, 10.).close(),
         ..Default::default()
     });
-    println!("###:\n{}\n###", image.to_svg_string());
-    /*
-
-    */
 }

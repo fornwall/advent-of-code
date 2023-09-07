@@ -55,6 +55,7 @@ impl Solver for SolverImpl {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     #![allow(clippy::expect_used)]
+    #![allow(clippy::print_stdout)]
 
     let addr = "0.0.0.0:50051".parse()?;
 

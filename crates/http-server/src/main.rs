@@ -13,6 +13,7 @@ use advent_of_code::solve_raw;
 #[tokio::main]
 async fn main() {
     #![allow(clippy::unwrap_used)]
+    #![allow(clippy::print_stdout)]
 
     let app = Router::new()
         .route("/", get(handle_get))

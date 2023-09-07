@@ -5,6 +5,8 @@ use std::io::Read;
 
 use advent_of_code::solve_raw;
 
+#[allow(clippy::print_stdout)]
+#[allow(clippy::print_stderr)]
 fn main() -> Result<(), String> {
     let usage = || -> ! {
         eprintln!("usage: advent-of-code [year] [day] [part] < [input-file]");
