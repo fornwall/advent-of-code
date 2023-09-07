@@ -78,18 +78,26 @@ fn parse<'a>(input: &'a [u8], current_idx: &mut usize) -> Result<JsonValue<'a>, 
             return Err("Invalid input - no end of string".to_string());
         }
         b'0'..=b'9' | b'-' => {
-            let mut string = String::new();
-            string.push(next_char as char);
-
             let mut idx = *current_idx;
+            let (next_char, sign) = if next_char == b'-' {
+                let res = (input[idx], -1);
+                idx += 1;
+                res
+            } else {
+                (next_char, 1)
+            };
+            let mut value = sign * i32::from(next_char - b'0');
+
             loop {
                 let read_char = if idx == input.len() { b' ' } else { input[idx] };
                 if read_char.is_ascii_digit() {
-                    string.push(read_char as char);
+                    value = value
+                        .checked_mul(10_i32)
+                        .and_then(|v| v.checked_add(sign * i32::from(read_char - b'0')))
+                        .ok_or("Non-i32 number")?;
                 } else {
                     *current_idx = idx;
-                    let number = string.parse::<i32>().unwrap_or_default();
-                    break JsonValue::Number(number);
+                    break JsonValue::Number(value);
                 }
                 idx += 1;
             }
@@ -142,6 +150,31 @@ pub fn test_parse() {
         Ok(JsonValue::String(b"1234")),
         parse(b"\"1234\"", &mut current_idx)
     );
+
+    current_idx = 0;
+    assert_eq!(
+        Ok(JsonValue::Number(i32::MAX)),
+        parse(b"2147483647", &mut current_idx)
+    );
+
+    current_idx = 0;
+    assert_eq!(
+        Ok(JsonValue::Number(i32::MIN)),
+        parse(b"-2147483648", &mut current_idx)
+    );
+
+    for input in [
+        b"2147483648".as_slice(),
+        b"-2147483649".as_slice(),
+        b"9000000000".as_slice(),
+        b"-9000000000".as_slice(),
+    ] {
+        current_idx = 0;
+        assert_eq!(
+            Err("Non-i32 number".to_string()),
+            parse(input, &mut current_idx)
+        );
+    }
 
     current_idx = 0;
     assert_eq!(
