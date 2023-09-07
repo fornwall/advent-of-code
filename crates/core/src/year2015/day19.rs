@@ -3,15 +3,21 @@ use std::collections::{HashMap, HashSet};
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     let mut mappings = HashMap::new();
-    let mut molecule = String::new();
+    let molecule;
 
-    for line in input.text.lines() {
-        if line.is_empty() {
-            // Blank line before last.
-        } else if let Some((part1, part2)) = line.split_once(" => ") {
-            mappings.entry(part1).or_insert_with(Vec::new).push(part2);
+    let mut lines = input.text.lines();
+    loop {
+        if let Some(line) = lines.next() {
+            if line.is_empty() {
+                // Blank line before last.
+            } else if let Some((part1, part2)) = line.split_once(" => ") {
+                mappings.entry(part1).or_insert_with(Vec::new).push(part2);
+            } else {
+                molecule = line.to_string();
+                break;
+            }
         } else {
-            molecule = line.to_string();
+            return Err("Invalid input".to_string());
         }
     }
 
@@ -24,7 +30,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         "{}{}{}",
                         &molecule[..start_idx],
                         value,
-                        &molecule[start_idx + key.len()..]
+                        &molecule[start_idx + key.len()..],
                     );
                     distinct_molecules.insert(new_molecule);
                 }
