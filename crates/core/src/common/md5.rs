@@ -132,6 +132,7 @@ fn lower_hex(data: &[u8]) -> String {
 
 fn transform(state: &mut [u32; 4], input: &[u32; 16]) {
     #![allow(clippy::unreadable_literal)]
+    #![allow(clippy::tuple_array_conversions)]
     let (mut a, mut b, mut c, mut d) = (state[0], state[1], state[2], state[3]);
     macro_rules! add(
         ($a:expr, $b:expr) => ($a.wrapping_add($b));

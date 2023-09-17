@@ -7,7 +7,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         lines
             .map(|line| {
                 let compartments = line.split_at(line.len() / 2);
-                common_item_priority([compartments.0, compartments.1])
+                common_item_priority(compartments.into())
             })
             .sum()
     } else {
