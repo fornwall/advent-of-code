@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
     <title>Advent of Code Solver</title>
@@ -8,20 +8,28 @@
     <link rel="shortcut icon" href="favicon_1.ico" type="image/x-icon" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css"
-      integrity="sha512-Z/def5z5u2aR89OuzYcxmDJ0Bnd5V1cKqBEbvLOiUNWdg9PQeXVvXLI90SE4QOHGlfLqUnDNVAYyZi8UwUTmWQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.1/superhero/bootstrap.min.css"
-      integrity="sha512-Qd4Ez/FE/anYVYk5yrlGlblYQe2DPgtXyddJvP5jEVAuh/y238Y6L+7eEpRi9+8g4BVnoeFI90kOkS3gAnJkkA=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css"
+      integrity="sha512-b2QcS5SsA8tZodcDtGRELiGv5SaKSk1vDHDaQRda0htPYWZ6046lr3kJ5bAAQdpV2mmA/4v0wQF9MyU6/pDIAg=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
 
     <style>
+      html,
+      body {
+        background-color: rgb(15, 15, 35);
+        user-select: none;
+        font: "Source Code Pro", monospace;
+      }
+      a {
+        color: rgb(0, 153, 0);
+        text-decoration: none;
+      }
+      a:hover,
+      a:focus {
+        color: #99ff99;
+      }
+
       .input-group .input-group-text {
         min-width: 4em;
       }
@@ -203,10 +211,11 @@
                 class="btn btn-primary form-control"
                 accesskey="w"
               >
-                <span class="when-idle">
-                  Solve
-                  <span id="execution-time" class="badge bg-secondary"></span>
-                </span>
+                Solve
+                <span
+                  id="execution-time"
+                  class="badge text-bg-secondary"
+                ></span>
                 <span class="when-in-progress">
                   <span class="spinner-border spinner-border-sm" role="status">
                     <span class="visually-hidden">Running...</span>
