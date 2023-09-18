@@ -114,7 +114,7 @@ def create_compiler_explorer_link(year, day, src, link_id=None):
                 "id": 1,
                 "language": "rust",
                 "source": src,
-                "compilers": [{ "id": "beta", "options": "--edition=2021 -C opt-level=2" }],
+                "compilers": [{ "id": "beta", "options": "-C opt-level=2" }],
         }]
     }
     response = requests.post('https://godbolt.org/api/shortener', json=client_state)
