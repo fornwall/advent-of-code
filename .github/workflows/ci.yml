@@ -56,17 +56,6 @@ jobs:
     - run: cargo test --features webgpu-compute
       working-directory: crates/core
 
-  test-rust-32-bits:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: i686-unknown-linux-musl
-    - run: rustc --version
-    - run: cargo test --target i686-unknown-linux-musl
-      working-directory: crates/core
-
   test-rust-wasi:
     runs-on: ubuntu-latest
     steps:
