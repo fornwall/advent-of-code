@@ -53,8 +53,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         .map(|s| {
             s.parse::<u8>()
                 .map_err(|_| "Invalid drawn numbers".to_string())
-        })
-        .collect::<Result<Vec<u8>, _>>()?;
+        });
 
     let mut boards = input
         .text
@@ -81,6 +80,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let mut num_wins = 0;
 
     for number in drawn_numbers {
+        let number = number?;
         for board in boards.iter_mut() {
             if !board.has_won() && board.note_drawn_number(number) {
                 num_wins += 1;
