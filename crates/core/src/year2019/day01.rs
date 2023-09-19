@@ -1,24 +1,13 @@
 use crate::input::Input;
 
-fn make_ascii_titlecase(s: &mut str) -> &str {
-    if let Some(r) = s.get_mut(0..1) {
-        r.make_ascii_uppercase();
-    }
-    s
-}
-
 fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Result<u32, String> {
-    let parts = input_string
+    input_string
         .lines()
         .enumerate()
         .map(|(line_index, line)| {
-            let module_mass = line.parse::<u32>().map_err(|error| {
-                format!(
-                    "Line {}: {}",
-                    line_index + 1,
-                    make_ascii_titlecase(&mut error.to_string())
-                )
-            })?;
+            let module_mass = line
+                .parse::<u32>()
+                .map_err(|error| format!("Line {}: {}", line_index + 1, error.to_string()))?;
             if module_mass < 6 {
                 return Err(format!(
                     "Line {}: Too small module mass (less than 6)",
@@ -27,8 +16,7 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
             }
             Ok(fuel_calculator(module_mass))
         })
-        .collect::<Result<Vec<u32>, String>>()?;
-    Ok(parts.iter().sum())
+        .sum::<Result<_, _>>()
 }
 
 pub fn solve(input: &Input) -> Result<u32, String> {
@@ -56,7 +44,7 @@ pub fn tests() {
     let input = include_str!("day01_input.txt");
     test_part_one!(input => 3_262_358);
     test_part_one_error!(
-        "\n" => "Line 1: Cannot parse integer from empty string"
+        "\n" => "Line 1: cannot parse integer from empty string"
     );
 
     test_part_two!("14" => 2);
