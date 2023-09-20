@@ -32,24 +32,12 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
 
     let test_input = "A Y\nB X\nC Z";
-    test_part_one!(test_input => 15);
+    test_part_one_no_allocations!(test_input => 15);
 
     let real_input = include_str!("day02_input.txt");
-    test_part_one!(real_input => 11063);
-    test_part_two!(real_input => 10349);
-}
-
-#[cfg(feature = "count-allocations")]
-#[test]
-pub fn no_memory_allocations() {
-    use crate::input::{test_part_one, test_part_two};
-    let real_input = include_str!("day02_input.txt");
-    let allocations = allocation_counter::count(|| {
-        test_part_one!(real_input => 11063);
-        test_part_two!(real_input => 10349);
-    });
-    assert_eq!(allocations, 0);
+    test_part_one_no_allocations!(real_input => 11063);
+    test_part_two_no_allocations!(real_input => 10349);
 }

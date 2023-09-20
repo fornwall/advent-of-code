@@ -36,7 +36,7 @@ fn items_bitset(items: &str) -> u64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
 
     let test_input = "vJrwpWtwJgWrhcsFMMfFFhFp
 jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
@@ -44,22 +44,10 @@ PmmdzqPrVvPwwTWBwg
 wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw";
-    test_part_one!(test_input => 157);
-    test_part_two!(test_input => 70);
+    test_part_one_no_allocations!(test_input => 157);
+    test_part_two_no_allocations!(test_input => 70);
 
     let real_input = include_str!("day03_input.txt");
-    test_part_one!(real_input => 8176);
-    test_part_two!(real_input => 2689);
-}
-
-#[cfg(feature = "count-allocations")]
-#[test]
-pub fn no_memory_allocations() {
-    use crate::input::{test_part_one, test_part_two};
-    let real_input = include_str!("day03_input.txt");
-    let allocations = allocation_counter::count(|| {
-        test_part_one!(real_input => 8176);
-        test_part_two!(real_input => 2689);
-    });
-    assert_eq!(allocations, 0);
+    test_part_one_no_allocations!(real_input => 8176);
+    test_part_two_no_allocations!(real_input => 2689);
 }

@@ -67,6 +67,24 @@ macro_rules! test_part_one {
 pub(crate) use test_part_one;
 
 #[cfg(test)]
+macro_rules! test_part_one_no_allocations {
+    ($input:tt => $expected:expr) => {
+        #[cfg(feature = "count-allocations")]
+        {
+            allocation_counter::assert_no_allocations(|| {
+                assert_eq!(solve(&Input::part_one($input)), Ok($expected));
+            });
+        }
+        #[cfg(not(feature = "count-allocations"))]
+        {
+            assert_eq!(solve(&Input::part_one($input)), Ok($expected));
+        }
+    };
+}
+#[cfg(test)]
+pub(crate) use test_part_one_no_allocations;
+
+#[cfg(test)]
 macro_rules! test_part_two {
     ($input:tt => $expected:expr) => {
         assert_eq!(solve(&Input::part_two($input)), Ok($expected));
@@ -74,6 +92,24 @@ macro_rules! test_part_two {
 }
 #[cfg(test)]
 pub(crate) use test_part_two;
+
+#[cfg(test)]
+macro_rules! test_part_two_no_allocations {
+    ($input:tt => $expected:expr) => {
+        #[cfg(feature = "count-allocations")]
+        {
+            allocation_counter::assert_no_allocations(|| {
+                assert_eq!(solve(&Input::part_two($input)), Ok($expected));
+            });
+        }
+        #[cfg(not(feature = "count-allocations"))]
+        {
+            assert_eq!(solve(&Input::part_two($input)), Ok($expected));
+        }
+    };
+}
+#[cfg(test)]
+pub(crate) use test_part_two_no_allocations;
 
 #[cfg(test)]
 macro_rules! test_part_one_error {

@@ -22,25 +22,18 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
+    use crate::input::{
+        test_part_one_error, test_part_one_no_allocations, test_part_two_no_allocations,
+    };
 
     let test_input = "mjqjpqmgbljsphdztnvjfqwrcgsmlb";
-    test_part_one!(test_input => 7);
-    test_part_two!(test_input => 19);
+    test_part_one_no_allocations!(test_input => 7);
+    test_part_two_no_allocations!(test_input => 19);
 
     let real_input = include_str!("day06_input.txt");
-    test_part_one!(real_input => 1109);
-    test_part_two!(real_input => 3965);
+    test_part_one_no_allocations!(real_input => 1109);
+    test_part_two_no_allocations!(real_input => 3965);
 
     test_part_one_error!("abc" => "No solution found");
     test_part_one_error!("abcc" => "No solution found");
-
-    #[cfg(feature = "count-allocations")]
-    {
-        let allocations = allocation_counter::count(|| {
-            test_part_one!(real_input => 1109);
-            test_part_two!(real_input => 3965);
-        });
-        assert_eq!(allocations, 0);
-    }
 }

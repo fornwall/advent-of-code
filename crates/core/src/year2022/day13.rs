@@ -155,7 +155,7 @@ fn next_token<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mu
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
+    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
 
     let test_input = "[1,1,3,1,1]
 [1,1,5,1,1]
@@ -180,12 +180,12 @@ pub fn tests() {
 
 [1,[2,[3,[4,[5,6,7]]]],8,9]
 [1,[2,[3,[4,[5,6,0]]]],8,9]";
-    test_part_one!(test_input => 13);
-    test_part_two!(test_input => 140);
+    test_part_one_no_allocations!(test_input => 13);
+    test_part_two_no_allocations!(test_input => 140);
 
     let real_input = include_str!("day13_input.txt");
-    test_part_one!(real_input => 4821);
-    test_part_two!(real_input => 21_890);
+    test_part_one_no_allocations!(real_input => 4821);
+    test_part_two_no_allocations!(real_input => 21_890);
 }
 
 #[test]
@@ -193,16 +193,4 @@ pub fn troublesome_packet() {
     let p1 = "[[[9,[9,[0,2]],10,[[0,7,9,4,2],2,[6,7,4,3],[7]],4],[],[[],10,4,5]]]";
     let p2 = "[[[[[9],[7],2,1,8],[[7,5,9],10],[],[]]]]";
     assert!(is_correctly_ordered(p1, p2));
-}
-
-#[cfg(feature = "count-allocations")]
-#[test]
-pub fn no_memory_allocations() {
-    use crate::input::{test_part_one, test_part_two};
-    let real_input = include_str!("day13_input.txt");
-    let allocations = allocation_counter::count(|| {
-        test_part_one!(real_input => 4821);
-        test_part_two!(real_input => 21_890);
-    });
-    assert_eq!(allocations, 0);
 }
