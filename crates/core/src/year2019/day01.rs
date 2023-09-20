@@ -7,7 +7,7 @@ fn sum_required_fuel(input_string: &str, fuel_calculator: fn(u32) -> u32) -> Res
         .map(|(line_index, line)| {
             let module_mass = line
                 .parse::<u32>()
-                .map_err(|error| format!("Line {}: {}", line_index + 1, error.to_string()))?;
+                .map_err(|error| format!("Line {}: {}", line_index + 1, error))?;
             if module_mass < 6 {
                 return Err(format!(
                     "Line {}: Too small module mass (less than 6)",
