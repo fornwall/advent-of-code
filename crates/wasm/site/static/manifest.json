@@ -5,8 +5,8 @@
 
   "short_name": "AoC Solver",
   "display": "standalone",
-  "background_color": "rgb(15, 15, 35)",
-  "theme_color": "#3367D6",
+  "background_color": "rgb(15,15,35)",
+  "theme_color": "rgb(15,15,35)",
   "description": "A solver of Advent of Code problems.",
   "icons": [
     {
