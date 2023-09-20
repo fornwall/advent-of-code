@@ -1,18 +1,18 @@
 {
-    "name": "Advent of Code Solver",
-    "id": "/?source=pwa",
-    "start_url": "/?source=pwa",
+  "name": "Advent of Code Solver",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
 
-    "short_name": "AoC Solver",
-    "display": "standalone",
-    "background_color": "rgb(15, 15, 35)",
-    "theme_color": "#3367D6",
-    "description": "A solver of Advent of Code problems.",
-    "icons": [
-        {
-            "src": "advent-of-code-logo.svg",
-            "sizes": "any",
-            "type": "image/svg"
-        }
-    ]
+  "short_name": "AoC Solver",
+  "display": "standalone",
+  "background_color": "rgb(15, 15, 35)",
+  "theme_color": "#3367D6",
+  "description": "A solver of Advent of Code problems.",
+  "icons": [
+    {
+      "src": "advent-of-code-logo.svg",
+      "sizes": "any",
+      "type": "image/svg"
+    }
+  ]
 }
