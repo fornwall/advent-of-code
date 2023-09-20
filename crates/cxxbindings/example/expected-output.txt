@@ -1,5 +1,5 @@
 2019-1-1: Input='14' -> ok=true, output='2'
-2019-1-1: Input='hej' -> ok=false, output='Line 1: Invalid digit found in string'
+2019-1-1: Input='hej' -> ok=false, output='Line 1: invalid digit found in string'
 2019-1-1: Input='' -> ok=false, output='Empty input'
 2019-1-1: Input='รถ' -> ok=false, output='Non-ASCII input'
 2019-1-1: Input='ร(' -> ok=false, output='data for rust::Str is not utf-8'
