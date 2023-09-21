@@ -327,11 +327,11 @@ pub fn tests() {
 
     #[cfg(feature = "count-allocations")]
     {
-        let allocations = allocation_counter::count(|| {
+        let allocations = allocation_counter::measure(|| {
             test_part_one!(real_input => 960);
             test_part_two!(real_input => 12_301_926_782_560);
         });
-        assert_eq!(allocations, 0);
+        assert_eq!(allocations.count_total, 0);
     }
 
     test_part_two_error!("b1/       5105 	   |" => "Unable to parse outermost package - check transmission");

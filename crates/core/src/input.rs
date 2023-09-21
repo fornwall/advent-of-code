@@ -74,7 +74,7 @@ macro_rules! test_part_one_no_allocations {
             let info = allocation_counter::measure(|| {
                 assert_eq!(solve(&Input::part_one($input)), Ok($expected));
             });
-            assert_eq!(0, into.count_total);
+            assert_eq!(0, info.count_total);
         }
         #[cfg(not(feature = "count-allocations"))]
         {
@@ -102,7 +102,7 @@ macro_rules! test_part_two_no_allocations {
             let info = allocation_counter::measure(|| {
                 assert_eq!(solve(&Input::part_two($input)), Ok($expected));
             });
-            assert_eq!(0, into.count_total);
+            assert_eq!(0, info.count_total);
         }
         #[cfg(not(feature = "count-allocations"))]
         {
