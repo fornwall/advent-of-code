@@ -320,21 +320,35 @@ document.addEventListener("copy", (event) => {
 });
 
 const registerServiceWorker = async () => {
+  const digestMessage = async (message) => {
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  };
+
   if ("serviceWorker" in navigator) {
     try {
+      const swResponse = await fetch("/service-worker.js?ts=" + Date.now());
+      const swText = await swResponse.text();
+      const swHash = digestMessage(swText);
       const registration = await navigator.serviceWorker.register(
-        "/service-worker.js?v=12",
+        "/service-worker.js?hash=" + swHash,
         {
           scope: "/",
         },
       );
-      if (registration.installing) {
-        console.log("Service worker installing");
-      } else if (registration.waiting) {
-        console.log("Service worker installed");
-      } else if (registration.active) {
-        console.log("Service worker active");
-      }
+
+      // https://whatwebcando.today/articles/handling-service-worker-updates/
+      registration.addEventListener("updatefound", () => {
+        if (registration.installing) {
+          registration.installing.addEventListener("statechange", () => {
+            if (registration.waiting && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          });
+        }
+      });
     } catch (error) {
       console.error(`Registration failed with ${error}`);
     }

@@ -1,7 +1,7 @@
 {
   "name": "Advent of Code Solver",
-  "id": "/?source=pwa",
-  "start_url": "/?source=pwa",
+  "id": "aoc.fornwall.net",
+  "start_url": "/",
 
   "short_name": "AoC Solver",
   "display": "standalone",
