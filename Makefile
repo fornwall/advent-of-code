@@ -86,7 +86,10 @@ site-renderer-wasm:
 	cd site/show/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
-site-pack: site-compute-wasm site-renderer-wasm
+--download-bootstrap-css:
+	cd crates/wasm/site/static/ && curl -O https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css
+
+site-pack: site-compute-wasm site-renderer-wasm --download-bootstrap-css
 	cd crates/wasm/site && \
 		rm -Rf dist && \
 		npm i && npm run webpack -- --mode=production
@@ -95,8 +98,8 @@ wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-compute-wasm && \
 	ls -la crates/wasm/site/generated/advent_of_code_wasm_bg.wasm
 
---run-devserver:
-	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type https --open
+--run-devserver: --download-bootstrap-css
+	cd crates/wasm/site && NODE_ENV=development npx webpack serve --server-type http --open
 
 --watch-and-build-wasm:
 	cargo watch --ignore crates/wasm/site --shell '$(MAKE) $(WASM_MAKE_TARGET)'

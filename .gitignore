@@ -8,6 +8,7 @@ generated/
 *.log
 *.wasm
 *.wasi
+*.min.css
 .idea/
 dist/
 /bin/

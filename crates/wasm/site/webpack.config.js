@@ -1,5 +1,6 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import CopyWebpackPlugin from "copy-webpack-plugin";
+import WorkboxPlugin from "workbox-webpack-plugin";
 
 export default {
   entry: {
@@ -44,6 +45,13 @@ export default {
     }),
     new CopyWebpackPlugin({
       patterns: [{ from: "static", to: "static" }],
+    }),
+    // See https://webpack.js.org/guides/progressive-web-application/
+    new WorkboxPlugin.GenerateSW({
+      // these options encourage the ServiceWorkers to get in there fast
+      // and not allow any straggling "old" SWs to hang around
+      clientsClaim: true,
+      skipWaiting: true,
     }),
   ],
 };
