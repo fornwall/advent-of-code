@@ -186,9 +186,9 @@ move 4 from 2 to 1";
 #[test]
 pub fn single_to_string_memory_allocation() {
     let real_input = include_str!("day05_input.txt");
-    let allocations = allocation_counter::count(|| {
+    let allocations = allocation_counter::measure(|| {
         assert!(solve(&Input::part_one(real_input)).is_ok());
         assert!(solve(&Input::part_two(real_input)).is_ok());
     });
-    assert_eq!(allocations, 2);
+    assert_eq!(allocations.count_total, 2);
 }

@@ -140,9 +140,9 @@ L.LLLLL.LL";
 pub fn limited_memory_allocations() {
     use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day11_input.txt");
-    let allocations = allocation_counter::count(|| {
+    let info = allocation_counter::measure(|| {
         test_part_one!(real_input => 2222);
         test_part_two!(real_input => 2032);
     });
-    assert!(allocations < 100);
+    assert!(info.count_total < 100);
 }

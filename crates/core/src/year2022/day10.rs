@@ -219,12 +219,12 @@ noop";
 #[test]
 pub fn single_to_string_memory_allocation() {
     let real_input = include_str!("day10_input.txt");
-    let allocations = allocation_counter::count(|| {
+    let allocations = allocation_counter::measure(|| {
         assert!(solve(&Input::part_one(real_input)).is_ok());
     });
-    assert_eq!(allocations, 1);
-    let allocations = allocation_counter::count(|| {
+    assert_eq!(allocations.count_total, 1);
+    let allocations = allocation_counter::measure(|| {
         assert!(solve(&Input::part_two(real_input)).is_ok());
     });
-    assert_eq!(allocations, 1);
+    assert_eq!(allocations.count_total, 1);
 }
