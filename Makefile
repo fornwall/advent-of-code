@@ -87,7 +87,7 @@ site-renderer-wasm:
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
 --download-bootstrap-css:
-	cd crates/wasm/site/static/ && curl -O https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css
+	cd crates/wasm/site/static/ && curl -O https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css && sh -c 'for size in 512 256; do convert advent-of-code-logo.svg -resize \${size}x\${size} advent-of-code-logo-\${size}.generated.png; done'
 
 site-pack: site-compute-wasm site-renderer-wasm --download-bootstrap-css
 	cd crates/wasm/site && \
@@ -141,9 +141,7 @@ install-nightly:
 
 install-wasm-bindgen:
 	rustup target add wasm32-unknown-unknown
-	# Pin to 0.2.86 until worker sdk updates:
-	# https://github.com/cloudflare/workers-rs/blob/main/worker/Cargo.toml
-	cargo install --version 0.2.86 wasm-bindgen-cli
+	cargo install wasm-bindgen-cli
 
 netlify: node-package
 	cd crates/wasm/functions && \
