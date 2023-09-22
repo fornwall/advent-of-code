@@ -7,12 +7,13 @@
   "display": "standalone",
   "background_color": "rgb(15,15,35)",
   "theme_color": "rgb(15,15,35)",
-  "description": "A solver of Advent of Code problems.",
+  "description": "Solver of Advent of Code problems.",
   "icons": [
     {
       "src": "advent-of-code-logo.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
