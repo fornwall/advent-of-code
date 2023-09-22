@@ -9,11 +9,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Advent of Code API",
-    "description": "API to solve [Advent of Code](https://adventofcode.com/) problems. See also [the web page](/).",
-    "contact": {
-      "name": "GitHub repository",
-      "url": "https://github.com/fornwall/advent-of-code"
-    }
+    "description": "API to solve [Advent of Code](https://adventofcode.com/) problems. See also [the web page](/)."
   },
   "servers": [
     {

@@ -2,10 +2,23 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <title>Advent of Code API</title>
     <script
       type="module"
       src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"
     ></script>
+    <style>
+      body {
+        color: white;
+        overscroll-behavior-y: contain;
+      }
+      rapi-doc::part(section-navbar) {
+        display: none;
+      }
+      rapi-doc::part(section-main-content) {
+        padding: 1em !important;
+      }
+    </style>
   </head>
   <body>
     <rapi-doc
@@ -13,14 +26,16 @@
       allow-authentication="false"
       allow-schema-description-expand-toggle="false"
       allow-search="false"
-      allow-spec-file-download="true"
+      bg-color="#0F0F23"
       default-schema-tab="example"
+      font-size="large"
       render-style="read"
       schema-description-expanded="true"
       schema-style="tree"
+      show-curl-before-try="true"
       show-header="false"
       spec-url="openapi.json"
-      theme="light"
+      theme="dark"
     >
     </rapi-doc>
   </body>
