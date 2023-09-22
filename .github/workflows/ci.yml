@@ -114,8 +114,8 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
-    - name: Install wasm-bindgen
-      run: make install-wasm-bindgen
+    - run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+    - run: cargo binstall --no-confirm wasm-bindgen-cli
     - name: Test with Node ${{ matrix.node-version }}
       run: make node-package
 
@@ -323,8 +323,8 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
-    - name: Install wasm-bindgen
-      run: make install-wasm-bindgen
+    - run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+    - run: cargo binstall --no-confirm wasm-bindgen-cli
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v3
       with:
