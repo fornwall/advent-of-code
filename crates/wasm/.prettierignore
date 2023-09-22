@@ -1,6 +1,7 @@
-**/advent_of_code_wasm.js
 **/*.min.js
-**/generated
+**/advent_of_code_wasm.js
 **/dist
+**/generated
 **/target
 /aoc.fornwall.net/
+site/static/bootstrap.min.css
