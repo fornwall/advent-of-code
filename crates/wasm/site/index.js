@@ -331,7 +331,7 @@ const registerServiceWorker = async () => {
     try {
       const swResponse = await fetch("/service-worker.js?ts=" + Date.now());
       const swText = await swResponse.text();
-      const swHash = digestMessage(swText);
+      const swHash = await digestMessage(swText);
       const registration = await navigator.serviceWorker.register(
         "/service-worker.js?hash=" + swHash,
         {
