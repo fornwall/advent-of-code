@@ -92,7 +92,7 @@ site-renderer-wasm:
 site-pack: site-compute-wasm site-renderer-wasm --download-bootstrap-css
 	cd crates/wasm/site && \
 		rm -Rf dist && \
-		npm i && npm run webpack -- --mode=production
+		npm i && NODE_ENV=production npm run webpack -- --mode=production
 
 wasm-size:
 	$(MAKE) WASM_RELEASE=1 site-compute-wasm && \
