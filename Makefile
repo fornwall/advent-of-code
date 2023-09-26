@@ -151,7 +151,7 @@ netlify: node-package
 
 deploy-site:
 	$(MAKE) WASM_RELEASE=1 site-pack && \
-		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon_1.ico && \
+		curl https://adventofcode.com/favicon.ico > crates/wasm/site/dist/favicon.ico && \
 		cd crates/wasm && \
 		rm -Rf aoc.fornwall.net && \
 		mkdir aoc.fornwall.net && \
