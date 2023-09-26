@@ -121,7 +121,7 @@ async function main() {
 
           const layout = {
             margin: { l: 0, r: 0, b: 0, t: 0 },
-            paper_bgcolor: "rgb(15,37,55)",
+            paper_bgcolor: "rgb(15,15,35)",
           };
 
           Plotly.newPlot("plot", [data], layout, {
