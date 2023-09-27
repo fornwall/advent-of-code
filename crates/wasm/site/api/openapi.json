@@ -9,7 +9,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Advent of Code API",
-    "description": "API to solve [Advent of Code](https://adventofcode.com/) problems. See also [the web page](/)."
+    "description": "API to solve [Advent of Code](https://adventofcode.com/) problems described by [openapi.json](https://aoc.fornwall.net/api/openapi.json). See the [Advent of Code Solver](/)."
   },
   "servers": [
     {
