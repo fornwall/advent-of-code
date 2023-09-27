@@ -49,10 +49,10 @@ else
   WASM_OPT += -O0
 endif
 
-ifeq ($(RENDER_ONLY),1)
+ifeq ($(SITE_DEV_RENDER),1)
   WASM_MAKE_TARGET = site-renderer-wasm
 else
-  WASM_MAKE_TARGET = site-compute-wasm site-renderer-wasm
+  WASM_MAKE_TARGET = site-compute-wasm
 endif
 
 check:
@@ -72,7 +72,7 @@ check-site:
 
 site-compute-wasm:
 	cd crates/wasm && \
-	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown && \
+	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" cargo +nightly build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features simd && \
 	rm -Rf site/generated && \
 	$(WASM_BINDGEN) --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/generated && \

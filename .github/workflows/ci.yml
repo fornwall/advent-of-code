@@ -316,6 +316,8 @@ jobs:
       with:
         python-version: '3.x'
     - uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: nightly
     - uses: actions/setup-node@v3
       with:
         node-version: 'lts/*'
