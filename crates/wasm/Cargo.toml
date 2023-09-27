@@ -17,6 +17,7 @@ crate-type = ["cdylib", "rlib"]
 [features]
 visualization = [ "advent-of-code/visualization" ]
 console-panic-hook = [ "console_error_panic_hook" ]
+simd = [ "advent-of-code/simd" ]
 
 [dependencies]
 advent-of-code = { path = "../core" }
