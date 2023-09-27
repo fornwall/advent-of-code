@@ -318,6 +318,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: nightly
+        targets: wasm32-unknown-unknown
     - uses: actions/setup-node@v3
       with:
         node-version: 'lts/*'
