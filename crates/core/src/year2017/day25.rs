@@ -1,5 +1,4 @@
 use crate::input::Input;
-use std::collections::HashSet;
 
 struct Action {
     write_one: bool,
@@ -12,8 +11,41 @@ struct State {
     if_one_action: Action,
 }
 
+struct Tape {
+    slots: Vec<bool>,
+}
+
+impl Tape {
+    const MIN_POSITION: i32 = -2000;
+    const MAX_POSITION: i32 = 10000;
+
+    fn new() -> Self {
+        Self {
+            slots: vec![false; (Self::MAX_POSITION - Self::MIN_POSITION) as usize],
+        }
+    }
+
+    const fn position_to_idx(&self, position: i32) -> usize {
+        (position - Self::MIN_POSITION) as usize
+    }
+
+    fn is_one_at(&self, position: i32) -> bool {
+        let idx = self.position_to_idx(position);
+        self.slots[idx]
+    }
+
+    fn set_slot(&mut self, position: i32, is_one: bool) {
+        let idx = self.position_to_idx(position);
+        self.slots[idx] = is_one;
+    }
+
+    fn diagnostic_checksum(&self) -> usize {
+        self.slots.iter().filter(|&&b| b).count()
+    }
+}
+
 pub fn solve(input: &Input) -> Result<usize, String> {
-    let mut tape = HashSet::new();
+    let mut tape = Tape::new();
     let mut target_steps = 0;
 
     let mut states: Vec<State> = Vec::new();
@@ -68,24 +100,33 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     let mut current_state = 0;
     let mut current_position = 0_i32;
 
+    if states.iter().any(|s| {
+        usize::from(s.if_one_action.next_state.max(s.if_zero_action.next_state)) >= states.len()
+    }) {
+        return Err("Invalid input - reference to non-defined state".to_string());
+    }
+
     for _ in 0..target_steps {
-        let current_action = if tape.contains(&current_position) {
+        let current_action = if tape.is_one_at(current_position) {
             &states[current_state].if_one_action
         } else {
             &states[current_state].if_zero_action
         };
 
-        if current_action.write_one {
-            tape.insert(current_position);
-        } else {
-            tape.remove(&current_position);
-        }
+        tape.set_slot(current_position, current_action.write_one);
 
         current_position += i32::from(current_action.move_direction);
+        if !(Tape::MIN_POSITION..Tape::MAX_POSITION).contains(&current_position) {
+            return Err(format!(
+                "Too long tape - only allowed inside [{},{}]",
+                Tape::MIN_POSITION,
+                Tape::MAX_POSITION
+            ));
+        }
         current_state = current_action.next_state as usize;
     }
 
-    Ok(tape.len())
+    Ok(tape.diagnostic_checksum())
 }
 
 #[test]
