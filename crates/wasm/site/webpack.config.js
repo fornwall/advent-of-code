@@ -50,17 +50,20 @@ export default {
     code: "./code/index.js",
   },
   output: {
-    publicPath: "/",
     assetModuleFilename: "asset-[name]-[contenthash][ext]",
     filename: "bundle-[name]-[contenthash].js",
     chunkFilename: "chunk-[name]-[contenthash].js",
   },
   devServer: {
     static: ".",
+    allowedHosts: "all",
     headers: {
       "Cross-Origin-Embedder-Policy": "require-corp",
       "Cross-Origin-Opener-Policy": "same-origin",
     },
+    // https://webpack.js.org/configuration/dev-server/#websocketurl:
+    // To get protocol/hostname/port from browser use:
+    // client: { webSocketURL: "auto://0.0.0.0:0/laptop/ws" },
   },
   plugins,
 };
