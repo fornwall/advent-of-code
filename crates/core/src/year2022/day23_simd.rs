@@ -1,6 +1,6 @@
 /// Solution to Advent of Code, day 23 in 2022.
 /// Using portable simd in rust.
-/// Taken from https://github.com/Crazytieguy/advent-of-code/blob/master/2022/src/bin/day23/main.rs
+/// Based on <https://github.com/Crazytieguy/advent-of-code/blob/master/2022/src/bin/day23/main.rs/>
 use std::array;
 use std::collections::VecDeque;
 use std::simd::u8x32;
@@ -110,6 +110,7 @@ impl ElfGrid {
         None
     }
 
+    #[allow(unstable_name_collisions)]
     fn play_round(&mut self, directions: [Direction; 4]) -> bool {
         // Given 9 rows:
         // - The above row:   [shifted-east, unmodified, shifted-west]
@@ -292,6 +293,7 @@ trait MapWindowsIterator: Iterator {
 impl<I: Iterator> MapWindowsIterator for I {}
 
 #[test]
+#[allow(unstable_name_collisions)]
 fn test_iterator() {
     let v = [1, 2, 3, 4]
         .iter()

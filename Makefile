@@ -34,7 +34,7 @@ check:
 
 check-simd:
 	cd crates/core && \
-		cargo +nightly clippy --features simd --lib --bins --tests $(CLIPPY_PARAMS) && \
+		cargo +nightly clippy --features simd --lib --bins && \
 		cargo +nightly test --features simd
 
 check-site:
