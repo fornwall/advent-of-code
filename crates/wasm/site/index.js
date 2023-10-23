@@ -222,7 +222,7 @@ showElement.disabled = !isVisualisationEnabled();
   element.addEventListener("change", storeForm),
 );
 
-window.addEventListener("pageshow", () => {
+globalThis.addEventListener("pageshow", () => {
   const problemString = window.localStorage.getItem("problem");
   if (problemString) {
     try {
@@ -251,7 +251,7 @@ outputElement.addEventListener("click", (event) => {
 });
 
 const pasteButton = document.getElementById("paste");
-if (navigator.clipboard.readText) {
+if (navigator?.clipboard?.readText) {
   pasteButton.addEventListener("click", async () => {
     setInputText(await navigator.clipboard.readText());
   });
