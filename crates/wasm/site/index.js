@@ -329,11 +329,11 @@ const registerServiceWorker = async () => {
 
   if ("serviceWorker" in navigator) {
     try {
-      const swResponse = await fetch("/service-worker.js?ts=" + Date.now());
+      const swResponse = await fetch("service-worker.js?ts=" + Date.now());
       const swText = await swResponse.text();
       const swHash = await digestMessage(swText);
       const registration = await navigator.serviceWorker.register(
-        "/service-worker.js?hash=" + swHash,
+        "service-worker.js?hash=" + swHash,
         {
           scope: "/",
         },
