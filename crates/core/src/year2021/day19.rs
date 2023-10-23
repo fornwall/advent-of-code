@@ -61,7 +61,7 @@ impl RotationMatrix {
     }
 }
 
-impl<'a> Mul<Point> for &'a RotationMatrix {
+impl Mul<Point> for &RotationMatrix {
     type Output = Point;
 
     fn mul(self, p: Point) -> Point {

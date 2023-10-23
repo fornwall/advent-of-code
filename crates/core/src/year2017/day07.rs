@@ -15,7 +15,7 @@ struct ProgramTree<'a> {
     root_node: ProgramId,
 }
 
-impl<'a> ProgramTree<'a> {
+impl ProgramTree<'_> {
     fn total_weight(&self, program_id: ProgramId) -> u32 {
         let program = &self.nodes[program_id];
         program.weight

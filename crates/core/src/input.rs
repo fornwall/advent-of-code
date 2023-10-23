@@ -16,7 +16,7 @@ pub struct Input<'a> {
     pub rendered_svg: RefCell<String>,
 }
 
-impl<'a> Input<'a> {
+impl Input<'_> {
     pub const fn is_part_one(&self) -> bool {
         matches!(self.part, Part::One)
     }
