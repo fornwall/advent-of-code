@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-/// A 2x2 tile represented as bits. Example: "../.#" is stored as 0b_10_00.
+/// A 2x2 tile represented as bits. Example: "../.#" is stored as `0b_10_00`.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct Tile2 {
     bits: u8,
@@ -52,7 +52,7 @@ impl Tile2 {
     }
 }
 
-/// A 3x3 tile represented as bits. Example: .#./..#/###" is stored as 0b_111_100_010
+/// A 3x3 tile represented as bits. Example: .#./..#/###" is stored as `0b_111_100_010`
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct Tile3 {
     bits: u16,

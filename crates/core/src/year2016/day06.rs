@@ -32,8 +32,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
                         b.1.cmp(a.1)
                     }
                 })
-                .map(|(&key, _value)| key as char)
-                .unwrap_or('?')
+                .map_or('?', |(&key, _value)| key as char)
         })
         .collect())
 }

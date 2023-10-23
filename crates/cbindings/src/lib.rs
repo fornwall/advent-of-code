@@ -15,9 +15,6 @@ use std::ffi::CString;
 ///
 /// Returns:
 /// The computed answer as text.
-///
-/// Raises:
-/// ValueError: If the input was invalid.
 #[no_mangle]
 pub extern "C" fn advent_of_code_solve(
     year: u16,
@@ -31,15 +28,18 @@ pub extern "C" fn advent_of_code_solve(
     use advent_of_code::solve;
 
     if input.is_null() {
+        // SAFETY: Responsibility of the caller.
         unsafe { *ok = false };
         let c_str_result = CString::new("Input is NULL").unwrap();
         return c_str_result.into_raw();
     }
 
+    // SAFETY: Responsibility of the caller.
     let c_str = unsafe { CStr::from_ptr(input) };
     let input_string = match c_str.to_str() {
         Ok(value) => value,
         Err(error) => {
+            // SAFETY: Responsibility of the caller.
             unsafe { *ok = false };
             let c_str_result = CString::new(format!("Invalid UTF-8 input: {error}")).unwrap();
             return c_str_result.into_raw();
@@ -49,11 +49,13 @@ pub extern "C" fn advent_of_code_solve(
     let result = solve(year, day, part, input_string);
     match result {
         Ok(value) => {
+            // SAFETY: Responsibility of the caller.
             unsafe { *ok = true };
             let c_str_result = CString::new(value).unwrap();
             c_str_result.into_raw()
         }
         Err(value) => {
+            // SAFETY: Responsibility of the caller.
             unsafe { *ok = false };
             let c_str_result = CString::new(value).unwrap();
             c_str_result.into_raw()

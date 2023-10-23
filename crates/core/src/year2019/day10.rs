@@ -39,7 +39,7 @@ pub fn parse_points(input_string: &str) -> Result<Vec<(usize, usize)>, String> {
         .collect())
 }
 
-/// Return (max_seen, (x, y)) of station.
+/// Return (`max_seen`, (`x`, `y`)) of station.
 pub fn determine_station(points: &[(usize, usize)]) -> Result<(usize, (usize, usize)), String> {
     points
         .iter()

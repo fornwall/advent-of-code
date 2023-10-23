@@ -247,7 +247,7 @@ impl OctreeNode {
 }
 
 /// An octree is a tree data structure in which each internal node has exactly eight children.
-/// - https://en.wikipedia.org/wiki/Octree
+/// - <https://en.wikipedia.org/wiki/Octree/>
 ///
 /// Three-dimensional space is partitioned by recursively subdividing it into eight octants.
 struct Octree {

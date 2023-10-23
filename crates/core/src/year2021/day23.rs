@@ -34,7 +34,7 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
     /// 0b10 = 3 amphipods
     /// 0b01 = 2 amphipods
     /// 0b00 = 1 OR 0 amphipods
-    ///        To determine, check if all second amphipod (0b0000_XX00) are stored with 0:s.
+    ///        To determine, check if all second amphipod (`0b0000_XX00`) are stored with 0:s.
     ///        As we normally set unoccupied to 1:s when popping
     ///        that means it is empty.
     pub const NUM_ROOMS: usize = 4;

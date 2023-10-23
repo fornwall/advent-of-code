@@ -47,7 +47,7 @@ pub fn solve(input: &Input) -> Result<i128, String> {
             .ok_or(format!("No card {desired_card} found"))
     } else {
         /// Explanation:
-        /// https://www.reddit.com/r/adventofcode/comments/ee0rqi/2019_day_22_solutions/fbnkaju?utm_source=share&utm_medium=web2x
+        /// <https://www.reddit.com/r/adventofcode/comments/ee0rqi/2019_day_22_solutions/fbnkaju?utm_source=share&utm_medium=web2x/>
         fn inv(n: i128) -> i128 {
             mod_exp(n, MOD - 2, MOD)
         }

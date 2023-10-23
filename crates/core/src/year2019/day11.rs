@@ -106,7 +106,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         let mut max_x = i32::MIN;
         let mut min_y = i32::MAX;
         let mut max_y = i32::MIN;
-        painted.iter().for_each(|(&(x, y), color)| {
+        for (&(x, y), color) in painted.iter() {
             if *color == Color::White {
                 min_x = std::cmp::min(min_x, x);
                 // Add one column for end of last letter:
@@ -114,16 +114,16 @@ pub fn solve(input: &Input) -> Result<String, String> {
                 min_y = std::cmp::min(min_y, y);
                 max_y = std::cmp::max(max_y, y);
             }
-        });
+        }
 
         let mut screen = vec![false; (max_x - min_x + 1) as usize * (max_y - min_y + 1) as usize];
-        painted.iter().for_each(|(&(x, y), color)| {
+        for (&(x, y), color) in painted.iter() {
             if *color == Color::White {
                 screen
                     [(max_y - y) as usize * (max_x - min_x + 1) as usize + (x - min_x) as usize] =
                     true;
             }
-        });
+        }
         recognize(&screen)
     }
 }

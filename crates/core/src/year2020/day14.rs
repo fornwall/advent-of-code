@@ -12,9 +12,7 @@ impl Hasher for CustomHash {
         self.hash
     }
 
-    fn write(&mut self, _: &[u8]) {
-        unimplemented!()
-    }
+    fn write(&mut self, _: &[u8]) {}
 
     fn write_u64(&mut self, value: u64) {
         // From Fx Hash.

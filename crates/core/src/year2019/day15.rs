@@ -21,7 +21,7 @@ fn instruction_for_direction(direction: (i32, i32)) -> Result<Word, String> {
 }
 
 /// Search the space ship using the given intcode program.
-/// The on_visit is called with ((pos_x, pos_y), is_oxygen, distance).
+/// The `on_visit` function is called with ((`pos_x`, `pos_y`), `is_oxygen`, `distance`).
 fn search_space_ship<F>(input_string: &str, mut on_visit: F) -> Result<(), String>
 where
     F: FnMut((i32, i32), bool, i32),

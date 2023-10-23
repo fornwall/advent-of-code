@@ -1,4 +1,4 @@
-/// From https://docs.rs/mod_exp/1.0.1/mod_exp, specialised to i128.
+/// From <https://docs.rs/mod_exp/1.0.1/mod_exp/>, specialised to i128.
 pub fn mod_exp(base: i128, exponent: i128, modulus: i128) -> i128 {
     const ONE: i128 = 1;
     const TWO: i128 = 2;

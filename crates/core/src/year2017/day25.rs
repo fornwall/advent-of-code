@@ -25,17 +25,17 @@ impl Tape {
         }
     }
 
-    const fn position_to_idx(&self, position: i32) -> usize {
+    const fn position_to_idx(position: i32) -> usize {
         (position - Self::MIN_POSITION) as usize
     }
 
     fn is_one_at(&self, position: i32) -> bool {
-        let idx = self.position_to_idx(position);
+        let idx = Self::position_to_idx(position);
         self.slots[idx]
     }
 
     fn set_slot(&mut self, position: i32, is_one: bool) {
-        let idx = self.position_to_idx(position);
+        let idx = Self::position_to_idx(position);
         self.slots[idx] = is_one;
     }
 

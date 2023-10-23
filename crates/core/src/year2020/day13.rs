@@ -12,8 +12,8 @@ struct ExtendedEuclidResult {
 /// - `gcd`, the greatest common divisor of `a` and `b`.
 /// - Two integers `x` and `y` such that `gcd = a * x + b * y`, called the "Bézout coefficients".
 ///
-/// See https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
-/// and https://cp-algorithms.com/algebra/extended-euclid-algorithm.html#toc-tgt-0
+/// See <https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm/>
+/// and <https://cp-algorithms.com/algebra/extended-euclid-algorithm.html#toc-tgt-0/>
 fn extended_euclid(a: i128, b: i128) -> ExtendedEuclidResult {
     if b == 0 {
         ExtendedEuclidResult { gcd: a, x: 1, y: 0 }
@@ -70,8 +70,8 @@ fn modular_multiplicative_inverse(a: i128, m: i128) -> Option<i128> {
 ///   remainders[i] == T % divisors[i]
 /// for all i.
 ///
-/// See https://en.wikipedia.org/wiki/Chinese_remainder_theorem
-/// and https://www.youtube.com/watch?v=ru7mWZJlRQg.
+/// See <https://en.wikipedia.org/wiki/Chinese_remainder_theorem/>
+/// and <https://www.youtube.com/watch?v=ru7mWZJlRQg/>.
 fn chinese_remainder(remainders: &[i128], divisors: &[i128]) -> Option<i128> {
     // Start by multiplying all divisors together, to facilitate obtaining
     // other_divisors_multiplied in the loop below:

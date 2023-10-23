@@ -37,7 +37,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             .enumerate()
             .flat_map(move |(x, rx)| {
                 rx.iter().enumerate().flat_map(move |(y, ry)| {
-                    ry.iter().enumerate().flat_map(move |(z, &value)| {
+                    ry.iter().enumerate().filter_map(move |(z, &value)| {
                         (value == LAVA_VALUE).then_some(Some((x as i32, y as i32, z as i32)))
                     })
                 })

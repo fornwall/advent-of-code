@@ -155,9 +155,9 @@ fn execute_battle(mut groups: Vec<ArmyGroup>) -> Vec<ArmyGroup> {
                 .cmp(&a.effective_power())
                 .then_with(|| b.initiative.cmp(&a.initiative))
         });
-        groups.iter_mut().for_each(|g| {
+        for g in groups.iter_mut() {
             g.attacked_by = -1;
-        });
+        }
 
         for i in 0..groups.len() {
             let (attacker_effective_power, attack_type, attacking_group_id, immune_system) = {

@@ -2,7 +2,7 @@ use crate::input::Input;
 type GridValue = i32;
 
 /// A summed-area table is a data structure for quickly generating sum of values in a rectangular grid.
-/// See https://en.wikipedia.org/wiki/Summed-area_table
+/// See <https://en.wikipedia.org/wiki/Summed-area_table/>
 /// Note that x and y coordinates are 1-based in method parameters.
 struct SummedAreaTable {
     storage: Vec<GridValue>,

@@ -22,8 +22,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             {
                 let unit_reacts_with_last = new_polymer
                     .last()
-                    .map(|&last| destroys_each_other(unit, last))
-                    .unwrap_or(false);
+                    .is_some_and(|&last| destroys_each_other(unit, last));
 
                 if unit_reacts_with_last {
                     new_polymer.pop();

@@ -4,7 +4,7 @@ use crate::escape::escape_xml;
 
 /// Common attributes to all SVG elements.
 ///
-/// https://oreillymedia.github.io/Using_SVG/guide/markup.html#common-attributes
+/// <https://oreillymedia.github.io/Using_SVG/guide/markup.html#common-attributes/>
 #[derive(Default)]
 pub struct CommonAttributes {
     pub(crate) style: Option<String>,

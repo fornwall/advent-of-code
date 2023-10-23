@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-/// Using double-height coordinates - see https://www.redblobgames.com/grids/hexagons/
+/// Using double-height coordinates - see <https://www.redblobgames.com/grids/hexagons//>
 pub fn solve(input: &Input) -> Result<u32, String> {
     fn distance(location: (i32, i32)) -> u32 {
         location.0.unsigned_abs()

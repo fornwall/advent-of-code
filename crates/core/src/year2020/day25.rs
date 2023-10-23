@@ -6,7 +6,7 @@ const MODULO: u64 = 20_201_227;
 
 /// Computes `loop_size` so that `BASE ^ loop_size % MODULO == public_key`.
 ///
-/// See https://en.wikipedia.org/wiki/Baby-step_giant-step
+/// See <https://en.wikipedia.org/wiki/Baby-step_giant-step/>
 fn babystep_giantstep(public_key: u32) -> Option<u32> {
     // math.ceil(math.sqrt(MODULO-1)):
     const SQRT_MODULO_MINUS_ONE: u32 = 4_495;

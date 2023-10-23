@@ -38,7 +38,7 @@ fn scramble(input: &str, password: &mut [u8]) -> Result<(), String> {
                     // Swap letters
                     let x = words[2].as_bytes()[0];
                     let y = words[5].as_bytes()[0];
-                    password.iter_mut().for_each(|c| {
+                    for c in password.iter_mut() {
                         let orig = *c;
                         *c = if orig == x {
                             y
@@ -47,7 +47,7 @@ fn scramble(input: &str, password: &mut [u8]) -> Result<(), String> {
                         } else {
                             orig
                         };
-                    });
+                    }
                 }
             }
             "rotate" => {
