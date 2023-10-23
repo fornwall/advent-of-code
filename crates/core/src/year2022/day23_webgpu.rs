@@ -1,9 +1,9 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
-    let gpu = crate::common::gpu::setup()?;
-
     const MAX_SIZE: usize = 256;
+
+    let gpu = crate::common::gpu::setup()?;
 
     let is_outside_max = |position: (i16, i16)| {
         position.0 < 0
@@ -296,7 +296,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         );
         drop(r);
         debug_buffer.unmap();
-        let rectangle_size = ((max_x + 1 - min_x) * (max_y + 1 - min_y)) as usize;
+        let rectangle_size = (max_x + 1 - min_x) * (max_y + 1 - min_y);
         return Ok(rectangle_size - num_elves);
     }
 

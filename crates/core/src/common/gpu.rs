@@ -10,7 +10,7 @@ impl Gpu {
         self.device
             .create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&data),
+                contents: bytemuck::cast_slice(data),
                 usage: usages,
             })
     }

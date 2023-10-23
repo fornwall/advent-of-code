@@ -27,6 +27,7 @@ endif
 check:
 	$(CARGO_COMMAND) fmt --all
 	$(CARGO_COMMAND) clippy --all-targets
+	$(CARGO_COMMAND) clippy --all-targets --features webgpu-compute
 	cd crates/core && $(CARGO_COMMAND) clippy --features visualization --tests
 	$(CARGO_COMMAND) clippy --lib --bins --all-targets -- -D clippy::panic
 	if [ -n "${COUNT_ALLOCATIONS}" ]; then $(CARGO_COMMAND) test --features count-allocations; else $(CARGO_COMMAND) test; fi
