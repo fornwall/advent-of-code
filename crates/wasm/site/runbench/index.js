@@ -12,7 +12,7 @@ async function main() {
   document.getElementById("description").innerHTML = `Benchmark running
           <a href="/">solutions</a> to
           <a href="https://adventofcode.com/${year}/">Advent of Code ${year}</a> in
-          the current browser using WebAssembly.`;
+          the browser using WebAssembly.`;
 
   const yearSelect = document.getElementById("year");
   yearSelect.value = year;

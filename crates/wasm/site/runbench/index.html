@@ -18,6 +18,12 @@
         background-color: rgb(15, 15, 35);
         overscroll-behavior-y: contain;
       }
+      h1 {
+        padding-top: 0.5em;
+      }
+      form {
+        padding: 0.5em;
+      }
     </style>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"
@@ -29,8 +35,22 @@
 
   <body>
     <main class="container">
-      <div style="padding-top: 1em">
-        <h1 class="text-center">AoC Benchmark</h1>
+      <h1 class="text-center">AoC Benchmark</h1>
+
+      <form id="form" class="text-center">
+        <select id="year" name="year">
+          <option value="2022">Year 2022</option>
+          <option value="2021">Year 2021</option>
+          <option value="2020">Year 2020</option>
+          <option value="2019">Year 2019</option>
+          <option value="2018">Year 2018</option>
+          <option value="2017">Year 2017</option>
+          <option value="2016">Year 2016</option>
+          <option value="2015">Year 2015</option>
+        </select>
+      </form>
+
+      <div style="padding-top: 0.5em">
         <p class="text-center" id="description"></p>
       </div>
 
@@ -41,20 +61,6 @@
       </div>
 
       <div id="result" class="invisible">
-        <form id="form" class="text-center">
-          <p>
-            <select id="year" name="year">
-              <option value="2022">Year 2022</option>
-              <option value="2021">Year 2021</option>
-              <option value="2020">Year 2020</option>
-              <option value="2019">Year 2019</option>
-              <option value="2018">Year 2018</option>
-              <option value="2017">Year 2017</option>
-              <option value="2016">Year 2016</option>
-              <option value="2015">Year 2015</option>
-            </select>
-          </p>
-        </form>
         <p id="total-time" class="text-center"></p>
 
         <div
