@@ -3,8 +3,9 @@
 import json
 import os
 import re
-import sys
 import subprocess
+import sys
+import time
 from pathlib import Path
 
 import requests
@@ -240,6 +241,9 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
             gist_mapping[year_str][day_str]['compiler_explorer'] = create_compiler_explorer_link(year, day, src)
 
         gist_mapping[year_str][day_str]['visualization'] = supports_visualization
+
+        # Avoid GitHub API rate limiting
+        time.sleep(1)
 
 if not dry_run:
     with open(MAPPING_FILE_NAME, "w") as outfile:
