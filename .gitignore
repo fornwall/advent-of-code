@@ -37,6 +37,7 @@ aoc.fornwall.net/
 /crates/wasm/site/benchmark/new-baseline.json
 generated-*
 perf.*
+*.trace
 oprofile_data
 
 failing-input*txt
