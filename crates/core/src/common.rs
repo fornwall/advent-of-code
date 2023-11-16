@@ -8,3 +8,4 @@ pub mod md5;
 pub mod parser;
 pub mod permutation;
 pub mod tuple_window_iterator;
+pub mod u256;
