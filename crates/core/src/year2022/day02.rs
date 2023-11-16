@@ -1,6 +1,9 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
+    let scores_indexed_by_input =
+        input.part_values([4, 8, 3, 1, 5, 9, 7, 2, 6], [3, 4, 8, 1, 5, 9, 2, 6, 7]);
+
     input
         .text
         .lines()
@@ -13,19 +16,10 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 return Err("Invalid input".to_string());
             }
 
-            let other_shape = (line[0] - b'A') as i8;
-            let second_value = (line[2] - b'X') as i8;
-
-            let my_shape =
-                input.part_values(second_value, (other_shape - 1 + second_value).rem_euclid(3));
-
-            let my_shape_score = 1 + my_shape as u32;
-            let my_outcome_score = match (other_shape - my_shape).rem_euclid(3) {
-                2 => 6,
-                1 => 0,
-                _ => 3_u32,
-            };
-            Ok(my_shape_score + my_outcome_score)
+            let other_shape = (line[0] - b'A') as usize;
+            let second_value = (line[2] - b'X') as usize;
+            let score_index = 3 * other_shape + second_value;
+            Ok(scores_indexed_by_input[score_index])
         })
         .sum()
 }
