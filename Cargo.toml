@@ -1,6 +1,6 @@
 [workspace]
 members = [ "crates/*" ]
-exclude = [ "crates/painter", "crates/fuzzing-afl" ]
+exclude = [ "crates/painter" ]
 resolver = "2"
 
 [workspace.package]
