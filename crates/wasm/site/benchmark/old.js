@@ -8,9 +8,8 @@ async function updatePage() {
     new URLSearchParams(window.location.hash.substring(1)).get("year") ||
     "2020";
 
-  document.querySelector(
-    "h1",
-  ).textContent = `Advent of Code ${currentYear} execution times`;
+  document.querySelector("h1").textContent =
+    `Advent of Code ${currentYear} execution times`;
 
   const baselineJson = await baselineJsonPromise;
   const benchmarks = Object.entries(baselineJson["benchmarks"]);

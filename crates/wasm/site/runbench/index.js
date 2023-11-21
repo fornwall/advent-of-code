@@ -57,11 +57,10 @@ async function main() {
           const totalTime = times
             .map((d) => d.executionTime)
             .reduce((a, b) => a + b, 0);
-          document.getElementById(
-            "total-time",
-          ).textContent = `Total time: ${totalTime.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-          })} ms`;
+          document.getElementById("total-time").textContent =
+            `Total time: ${totalTime.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+            })} ms`;
           for (const data of times) {
             const tr = document.createElement("tr");
             const percentageTime = (data.executionTime * 100) / totalTime;
