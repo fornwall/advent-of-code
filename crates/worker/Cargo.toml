@@ -9,6 +9,9 @@ name = "advent-of-code-worker"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 

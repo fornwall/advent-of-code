@@ -13,6 +13,9 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[lints]
+workspace = true
+
 [[bin]]
 name = "advent-of-code"
 bench = false

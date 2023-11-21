@@ -11,6 +11,9 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[lints]
+workspace = true
+
 [build-dependencies]
 cbindgen = "0"
 

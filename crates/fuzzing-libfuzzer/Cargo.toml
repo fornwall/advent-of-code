@@ -8,3 +8,6 @@ repository = "https://github.com/fornwall/advent-of-code"
 description = "Fuzzing of solutions to Advent of Code written in Rust"
 license = "MIT"
 edition = "2021"
+
+[lints]
+workspace = true

@@ -10,6 +10,9 @@ repository = "https://github.com/fornwall/advent-of-code"
 rust-version = "1.66"
 version = "1.0.0"
 
+[lints]
+workspace = true
+
 [dependencies]
 advent-of-code = { path = "../core" }
 afl = "*"
