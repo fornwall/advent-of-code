@@ -7,7 +7,10 @@ use advent::{ProblemInput, ProblemOutput};
 
 mod advent {
     #![allow(warnings)]
-    #![allow(clippy)]
+    #![allow(clippy::future_not_send)]
+    #![allow(clippy::missing_const_for_fn)]
+    #![allow(clippy::similar_names)]
+    #![allow(clippy::unwrap_used)]
     tonic::include_proto!("advent");
 }
 
