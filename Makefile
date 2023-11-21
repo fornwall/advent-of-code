@@ -91,7 +91,7 @@ fuzz-afl:
 		cargo afl build && \
 		rm -Rf target/fuzz-findings && \
 		mkdir -p target/fuzz-findings && \
-		cargo afl fuzz -i testcase-dir -o target/fuzz-findings target/debug/advent-of-code-fuzzing-afl --max_total_time=1200 && \
+		cargo afl fuzz -i testcase-dir -o target/fuzz-findings ../../target/debug/advent-of-code-fuzzing-afl --max_total_time=1200 && \
 		./process-files-for-upload.sh target/fuzz-findings/default/crashes
 
 fuzz-hfuzz:
