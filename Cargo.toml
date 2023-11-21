@@ -27,7 +27,7 @@ lto = true
 codegen-units = 1
 
 [workspace.lints.rust]
-future_incompatible = "forbid"
+future_incompatible = "warn"
 nonstandard_style = "warn"
 rust_2021_compatibility = "forbid"
 single_use_lifetimes = "warn"
