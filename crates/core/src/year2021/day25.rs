@@ -14,37 +14,6 @@ impl CucumberRow {
     }
 }
 
-pub const fn shift_left(this: U256, width: usize) -> U256 {
-    if width <= 128 {
-        let mask = if width == 128 { !0 } else { !(1 << width) };
-        let low = ((this.low << 1) & mask) | (this.low >> (width - 1));
-        U256 {
-            high: this.high,
-            low,
-        }
-    } else {
-        // abcd efgh -> bcde efga
-        let mask = !(1 << (width - 128));
-        let high = ((this.high << 1) & mask) | (this.low >> 127);
-        let low = (this.low << 1) | (this.high >> (width - 129));
-        U256 { high, low }
-    }
-}
-
-pub const fn shift_right(this: U256, width: usize) -> U256 {
-    if width <= 128 {
-        let low = (this.low >> 1) | ((this.low & 1) << (width - 1));
-        U256 {
-            high: this.high,
-            low,
-        }
-    } else {
-        let high = (this.high >> 1) | ((this.low & 1) << (width - 129));
-        let low = (this.low >> 1) | ((this.high & 1) << 127);
-        U256 { high, low }
-    }
-}
-
 pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_ITERATIONS: u32 = 1000;
 
@@ -83,9 +52,9 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
         // "Every step, the sea cucumbers in the east-facing herd attempt to move forward one location":
         for row in cucumber_rows.iter_mut() {
-            let moved = shift_left(row.moving_east_bits, width) & !row.bits();
+            let moved = row.moving_east_bits.shift_left(width) & !row.bits();
             any_cucumber_moved |= moved.non_zero();
-            let stay = row.moving_east_bits & !shift_right(moved, width);
+            let stay = row.moving_east_bits & !moved.shift_right(width);
             row.moving_east_bits = moved | stay;
         }
 
@@ -133,63 +102,4 @@ v.v..>>v.v
 
     let real_input = include_str!("day25_input.txt");
     test_part_one!(real_input => 582);
-}
-
-#[test]
-pub fn test_shift_left() {
-    let mut val = U256 { low: 0, high: 0 };
-    val.set_bit(0);
-    assert_eq!(val.low, 1);
-    assert_eq!(val.high, 0);
-    val = shift_left(val, 10);
-    assert_eq!(val.low, 2);
-    assert_eq!(val.high, 0);
-    val = shift_left(val, 10);
-    assert_eq!(val.low, 4);
-    assert_eq!(val.high, 0);
-    val = shift_left(val, 4);
-    assert_eq!(val.low, 8);
-    assert_eq!(val.high, 0);
-    val = shift_left(val, 4);
-    assert_eq!(val.low, 1);
-    assert_eq!(val.high, 0);
-
-    val.low = 1 << 127;
-    val = shift_left(val, 128);
-    assert_eq!(val.low, 1);
-    assert_eq!(val.high, 0);
-
-    val.low = 1 << 127;
-    val = shift_left(val, 129);
-    assert_eq!(val.low, 0);
-    assert_eq!(val.high, 1);
-    val = shift_left(val, 129);
-    assert_eq!(val.low, 1);
-    assert_eq!(val.high, 0);
-}
-
-#[test]
-pub fn test_shift_right() {
-    let mut val = U256 { low: 0, high: 0 };
-    val.set_bit(0);
-    assert_eq!(val.low, 1);
-    assert_eq!(val.high, 0);
-    val = shift_right(val, 4);
-    assert_eq!(val.low, 8);
-    assert_eq!(val.high, 0);
-    val = shift_right(val, 4);
-    assert_eq!(val.low, 4);
-    assert_eq!(val.high, 0);
-    val.low = 1;
-    val = shift_right(val, 128);
-    assert_eq!(val.low, 1 << 127);
-    assert_eq!(val.high, 0);
-    val.low = 1;
-    val.high = 0;
-    val = shift_right(val, 129);
-    assert_eq!(val.low, 0);
-    assert_eq!(val.high, 1);
-    val = shift_right(val, 129);
-    assert_eq!(val.low, 1 << 127);
-    assert_eq!(val.high, 0);
 }

@@ -19,7 +19,6 @@ impl U256 {
         self.low != 0 || self.high != 0
     }
 
-    /*
     pub fn is_bit_set(&self, offset: usize) -> bool {
         if offset < 128 {
             (self.low & 1 << offset) != 0
@@ -32,6 +31,7 @@ impl U256 {
         self.low.count_ones() + self.high.count_ones()
     }
 
+    /*
     pub const fn leading_zeros(&self) -> u32 {
         if self.high != 0 {
             self.high.leading_zeros()
@@ -62,6 +62,37 @@ impl U256 {
         }
     }
      */
+
+    pub const fn shift_left(self, width: usize) -> U256 {
+        if width <= 128 {
+            let mask = if width == 128 { !0 } else { !(1 << width) };
+            let low = ((self.low << 1) & mask) | (self.low >> (width - 1));
+            U256 {
+                high: self.high,
+                low,
+            }
+        } else {
+            // abcd efgh -> bcde efga
+            let mask = !(1 << (width - 128));
+            let high = ((self.high << 1) & mask) | (self.low >> 127);
+            let low = (self.low << 1) | (self.high >> (width - 129));
+            U256 { high, low }
+        }
+    }
+
+    pub const fn shift_right(self, width: usize) -> U256 {
+        if width <= 128 {
+            let low = (self.low >> 1) | ((self.low & 1) << (width - 1));
+            U256 {
+                high: self.high,
+                low,
+            }
+        } else {
+            let high = (self.high >> 1) | ((self.low & 1) << (width - 129));
+            let low = (self.low >> 1) | ((self.high & 1) << 127);
+            U256 { high, low }
+        }
+    }
 }
 
 impl BitAnd for U256 {
@@ -132,4 +163,63 @@ fn basics() {
     val.set_bit(255);
     assert_eq!(val.high, 1 << 127);
     assert_eq!(val.low, 0);
+}
+
+#[test]
+pub fn test_shift_left() {
+    let mut val = U256 { low: 0, high: 0 };
+    val.set_bit(0);
+    assert_eq!(val.low, 1);
+    assert_eq!(val.high, 0);
+    val = val.shift_left(10);
+    assert_eq!(val.low, 2);
+    assert_eq!(val.high, 0);
+    val = val.shift_left(10);
+    assert_eq!(val.low, 4);
+    assert_eq!(val.high, 0);
+    val = val.shift_left(4);
+    assert_eq!(val.low, 8);
+    assert_eq!(val.high, 0);
+    val = val.shift_left(4);
+    assert_eq!(val.low, 1);
+    assert_eq!(val.high, 0);
+
+    val.low = 1 << 127;
+    val = val.shift_left(128);
+    assert_eq!(val.low, 1);
+    assert_eq!(val.high, 0);
+
+    val.low = 1 << 127;
+    val = val.shift_left(129);
+    assert_eq!(val.low, 0);
+    assert_eq!(val.high, 1);
+    val = val.shift_left(129);
+    assert_eq!(val.low, 1);
+    assert_eq!(val.high, 0);
+}
+
+#[test]
+pub fn test_shift_right() {
+    let mut val = U256 { low: 0, high: 0 };
+    val.set_bit(0);
+    assert_eq!(val.low, 1);
+    assert_eq!(val.high, 0);
+    val = val.shift_right(4);
+    assert_eq!(val.low, 8);
+    assert_eq!(val.high, 0);
+    val = val.shift_right(4);
+    assert_eq!(val.low, 4);
+    assert_eq!(val.high, 0);
+    val.low = 1;
+    val = val.shift_right(128);
+    assert_eq!(val.low, 1 << 127);
+    assert_eq!(val.high, 0);
+    val.low = 1;
+    val.high = 0;
+    val = val.shift_right(129);
+    assert_eq!(val.low, 0);
+    assert_eq!(val.high, 1);
+    val = val.shift_right(129);
+    assert_eq!(val.low, 1 << 127);
+    assert_eq!(val.high, 0);
 }
