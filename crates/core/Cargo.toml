@@ -29,7 +29,7 @@ name = "advent_of_code"
 count-allocations = ["allocation-counter"]
 debug-output = []
 simd = []
-visualization = ["svgplot"]
+visualization = ["svgplot", "wgpu"]
 webgpu-compute = ["bytemuck", "pollster", "wgpu"]
 
 [dependencies]

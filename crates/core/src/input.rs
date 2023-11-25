@@ -9,11 +9,29 @@ pub enum Part {
     Two,
 }
 
+#[cfg(feature = "visualization")]
+pub enum Visualization {
+    Svg(String),
+}
+
+#[cfg(feature = "visualization")]
+impl Default for Visualization {
+    fn default() -> Self {
+        Self::Svg("".to_string())
+    }
+}
+
+#[cfg(feature = "visualization")]
+pub type ResultType = Visualization;
+
+#[cfg(not(feature = "visualization"))]
+pub type ResultType = String;
+
 pub struct Input<'a> {
     pub part: Part,
     pub text: &'a str,
     #[cfg(feature = "visualization")]
-    pub rendered_svg: RefCell<String>,
+    pub visualization: RefCell<Visualization>,
 }
 
 #[allow(single_use_lifetimes)]
@@ -42,7 +60,7 @@ impl<'a> Input<'a> {
             part: Part::One,
             text,
             #[cfg(feature = "visualization")]
-            rendered_svg: RefCell::new("".to_string()),
+            visualization: RefCell::new(Visualization::Svg("".to_string())),
         }
     }
 
@@ -53,7 +71,7 @@ impl<'a> Input<'a> {
             part: Part::Two,
             text,
             #[cfg(feature = "visualization")]
-            rendered_svg: RefCell::new("".to_string()),
+            visualization: RefCell::new(Visualization::Svg("".to_string())),
         }
     }
 }

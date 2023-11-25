@@ -6,6 +6,8 @@ use svgplot::{SvgImage, SvgRect, SvgScript, SvgStyle};
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
 use crate::input::Input;
+#[cfg(feature = "visualization")]
+use crate::input::Visualization;
 
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
@@ -201,7 +203,7 @@ window.onNewStep = (step) => {{\n\
 }};",
                     elves.len(),
                 )));
-                input.rendered_svg.replace(
+                input.visualization.replace(Visualization::Svg(
                     svg.view_box((
                         i64::from(min_coords.0),
                         i64::from(min_coords.1),
@@ -212,7 +214,7 @@ window.onNewStep = (step) => {{\n\
                     .data_attribute("steps".to_string(), format!("{}", round + 1))
                     .data_attribute("step-duration".to_string(), format!("{step_duration_ms}"))
                     .to_svg_string(),
-                );
+                ));
             }
         }
 

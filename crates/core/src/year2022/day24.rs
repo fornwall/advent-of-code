@@ -47,8 +47,10 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             if remaining_trips == 0 {
                 #[cfg(feature = "visualization")]
                 input
-                    .rendered_svg
-                    .replace(renderer.final_svg(&valley, minute));
+                    .visualization
+                    .replace(crate::input::Visualization::Svg(
+                        renderer.final_svg(&valley, minute),
+                    ));
                 return Ok(minute as i32 + 1);
             }
             continue;

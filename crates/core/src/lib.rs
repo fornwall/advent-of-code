@@ -25,6 +25,8 @@ assert_eq!(solution, Ok("2".to_string()));
 */
 #![crate_name = "advent_of_code"]
 
+use crate::input::ResultType;
+
 mod common;
 #[cfg_attr(test, macro_use)]
 mod input;
@@ -62,7 +64,7 @@ fn to_stringer_input<T: ToString>(
 /// let solution = solve(2019, 1, 1, "14");
 /// assert_eq!(solution, Ok("2".to_string()));
 /// ```
-pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String> {
+pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<ResultType, String> {
     #![allow(clippy::let_and_return)]
     use crate::input::{Input, Part};
     let input = input.trim_end();
@@ -80,13 +82,13 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String
     }
 
     #[cfg(feature = "visualization")]
-    let rendered_svg = std::cell::RefCell::new(String::new());
+    let visualization = std::cell::RefCell::new(input::Visualization::Svg(String::new()));
 
     let input = Input {
         part: if part == 1 { Part::One } else { Part::Two },
         text: input,
         #[cfg(feature = "visualization")]
-        rendered_svg,
+        visualization,
     };
 
     let result = match (year, day) {
@@ -294,14 +296,14 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String
     };
 
     #[cfg(feature = "visualization")]
-    return result.map(|_| input.rendered_svg.take());
+    return result.map(|_| input.visualization.take());
 
     #[cfg(not(feature = "visualization"))]
     result
 }
 
 /// A version of [solve](fn.solve.html) that takes strings as arguments and parses them to the required types.
-pub fn solve_raw(year: &str, day: &str, part: &str, input: &str) -> Result<String, String> {
+pub fn solve_raw(year: &str, day: &str, part: &str, input: &str) -> Result<ResultType, String> {
     let year = year.parse::<u16>().map_err(|_| "Invalid year")?;
     let day = day.parse::<u8>().map_err(|_| "Invalid day")?;
     let part = part.parse::<u8>().map_err(|_| "Invalid part")?;

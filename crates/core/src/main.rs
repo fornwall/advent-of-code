@@ -38,10 +38,19 @@ fn main() -> Result<(), String> {
             .map_err(|error| format!("Error reading input: {error}"))?;
 
         for _ in 0..repeat {
-            let solution = solve_raw(year, day, part, input.as_ref())
-                .unwrap_or_else(|error| format!("Error: {error}"));
-            if repeat == 1 {
-                println!("{solution}");
+            match solve_raw(year, day, part, input.as_ref()) {
+                Ok(result) => {
+                    if repeat == 1 {
+                        #[cfg(feature = "visualization")]
+                        println!("impl Default for Visualization(visualization)");
+                        #[cfg(not(feature = "visualization"))]
+                        println!("{result}");
+                    }
+                }
+                Err(error) => {
+                    eprintln!("Error: {error}");
+                    std::process::exit(1);
+                }
             }
         }
     } else {

@@ -207,11 +207,13 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         svg.add(SvgScript::new(format!(
                             "{circles_render_script}{path_render_script}"
                         )));
-                        input.rendered_svg.replace(
-                            svg.data_attribute("steps".to_string(), format!("{new_cost}"))
-                                .data_attribute("step-duration".to_string(), format!("{}", 100))
-                                .to_svg_string(),
-                        );
+                        input
+                            .visualization
+                            .replace(crate::input::Visualization::Svg(
+                                svg.data_attribute("steps".to_string(), format!("{new_cost}"))
+                                    .data_attribute("step-duration".to_string(), format!("{}", 100))
+                                    .to_svg_string(),
+                            ));
                     }
                     return Ok(new_cost);
                 }

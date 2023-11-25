@@ -1,5 +1,7 @@
 use super::day10::solve as knot_hash;
 use super::disjoint_set::DisjointSet;
+#[cfg(feature = "visualization")]
+use crate::input::Visualization;
 use crate::input::{Input, Part};
 #[cfg(feature = "visualization")]
 use std::cell::RefCell;
@@ -22,7 +24,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             text: &hash_input,
             part: Part::Two,
             #[cfg(feature = "visualization")]
-            rendered_svg: RefCell::new("".to_string()),
+            visualization: RefCell::new(Visualization::Svg("".to_string())),
         })?;
         for (index, digit) in hash.bytes().enumerate() {
             let byte = digit - if digit < b'a' { b'0' } else { b'a' - 10 };
