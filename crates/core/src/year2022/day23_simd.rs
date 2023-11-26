@@ -1,10 +1,9 @@
 /// Solution to Advent of Code, day 23 in 2022.
 /// Using portable simd in rust.
 /// Based on <https://github.com/Crazytieguy/advent-of-code/blob/master/2022/src/bin/day23/main.rs/>
-use std::array;
-use std::collections::VecDeque;
 use std::simd::u8x32;
 
+use crate::common::map_windows::MapWindowsIterator;
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
@@ -192,8 +191,10 @@ impl ElfGrid {
         self.bit_rows
             .iter()
             .map(|row| [Self::shift_cols_east(row), *row, Self::shift_cols_west(row)])
-            .map_windows(|[above, cur, below]| propose_movements(above, cur, below, directions))
-            .map_windows(|[above, cur, below]| collide_proposals(above, cur, below))
+            .map_windows_stable(|[above, cur, below]| {
+                propose_movements(above, cur, below, directions)
+            })
+            .map_windows_stable(|[above, cur, below]| collide_proposals(above, cur, below))
             .enumerate()
             .for_each(
                 |(row_idx, [from_south, from_north, from_east, from_west])| {
@@ -243,77 +244,4 @@ impl ElfGrid {
             .map(|x| x.count_ones() as usize)
             .sum()
     }
-}
-
-struct MapWindows<I: Iterator, F, T, const N: usize>
-where
-    F: FnMut([&I::Item; N]) -> T,
-{
-    iter: I,
-    f: F,
-    buf: VecDeque<I::Item>,
-}
-
-impl<I: Iterator, F, T, const N: usize> MapWindows<I, F, T, N>
-where
-    F: FnMut([&I::Item; N]) -> T,
-{
-    fn new(mut iter: I, f: F) -> Self {
-        let buf: VecDeque<_> = iter.by_ref().take(N - 1).collect();
-        Self { iter, f, buf }
-    }
-}
-
-impl<I: Iterator, F, T, const N: usize> Iterator for MapWindows<I, F, T, N>
-where
-    F: FnMut([&I::Item; N]) -> T,
-{
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|next| {
-            self.buf.push_back(next);
-            let res = (self.f)(array::from_fn(|i| &self.buf[i]));
-            self.buf.pop_front();
-            res
-        })
-    }
-}
-
-trait MapWindowsIterator: Iterator {
-    fn map_windows<T, F, const N: usize>(self, f: F) -> MapWindows<Self, F, T, N>
-    where
-        Self: Sized,
-        F: FnMut([&Self::Item; N]) -> T,
-    {
-        MapWindows::new(self, f)
-    }
-}
-
-impl<I: Iterator> MapWindowsIterator for I {}
-
-#[test]
-#[allow(unstable_name_collisions)]
-fn test_iterator() {
-    let v = [1, 2, 3, 4]
-        .iter()
-        .map_windows(|[a, b]| (**a, **b))
-        .collect::<Vec<_>>();
-    assert_eq!(vec![(1, 2), (2, 3), (3, 4)], v);
-
-    let v = [1, 2, 3, 4]
-        .iter()
-        .map_windows(|[a, b, c]| (**a, **b, **c))
-        .collect::<Vec<_>>();
-    assert_eq!(vec![(1, 2, 3), (2, 3, 4)], v);
-    let v = [1, 2, 3, 4]
-        .iter()
-        .map_windows(|[a, b, c, d, e]| (**a, **b, **c, **d, **e))
-        .next();
-    assert_eq!(None, v);
-    let v = [1, 2, 3]
-        .iter()
-        .map_windows(|[a, b, c, d, e]| (**a, **b, **c, **d, **e))
-        .next();
-    assert_eq!(None, v);
 }

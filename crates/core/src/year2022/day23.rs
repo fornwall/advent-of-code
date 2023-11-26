@@ -7,237 +7,235 @@ use svgplot::{SvgImage, SvgRect, SvgScript, SvgStyle};
 #[cfg(not(feature = "webgpu-compute"))]
 use crate::input::Input;
 #[cfg(feature = "visualization")]
-use crate::input::Visualization;
+use crate::visualization::Visualization;
 
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
 pub fn solve(input: &Input) -> Result<usize, String> {
-    const DIRECTIONS: [(i16, i16); 8] = [
-        // NW
-        (-1, -1),
-        // N
-        (0, -1),
-        // NE
-        (1, -1),
-        // W
-        (-1, 0),
-        // E
-        (1, 0),
-        // SW
-        (-1, 1),
-        // S
-        (0, 1),
-        // SE
-        (1, 1),
-    ];
+    use crate::common::map_windows::MapWindowsIterator;
+    use crate::common::u256::U256;
 
-    const RULES: [(u8, (i16, i16)); 4] = [
-        // "If there is no elf in the n, ne, or nw adjacent positions, the elf proposes moving north one step"
-        (0b0000_0111, (0, -1)),
-        // "if there is no elf in the s, se, or sw adjacent positions, the elf proposes moving south one step"
-        (0b1110_0000, (0, 1)),
-        // "if there is no elf in the w, nw, or sw adjacent positions, the elf proposes moving west one step"
-        (0b0010_1001, (-1, 0)),
-        // "if there is no elf in the e, ne, or se adjacent positions, the elf proposes moving east one step"
-        (0b1001_0100, (1, 0)),
-    ];
+    /// Each row is represented as a bitset.
+    type ElfGridRow = U256;
 
-    const MAX_SIZE: usize = 256;
-    const MAX_ELVES: usize = 10_000;
-    const NO_ELF: u16 = u16::MAX;
-
-    let is_outside_max = |position: (i16, i16)| {
-        position.0 < 0
-            || position.1 < 0
-            || position.0 >= MAX_SIZE as i16
-            || position.1 >= MAX_SIZE as i16
-    };
-
-    let mut elves = input
-        .text
-        .lines()
-        .enumerate()
-        .flat_map(|(y, line)| {
-            line.bytes()
-                .enumerate()
-                .filter_map(move |(x, c)| (c == b'#').then_some((x as i16 + 72, y as i16 + 24)))
-        })
-        .collect::<Vec<_>>();
-
-    if elves.len() > MAX_ELVES {
-        return Err(format!("Too many elves - max {MAX_ELVES} supported"));
+    #[derive(Clone, Copy)]
+    enum Direction {
+        North,
+        South,
+        West,
+        East,
     }
 
-    let mut elf_grid = vec![NO_ELF; MAX_SIZE * MAX_SIZE];
-    for (elf_idx, &elf) in elves.iter().enumerate() {
-        if is_outside_max(elf) {
-            return Err(format!("Elf is outside of [0,{MAX_SIZE})"));
+    struct ElfGrid {
+        bit_rows: [ElfGridRow; Self::NUM_ROWS],
+    }
+
+    impl ElfGrid {
+        // Values big enough to solve official advent of code inputs:
+        const NUM_ROWS: usize = 160;
+        const NUM_COLS: usize = 256;
+        const ROW_OFFSET: usize = 24;
+        const COL_OFFSET: usize = 72;
+
+        fn parse(input: &str) -> Result<Self, String> {
+            let mut grid = Self {
+                bit_rows: [ElfGridRow::default(); Self::NUM_ROWS],
+            };
+            for (row, line) in input.lines().enumerate() {
+                for (col, b) in line.bytes().enumerate() {
+                    if b == b'#' {
+                        let storage_row = row + Self::ROW_OFFSET;
+                        let storage_col = col + Self::COL_OFFSET;
+                        if storage_row >= Self::NUM_ROWS || storage_col >= Self::NUM_COLS {
+                            return Err("Elves does not fit into optimised grid".to_string());
+                        }
+                        grid.bit_rows[storage_row].set_bit(storage_col);
+                    }
+                }
+            }
+            Ok(grid)
         }
-        elf_grid[elf.1 as usize * MAX_SIZE + elf.0 as usize] = elf_idx as u16;
-    }
 
-    let mut elf_moves = Vec::with_capacity(elves.len());
+        fn shift_cols_west(&row: &ElfGridRow) -> ElfGridRow {
+            // Shift cols to the west/left (to _lower_ values).
+            // Start with each lane shifted right (so lowest bit is lost):
+            // [abcd, efgh, ijkl] -> [0abc, 0efg, 0ijk]
+            // OLD:(row >> ElfGridRow::splat(1))
+            row.shift_right(255)
+            // Bitwise OR with the lowest bit shifted to highest, with rotated lanes.
+            // [abcd, efgh, ijkl] -> [h000, l000, d000]
+            // OLD| (row.rotate_lanes_left::<1>() << ElfGridRow::splat(7))
+        }
 
-    #[cfg(feature = "visualization")]
-    let mut elf_positions_per_step = vec![elves.clone()];
+        fn shift_cols_east(&row: &ElfGridRow) -> ElfGridRow {
+            // Shift cols to the east/right (to _higher_ values).
+            // Start with each lane shifted left (so highest bit is lost):
+            // [abcd, efgh, ijkl] -> [bcd0, fgh0, jkl0]
+            row.shift_left(255)
+            //(row << ElfGridRow::splat(1))
+            // Bitwise OR with the highest bit shifted to lowest, with rotated lanes.
+            // [abcd, efgh, ijkl] -> [000l, 000a, 000e]
+            //| (row.rotate_lanes_right::<1>() >> ElfGridRow::splat(7))
+        }
 
-    for round in 0..input.part_values(10, 10000) {
-        let mut num_moves = 0;
+        fn run_simulation(&mut self, max_rounds: usize) -> Option<usize> {
+            let mut directions = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East,
+            ];
+            for round in 0..max_rounds {
+                if !self.play_round(directions) {
+                    return Some(round + 1);
+                }
+                directions.rotate_left(1);
+            }
+            None
+        }
 
-        for (elf_idx, elf) in elves.iter_mut().enumerate() {
-            let adjacent_bitmask = DIRECTIONS
+        #[allow(unstable_name_collisions)]
+        fn play_round(&mut self, directions: [Direction; 4]) -> bool {
+            // Given 9 rows:
+            // - The above row:   [shifted-east, unmodified, shifted-west]
+            // - The current row: [shifted-east, unmodified, shifted-west]
+            // - The below row:   [shifted-east, unmodified, shifted-west]
+            //
+            // This function computes an array, indexed by direction (N=1, S=2, W=3, E=4)
+            // mapping to a bitset of those elves who will be moving in the specified direction
+            // (not taking collisions into account).
+            //
+            // Note that e.g. "the above row, shifted-east" is actually "nw" in the function signature.
+            // That is since it contains the bits shifted east, so shows the population to the west.
+            fn propose_movements(
+                [nw, n, ne]: &[ElfGridRow; 3],
+                [w, cur, e]: &[ElfGridRow; 3],
+                [sw, s, se]: &[ElfGridRow; 3],
+                ordered_directions: [Direction; 4],
+            ) -> [ElfGridRow; 4] {
+                let mut propositions = [*cur; 4];
+
+                // Keep track of elves who can still move. Start by require adjacent elf:
+                // "During the first half of each round, each Elf considers the eight
+                // positions adjacent to themself. If no other Elves are in one of those
+                // eight positions, the Elf does not do anything during this round":
+                let mut available_to_move = *nw | *n | *ne | *w | *e | *sw | *s | *se;
+
+                for direction in ordered_directions {
+                    let direction_occupied = match direction {
+                        // "If there is no Elf in the N, NE, or NW adjacent positions,
+                        // the Elf proposes moving north one step"
+                        Direction::North => *ne | *n | *nw,
+                        // "If there is no Elf in the S, SE, or SW adjacent positions,
+                        // the Elf proposes moving south one step"
+                        Direction::South => *se | *s | *sw,
+                        // "If there is no Elf in the W, NW, or SW adjacent positions,
+                        // the Elf proposes moving west one step"
+                        Direction::West => *nw | *w | *sw,
+                        // "If there is no Elf in the E, NE, or SE adjacent positions,
+                        // the Elf proposes moving east one step"
+                        Direction::East => *ne | *e | *se,
+                    };
+
+                    // Move the elf if the three adjacent positions in the direction
+                    // are unoccupied, and elf have not already moved in another direction:
+                    propositions[direction as usize] &= !direction_occupied & available_to_move;
+
+                    // Clear elves who have already moved:
+                    available_to_move &= direction_occupied;
+                }
+                propositions
+            }
+
+            // Given 3 results from bitset_per_direction_excluding_collisions() above:
+            // - How the above row would move   [N, S, W, E]
+            // - How the current row would move [N, S, W, E]
+            // - How the below row would move   [N, S, W, E],
+            // if there were no collisions, this function computes how the current row
+            // will be populated by elves moving from the north, south, weast and east.
+            //
+            // Output format is an array, indexed by direction (N=1, S=2, W=3, E=4)
+            // mapping to a bitset of those elves who will be coming from the specified
+            // direction - now taking collisions into account.
+            fn collide_proposals(
+                [_, south, _, _]: &[ElfGridRow; 4],
+                [_, _, west, east]: &[ElfGridRow; 4],
+                [north, _, _, _]: &[ElfGridRow; 4],
+            ) -> [ElfGridRow; 4] {
+                [
+                    *north & !*south,
+                    *south & !*north,
+                    ElfGrid::shift_cols_west(west) & !ElfGrid::shift_cols_east(east),
+                    ElfGrid::shift_cols_east(east) & !ElfGrid::shift_cols_west(west),
+                ]
+            }
+
+            let mut new_bit_rows = self.bit_rows;
+            let mut moved = false;
+
+            self.bit_rows
                 .iter()
+                .map(|row| [Self::shift_cols_east(row), *row, Self::shift_cols_west(row)])
+                .map_windows_stable(|[above, cur, below]| {
+                    propose_movements(above, cur, below, directions)
+                })
+                .map_windows_stable(|[above, cur, below]| collide_proposals(above, cur, below))
                 .enumerate()
-                .fold(0, |acc, (idx, (dx, dy))| {
-                    acc | if elf_grid[(elf.1 + dy) as usize * MAX_SIZE + (elf.0 + dx) as usize]
-                        == NO_ELF
-                    {
-                        0
-                    } else {
-                        1 << idx
-                    }
-                });
-
-            // "During the first half of each round, each Elf considers the eight positions adjacent to themself.
-            // If no other Elves are in one of those eight positions, the Elf does not do anything during this round."
-            if adjacent_bitmask != 0 {
-                for rule_offset in 0..RULES.len() {
-                    let (check_mask, to_move) = RULES[(round + rule_offset) % RULES.len()];
-                    if (check_mask & adjacent_bitmask) == 0 {
-                        elf_moves.push((elf_idx, to_move));
-                        break;
-                    }
-                }
-            }
-        }
-
-        for &(elf_idx, to_move) in elf_moves.iter() {
-            let elf = &mut elves[elf_idx];
-            let new_position = (elf.0 + to_move.0, elf.1 + to_move.1);
-            if is_outside_max(new_position) {
-                return Err(format!(
-                    "Elf tried to moved outside of [0,{MAX_SIZE}): {new_position:?}"
-                ));
-            }
-
-            let elf_idx_at_position =
-                elf_grid[new_position.1 as usize * MAX_SIZE + new_position.0 as usize];
-
-            if elf_idx_at_position == NO_ELF {
-                elf_grid[elf.1 as usize * MAX_SIZE + elf.0 as usize] = NO_ELF;
-                *elf = new_position;
-                elf_grid[elf.1 as usize * MAX_SIZE + elf.0 as usize] = elf_idx as u16;
-                num_moves += 1;
-            } else {
-                // Position was occupied - stand still and push other elf (which must be coming from other direction) back:
-                elf_grid[new_position.1 as usize * MAX_SIZE + new_position.0 as usize] = NO_ELF;
-                let pushed_back_position = (new_position.0 + to_move.0, new_position.1 + to_move.1);
-                elves[elf_idx_at_position as usize] = pushed_back_position;
-                elf_grid[pushed_back_position.1 as usize * MAX_SIZE
-                    + pushed_back_position.0 as usize] = elf_idx_at_position;
-                num_moves -= 1;
-            }
-        }
-        elf_moves.clear();
-
-        #[cfg(feature = "visualization")]
-        {
-            elf_positions_per_step.push(elves.clone());
-
-            if num_moves == 0 || (input.is_part_one() && round == 9) {
-                let mut svg = SvgImage::new();
-                for elf in elf_positions_per_step[0].iter() {
-                    svg.add_with_id(
-                        SvgRect::default()
-                            .x(f64::from(elf.0))
-                            .y(f64::from(elf.1))
-                            .width(1)
-                            .height(1),
-                    );
-                }
-
-                let (max_coords, min_coords) = elf_positions_per_step.iter().flatten().fold(
-                    ((0, 0), (i16::MAX, i16::MAX)),
-                    |(max, min), elf| {
-                        (
-                            (elf.0.max(max.0), elf.1.max(max.1)),
-                            (elf.0.min(min.0), elf.1.min(min.1)),
-                        )
+                .for_each(
+                    |(row_idx, [from_south, from_north, from_east, from_west])| {
+                        // Offset two for the two uses of map_windows() with an array size of 3:
+                        let row_idx = row_idx + 2;
+                        let destinations = from_north | from_south | from_west | from_east;
+                        if destinations != ElfGridRow::default() {
+                            moved = true;
+                            new_bit_rows[row_idx + 1] &= !from_south;
+                            new_bit_rows[row_idx - 1] &= !from_north;
+                            new_bit_rows[row_idx] &= !Self::shift_cols_west(&from_west);
+                            new_bit_rows[row_idx] &= !Self::shift_cols_east(&from_east);
+                            new_bit_rows[row_idx] |= destinations;
+                        }
                     },
                 );
-                let step_duration_ms = 300;
-                let animation_duration_ms = step_duration_ms - 100;
-                svg.add(SvgStyle::new(format!("\n\
-    rect {{ fill: #00B1D2; transition: x {animation_duration_ms}ms, y {animation_duration_ms}ms, fill {animation_duration_ms}ms; }} rect.moving {{ fill: #FDDB27 !important; }}
-")));
 
-                let array_declaration = format!(
-                    "const elfPositions = [{}];",
-                    elf_positions_per_step
-                        .iter()
-                        .map(|positions| format!(
-                            "[{}]",
-                            positions
-                                .iter()
-                                .map(|p| format!("[{},{}]", p.0, p.1))
-                                .collect::<Vec<_>>()
-                                .join(",")
-                        ))
-                        .collect::<Vec<_>>()
-                        .join(",")
-                );
-                svg.add(SvgScript::new(format!("{array_declaration}\nconst elfRects = document.querySelectorAll('rect');\n\
-window.onNewStep = (step) => {{\n\
-        const prevPos = (step == 0) ? null : elfPositions[step-1];\n\
-        const pos = elfPositions[step];\n\
-        for (let i = 0; i < {}; i++) {{\n\
-            const e = elfRects[i];
-            e.setAttribute('x', pos[i][0]);\n\
-            e.setAttribute('y', pos[i][1]);\n\
-            if (prevPos === null || (prevPos[i][0] === pos[i][0] && prevPos[i][1] === pos[i][1])) {{\n\
-               e.classList.remove('moving');\n\
-            }} else {{\n\
-               e.classList.add('moving');\n\
-            }}\n\
-        }}\n\
-}};",
-                    elves.len(),
-                )));
-                input.visualization.replace(Visualization::Svg(
-                    svg.view_box((
-                        i64::from(min_coords.0),
-                        i64::from(min_coords.1),
-                        i64::from(max_coords.0 - min_coords.0 + 1),
-                        i64::from(max_coords.1 - min_coords.1 + 1),
-                    ))
-                    .style("background: black;")
-                    .data_attribute("steps".to_string(), format!("{}", round + 1))
-                    .data_attribute("step-duration".to_string(), format!("{step_duration_ms}"))
-                    .to_svg_string(),
-                ));
-            }
+            self.bit_rows = new_bit_rows;
+            moved
         }
 
-        if num_moves == 0 {
-            return Ok(round + 1);
+        fn populated_rect_size(&self) -> usize {
+            let bounds = (0..self.bit_rows.len())
+                .flat_map(|row| (0..Self::NUM_COLS).map(move |col| (row, col)))
+                .fold(
+                    (usize::MAX, usize::MIN, usize::MAX, usize::MIN),
+                    |acc, (row, col)| {
+                        if self.bit_rows[row].is_bit_set(col) {
+                            (
+                                acc.0.min(row),
+                                acc.1.max(row),
+                                acc.2.min(col),
+                                acc.3.max(col),
+                            )
+                        } else {
+                            acc
+                        }
+                    },
+                );
+            (bounds.1 + 1 - bounds.0) * (bounds.3 + 1 - bounds.2)
+        }
+
+        fn num_elves(&self) -> usize {
+            self.bit_rows.iter().map(|x| x.count_ones() as usize).sum()
         }
     }
+    let mut grid = ElfGrid::parse(input.text)?;
 
-    let (min_x, max_x, min_y, max_y) =
-        elves
-            .iter()
-            .fold((i16::MAX, i16::MIN, i16::MAX, i16::MIN), |acc, e| {
-                (
-                    acc.0.min(e.0),
-                    acc.1.max(e.0),
-                    acc.2.min(e.1),
-                    acc.3.max(e.1),
-                )
-            });
-    let rectangle_size = ((max_x + 1 - min_x) * (max_y + 1 - min_y)) as usize;
-    Ok(rectangle_size - elves.len())
+    if input.is_part_one() {
+        grid.run_simulation(10);
+        Ok(grid.populated_rect_size() - grid.num_elves())
+    } else {
+        grid.run_simulation(10000)
+            .ok_or_else(|| "No solution found in 10,000 rounds".to_string())
+    }
 }
-
 #[cfg(feature = "simd")]
 pub use super::day23_simd::solve;
 

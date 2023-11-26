@@ -4,6 +4,7 @@ pub mod chunk_iterator;
 pub mod gpu;
 pub mod id_assigner;
 pub mod int_to_ascii;
+pub mod map_windows;
 pub mod md5;
 pub mod parser;
 pub mod permutation;
