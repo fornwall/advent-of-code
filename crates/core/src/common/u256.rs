@@ -19,7 +19,7 @@ impl U256 {
         self.low != 0 || self.high != 0
     }
 
-    pub fn is_bit_set(&self, offset: usize) -> bool {
+    pub const fn is_bit_set(&self, offset: usize) -> bool {
         if offset < 128 {
             (self.low & 1 << offset) != 0
         } else {
@@ -63,11 +63,11 @@ impl U256 {
     }
      */
 
-    pub const fn shift_left(self, width: usize) -> U256 {
+    pub const fn shift_left(self, width: usize) -> Self {
         if width <= 128 {
             let mask = if width == 128 { !0 } else { !(1 << width) };
             let low = ((self.low << 1) & mask) | (self.low >> (width - 1));
-            U256 {
+            Self {
                 high: self.high,
                 low,
             }
@@ -76,21 +76,21 @@ impl U256 {
             let mask = !(1 << (width - 128));
             let high = ((self.high << 1) & mask) | (self.low >> 127);
             let low = (self.low << 1) | (self.high >> (width - 129));
-            U256 { high, low }
+            Self { high, low }
         }
     }
 
-    pub const fn shift_right(self, width: usize) -> U256 {
+    pub const fn shift_right(self, width: usize) -> Self {
         if width <= 128 {
             let low = (self.low >> 1) | ((self.low & 1) << (width - 1));
-            U256 {
+            Self {
                 high: self.high,
                 low,
             }
         } else {
             let high = (self.high >> 1) | ((self.low & 1) << (width - 129));
             let low = (self.low >> 1) | ((self.high & 1) << 127);
-            U256 { high, low }
+            Self { high, low }
         }
     }
 }

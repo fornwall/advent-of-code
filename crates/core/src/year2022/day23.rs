@@ -56,26 +56,14 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             Ok(grid)
         }
 
-        fn shift_cols_west(&row: &ElfGridRow) -> ElfGridRow {
+        const fn shift_cols_west(&row: &ElfGridRow) -> ElfGridRow {
             // Shift cols to the west/left (to _lower_ values).
-            // Start with each lane shifted right (so lowest bit is lost):
-            // [abcd, efgh, ijkl] -> [0abc, 0efg, 0ijk]
-            // OLD:(row >> ElfGridRow::splat(1))
             row.shift_right(255)
-            // Bitwise OR with the lowest bit shifted to highest, with rotated lanes.
-            // [abcd, efgh, ijkl] -> [h000, l000, d000]
-            // OLD| (row.rotate_lanes_left::<1>() << ElfGridRow::splat(7))
         }
 
-        fn shift_cols_east(&row: &ElfGridRow) -> ElfGridRow {
+        const fn shift_cols_east(&row: &ElfGridRow) -> ElfGridRow {
             // Shift cols to the east/right (to _higher_ values).
-            // Start with each lane shifted left (so highest bit is lost):
-            // [abcd, efgh, ijkl] -> [bcd0, fgh0, jkl0]
             row.shift_left(255)
-            //(row << ElfGridRow::splat(1))
-            // Bitwise OR with the highest bit shifted to lowest, with rotated lanes.
-            // [abcd, efgh, ijkl] -> [000l, 000a, 000e]
-            //| (row.rotate_lanes_right::<1>() >> ElfGridRow::splat(7))
         }
 
         fn run_simulation(&mut self, max_rounds: usize) -> Option<usize> {
