@@ -1,6 +1,6 @@
 use crate::input::Input;
 
-pub fn solve(input: &Input) -> Result<u64, String> {
+pub fn solve(input: &Input) -> Result<u32, String> {
     Ok(input
         .text
         .lines()
@@ -8,7 +8,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             let line = line.as_bytes();
             let first_digit = find_digit(line.iter(), input.is_part_two());
             let last_digit = find_digit(line.iter().rev(), input.is_part_two());
-            u64::from(first_digit * 10 + last_digit)
+            u32::from(first_digit * 10 + last_digit)
         })
         .sum())
 }
