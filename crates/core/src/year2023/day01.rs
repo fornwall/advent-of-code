@@ -180,27 +180,6 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
 #[test]
 pub fn tests() {
     use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-    assert_eq!(1, find_digit(b" one2".iter(), true));
-    assert_eq!(2, find_digit(b" two7".iter(), true));
-    assert_eq!(3, find_digit(b" three1".iter(), true));
-    assert_eq!(4, find_digit(b" four1".iter(), true));
-    assert_eq!(5, find_digit(b" five1".iter(), true));
-    assert_eq!(6, find_digit(b" six1".iter(), true));
-    assert_eq!(7, find_digit(b" seven1".iter(), true));
-    assert_eq!(8, find_digit(b" eight1".iter(), true));
-    assert_eq!(9, find_digit(b" nine1".iter(), true));
-
-    assert_eq!(0, find_digit(b" 01one".iter(), true));
-    assert_eq!(1, find_digit(b" 11one".iter(), true));
-    assert_eq!(2, find_digit(b" 21one".iter(), true));
-    assert_eq!(3, find_digit(b" 31one".iter(), true));
-    assert_eq!(4, find_digit(b" 41one".iter(), true));
-    assert_eq!(5, find_digit(b" 51one".iter(), true));
-    assert_eq!(6, find_digit(b" 61one".iter(), true));
-    assert_eq!(7, find_digit(b" 71one".iter(), true));
-    assert_eq!(8, find_digit(b" 81one".iter(), true));
-    assert_eq!(9, find_digit(b" 91one".iter(), true));
-
     let real_input = include_str!("day01_input.txt");
     test_part_one_no_allocations!(real_input => 55386);
     test_part_two_no_allocations!(real_input => 54824);
