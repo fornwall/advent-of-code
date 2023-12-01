@@ -46,7 +46,6 @@ fn find_digit<'a, I: Iterator<Item=&'a u8>>(bytes: I, part2: bool) -> u8 {
                     }
                     // [e]ight:
                     start_idx[7] = byte_idx;
-                    continues[7] = byte_idx;
                 }
                 b'f' => {
                     // [f]our
