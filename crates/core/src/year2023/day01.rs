@@ -12,29 +12,69 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     Ok(sum)
 }
 
-fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
+fn find_digit<'a, I: Iterator<Item=&'a u8>>(bytes: I, part2: bool) -> u8 {
+    fn set_if_idx(candidates: &mut usize, idx: usize, start_idx: usize) {}
+
     // candidates[N] is the possible start idx of digit N:
     let mut candidates = [0; 9];
+    let mut last_checked = [0; 9];
 
     for (byte_idx, byte) in bytes.enumerate() {
         if byte.is_ascii_digit() {
             return byte - b'0';
         } else if part2 {
+            match byte {
+                b'e' => {
+                    if candidates[0] + 2 == byte_idx {
+                        // on[e]
+                        return 1;
+                    } else if candidates[2] + 4 == byte_idx {
+                        // thre[e]
+                        return 3;
+                    } else if candidates[4] + 3 == byte_idx {
+                        // fiv[e]
+                        return 5;
+                    } else if candidates[8] + 3 == byte_idx {
+                        // nin[e]
+                        return 9;
+                    }
+                }
+                b'o' => {
+                    if candidates[1] + 2 == byte_idx {
+                        // tw[o]
+                        return 2;
+                    }
+                }
+                b'r' => {
+                    if candidates[3] + 3 == byte_idx {
+                        // fou[r]
+                        return 4;
+                    }
+                }
+                b'x' => {
+                    if candidates[5] + 2 == byte_idx {
+                        // si[x]
+                        return 6;
+                    }
+                }
+                b'n' => {
+                    if candidates[6] + 4 == byte_idx {
+                        // seve[n]
+                        return 7;
+                    }
+                }
+                b't' => {
+                    if candidates[7] + 4 == byte_idx {
+                        // eigh[t]
+                        return 8;
+                    }
+                }
+                _ => {}
+            }
             for (candidate_idx, candidate_start_idx) in candidates.iter_mut().enumerate() {
                 let candidate_num = candidate_idx as u8 + 1;
                 let candidate_len = byte_idx - *candidate_start_idx;
                 let continue_match = match (byte, candidate_num, candidate_len) {
-                    // on[e] | tw[o] | thre[e] | fou|r] | fiv[e] | fou[r] | si[x] | seve[n] | eigh[t] | nin[e]
-                    (b'e', 1, 2)
-                    | (b'o', 2, 2)
-                    | (b'e', 3, 4)
-                    | (b'r', 4, 3)
-                    | (b'e', 5 | 9, 3)
-                    | (b'x', 6, 2)
-                    | (b'n', 7, 4)
-                    | (b't', 8, 4) => {
-                        return candidate_num;
-                    }
                     // thr[e]e | s[e]ven | sev[e]n | [e]ight
                     (b'e', 3, 3) | (b'e', 7, 1 | 3) | (b'e', 8, 0) |
                     // [f]our | [f]ive
