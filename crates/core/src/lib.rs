@@ -25,12 +25,12 @@ assert_eq!(solution, Ok("2".to_string()));
 */
 #![crate_name = "advent_of_code"]
 
-use crate::input::ResultType;
-
 mod common;
 #[cfg_attr(test, macro_use)]
 mod input;
 mod mod_exp;
+#[cfg(feature = "visualization")]
+mod visualization;
 mod year2015;
 mod year2016;
 mod year2017;
@@ -39,6 +39,13 @@ mod year2019;
 mod year2020;
 mod year2021;
 mod year2022;
+mod year2023;
+
+#[cfg(feature = "visualization")]
+pub type ResultType = visualization::Visualization;
+
+#[cfg(not(feature = "visualization"))]
+pub type ResultType = String;
 
 // Never inline to prevent stack size from blowing up in release builds.
 #[inline(never)]
@@ -82,7 +89,7 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<ResultType, St
     }
 
     #[cfg(feature = "visualization")]
-    let visualization = std::cell::RefCell::new(input::Visualization::Svg(String::new()));
+    let visualization = std::cell::RefCell::new(visualization::Visualization::default());
 
     let input = Input {
         part: if part == 1 { Part::One } else { Part::Two },
@@ -292,6 +299,31 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<ResultType, St
         (2022, 23) => to_stringer_input(year2022::day23::solve, &input),
         (2022, 24) => to_stringer_input(year2022::day24::solve, &input),
         (2022, 25) => to_stringer_input(year2022::day25::solve, &input),
+        (2023, 1) => to_stringer_input(year2023::day01::solve, &input),
+        (2023, 2) => to_stringer_input(year2023::day02::solve, &input),
+        (2023, 3) => to_stringer_input(year2023::day03::solve, &input),
+        (2023, 4) => to_stringer_input(year2023::day04::solve, &input),
+        (2023, 5) => to_stringer_input(year2023::day05::solve, &input),
+        (2023, 6) => to_stringer_input(year2023::day06::solve, &input),
+        (2023, 7) => to_stringer_input(year2023::day07::solve, &input),
+        (2023, 8) => to_stringer_input(year2023::day08::solve, &input),
+        (2023, 9) => to_stringer_input(year2023::day09::solve, &input),
+        (2023, 10) => to_stringer_input(year2023::day10::solve, &input),
+        (2023, 11) => to_stringer_input(year2023::day11::solve, &input),
+        (2023, 12) => to_stringer_input(year2023::day12::solve, &input),
+        (2023, 13) => to_stringer_input(year2023::day13::solve, &input),
+        (2023, 14) => to_stringer_input(year2023::day14::solve, &input),
+        (2023, 15) => to_stringer_input(year2023::day15::solve, &input),
+        (2023, 16) => to_stringer_input(year2023::day16::solve, &input),
+        (2023, 17) => to_stringer_input(year2023::day17::solve, &input),
+        (2023, 18) => to_stringer_input(year2023::day18::solve, &input),
+        (2023, 19) => to_stringer_input(year2023::day19::solve, &input),
+        (2023, 20) => to_stringer_input(year2023::day20::solve, &input),
+        (2023, 21) => to_stringer_input(year2023::day21::solve, &input),
+        (2023, 22) => to_stringer_input(year2023::day22::solve, &input),
+        (2023, 23) => to_stringer_input(year2023::day23::solve, &input),
+        (2023, 24) => to_stringer_input(year2023::day24::solve, &input),
+        (2023, 25) => to_stringer_input(year2023::day25::solve, &input),
         _ => Err(format!("Unsupported year={year}, day={day}, part={part}")),
     };
 
