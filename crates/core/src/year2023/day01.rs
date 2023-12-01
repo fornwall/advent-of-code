@@ -13,11 +13,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 }
 
 fn find_digit<'a, I: Iterator<Item=&'a u8>>(bytes: I, part2: bool) -> u8 {
-    fn set_if_idx(candidates: &mut usize, idx: usize, start_idx: usize) {}
-
     // candidates[N] is the possible start idx of digit N:
-    let mut candidates = [0; 9];
-    let mut last_checked = [0; 9];
+    let mut start_idx = [0; 9];
+    let mut continues = [0; 9];
 
     for (byte_idx, byte) in bytes.enumerate() {
         if byte.is_ascii_digit() {
@@ -25,87 +23,154 @@ fn find_digit<'a, I: Iterator<Item=&'a u8>>(bytes: I, part2: bool) -> u8 {
         } else if part2 {
             match byte {
                 b'e' => {
-                    if candidates[0] + 2 == byte_idx {
+                    if continues[0] + 1 == byte_idx && start_idx[0] + 2 == byte_idx {
                         // on[e]
                         return 1;
-                    } else if candidates[2] + 4 == byte_idx {
+                    } else if continues[2] + 1 == byte_idx && start_idx[2] + 4 == byte_idx {
                         // thre[e]
                         return 3;
-                    } else if candidates[4] + 3 == byte_idx {
+                    } else if continues[4] + 1 == byte_idx && start_idx[4] + 3 == byte_idx {
                         // fiv[e]
                         return 5;
-                    } else if candidates[8] + 3 == byte_idx {
+                    } else if continues[8] + 1 == byte_idx && start_idx[8] + 3 == byte_idx {
                         // nin[e]
                         return 9;
                     }
+                    // thr[e]e
+                    if continues[2] + 1 == byte_idx && start_idx[2] + 3 == byte_idx {
+                        continues[2] = byte_idx;
+                    }
+                    // s[e]v[e]en
+                    if start_idx[6] + 1 == byte_idx || (continues[6] + 1 == byte_idx && start_idx[6] + 3 == byte_idx) {
+                        continues[6] = byte_idx;
+                    }
+                    // [e]ight:
+                    start_idx[7] = byte_idx;
+                    continues[7] = byte_idx;
+                }
+                b'f' => {
+                    // [f]our
+                    start_idx[3] = byte_idx;
+                    // [f]ive
+                    start_idx[4] = byte_idx;
+                }
+                b'g' => {
+                    // ei[g]ht
+                    if continues[7] + 1 == byte_idx && start_idx[7] + 2 == byte_idx {
+                        continues[7] = byte_idx;
+                    }
+                }
+                b'h' => {
+                    // t[h]ree
+                    if start_idx[2] + 1 == byte_idx {
+                        continues[2] = byte_idx;
+                    }
+                    // eig[h]t
+                    if continues[7] + 1 == byte_idx && start_idx[7] + 3 == byte_idx {
+                        continues[7] = byte_idx;
+                    }
+                }
+                b'i' => {
+                    // f[i]ve
+                    if start_idx[4] + 1 == byte_idx {
+                        continues[4] = byte_idx;
+                    }
+                    // s[i]x
+                    if start_idx[5] + 1 == byte_idx {
+                        continues[5] = byte_idx;
+                    }
+                    // e[i]ght
+                    if start_idx[7] + 1 == byte_idx {
+                        continues[7] = byte_idx;
+                    }
+                    // n[i]ne
+                    if start_idx[8] + 1 == byte_idx {
+                        continues[8] = byte_idx;
+                    }
+                }
+                b'n' => {
+                    // o[n]e
+                    if start_idx[0] + 1 == byte_idx {
+                        continues[0] = byte_idx;
+                    }
+                    // seve[n]
+                    if continues[6] + 1 == byte_idx && start_idx[6] + 4 == byte_idx {
+                        return 7;
+                    }
+                    // ni[n]e or [n]ine:
+                    if continues[8] + 1 == byte_idx && start_idx[8] + 2 == byte_idx {
+                        continues[8] = byte_idx;
+                    } else {
+                        start_idx[8] = byte_idx;
+                    }
                 }
                 b'o' => {
-                    if candidates[1] + 2 == byte_idx {
-                        // tw[o]
+                    // [o]ne
+                    start_idx[0] = byte_idx;
+                    // tw[o]
+                    if continues[1] + 1 == byte_idx && start_idx[1] + 2 == byte_idx {
                         return 2;
+                    }
+                    // f[o]ur
+                    if start_idx[3] + 1 == byte_idx {
+                        continues[3] = byte_idx;
                     }
                 }
                 b'r' => {
-                    if candidates[3] + 3 == byte_idx {
-                        // fou[r]
+                    // th[r]ee
+                    if continues[2] + 1 == byte_idx && start_idx[2] + 2 == byte_idx {
+                        continues[2] = byte_idx;
+                    }
+                    // fou[r]
+                    if continues[3] + 1 == byte_idx && start_idx[3] + 3 == byte_idx {
                         return 4;
                     }
                 }
+                b's' => {
+                    // [s]ix
+                    start_idx[5] = byte_idx;
+                    // [s]even
+                    start_idx[6] = byte_idx;
+                }
+                b't' => {
+                    // eigh[t]
+                    if continues[7] + 1 == byte_idx && start_idx[7] + 4 == byte_idx {
+                        return 8;
+                    }
+                    // [t]wo:
+                    start_idx[1] = byte_idx;
+                    // [t]hree:
+                    start_idx[2] = byte_idx;
+                }
+                b'u' => {
+                    // fo[u]r
+                    if continues[3] + 1 == byte_idx && start_idx[3] + 2 == byte_idx {
+                        continues[3] = byte_idx;
+                    }
+                }
+                b'v' => {
+                    // fi[v]e
+                    if continues[4] + 1 == byte_idx && start_idx[4] + 2 == byte_idx {
+                        continues[4] = byte_idx;
+                    }
+                    // se[v]en
+                    if continues[6] + 1 == byte_idx && start_idx[6] + 2 == byte_idx {
+                        continues[6] = byte_idx;
+                    }
+                }
+                b'w' => {
+                    // t[w]o
+                    if start_idx[1] + 1 == byte_idx {
+                        continues[1] = byte_idx;
+                    }
+                }
                 b'x' => {
-                    if candidates[5] + 2 == byte_idx {
+                    if continues[5] + 1 == byte_idx && start_idx[5] + 2 == byte_idx {
                         // si[x]
                         return 6;
                     }
                 }
-                b'n' => {
-                    if candidates[6] + 4 == byte_idx {
-                        // seve[n]
-                        return 7;
-                    }
-                }
-                b't' => {
-                    if candidates[7] + 4 == byte_idx {
-                        // eigh[t]
-                        return 8;
-                    }
-                }
                 _ => {}
-            }
-            for (candidate_idx, candidate_start_idx) in candidates.iter_mut().enumerate() {
-                let candidate_num = candidate_idx as u8 + 1;
-                let candidate_len = byte_idx - *candidate_start_idx;
-                let continue_match = match (byte, candidate_num, candidate_len) {
-                    // thr[e]e | s[e]ven | sev[e]n | [e]ight
-                    (b'e', 3, 3) | (b'e', 7, 1 | 3) | (b'e', 8, 0) |
-                    // [f]our | [f]ive
-                    (b'f', 4 | 5, 0) |
-                    // ei[g]ht
-                    (b'g', 8, 2) |
-                    // t[h]ree | eig[h]t
-                    (b'h', 3, 1) | (b'h', 8, 3) |
-                    // f[i]ve | s[i]x | e[i]ght | n[i]ne
-                    (b'i', 5 | 6 | 8 | 9, 1) |
-                    // o[n]e | [n]ine | ni[n]e
-                    (b'n', 1, 1) | (b'n', 9, 0 | 2) |
-                    // [o]ne | tw[o] | f[o]ur
-                    (b'o', 1, 0) | (b'o', 4, 1) |
-                    // th[r]ee
-                    (b'r', 3, 2) |
-                    // [s]ix, [s]even
-                    (b's', 6 | 7, 0) |
-                    // [t]wo | [t]hree
-                    (b't', 2 | 3, 0) |
-                    // fo[u]r
-                    (b'u', 4, 2) |
-                    // fi[v]e | se[v]en
-                    (b'v', 5 | 7, 2) |
-                    // t[w]o
-                    (b'w', 2, 1) => true,
-                    _ => false,
-                };
-                if !continue_match {
-                    *candidate_start_idx = byte_idx + 1;
-                };
             }
         }
     }
@@ -116,7 +181,7 @@ fn find_digit<'a, I: Iterator<Item=&'a u8>>(bytes: I, part2: bool) -> u8 {
 pub fn tests() {
     use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
     assert_eq!(1, find_digit(b" one2".iter(), true));
-    assert_eq!(2, find_digit(b" two3".iter(), true));
+    assert_eq!(2, find_digit(b" two7".iter(), true));
     assert_eq!(3, find_digit(b" three1".iter(), true));
     assert_eq!(4, find_digit(b" four1".iter(), true));
     assert_eq!(5, find_digit(b" five1".iter(), true));
