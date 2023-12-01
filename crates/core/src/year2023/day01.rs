@@ -1,19 +1,15 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u64, String> {
-    let mut sum = 0;
-    for line in input.text.lines() {
+    Ok(input.text.lines().map(|line| {
         let line = line.as_bytes();
         let first_digit = find_digit(line.iter(), input.is_part_two());
         let last_digit = find_digit(line.iter().rev(), input.is_part_two());
-        let calibration_value = u64::from(first_digit * 10 + last_digit);
-        sum += calibration_value;
-    }
-    Ok(sum)
+        u64::from(first_digit * 10 + last_digit)
+    }).sum())
 }
 
 fn find_digit<'a, I: Iterator<Item=&'a u8>>(bytes: I, part2: bool) -> u8 {
-    // candidates[N] is the possible start idx of digit N:
     let mut start_idx = [0; 9];
     let mut continues = [0; 9];
 
