@@ -19,12 +19,10 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
     for (byte_idx, byte) in bytes.enumerate() {
         if byte.is_ascii_digit() {
             return byte - b'0';
-        }
-
-        for (candidate_idx, candidate_start_idx) in candidates.iter_mut().enumerate() {
-            let candidate_num = candidate_idx as u8 + 1;
-            let candidate_len = byte_idx - *candidate_start_idx;
-            if part2 {
+        } else if part2 {
+            for (candidate_idx, candidate_start_idx) in candidates.iter_mut().enumerate() {
+                let candidate_num = candidate_idx as u8 + 1;
+                let candidate_len = byte_idx - *candidate_start_idx;
                 let continue_match = match (byte, candidate_num, candidate_len) {
                     // on[e] | tw[o] | thre[e] | fou|r] | fiv[e] | fou[r] | si[x] | seve[n] | eigh[t] | nin[e]
                     (b'e', 1, 2)
