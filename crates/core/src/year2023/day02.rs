@@ -3,43 +3,45 @@ use crate::input::Input;
 pub fn solve(input: &Input) -> Result<u32, String> {
     let on_error = || "Invalid input".to_string();
 
-    let mut sum = 0;
-    for game_str in input.text.lines() {
-        let (game_declaration_str, draws_str) = game_str.split_once(": ").ok_or_else(on_error)?;
-        let mut max_shown = [0; 3];
+    input
+        .text
+        .lines()
+        .map(|game_str| {
+            let (game_declaration_str, draws_str) =
+                game_str.split_once(": ").ok_or_else(on_error)?;
+            let mut max_shown = [0; 3];
 
-        for draw_str in draws_str.split("; ") {
-            for color_reveal_str in draw_str.split(", ") {
-                let (num_revealed_cubes, color_str) =
-                    color_reveal_str.split_once(' ').ok_or_else(on_error)?;
+            for draw_str in draws_str.split("; ") {
+                for color_reveal_str in draw_str.split(", ") {
+                    let (num_revealed_cubes, color_str) =
+                        color_reveal_str.split_once(' ').ok_or_else(on_error)?;
 
-                let color_idx = match color_str {
-                    "red" => 0,
-                    "green" => 1,
-                    "blue" => 2,
-                    _ => return Err(format!("Invalid color: {color_reveal_str}")),
-                };
+                    let color_idx = match color_str {
+                        "red" => 0,
+                        "green" => 1,
+                        "blue" => 2,
+                        _ => return Err(format!("Invalid color: {color_reveal_str}")),
+                    };
 
-                let num_revealed_cubes = num_revealed_cubes.parse().map_err(|_| on_error())?;
-                max_shown[color_idx] = max_shown[color_idx].max(num_revealed_cubes);
+                    let num_revealed_cubes =
+                        u32::from(num_revealed_cubes.parse::<u8>().map_err(|_| on_error())?);
+                    max_shown[color_idx] = max_shown[color_idx].max(num_revealed_cubes);
+                }
             }
-        }
 
-        let possible_game = max_shown[0] <= 12 && max_shown[1] <= 13 && max_shown[2] <= 14;
-        match (input.is_part_one(), possible_game) {
-            (true, true) => {
-                sum += game_declaration_str
-                    .split_once(' ')
-                    .ok_or_else(on_error)?
-                    .1
-                    .parse::<u32>()
-                    .map_err(|_| on_error())?
-            }
-            (false, _) => sum += max_shown[0] * max_shown[1] * max_shown[2],
-            _ => {}
-        }
-    }
-    Ok(sum)
+            Ok(if input.is_part_one() {
+                u32::from(max_shown[0] <= 12 && max_shown[1] <= 13 && max_shown[2] <= 14)
+                    * game_declaration_str
+                        .split(' ')
+                        .nth(1)
+                        .ok_or_else(on_error)?
+                        .parse::<u32>()
+                        .map_err(|_| on_error())?
+            } else {
+                max_shown[0] * max_shown[1] * max_shown[2]
+            })
+        })
+        .sum::<Result<_, _>>()
 }
 
 #[test]
