@@ -42,7 +42,7 @@ fn main() -> Result<(), String> {
                 Ok(result) => {
                     if repeat == 1 {
                         #[cfg(feature = "visualization")]
-                        println!("impl Default for Visualization(visualization)");
+                        println!("{result:?}");
                         #[cfg(not(feature = "visualization"))]
                         println!("{result}");
                     }

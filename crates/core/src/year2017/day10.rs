@@ -1,7 +1,7 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<String, String> {
-   knot_hash(input.text, input.is_part_one())
+    knot_hash(input.text, input.is_part_one())
 }
 
 pub fn knot_hash(input: &str, part1: bool) -> Result<String, String> {
@@ -22,10 +22,7 @@ pub fn knot_hash(input: &str, part1: bool) -> Result<String, String> {
             .collect::<Result<Vec<_>, _>>()?
     } else {
         let to_append = [17_u8, 31_u8, 73_u8, 47_u8, 23_u8];
-        input
-            .bytes()
-            .chain(to_append.iter().copied())
-            .collect()
+        input.bytes().chain(to_append.iter().copied()).collect()
     };
 
     let num_rounds = if part1 { 1 } else { 64 };

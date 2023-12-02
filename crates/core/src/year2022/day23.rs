@@ -1,13 +1,11 @@
 #[cfg(feature = "visualization")]
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
-use svgplot::{SvgImage, SvgRect, SvgScript, SvgStyle};
+use crate::visualization::Visualization;
 
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
 use crate::input::Input;
-#[cfg(feature = "visualization")]
-use crate::visualization::Visualization;
 
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]

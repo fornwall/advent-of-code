@@ -26,6 +26,4 @@ pub mod day23_simd;
 #[cfg(feature = "webgpu-compute")]
 pub mod day23_webgpu;
 pub mod day24;
-#[cfg(feature = "visualization")]
-pub mod day24_renderer;
 pub mod day25;
