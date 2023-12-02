@@ -1,5 +1,4 @@
 use axum::{
-    body::{Bytes, Full},
     extract::Path,
     http::StatusCode,
     response::Response,
@@ -7,6 +6,7 @@ use axum::{
     Router,
 };
 use std::collections::HashMap;
+use axum::body::Body;
 
 use advent_of_code::solve_raw;
 
@@ -19,19 +19,18 @@ async fn main() {
         .route("/", get(handle_get))
         .route("/solve/:year/:day/:part", post(handle_post));
 
+    let port = "8080";
     println!("Running on port 8080");
-    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{port}")).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }
 
-async fn handle_get() -> Response<Full<Bytes>> {
+async fn handle_get() -> Response<Body> {
     #![allow(clippy::unwrap_used)]
     Response::builder()
         .status(StatusCode::OK)
         .header("content-type", "text/html")
-        .body(Full::from(
+        .body(Body::from(
             "<h1>Advent of Code API</h1>\n\
               <p>Check the <a href='https://aoc.fornwall.net/api/openapi.json'>OpenAPI document</a>.</p>"
         ))
@@ -41,7 +40,7 @@ async fn handle_get() -> Response<Full<Bytes>> {
 async fn handle_post(
     Path(params): Path<HashMap<String, String>>,
     body: String,
-) -> Response<Full<Bytes>> {
+) -> Response<Body> {
     #![allow(clippy::unwrap_used)]
     let year = params.get("year").unwrap();
     let day = params.get("day").unwrap();
@@ -51,13 +50,13 @@ async fn handle_post(
             .status(StatusCode::OK)
             .header("Access-Control-Allow-Origin", "*")
             .header("Content-Type", "text/plain")
-            .body(Full::from(solution))
+            .body(Body::from(solution))
             .unwrap(),
         Err(error) => Response::builder()
             .status(StatusCode::BAD_REQUEST)
             .header("Access-Control-Allow-Origin", "*")
             .header("content-type", "text/plain")
-            .body(Full::from(error))
+            .body(Body::from(error))
             .unwrap(),
     }
 }
