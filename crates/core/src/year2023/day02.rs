@@ -31,12 +31,14 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
             Ok(if input.is_part_one() {
                 u32::from(max_shown[0] <= 12 && max_shown[1] <= 13 && max_shown[2] <= 14)
-                    * game_declaration_str
-                        .split(' ')
-                        .nth(1)
-                        .ok_or_else(on_error)?
-                        .parse::<u32>()
-                        .map_err(|_| on_error())?
+                    * u32::from(
+                        game_declaration_str
+                            .split(' ')
+                            .nth(1)
+                            .ok_or_else(on_error)?
+                            .parse::<u8>()
+                            .map_err(|_| on_error())?,
+                    )
             } else {
                 max_shown[0] * max_shown[1] * max_shown[2]
             })
