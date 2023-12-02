@@ -1,15 +1,18 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<String, String> {
+   knot_hash(input.text, input.is_part_one())
+}
+
+pub fn knot_hash(input: &str, part1: bool) -> Result<String, String> {
     const SIZE: usize = 256;
     let mut list: Vec<u8> = (0..SIZE).map(|i| i as u8).collect();
 
     let mut current_position = 0;
     let mut skip_size = 0;
 
-    let input_vec = if input.is_part_one() {
+    let input_vec = if part1 {
         input
-            .text
             .split(',')
             .map(|length| {
                 length
@@ -20,13 +23,13 @@ pub fn solve(input: &Input) -> Result<String, String> {
     } else {
         let to_append = [17_u8, 31_u8, 73_u8, 47_u8, 23_u8];
         input
-            .text
             .bytes()
             .chain(to_append.iter().copied())
             .collect()
     };
 
-    for _round in 0..input.part_values(1, 64) {
+    let num_rounds = if part1 { 1 } else { 64 };
+    for _round in 0..num_rounds {
         for &length in &input_vec {
             let length = length as usize;
 
@@ -46,7 +49,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         }
     }
 
-    Ok(if input.is_part_one() {
+    Ok(if part1 {
         (u32::from(list[0]) * u32::from(list[1])).to_string()
     } else {
         list.chunks(16)
