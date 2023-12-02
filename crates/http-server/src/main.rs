@@ -1,3 +1,4 @@
+use axum::body::Body;
 use axum::{
     extract::Path,
     http::StatusCode,
@@ -6,7 +7,6 @@ use axum::{
     Router,
 };
 use std::collections::HashMap;
-use axum::body::Body;
 
 use advent_of_code::solve_raw;
 
@@ -21,7 +21,9 @@ async fn main() {
 
     let port = "8080";
     println!("Running on port 8080");
-    let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{port}")).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{port}"))
+        .await
+        .unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
@@ -37,10 +39,7 @@ async fn handle_get() -> Response<Body> {
         .unwrap()
 }
 
-async fn handle_post(
-    Path(params): Path<HashMap<String, String>>,
-    body: String,
-) -> Response<Body> {
+async fn handle_post(Path(params): Path<HashMap<String, String>>, body: String) -> Response<Body> {
     #![allow(clippy::unwrap_used)]
     let year = params.get("year").unwrap();
     let day = params.get("day").unwrap();

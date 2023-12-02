@@ -22,7 +22,7 @@ default = ["console_error_panic_hook"]
 advent-of-code = { path = "../core" }
 cfg-if = "*"
 # wasm-bindgen bump:
-worker = { git = "https://github.com/cloudflare/workers-rs" }
+worker = { git = "https://github.com/fornwall/workers-rs", branch = "wasm-bindgen-0.2.88" }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
