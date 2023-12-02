@@ -4,37 +4,42 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     Ok(input
         .text
         .lines()
-        .map(|line| {
-            let line = line.as_bytes();
-            let first_digit = find_digit(line.iter(), input.is_part_two());
-            let last_digit = find_digit(line.iter().rev(), input.is_part_two());
-            u32::from(first_digit * 10 + last_digit)
-        })
+        .map(|line| calibration_value(line, input.is_part_two()))
         .sum())
 }
 
-fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
-    let mut start_idx = [0; 9];
+fn calibration_value(line: &str, part2: bool) -> u32 {
+    let mut start_idx = [usize::MAX - 10; 9];
     let mut continues = [0; 9];
 
-    for (byte_idx, byte) in bytes.enumerate() {
+    let mut first_digit = None;
+    let mut last_digit = 0;
+
+    let mut on_digit = |digit| {
+        if first_digit.is_none() {
+            first_digit = Some(digit);
+        }
+        last_digit = digit;
+    };
+
+    for (byte_idx, byte) in line.bytes().enumerate() {
         match (byte, part2) {
             ((b'0'..=b'9'), _) => {
-                return byte - b'0';
+                on_digit(byte - b'0');
             }
             (b'e', true) => {
                 if continues[0] + 1 == byte_idx && start_idx[0] + 2 == byte_idx {
                     // on[e]
-                    return 1;
+                    on_digit(1)
                 } else if continues[2] + 1 == byte_idx && start_idx[2] + 4 == byte_idx {
                     // thre[e]
-                    return 3;
+                    on_digit(3)
                 } else if continues[4] + 1 == byte_idx && start_idx[4] + 3 == byte_idx {
                     // fiv[e]
-                    return 5;
+                    on_digit(5)
                 } else if continues[8] + 1 == byte_idx && start_idx[8] + 3 == byte_idx {
                     // nin[e]
-                    return 9;
+                    on_digit(9)
                 }
                 // thr[e]e
                 if continues[2] + 1 == byte_idx && start_idx[2] + 3 == byte_idx {
@@ -87,6 +92,10 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
                 // n[i]ne
                 if start_idx[8] + 1 == byte_idx {
                     continues[8] = byte_idx;
+                } else if continues[8] + 1 == byte_idx && start_idx[8] + 3 == byte_idx {
+                    // Handle ni[n]ine:
+                    start_idx[8] = byte_idx - 1;
+                    continues[8] = byte_idx;
                 }
             }
             (b'n', true) => {
@@ -96,9 +105,10 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
                 }
                 // seve[n]
                 if continues[6] + 1 == byte_idx && start_idx[6] + 4 == byte_idx {
-                    return 7;
+                    on_digit(7)
                 }
-                // ni[n]e or [n]ine:
+                // ni[n]e or [n]ine (we handle the case of ni[n]ine, where we here
+                // will incorrectly set [n] as the third character, when handling 'i'):
                 if continues[8] + 1 == byte_idx && start_idx[8] + 2 == byte_idx {
                     continues[8] = byte_idx;
                 } else {
@@ -110,7 +120,7 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
                 start_idx[0] = byte_idx;
                 // tw[o]
                 if continues[1] + 1 == byte_idx && start_idx[1] + 2 == byte_idx {
-                    return 2;
+                    on_digit(2)
                 }
                 // f[o]ur
                 if start_idx[3] + 1 == byte_idx {
@@ -124,7 +134,7 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
                 }
                 // fou[r]
                 if continues[3] + 1 == byte_idx && start_idx[3] + 3 == byte_idx {
-                    return 4;
+                    on_digit(4);
                 }
             }
             (b's', true) => {
@@ -136,7 +146,7 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
             (b't', true) => {
                 // eigh[t]
                 if continues[7] + 1 == byte_idx && start_idx[7] + 4 == byte_idx {
-                    return 8;
+                    on_digit(8);
                 }
                 // [t]wo:
                 start_idx[1] = byte_idx;
@@ -168,18 +178,42 @@ fn find_digit<'a, I: Iterator<Item = &'a u8>>(bytes: I, part2: bool) -> u8 {
             (b'x', true) => {
                 if continues[5] + 1 == byte_idx && start_idx[5] + 2 == byte_idx {
                     // si[x]
-                    return 6;
+                    on_digit(6);
                 }
             }
             _ => {}
         }
     }
-    0
+
+    u32::from(first_digit.unwrap_or_default() * 10 + last_digit)
 }
 
 #[test]
 pub fn tests() {
     use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+
+    let test_input = "1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet";
+    test_part_one_no_allocations!(test_input => 142);
+
+    let test_input = "two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen
+five3threeqgtwone
+twone
+oneight
+nine
+ninine";
+    test_part_two_no_allocations!(test_input => 281 + 51 + 21 + 18 + 99 + 99);
+    let test_input = "cneightwotdkfxxxjfdpz3zkkthree";
+    test_part_two_no_allocations!(test_input => 83);
+
     let real_input = include_str!("day01_input.txt");
     test_part_one_no_allocations!(real_input => 55386);
     test_part_two_no_allocations!(real_input => 54824);
