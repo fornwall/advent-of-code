@@ -16,7 +16,7 @@ struct Tape {
 }
 
 impl Tape {
-    const MIN_POSITION: i32 = -2000;
+    const MIN_POSITION: i32 = -10000;
     const MAX_POSITION: i32 = 10000;
 
     fn new() -> Self {
@@ -118,7 +118,8 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         current_position += i32::from(current_action.move_direction);
         if !(Tape::MIN_POSITION..Tape::MAX_POSITION).contains(&current_position) {
             return Err(format!(
-                "Too long tape - only allowed inside [{},{}]",
+                "Too long tape {} - only allowed inside [{},{}]",
+                current_position,
                 Tape::MIN_POSITION,
                 Tape::MAX_POSITION
             ));
