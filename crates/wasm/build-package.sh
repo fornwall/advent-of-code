@@ -11,7 +11,7 @@ mv target/nodejs/advent_of_code_wasm_bg.wasm-optimized target/nodejs/advent_of_c
 cp README.md target/nodejs/
 cp cli.js target/nodejs/
 
-PACKAGE_VERSION=`cargo metadata --format-version 1 | jq -r '.packages[0].version'`
+PACKAGE_VERSION=`cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="advent-of-code").version'`
 
 cd target/nodejs
 
