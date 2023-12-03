@@ -28,18 +28,13 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 on_digit(byte - b'0');
             }
             (b'e', true) => {
-                if continues[0] + 1 == byte_idx && start_idx[0] + 2 == byte_idx {
-                    // on[e]
-                    on_digit(1)
-                } else if continues[2] + 1 == byte_idx && start_idx[2] + 4 == byte_idx {
-                    // thre[e]
-                    on_digit(3)
-                } else if continues[4] + 1 == byte_idx && start_idx[4] + 3 == byte_idx {
-                    // fiv[e]
-                    on_digit(5)
-                } else if continues[8] + 1 == byte_idx && start_idx[8] + 3 == byte_idx {
-                    // nin[e]
-                    on_digit(9)
+                // on[e], thre[e], fiv[e] or nin[e]
+                for (digit, digit_len) in [(1, 2), (3, 4), (5, 3), (9, 3)] {
+                    if continues[digit - 1] + 1 == byte_idx
+                        && start_idx[digit - 1] + digit_len == byte_idx
+                    {
+                        on_digit(digit as u8);
+                    }
                 }
                 // thr[e]e
                 if continues[2] + 1 == byte_idx && start_idx[2] + 3 == byte_idx {
@@ -105,7 +100,7 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 }
                 // seve[n]
                 if continues[6] + 1 == byte_idx && start_idx[6] + 4 == byte_idx {
-                    on_digit(7)
+                    on_digit(7);
                 }
                 // ni[n]e or [n]ine (we handle the case of ni[n]ine, where we here
                 // will incorrectly set [n] as the third character, when handling 'i'):
@@ -120,7 +115,7 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 start_idx[0] = byte_idx;
                 // tw[o]
                 if continues[1] + 1 == byte_idx && start_idx[1] + 2 == byte_idx {
-                    on_digit(2)
+                    on_digit(2);
                 }
                 // f[o]ur
                 if start_idx[3] + 1 == byte_idx {
