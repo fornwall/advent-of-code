@@ -201,7 +201,13 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         day_str = str(day)
 
         if year_str in gist_mapping and day_str in gist_mapping[year_str] and 'gist' in gist_mapping[year_str][day_str]:
-            existing_id = gist_mapping[year_str][day_str]['gist']
+            gist_fields = gist_mapping[year_str][day_str]
+
+            get_response = requests.get(gist_fields['raw_url'])
+            if get_response.text == src:
+                continue
+
+            existing_id = gist_fields['gist']
             if dry_run:
                 if only_year and only_day:
                     print(src)
@@ -243,7 +249,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         gist_mapping[year_str][day_str]['visualization'] = supports_visualization
 
         # Avoid GitHub API rate limiting
-        time.sleep(1)
+        time.sleep(10)
 
 if not dry_run:
     with open(MAPPING_FILE_NAME, "w") as outfile:
