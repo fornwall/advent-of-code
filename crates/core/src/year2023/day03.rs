@@ -1,4 +1,4 @@
-use crate::common::map_windows::MapWindowsIterator;
+use crate::common::triple_window_iterator::TripleWindowIteratorExt;
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u64, String> {
@@ -6,7 +6,8 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         .text
         .lines()
         .map(str::as_bytes)
-        .map_windows_stable(|[&above, &middle, &below]| {
+        .triple_windows()
+        .map(|(above, middle, below)| {
             middle
                 .iter()
                 .enumerate()

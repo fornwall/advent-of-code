@@ -8,5 +8,6 @@ pub mod map_windows;
 pub mod md5;
 pub mod parser;
 pub mod permutation;
+pub mod triple_window_iterator;
 pub mod tuple_window_iterator;
 pub mod u256;
