@@ -80,7 +80,7 @@ impl ElfGrid {
         (row >> ElfGridRow::splat(1))
             // Bitwise OR with the lowest bit shifted to highest, with rotated lanes.
             // [abcd, efgh, ijkl] -> [h000, l000, d000]
-            | (row.rotate_lanes_left::<1>() << ElfGridRow::splat(7))
+            | (row.rotate_elements_left::<1>() << ElfGridRow::splat(7))
     }
 
     fn shift_cols_east(&row: &ElfGridRow) -> ElfGridRow {
@@ -90,7 +90,7 @@ impl ElfGrid {
         (row << ElfGridRow::splat(1))
             // Bitwise OR with the highest bit shifted to lowest, with rotated lanes.
             // [abcd, efgh, ijkl] -> [000l, 000a, 000e]
-            | (row.rotate_lanes_right::<1>() >> ElfGridRow::splat(7))
+            | (row.rotate_elements_right::<1>() >> ElfGridRow::splat(7))
     }
 
     fn run_simulation(&mut self, max_rounds: usize) -> Option<usize> {
