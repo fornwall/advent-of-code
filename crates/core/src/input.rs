@@ -87,25 +87,6 @@ macro_rules! test_part_one_no_allocations {
 pub(crate) use test_part_one_no_allocations;
 
 #[cfg(test)]
-macro_rules! test_part_one_num_allocations {
-    ($input:tt => $expected:expr, $num_allocations:tt) => {
-        #[cfg(feature = "count-allocations")]
-        {
-            let info = allocation_counter::measure(|| {
-                assert_eq!(solve(&Input::part_one($input)), Ok($expected));
-            });
-            assert_eq!($num_allocations, info.count_total);
-        }
-        #[cfg(not(feature = "count-allocations"))]
-        {
-            assert_eq!(solve(&Input::part_one($input)), Ok($expected));
-        }
-    };
-}
-#[cfg(test)]
-pub(crate) use test_part_one_num_allocations;
-
-#[cfg(test)]
 macro_rules! test_part_two {
     ($input:tt => $expected:expr) => {
         assert_eq!(solve(&Input::part_two($input)), Ok($expected));
@@ -132,25 +113,6 @@ macro_rules! test_part_two_no_allocations {
 }
 #[cfg(test)]
 pub(crate) use test_part_two_no_allocations;
-
-#[cfg(test)]
-macro_rules! test_part_two_num_allocations {
-    ($input:tt => $expected:expr, $num_allocations:tt) => {
-        #[cfg(feature = "count-allocations")]
-        {
-            let info = allocation_counter::measure(|| {
-                assert_eq!(solve(&Input::part_two($input)), Ok($expected));
-            });
-            assert_eq!($num_allocations, info.count_total);
-        }
-        #[cfg(not(feature = "count-allocations"))]
-        {
-            assert_eq!(solve(&Input::part_two($input)), Ok($expected));
-        }
-    };
-}
-#[cfg(test)]
-pub(crate) use test_part_two_num_allocations;
 
 #[cfg(test)]
 macro_rules! test_part_one_error {
