@@ -1,49 +1,50 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
-    let on_error = || "Invalid input".to_string();
-
     input
         .text
         .lines()
-        .map(|game_str| {
-            let (game_declaration_str, draws_str) =
-                game_str.split_once(": ").ok_or_else(on_error)?;
-            let mut max_shown = [0; 3];
-
-            for draw_str in draws_str.split("; ") {
-                for color_reveal_str in draw_str.split(", ") {
-                    let (num_revealed_cubes, color_str) =
-                        color_reveal_str.split_once(' ').ok_or_else(on_error)?;
-
-                    let color_idx = match color_str {
-                        "red" => 0,
-                        "green" => 1,
-                        "blue" => 2,
-                        _ => return Err(format!("Invalid color: {color_reveal_str}")),
-                    };
-
-                    let num_revealed_cubes =
-                        u32::from(num_revealed_cubes.parse::<u8>().map_err(|_| on_error())?);
-                    max_shown[color_idx] = max_shown[color_idx].max(num_revealed_cubes);
-                }
-            }
-
-            Ok(if input.is_part_one() {
-                u32::from(max_shown[0] <= 12 && max_shown[1] <= 13 && max_shown[2] <= 14)
-                    * u32::from(
-                        game_declaration_str
-                            .split(' ')
-                            .nth(1)
-                            .ok_or_else(on_error)?
-                            .parse::<u8>()
-                            .map_err(|_| on_error())?,
-                    )
-            } else {
-                max_shown[0] * max_shown[1] * max_shown[2]
-            })
-        })
+        .map(|game_str| game_score(game_str, input.is_part_one()))
         .sum::<Result<_, _>>()
+}
+
+fn game_score(game_str: &str, part1: bool) -> Result<u32, String> {
+    let on_error = || "Invalid input".to_string();
+
+    let (game_declaration_str, draws_str) = game_str.split_once(": ").ok_or_else(on_error)?;
+    let mut max_shown = [0; 3];
+
+    for draw_str in draws_str.split("; ") {
+        for color_reveal_str in draw_str.split(", ") {
+            let (num_revealed_cubes, color_str) =
+                color_reveal_str.split_once(' ').ok_or_else(on_error)?;
+
+            let color_idx = match color_str {
+                "red" => 0,
+                "green" => 1,
+                "blue" => 2,
+                _ => return Err(format!("Invalid color: {color_reveal_str}")),
+            };
+
+            let num_revealed_cubes =
+                u32::from(num_revealed_cubes.parse::<u8>().map_err(|_| on_error())?);
+            max_shown[color_idx] = max_shown[color_idx].max(num_revealed_cubes);
+        }
+    }
+
+    Ok(if part1 {
+        u32::from(max_shown[0] <= 12 && max_shown[1] <= 13 && max_shown[2] <= 14)
+            * u32::from(
+                game_declaration_str
+                    .split(' ')
+                    .nth(1)
+                    .ok_or_else(on_error)?
+                    .parse::<u8>()
+                    .map_err(|_| on_error())?,
+            )
+    } else {
+        max_shown[0] * max_shown[1] * max_shown[2]
+    })
 }
 
 #[test]
