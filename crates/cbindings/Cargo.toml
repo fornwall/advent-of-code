@@ -20,7 +20,6 @@ cbindgen = "0"
 [lib]
 name = "advent_of_code"
 doc = false
-# crate-type = ["cdylib"]
 crate-type = ["staticlib"]
 
 [dependencies]
