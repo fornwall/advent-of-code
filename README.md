@@ -10,7 +10,7 @@ For learning and demonstration purposes, this repository contains additional res
   - The command-line tool is wrapped in Docker and published to [Docker Hub](https://hub.docker.com/r/fredrikfornwall/advent-of-code).
   - The command-line tool is also published as a [homebrew](https://brew.sh/) tap.
   - No unsafe code.
-- [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [Tonic](https://docs.rs/tonic).
+- [crates/grpc-server](crates/grpc-server): Server with a gRPC API using [tonic](https://docs.rs/tonic).
   - Deployed to [fly.io](https://fly.io/).
 - [crates/http-server](crates/http-server): Server with a HTTP API using [axum](https://docs.rs/axum/latest/axum/).
   - Deployed to [fly.io](https://fly.io/).
