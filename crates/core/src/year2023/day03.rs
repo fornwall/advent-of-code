@@ -1,37 +1,17 @@
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u64, String> {
-    const MAP_SIZE: usize = 256;
-    let mut numbers = vec![0; MAP_SIZE * MAP_SIZE];
-
-    for (row_idx, row_str) in input.text.lines().enumerate() {
-        if row_idx >= MAP_SIZE || row_str.len() >= MAP_SIZE {
-            return Err("Too big schematic".to_string());
-        }
-
-        let mut num_start_idx = None;
-        for (col_idx, col_byte) in row_str.bytes().chain(std::iter::once(b'.')).enumerate() {
-            if col_byte.is_ascii_digit() {
-                if num_start_idx.is_none() {
-                    num_start_idx = Some(col_idx);
-                }
-            } else if let Some(start_idx) = num_start_idx {
-                let num_str = &row_str[start_idx..col_idx];
-                let num = num_str
-                    .parse::<u16>()
-                    .map_err(|_| "Invalid number".to_string())?;
-                for i in start_idx..col_idx {
-                    numbers[row_idx * MAP_SIZE + i] = num;
-                }
-                num_start_idx = None;
-            }
-        }
-    }
-
+    let rows = input.text.lines().map(str::as_bytes).collect::<Vec<_>>();
     let mut sum = 0;
 
     for (row_idx, row_str) in input.text.lines().enumerate() {
-        for (col_idx, col_byte) in row_str.bytes().chain(std::iter::once(b'.')).enumerate() {
+        let row_bytes = row_str.as_bytes();
+        for (col_idx, col_byte) in row_bytes
+            .iter()
+            .copied()
+            .chain(std::iter::once(b'.'))
+            .enumerate()
+        {
             let interesting = if input.is_part_one() {
                 !col_byte.is_ascii_digit() && col_byte != b'.'
             } else {
@@ -51,17 +31,18 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                         let x = col_idx as i32 + dx;
                         let y = row_idx as i32 + dy;
                         if matches!((dx, dy), (0 | 1, -1 | 1))
-                            && numbers[(y as usize) * MAP_SIZE + (x - 1) as usize] != 0
+                            && rows[y as usize][(x - 1) as usize].is_ascii_digit()
                         {
                             // Avoid counting same number multiple times.
                             continue;
                         }
-                        let adjacent_num = numbers[y as usize * MAP_SIZE + x as usize];
-                        if input.is_part_one() {
-                            this_value += u64::from(adjacent_num);
-                        } else if adjacent_num != 0 {
+                        if let Some(adjacent_num) = parse_num_at(rows[y as usize], x as usize) {
                             num_neighbour_count += 1;
-                            this_value *= u64::from(adjacent_num);
+                            if input.is_part_one() {
+                                this_value += u64::from(adjacent_num);
+                            } else if adjacent_num != 0 {
+                                this_value *= u64::from(adjacent_num);
+                            }
                         }
                     }
                 }
@@ -77,9 +58,33 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     Ok(sum)
 }
 
+fn parse_num_at(str: &[u8], idx: usize) -> Option<u16> {
+    if !str[idx].is_ascii_digit() {
+        return None;
+    }
+    let mut start_idx = idx;
+    while start_idx > 0 && str[start_idx - 1].is_ascii_digit() {
+        start_idx -= 1;
+    }
+    let mut end_idx = idx;
+    while end_idx + 1 < str.len() && str[end_idx + 1].is_ascii_digit() {
+        end_idx += 1;
+    }
+    let mut result = u16::from(str[start_idx] - b'0');
+    while start_idx < end_idx {
+        start_idx += 1;
+        result = result * 10 + u16::from(str[start_idx] - b'0');
+    }
+    Some(result)
+}
+
 #[test]
 pub fn tests() {
     use crate::input::{test_part_one_num_allocations, test_part_two_num_allocations};
+
+    assert_eq!(parse_num_at(b"a123", 1), Some(123));
+    assert_eq!(parse_num_at(b"a123", 2), Some(123));
+    assert_eq!(parse_num_at(b"a123", 3), Some(123));
 
     let test_input = "467..114..
 ...*......
