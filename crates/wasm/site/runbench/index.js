@@ -7,7 +7,7 @@ async function main() {
   });
 
   const year = parseInt(
-    new URLSearchParams(window.location.search).get("year") || "2022",
+    new URLSearchParams(window.location.search).get("year") || "2023",
   );
   document.getElementById("description").innerHTML = `Benchmark running
           <a href="/">solutions</a> to
