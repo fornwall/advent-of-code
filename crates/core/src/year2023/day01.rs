@@ -23,19 +23,30 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
     };
 
     for (byte_idx, byte) in line.bytes().enumerate() {
+        for (last, digit, digit_len) in [
+            (b'e', 1, 2),
+            (b'o', 2, 2),
+            (b'e', 3, 4),
+            (b'r', 4, 3),
+            (b'e', 5, 3),
+            (b'x', 6, 2),
+            (b'n', 7, 4),
+            (b't', 8, 4),
+            (b'e', 9, 3),
+        ] {
+            if byte == last
+                && continues[digit - 1] + 1 == byte_idx
+                && start_idx[digit - 1] + digit_len == byte_idx
+            {
+                on_digit(digit as u8);
+            }
+        }
+
         match (byte, part2) {
             ((b'0'..=b'9'), _) => {
                 on_digit(byte - b'0');
             }
             (b'e', true) => {
-                // on[e], thre[e], fiv[e] or nin[e]
-                for (digit, digit_len) in [(1, 2), (3, 4), (5, 3), (9, 3)] {
-                    if continues[digit - 1] + 1 == byte_idx
-                        && start_idx[digit - 1] + digit_len == byte_idx
-                    {
-                        on_digit(digit as u8);
-                    }
-                }
                 // thr[e]e
                 if continues[2] + 1 == byte_idx && start_idx[2] + 3 == byte_idx {
                     continues[2] = byte_idx;
@@ -98,10 +109,6 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 if start_idx[0] + 1 == byte_idx {
                     continues[0] = byte_idx;
                 }
-                // seve[n]
-                if continues[6] + 1 == byte_idx && start_idx[6] + 4 == byte_idx {
-                    on_digit(7);
-                }
                 // ni[n]e or [n]ine (we handle the case of ni[n]ine, where we here
                 // will incorrectly set [n] as the third character, when handling 'i'):
                 if continues[8] + 1 == byte_idx && start_idx[8] + 2 == byte_idx {
@@ -113,10 +120,6 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
             (b'o', true) => {
                 // [o]ne
                 start_idx[0] = byte_idx;
-                // tw[o]
-                if continues[1] + 1 == byte_idx && start_idx[1] + 2 == byte_idx {
-                    on_digit(2);
-                }
                 // f[o]ur
                 if start_idx[3] + 1 == byte_idx {
                     continues[3] = byte_idx;
@@ -127,10 +130,6 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 if continues[2] + 1 == byte_idx && start_idx[2] + 2 == byte_idx {
                     continues[2] = byte_idx;
                 }
-                // fou[r]
-                if continues[3] + 1 == byte_idx && start_idx[3] + 3 == byte_idx {
-                    on_digit(4);
-                }
             }
             (b's', true) => {
                 // [s]ix
@@ -139,10 +138,6 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 start_idx[6] = byte_idx;
             }
             (b't', true) => {
-                // eigh[t]
-                if continues[7] + 1 == byte_idx && start_idx[7] + 4 == byte_idx {
-                    on_digit(8);
-                }
                 // [t]wo:
                 start_idx[1] = byte_idx;
                 // [t]hree:
@@ -168,12 +163,6 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
                 // t[w]o
                 if start_idx[1] + 1 == byte_idx {
                     continues[1] = byte_idx;
-                }
-            }
-            (b'x', true) => {
-                if continues[5] + 1 == byte_idx && start_idx[5] + 2 == byte_idx {
-                    // si[x]
-                    on_digit(6);
                 }
             }
             _ => {}
@@ -204,8 +193,9 @@ five3threeqgtwone
 twone
 oneight
 nine
-ninine";
-    test_part_two_no_allocations!(test_input => 281 + 51 + 21 + 18 + 99 + 99);
+ninine
+eightwo";
+    test_part_two_no_allocations!(test_input => 281 + 51 + 21 + 18 + 99 + 99 + 82);
     let test_input = "cneightwotdkfxxxjfdpz3zkkthree";
     test_part_two_no_allocations!(test_input => 83);
 
