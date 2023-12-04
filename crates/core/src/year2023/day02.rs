@@ -1,4 +1,4 @@
-use crate::input::Input;
+use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     input
@@ -9,8 +9,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 }
 
 fn game_score(game_str: &str, part1: bool) -> Result<u32, String> {
-    let on_error = || "Invalid input".to_string();
-
     let (game_declaration_str, draws_str) = game_str.split_once(": ").ok_or_else(on_error)?;
     let mut max_shown = [0; 3];
 

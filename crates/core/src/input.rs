@@ -131,3 +131,7 @@ macro_rules! test_part_two_error {
 }
 #[cfg(test)]
 pub(crate) use test_part_two_error;
+
+pub fn on_error() -> String {
+    "Invalid input".to_string()
+}
