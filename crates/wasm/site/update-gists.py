@@ -159,11 +159,20 @@ def set_gist(year, day, src, gist_id=None):
 with open(MAPPING_FILE_NAME, "r") as infile:
     gist_mapping = json.load(infile)
 
+num_updated = 0
+MAX_UPDATES = 20
+
 for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
+    if num_updated == MAX_UPDATES:
+        break
+
     if not "year" in dirpath:
         continue
     year = int(dirpath.split("/")[-1][4:])
     for filename in filenames:
+        if num_updated == MAX_UPDATES:
+            break
+
         if not filename.endswith(".rs"):
             continue
         if not filename.startswith("day"):
@@ -248,8 +257,9 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
 
         gist_mapping[year_str][day_str]['visualization'] = supports_visualization
 
+        num_updated += 1
         # Avoid GitHub API rate limiting
-        time.sleep(10)
+        time.sleep(5)
 
 if not dry_run:
     with open(MAPPING_FILE_NAME, "w") as outfile:
