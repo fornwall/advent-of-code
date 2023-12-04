@@ -1,48 +1,48 @@
 use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
-    const MAX_CARDS: usize = 256;
+    const MAX_WINNING_NUMBERS: usize = 15;
+    let multiplier_stack = &mut [1; MAX_WINNING_NUMBERS + 1];
+    let mut multiplier_idx = 0;
 
-    let num_cards = input.text.lines().count();
-    if num_cards > MAX_CARDS {
-        return Err(format!("Too many cards: {num_cards}"));
-    }
-    let cards = &mut [1; MAX_CARDS][0..num_cards];
+    input
+        .text
+        .lines()
+        .map(|card_str| {
+            let card_str = card_str.split_once(": ").ok_or_else(on_error)?.1;
+            let (win_numbers, my_numbers) = card_str.split_once(" | ").ok_or_else(on_error)?;
 
-    for (card_idx, card_str) in input.text.lines().enumerate() {
-        let card_str = card_str.split_once(": ").ok_or_else(on_error)?.1;
-
-        let (win_numbers, my_numbers) = card_str.split_once(" | ").ok_or_else(on_error)?;
-
-        let mut winning = 0_u128;
-        for number in win_numbers.split_ascii_whitespace() {
-            let number = parse_number(number)?;
-            winning |= 1 << number;
-        }
-
-        let mut this_score = 0;
-        for number in my_numbers.split_ascii_whitespace() {
-            let number = parse_number(number)?;
-            if winning & (1 << number) != 0 {
-                this_score = if input.is_part_one() && this_score != 0 {
-                    this_score * 2
-                } else {
-                    this_score + 1
-                };
+            let mut winning_bitmask = 0_u128;
+            for number in win_numbers.split_ascii_whitespace() {
+                let number = parse_number(number)?;
+                winning_bitmask |= 1 << number;
             }
-        }
 
-        if input.is_part_one() {
-            cards[card_idx] = this_score;
-        } else {
-            let num_copies = cards[card_idx];
-            for i in card_idx..(card_idx + this_score).min(cards.len() - 1) {
-                cards[i + 1] += num_copies;
+            let mut points = 0;
+            for number in my_numbers.split_ascii_whitespace() {
+                let number = parse_number(number)?;
+                if winning_bitmask & (1 << number) != 0 {
+                    points = if input.is_part_one() && points != 0 {
+                        points * 2
+                    } else {
+                        points + 1
+                    };
+                }
             }
-        }
-    }
 
-    Ok(cards.iter().sum::<usize>() as u64)
+            Ok(if input.is_part_one() {
+                points as u64
+            } else {
+                let num_copies = multiplier_stack[multiplier_idx];
+                for i in 1..=points {
+                    multiplier_stack[(multiplier_idx + i) % MAX_WINNING_NUMBERS] += num_copies;
+                }
+                multiplier_stack[multiplier_idx] = 1;
+                multiplier_idx = (multiplier_idx + 1) % MAX_WINNING_NUMBERS;
+                num_copies
+            })
+        })
+        .sum()
 }
 
 fn parse_number(num_str: &str) -> Result<u8, String> {
