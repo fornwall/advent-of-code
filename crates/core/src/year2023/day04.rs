@@ -10,14 +10,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let cards = &mut [1; MAX_CARDS][0..num_cards];
 
     let mut sum = 0;
-    for card_str in input.text.lines() {
-        let (card_number, card_str) = card_str.split_once(": ").ok_or_else(on_error)?;
-        let card_id = card_number
-            .split_ascii_whitespace()
-            .nth(1)
-            .ok_or_else(on_error)?
-            .parse::<u32>()
-            .map_err(|_| on_error())?;
+    for (card_idx, card_str) in input.text.lines().enumerate() {
+        let card_str = card_str.split_once(": ").ok_or_else(on_error)?.1;
 
         let (win_numbers, my_numbers) = card_str.split_once(" | ").ok_or_else(on_error)?;
 
@@ -42,24 +36,23 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         if input.is_part_one() {
             sum += this_score;
         } else {
-            for i in (card_id + 1)..(card_id + 1 + this_score).min(cards.len() as u32) {
-                cards[i as usize] += cards[card_id as usize];
+            let num_copies = cards[card_idx];
+            for i in card_idx..(card_idx + this_score).min(cards.len() - 1) {
+                cards[i + 1] += num_copies;
             }
         }
     }
     Ok(if input.is_part_one() {
-        sum
+        sum as u32
     } else {
         cards.iter().sum::<u32>()
     })
 }
 
 fn parse_number(num_str: &str) -> Result<u8, String> {
-    let n = num_str
-        .parse::<u8>()
-        .map_err(|_| crate::input::on_error())?;
+    let n = num_str.parse::<u8>().map_err(|_| on_error())?;
     if n >= 128 {
-        return Err(crate::input::on_error());
+        return Err(on_error());
     }
     Ok(n)
 }
@@ -80,4 +73,6 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
     let real_input = include_str!("day04_input.txt");
     test_part_one_no_allocations!(real_input => 17803);
     test_part_two_no_allocations!(real_input => 5_554_894);
+    let real_input = include_str!("day04_input_other.txt");
+    test_part_two_no_allocations!(real_input => 6_420_979);
 }
