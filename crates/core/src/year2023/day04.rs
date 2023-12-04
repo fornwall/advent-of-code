@@ -1,6 +1,6 @@
 use crate::input::{on_error, Input};
 
-pub fn solve(input: &Input) -> Result<u32, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_CARDS: usize = 256;
 
     let num_cards = input.text.lines().count();
@@ -9,7 +9,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     }
     let cards = &mut [1; MAX_CARDS][0..num_cards];
 
-    let mut sum = 0;
     for (card_idx, card_str) in input.text.lines().enumerate() {
         let card_str = card_str.split_once(": ").ok_or_else(on_error)?.1;
 
@@ -34,7 +33,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
 
         if input.is_part_one() {
-            sum += this_score;
+            cards[card_idx] = this_score;
         } else {
             let num_copies = cards[card_idx];
             for i in card_idx..(card_idx + this_score).min(cards.len() - 1) {
@@ -42,11 +41,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             }
         }
     }
-    Ok(if input.is_part_one() {
-        sum as u32
-    } else {
-        cards.iter().sum::<u32>()
-    })
+
+    Ok(cards.iter().sum::<usize>() as u64)
 }
 
 fn parse_number(num_str: &str) -> Result<u8, String> {
