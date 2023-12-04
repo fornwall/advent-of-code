@@ -19,16 +19,16 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             .parse::<u32>()
             .map_err(|_| on_error())?;
 
-        let (win_cards, my_cards) = card_str.split_once(" | ").ok_or_else(on_error)?;
+        let (win_numbers, my_numbers) = card_str.split_once(" | ").ok_or_else(on_error)?;
 
         let mut winning = 0_u128;
-        for number in win_cards.split_ascii_whitespace() {
+        for number in win_numbers.split_ascii_whitespace() {
             let number = parse_number(number)?;
             winning |= 1 << number;
         }
 
         let mut this_score = 0;
-        for number in my_cards.split_ascii_whitespace() {
+        for number in my_numbers.split_ascii_whitespace() {
             let number = parse_number(number)?;
             if winning & (1 << number) != 0 {
                 this_score = if input.is_part_one() && this_score != 0 {
