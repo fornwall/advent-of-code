@@ -1,5 +1,7 @@
 use crate::input::{on_error, Input};
 
+type Interval = (i64, i64);
+
 pub fn solve(input: &Input) -> Result<i64, String> {
     const MAX_INTERVALS: usize = 256;
 
@@ -10,6 +12,15 @@ pub fn solve(input: &Input) -> Result<i64, String> {
     let mut scratch_intervals = [(0, 0); MAX_INTERVALS];
     let mut scratch_idx = 0;
 
+    let push_entry = |interval: &mut [Interval], element, idx: &mut usize| {
+        if *idx == MAX_INTERVALS {
+            return Err(format!("More then {MAX_INTERVALS} intervals"));
+        }
+        interval[*idx] = element;
+        *idx += 1;
+        Ok(())
+    };
+
     let mut lines = input.text.lines();
     let initial_line = &lines.next().ok_or_else(on_error)?["seeds: ".len()..];
     let mut first_value = None;
@@ -17,15 +28,13 @@ pub fn solve(input: &Input) -> Result<i64, String> {
         let n = n.parse::<i64>().map_err(|_| on_error())?;
         if input.is_part_two() {
             if let Some(start) = first_value {
-                mapped_intervals[mapped_idx] = (start, start + n);
-                mapped_idx += 1;
+                push_entry(&mut mapped_intervals, (start, start + n), &mut mapped_idx)?;
                 first_value = None;
             } else {
                 first_value = Some(n);
             }
         } else {
-            mapped_intervals[mapped_idx] = (n, n + 1);
-            mapped_idx += 1;
+            push_entry(&mut mapped_intervals, (n, n + 1), &mut mapped_idx)?;
         }
     }
 
@@ -36,8 +45,7 @@ pub fn solve(input: &Input) -> Result<i64, String> {
         if line.ends_with("map:") {
             // Any source numbers that aren't mapped correspond to the same destination number:
             for source_interval in source_intervals.into_iter().take(source_idx) {
-                mapped_intervals[mapped_idx] = source_interval;
-                mapped_idx += 1;
+                push_entry(&mut mapped_intervals, source_interval, &mut mapped_idx)?;
             }
 
             std::mem::swap(&mut source_intervals, &mut mapped_intervals);
@@ -45,21 +53,9 @@ pub fn solve(input: &Input) -> Result<i64, String> {
             mapped_idx = 0;
         } else {
             let mut parts = line.split(' ');
-            let destination_range_start = parts
-                .next()
-                .ok_or_else(on_error)?
-                .parse::<i64>()
-                .map_err(|_| on_error())?;
-            let source_range_start = parts
-                .next()
-                .ok_or_else(on_error)?
-                .parse::<i64>()
-                .map_err(|_| on_error())?;
-            let range_len = parts
-                .next()
-                .ok_or_else(on_error)?
-                .parse::<i64>()
-                .map_err(|_| on_error())?;
+            let destination_range_start = parse_num(parts.next())?;
+            let source_range_start = parse_num(parts.next())?;
+            let range_len = parse_num(parts.next())?;
 
             let source = (source_range_start, source_range_start + range_len);
             let dest_diff = destination_range_start - source_range_start;
@@ -67,20 +63,20 @@ pub fn solve(input: &Input) -> Result<i64, String> {
             for source_interval in source_intervals.into_iter().take(source_idx) {
                 let [before, inside, after] = intersect_intervals(source_interval, source);
                 if let Some(inside) = inside {
-                    mapped_intervals[mapped_idx] = (inside.0 + dest_diff, inside.1 + dest_diff);
-                    mapped_idx += 1;
+                    push_entry(
+                        &mut mapped_intervals,
+                        (inside.0 + dest_diff, inside.1 + dest_diff),
+                        &mut mapped_idx,
+                    )?;
 
                     if let Some(before) = before {
-                        scratch_intervals[scratch_idx] = before;
-                        scratch_idx += 1;
+                        push_entry(&mut scratch_intervals, before, &mut scratch_idx)?;
                     }
                     if let Some(after) = after {
-                        scratch_intervals[scratch_idx] = after;
-                        scratch_idx += 1;
+                        push_entry(&mut scratch_intervals, after, &mut scratch_idx)?;
                     }
                 } else {
-                    scratch_intervals[scratch_idx] = source_interval;
-                    scratch_idx += 1;
+                    push_entry(&mut scratch_intervals, source_interval, &mut scratch_idx)?;
                 }
             }
 
@@ -97,6 +93,12 @@ pub fn solve(input: &Input) -> Result<i64, String> {
         .map(|i| i.0)
         .min()
         .unwrap_or_default())
+}
+
+fn parse_num(part: Option<&str>) -> Result<i64, String> {
+    part.ok_or_else(on_error)?
+        .parse::<i64>()
+        .map_err(|_| on_error())
 }
 
 fn intersect_intervals(interval_a: (i64, i64), interval_b: (i64, i64)) -> [Option<(i64, i64)>; 3] {
