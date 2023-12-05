@@ -4,11 +4,11 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     input
         .text
         .lines()
-        .map(|game_str| game_score(game_str, input.is_part_one()))
+        .map(|game_str| score_game(game_str, input.is_part_one()))
         .sum::<Result<_, _>>()
 }
 
-fn game_score(game_str: &str, part1: bool) -> Result<u32, String> {
+fn score_game(game_str: &str, part1: bool) -> Result<u32, String> {
     let (game_declaration_str, draws_str) = game_str.split_once(": ").ok_or_else(on_error)?;
     let mut max_shown = [0; 3];
 

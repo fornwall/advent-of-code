@@ -25,13 +25,11 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
                         for dx in -1_i32..=1 {
                             for row in [above, middle, below] {
-                                if dx == 0 && row == middle {
-                                    continue;
-                                }
                                 let x = col_idx as i32 + dx;
-
-                                if matches!(dx, 0 | 1) && row[(x - 1) as usize].is_ascii_digit() {
-                                    // Avoid counting same number multiple times.
+                                if (dx == 0 && row == middle)
+                                    // Avoid counting same number multiple times:
+                                    || matches!(dx, 0 | 1) && row[(x - 1) as usize].is_ascii_digit()
+                                {
                                     continue;
                                 }
 

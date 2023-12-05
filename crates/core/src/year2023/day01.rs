@@ -69,6 +69,7 @@ nine
 ninine
 eightwo";
     test_part_two_no_allocations!(test_input => 281 + 51 + 21 + 18 + 99 + 99 + 82);
+
     let test_input = "cneightwotdkfxxxjfdpz3zkkthree";
     test_part_two_no_allocations!(test_input => 83);
 

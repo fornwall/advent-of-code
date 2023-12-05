@@ -1,8 +1,8 @@
 use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
-    const MAX_WINNING_NUMBERS: usize = 15;
-    let multiplier_stack = &mut [1; MAX_WINNING_NUMBERS + 1];
+    const MAX_WINNING_NUMBERS: usize = 16;
+    let multiplier_stack = &mut [1; MAX_WINNING_NUMBERS];
     let mut multiplier_idx = 0;
 
     input
@@ -34,10 +34,10 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 points as u64
             } else {
                 let num_copies = multiplier_stack[multiplier_idx];
+                multiplier_stack[multiplier_idx] = 1;
                 for i in 1..=points {
                     multiplier_stack[(multiplier_idx + i) % MAX_WINNING_NUMBERS] += num_copies;
                 }
-                multiplier_stack[multiplier_idx] = 1;
                 multiplier_idx = (multiplier_idx + 1) % MAX_WINNING_NUMBERS;
                 num_copies
             })
