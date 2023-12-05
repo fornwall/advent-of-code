@@ -101,7 +101,7 @@ fn parse_num(part: Option<&str>) -> Result<i64, String> {
         .map_err(|_| on_error())
 }
 
-fn intersect_intervals(interval_a: (i64, i64), interval_b: (i64, i64)) -> [Option<(i64, i64)>; 3] {
+fn intersect_intervals(interval_a: Interval, interval_b: Interval) -> [Option<Interval>; 3] {
     if interval_b.0 > interval_a.1 || interval_a.0 > interval_b.1 {
         [None, None, None]
     } else {
