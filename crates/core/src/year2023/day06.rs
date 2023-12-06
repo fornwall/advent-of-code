@@ -29,12 +29,18 @@ fn num_wins((duration, record): (&str, &str)) -> u64 {
     //   duration * hold_time - hold_time^2 > record
     // =>
     //   hold_time^2 - duration * hold_time + record < 0
-    // => (quadratic equation) for boundary points:
-    let d2 = duration / 2.;
-    let sqrt = d2.mul_add(d2, -record).sqrt();
-    let max = (d2 + sqrt - 1.).ceil();
-    let min = (d2 - sqrt + 1.).floor();
-    (max - min + 1.).round() as u64
+    // (quadratic equation, with fused multiply-add (FMA) / mul_add()) =>
+    let b = duration / 2.;
+    let sqrt = b.mul_add(b, -record).sqrt();
+    // For floating points a, b, and the open interval [a, b],
+    // the integers contained in the interval are: [a.floor() + 1, b.ceil() - 1].
+    // The reason for floor() + 1 instead of ceil() (and similarly for b.ceil() - 1 vs floor())
+    // is that with a or b being exact integer values, the integer values are not
+    // contained in the interval.
+    let min = (b - sqrt).floor() as u64 + 1;
+    let max = (b + sqrt).ceil() as u64 - 1;
+    // +1 to beat the record:
+    max - min + 1
 }
 
 fn parse_digits(s: &str) -> f64 {
