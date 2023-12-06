@@ -69,7 +69,7 @@ async function main() {
             if (data.part == 2) problemLink += "#part2";
 
             const gistLink =
-              "https://play.rust-lang.org/?version=stable&mode=release&edition=edition=2021&gist=" +
+              "https://play.rust-lang.org/?version=stable&mode=release&edition=2021&gist=" +
               gistMapping[data.year][data.day]["gist"];
             const compilerExplorerLink =
               "https://godbolt.org/z/" +
