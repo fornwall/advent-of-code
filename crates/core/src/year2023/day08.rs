@@ -55,12 +55,11 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         map[from_id] = to;
     }
 
-    let starting_nodes = if input.is_part_one() {
-        &[0]
+    let (starting_nodes, end_nodes) = if input.is_part_one() {
+        (&[0][..], &[1][..])
     } else {
-        starting_nodes.slice()
+        (starting_nodes.slice(), end_nodes.slice())
     };
-    let end_nodes = end_nodes.slice();
 
     let mut result = 1;
     'outer: for &starting_node in starting_nodes {
