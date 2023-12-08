@@ -7,18 +7,11 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_START_END_NODES: usize = 32;
 
     let mut id_assigner = IdAssigner::<MAX_ENTRIES, u32>::new(0);
-
-    let (instructions, map_lines) = input.text.split_once("\n\n").ok_or_else(on_error)?;
-
-    let a = u32::from(b'A');
-    let _ = id_assigner.id_of((a << 16) + (a << 8) + a);
-    let z = u32::from(b'Z');
-    let _ = id_assigner.id_of((z << 16) + (z << 8) + z);
-
     let mut map = [(0, 0); MAX_ENTRIES];
-
     let mut starting_nodes = ArrayStack::<MAX_START_END_NODES, u16>::new();
     let mut end_nodes = ArrayStack::<MAX_START_END_NODES, u16>::new();
+
+    let (instructions, map_lines) = input.text.split_once("\n\n").ok_or_else(on_error)?;
 
     for line in map_lines.lines() {
         let mut start_idx = usize::MAX;
@@ -38,9 +31,15 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                     + (u32::from(bytes[start_idx + 1]) << 8)
                     + u32::from(bytes[start_idx + 2]);
                 ids[str_count] = id_assigner.id_of(key)?;
-                if str_count == 0 && bytes[2] == b'A' {
+                if str_count == 0
+                    && bytes[2] == b'A'
+                    && !(input.is_part_one() && (bytes[0] != b'A' || bytes[1] != b'A'))
+                {
                     starting_nodes.push(ids[str_count])?;
-                } else if str_count == 0 && bytes[2] == b'Z' {
+                } else if str_count == 0
+                    && bytes[2] == b'Z'
+                    && !(input.is_part_one() && (bytes[0] != b'Z' || bytes[1] != b'Z'))
+                {
                     end_nodes.push(ids[str_count])?;
                 }
                 str_count += 1;
@@ -53,11 +52,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         map[ids[0] as usize] = (ids[1], ids[2]);
     }
 
-    let (starting_nodes, end_nodes) = if input.is_part_one() {
-        (&[0][..], &[1][..])
-    } else {
-        (starting_nodes.slice(), end_nodes.slice())
-    };
+    let (starting_nodes, end_nodes) = (starting_nodes.slice(), end_nodes.slice());
 
     let mut result = 1;
     'outer: for &starting_node in starting_nodes {
