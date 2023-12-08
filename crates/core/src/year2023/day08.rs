@@ -1,16 +1,24 @@
 use crate::common::id_assigner::IdAssigner;
-use crate::input::Input;
+use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
-    let mut id_assigner = IdAssigner::<1000, [u8]>::new();
+    const MAX_ENTRIES: usize = 1024;
+    const MAX_START_END_NODES: usize = 32;
 
-    let (instructions, map_lines) = input.text.split_once("\n\n").unwrap();
+    let mut id_assigner = IdAssigner::<MAX_ENTRIES, [u8]>::new(&[0]);
+
+    let (instructions, map_lines) = input.text.split_once("\n\n").ok_or_else(on_error)?;
 
     let _ = id_assigner.id_of(&[b'A', b'A', b'A'])?;
     let _ = id_assigner.id_of(&[b'Z', b'Z', b'Z'])?;
-    let mut map = vec![(0, 0), (0, 0)];
-    let mut starting_nodes = Vec::new();
-    let mut end_nodes = Vec::new();
+
+    let mut map = [(0, 0); MAX_ENTRIES];
+
+    let mut starting_nodes = [0; MAX_START_END_NODES];
+    let mut starting_nodes_idx = 0;
+
+    let mut end_nodes = [0; MAX_START_END_NODES];
+    let mut end_nodes_idx = 0;
 
     for line in map_lines.lines() {
         let mut start_idx = usize::MAX;
@@ -28,9 +36,11 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 }
                 ids[str_count] = id_assigner.id_of(&bytes[start_idx..idx])?;
                 if str_count == 0 && bytes[2] == b'A' {
-                    starting_nodes.push(ids[str_count]);
+                    starting_nodes[starting_nodes_idx] = ids[str_count];
+                    starting_nodes_idx += 1;
                 } else if str_count == 0 && bytes[2] == b'Z' {
-                    end_nodes.push(ids[str_count]);
+                    end_nodes[end_nodes_idx] = ids[str_count];
+                    end_nodes_idx += 1;
                 }
                 str_count += 1;
                 start_idx = usize::MAX;
@@ -41,25 +51,28 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         }
         let from_id = ids[0] as usize;
         let to = (ids[1], ids[2]);
-        if from_id < map.len() {
-            map[from_id] = to
-        } else {
-            map.resize(from_id + 1, (0, 0));
-            map[from_id] = to;
+        if from_id >= map.len() {
+            return Err("Too many entries".to_string());
         }
+        map[from_id] = to;
     }
 
     let starting_nodes = if input.is_part_one() {
-        vec![0]
+        &[0]
     } else {
-        starting_nodes
+        &starting_nodes[0..starting_nodes_idx]
     };
+    let end_nodes = &end_nodes[0..end_nodes_idx];
 
     let mut result = 1;
-    'outer: for starting_node in starting_nodes {
+    'outer: for &starting_node in starting_nodes {
         let mut current_pos = starting_node as usize;
         let mut steps = 0;
-        for i in instructions.bytes().cycle().take(100000) {
+        for i in instructions
+            .bytes()
+            .cycle()
+            .take(id_assigner.len() * id_assigner.len())
+        {
             steps += 1;
             let entry = map[current_pos];
             current_pos = if i == b'L' {
@@ -67,7 +80,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             } else {
                 entry.1 as usize
             };
-            if (input.is_part_one() && current_pos == 1) || (input.is_part_two() && end_nodes.contains(&(current_pos as u16))) {
+            if (input.is_part_one() && current_pos == 1)
+                || (input.is_part_two() && end_nodes.contains(&(current_pos as u16)))
+            {
                 result = lcm(result, steps);
                 continue 'outer;
             }
@@ -124,5 +139,5 @@ XXX = (XXX, XXX)";
 
     let real_input = include_str!("day08_input.txt");
     test_part_one_no_allocations!(real_input => 20221);
-    test_part_two_no_allocations!(real_input => 14616363770447);
+    test_part_two_no_allocations!(real_input => 14_616_363_770_447);
 }
