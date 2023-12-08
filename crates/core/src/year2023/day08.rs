@@ -52,9 +52,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         }
         let from_id = ids[0] as usize;
         let to = (ids[1], ids[2]);
-        if from_id >= map.len() {
-            return Err("Too many entries".to_string());
-        }
         map[from_id] = to;
     }
 
