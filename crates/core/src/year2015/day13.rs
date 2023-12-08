@@ -2,10 +2,10 @@ use crate::common::id_assigner::IdAssigner;
 use crate::common::permutation::all_permutations;
 use crate::input::Input;
 
-const MAX_ATTENDEES: u16 = 10;
+const MAX_ATTENDEES: usize = 10;
 
 pub fn solve(input: &Input) -> Result<i32, String> {
-    let mut id_assigner = IdAssigner::<MAX_ATTENDEES>::new();
+    let mut id_assigner = IdAssigner::<MAX_ATTENDEES, str>::new("");
 
     let mut happiness_changes = Vec::new();
     for line in input.text.lines() {

@@ -1,16 +1,12 @@
-use std::hash::Hash;
-
 pub struct IdAssigner<'a, const MAX_SIZE: usize, H: Ord + Eq + ?Sized> {
-    //id_map: std::collections::hash_map::HashMap<&'a H, u16>,
     id_map: [&'a H; MAX_SIZE],
     ids: [u16; MAX_SIZE],
     assigned_count: u16,
 }
 
 impl<'a, const MAX_SIZE: usize, H: Ord + Eq + ?Sized> IdAssigner<'a, MAX_SIZE, H> {
-    pub fn new(default: &'a H) -> Self {
+    pub const fn new(default: &'a H) -> Self {
         Self {
-            //id_map: Default::default(),
             id_map: [default; MAX_SIZE],
             ids: [0; MAX_SIZE],
             assigned_count: 0,
@@ -18,22 +14,8 @@ impl<'a, const MAX_SIZE: usize, H: Ord + Eq + ?Sized> IdAssigner<'a, MAX_SIZE, H
     }
 
     pub fn id_of(&mut self, name: &'a H) -> Result<u16, String> {
-        /*
-        let next_id = self.id_map.len() as u16;
-        Ok(match self.id_map.entry(name) {
-            std::collections::hash_map::Entry::Vacant(entry) => {
-                if usize::from(next_id) == MAX_SIZE {
-                    return Err("Too many entries".to_string());
-                }
-                entry.insert(next_id);
-                next_id
-            }
-            std::collections::hash_map::Entry::Occupied(e) => *e.get(),
-        })
-         */
-
         Ok(
-            match (&self.id_map[0..(self.assigned_count as usize)]).binary_search(&name) {
+            match self.id_map[0..(self.assigned_count as usize)].binary_search(&name) {
                 Ok(idx) => self.ids[idx],
                 Err(idx) => {
                     self.id_map
@@ -51,17 +33,14 @@ impl<'a, const MAX_SIZE: usize, H: Ord + Eq + ?Sized> IdAssigner<'a, MAX_SIZE, H
     }
 
     pub fn get_id(&mut self, name: &H) -> Option<u16> {
-        //self.id_map.get(name).copied()
-
-        if let Ok(idx) = (&self.id_map[0..(self.assigned_count as usize)]).binary_search(&name) {
+        if let Ok(idx) = self.id_map[0..(self.assigned_count as usize)].binary_search(&name) {
             Some(self.ids[idx])
         } else {
             None
         }
     }
 
-    pub fn len(&self) -> usize {
-        //self.id_map.len()
+    pub const fn len(&self) -> usize {
         self.assigned_count as usize
     }
 }

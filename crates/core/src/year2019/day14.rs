@@ -14,7 +14,7 @@ struct Reactions {
 
 impl Reactions {
     fn parse(input_string: &str) -> Result<Self, String> {
-        let mut id_assigner = IdAssigner::<100>::new();
+        let mut id_assigner = IdAssigner::<100, str>::new("");
 
         // Indexed by chemical id that is produced, to amount produced and required.
         let mut reactions: Vec<(ChemicalAmount, Vec<ChemicalAmount>)> = Vec::new();

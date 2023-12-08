@@ -3,6 +3,7 @@ pub mod chunk_iterator;
 #[cfg(feature = "webgpu-compute")]
 pub mod gpu;
 pub mod id_assigner;
+pub mod id_assigner_copy;
 pub mod int_to_ascii;
 pub mod map_windows;
 pub mod md5;

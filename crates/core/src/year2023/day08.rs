@@ -1,16 +1,18 @@
-use crate::common::id_assigner::IdAssigner;
+use crate::common::id_assigner_copy::IdAssigner;
 use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_ENTRIES: usize = 1024;
     const MAX_START_END_NODES: usize = 32;
 
-    let mut id_assigner = IdAssigner::<MAX_ENTRIES, [u8]>::new(&[0]);
+    let mut id_assigner = IdAssigner::<MAX_ENTRIES, u32>::new(0);
 
     let (instructions, map_lines) = input.text.split_once("\n\n").ok_or_else(on_error)?;
 
-    let _ = id_assigner.id_of(&[b'A', b'A', b'A'])?;
-    let _ = id_assigner.id_of(&[b'Z', b'Z', b'Z'])?;
+    let a = u32::from(b'A');
+    let _ = id_assigner.id_of((a << 16) + (a << 8) + a);
+    let z = u32::from(b'Z');
+    let _ = id_assigner.id_of((z << 16) + (z << 8) + z);
 
     let mut map = [(0, 0); MAX_ENTRIES];
 
@@ -31,10 +33,13 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                     start_idx = idx;
                 }
             } else if start_idx != usize::MAX {
-                if str_count == 3 {
+                if str_count == 3 || (start_idx + 3 != idx) {
                     return Err("Invalid input".to_string());
                 }
-                ids[str_count] = id_assigner.id_of(&bytes[start_idx..idx])?;
+                let key = (u32::from(bytes[start_idx]) << 16)
+                    + (u32::from(bytes[start_idx + 1]) << 8)
+                    + u32::from(bytes[start_idx + 2]);
+                ids[str_count] = id_assigner.id_of(key)?;
                 if str_count == 0 && bytes[2] == b'A' {
                     starting_nodes[starting_nodes_idx] = ids[str_count];
                     starting_nodes_idx += 1;

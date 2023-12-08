@@ -6,7 +6,7 @@ use crate::input::Input;
 const MAX_LOCATIONS: u16 = 10;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
-    let mut id_assigner = IdAssigner::<MAX_LOCATIONS>::new();
+    let mut id_assigner = IdAssigner::<{ MAX_LOCATIONS as usize }, str>::new("");
 
     let mut places = Vec::with_capacity(MAX_LOCATIONS as usize);
     let mut distances = [0; (MAX_LOCATIONS * MAX_LOCATIONS) as usize];
