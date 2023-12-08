@@ -1,18 +1,14 @@
+use crate::common::array_stack::ArrayStack;
 use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_HANDS: usize = 1024;
-    let mut hands = [Hand::default(); MAX_HANDS];
-    let mut num_hands = 0;
+    let mut hands = ArrayStack::<MAX_HANDS, Hand>::new();
 
-    for (idx, line) in input.text.lines().enumerate() {
-        hands[idx] = Hand::parse(line, input.is_part_two())?;
-        num_hands += 1;
-        if num_hands > MAX_HANDS {
-            return Err(format!("Too many hands - max {MAX_HANDS} supported"));
-        }
+    for line in input.text.lines() {
+        hands.push(Hand::parse(line, input.is_part_two())?)?;
     }
-    let hands = &mut hands[0..num_hands];
+    let hands = hands.slice_mut();
 
     hands.sort_unstable();
     Ok(hands

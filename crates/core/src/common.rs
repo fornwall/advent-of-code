@@ -1,3 +1,4 @@
+pub mod array_stack;
 pub mod character_recognition;
 pub mod chunk_iterator;
 #[cfg(feature = "webgpu-compute")]

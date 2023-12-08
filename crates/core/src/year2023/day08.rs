@@ -1,3 +1,4 @@
+use crate::common::array_stack::ArrayStack;
 use crate::common::id_assigner_copy::IdAssigner;
 use crate::input::{on_error, Input};
 
@@ -16,11 +17,8 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
     let mut map = [(0, 0); MAX_ENTRIES];
 
-    let mut starting_nodes = [0; MAX_START_END_NODES];
-    let mut starting_nodes_idx = 0;
-
-    let mut end_nodes = [0; MAX_START_END_NODES];
-    let mut end_nodes_idx = 0;
+    let mut starting_nodes = ArrayStack::<MAX_START_END_NODES, u16>::new();
+    let mut end_nodes = ArrayStack::<MAX_START_END_NODES, u16>::new();
 
     for line in map_lines.lines() {
         let mut start_idx = usize::MAX;
@@ -41,11 +39,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                     + u32::from(bytes[start_idx + 2]);
                 ids[str_count] = id_assigner.id_of(key)?;
                 if str_count == 0 && bytes[2] == b'A' {
-                    starting_nodes[starting_nodes_idx] = ids[str_count];
-                    starting_nodes_idx += 1;
+                    starting_nodes.push(ids[str_count])?;
                 } else if str_count == 0 && bytes[2] == b'Z' {
-                    end_nodes[end_nodes_idx] = ids[str_count];
-                    end_nodes_idx += 1;
+                    end_nodes.push(ids[str_count])?;
                 }
                 str_count += 1;
                 start_idx = usize::MAX;
@@ -65,9 +61,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     let starting_nodes = if input.is_part_one() {
         &[0]
     } else {
-        &starting_nodes[0..starting_nodes_idx]
+        starting_nodes.slice()
     };
-    let end_nodes = &end_nodes[0..end_nodes_idx];
+    let end_nodes = end_nodes.slice();
 
     let mut result = 1;
     'outer: for &starting_node in starting_nodes {
