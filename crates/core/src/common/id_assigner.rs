@@ -1,17 +1,18 @@
 use std::collections::{hash_map::Entry, HashMap};
+use std::hash::Hash;
 
-pub struct IdAssigner<'a, const MAX_SIZE: u16> {
-    id_map: HashMap<&'a str, u16>,
+pub struct IdAssigner<'a, const MAX_SIZE: u16, H: Hash + PartialOrd + Eq + ?Sized> {
+    id_map: HashMap<&'a H, u16>,
 }
 
-impl<'a, const MAX_SIZE: u16> IdAssigner<'a, MAX_SIZE> {
+impl<'a, const MAX_SIZE: u16, H: Hash + Hash + PartialOrd + Eq  + ?Sized> IdAssigner<'a, MAX_SIZE, H> {
     pub fn new() -> Self {
         Self {
             id_map: HashMap::new(),
         }
     }
 
-    pub fn id_of(&mut self, name: &'a str) -> Result<u16, String> {
+    pub fn id_of(&mut self, name: &'a H) -> Result<u16, String> {
         let next_id = self.id_map.len() as u16;
         Ok(match self.id_map.entry(name) {
             Entry::Vacant(entry) => {
@@ -25,7 +26,7 @@ impl<'a, const MAX_SIZE: u16> IdAssigner<'a, MAX_SIZE> {
         })
     }
 
-    pub fn get_id(&mut self, name: &str) -> Option<u16> {
+    pub fn get_id(&mut self, name: &H) -> Option<u16> {
         self.id_map.get(name).copied()
     }
 
