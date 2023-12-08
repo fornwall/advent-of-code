@@ -1,3 +1,4 @@
+use crate::common::array_stack::ArrayStack;
 use crate::input::{on_error, Input};
 
 type Interval = (i64, i64);
@@ -5,21 +6,9 @@ type Interval = (i64, i64);
 pub fn solve(input: &Input) -> Result<i64, String> {
     const MAX_INTERVALS: usize = 256;
 
-    let mut mapped_intervals = [(0, 0); MAX_INTERVALS];
-    let mut mapped_idx = 0;
-    let mut source_intervals = [(0, 0); MAX_INTERVALS];
-    let mut source_idx = 0;
-    let mut scratch_intervals = [(0, 0); MAX_INTERVALS];
-    let mut scratch_idx = 0;
-
-    let push_entry = |interval: &mut [Interval], element, idx: &mut usize| {
-        if *idx == MAX_INTERVALS {
-            return Err(format!("More then {MAX_INTERVALS} intervals"));
-        }
-        interval[*idx] = element;
-        *idx += 1;
-        Ok(())
-    };
+    let mut mapped_intervals = ArrayStack::<MAX_INTERVALS, Interval>::new();
+    let mut source_intervals = ArrayStack::<MAX_INTERVALS, Interval>::new();
+    let mut scratch_intervals = ArrayStack::<MAX_INTERVALS, Interval>::new();
 
     let mut lines = input.text.lines();
     let initial_line = &lines.next().ok_or_else(on_error)?["seeds: ".len()..];
@@ -28,13 +17,13 @@ pub fn solve(input: &Input) -> Result<i64, String> {
         let n = n.parse::<i64>().map_err(|_| on_error())?;
         if input.is_part_two() {
             if let Some(start) = first_value {
-                push_entry(&mut mapped_intervals, (start, start + n), &mut mapped_idx)?;
+                mapped_intervals.push((start, start + n))?;
                 first_value = None;
             } else {
                 first_value = Some(n);
             }
         } else {
-            push_entry(&mut mapped_intervals, (n, n + 1), &mut mapped_idx)?;
+            mapped_intervals.push((n, n + 1))?;
         }
     }
 
@@ -44,13 +33,12 @@ pub fn solve(input: &Input) -> Result<i64, String> {
         }
         if line.ends_with("map:") {
             // Any source numbers that aren't mapped correspond to the same destination number:
-            for source_interval in source_intervals.into_iter().take(source_idx) {
-                push_entry(&mut mapped_intervals, source_interval, &mut mapped_idx)?;
+            for source_interval in source_intervals.slice() {
+                mapped_intervals.push(*source_interval)?;
             }
 
             std::mem::swap(&mut source_intervals, &mut mapped_intervals);
-            source_idx = mapped_idx;
-            mapped_idx = 0;
+            mapped_intervals.clear();
         } else {
             let mut parts = line.split(' ');
             let destination_range_start = parse_num(parts.next())?;
@@ -60,36 +48,31 @@ pub fn solve(input: &Input) -> Result<i64, String> {
             let source = (source_range_start, source_range_start + range_len);
             let dest_diff = destination_range_start - source_range_start;
 
-            for source_interval in source_intervals.into_iter().take(source_idx) {
-                let [before, inside, after] = intersect_intervals(source_interval, source);
+            for source_interval in source_intervals.slice() {
+                let [before, inside, after] = intersect_intervals(*source_interval, source);
                 if let Some(inside) = inside {
-                    push_entry(
-                        &mut mapped_intervals,
-                        (inside.0 + dest_diff, inside.1 + dest_diff),
-                        &mut mapped_idx,
-                    )?;
+                    mapped_intervals.push((inside.0 + dest_diff, inside.1 + dest_diff))?;
 
                     if let Some(before) = before {
-                        push_entry(&mut scratch_intervals, before, &mut scratch_idx)?;
+                        scratch_intervals.push(before)?;
                     }
                     if let Some(after) = after {
-                        push_entry(&mut scratch_intervals, after, &mut scratch_idx)?;
+                        scratch_intervals.push(after)?;
                     }
                 } else {
-                    push_entry(&mut scratch_intervals, source_interval, &mut scratch_idx)?;
+                    scratch_intervals.push(*source_interval)?;
                 }
             }
 
             std::mem::swap(&mut source_intervals, &mut scratch_intervals);
-            source_idx = scratch_idx;
-            scratch_idx = 0;
+            scratch_intervals.clear();
         }
     }
 
     Ok(mapped_intervals
+        .slice()
         .iter()
-        .take(mapped_idx)
-        .chain(source_intervals.iter().take(source_idx))
+        .chain(source_intervals.slice().iter())
         .map(|i| i.0)
         .min()
         .unwrap_or_default())
