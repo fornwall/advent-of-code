@@ -29,4 +29,4 @@ For learning and demonstration purposes, this repository contains additional res
 - [crates/worker](crates/worker): A [Cloudflare Worker](https://workers.cloudflare.com/).
   - API is available through the [OpenAPI](https://www.openapis.org/) interface at [aoc.fornwall.net/api/](https://aoc.fornwall.net/api/).
 
-All deployments are done using [GitHub Actions workflows](.github/workflows/).
+Deployments are done using [GitHub Actions workflows](.github/workflows/).
