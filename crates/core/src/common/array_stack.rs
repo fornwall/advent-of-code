@@ -27,4 +27,8 @@ impl<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone + Default> ArrayStack<MAX
     pub fn slice_mut(&mut self) -> &mut [H] {
         &mut self.elements[0..self.len]
     }
+
+    pub fn clear(&mut self) {
+        self.len = 0;
+    }
 }

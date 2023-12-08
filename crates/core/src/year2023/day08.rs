@@ -75,9 +75,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             } else {
                 entry.1 as usize
             };
-            if (input.is_part_one() && current_pos == 1)
-                || (input.is_part_two() && end_nodes.contains(&(current_pos as u16)))
-            {
+            if end_nodes.contains(&(current_pos as u16)) {
                 result = lcm(result, steps);
                 continue 'outer;
             }
