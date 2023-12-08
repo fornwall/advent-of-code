@@ -50,9 +50,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         if str_count != 3 {
             return Err("Invalid input".to_string());
         }
-        let from_id = ids[0] as usize;
-        let to = (ids[1], ids[2]);
-        map[from_id] = to;
+        map[ids[0] as usize] = (ids[1], ids[2]);
     }
 
     let (starting_nodes, end_nodes) = if input.is_part_one() {
