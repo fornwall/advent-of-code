@@ -36,7 +36,7 @@ impl CaveMap {
             end_cave_identifier: u8::MAX,
         };
 
-        let mut id_assigner = IdAssigner::<{ Self::MAX_SIZE as u16 }>::new();
+        let mut id_assigner = IdAssigner::<{ Self::MAX_SIZE }, str>::new("");
 
         for line in text.lines() {
             if let Some((from, to)) = line.split_once('-') {
