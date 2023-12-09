@@ -1,5 +1,5 @@
 pub struct ArrayStack<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone + Default> {
-    elements: [H; MAX_SIZE],
+    pub elements: [H; MAX_SIZE],
     len: usize,
 }
 
@@ -30,5 +30,16 @@ impl<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone + Default> ArrayStack<MAX
 
     pub fn clear(&mut self) {
         self.len = 0;
+    }
+
+    pub const fn len(&self) -> usize {
+        self.len
+    }
+
+    #[allow(clippy::unwrap_used)]
+    pub fn pop_unwrap(&mut self) -> H {
+        let result = self.elements[self.len - 1];
+        self.len -= 1;
+        result
     }
 }
