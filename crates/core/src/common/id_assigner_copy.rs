@@ -18,6 +18,9 @@ impl<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone> IdAssigner<MAX_SIZE, H> 
             match self.id_map[0..(self.assigned_count as usize)].binary_search(&name) {
                 Ok(idx) => self.ids[idx],
                 Err(idx) => {
+                    if usize::from(self.assigned_count) == MAX_SIZE {
+                        return Err("Too many elements".to_string());
+                    }
                     self.id_map
                         .copy_within(idx..self.assigned_count as usize, idx + 1);
                     self.ids
@@ -48,11 +51,13 @@ impl<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone> IdAssigner<MAX_SIZE, H> 
 #[allow(clippy::unwrap_used)]
 #[test]
 fn test() {
-    let mut id_assigner = IdAssigner::<100, u16>::new(1);
+    let mut id_assigner = IdAssigner::<3, u16>::new(1);
     assert_eq!(id_assigner.id_of(1).unwrap(), 0);
     assert_eq!(id_assigner.id_of(1).unwrap(), 0);
     assert_eq!(id_assigner.id_of(2).unwrap(), 1);
     assert_eq!(id_assigner.id_of(2).unwrap(), 1);
     assert_eq!(id_assigner.id_of(1).unwrap(), 0);
     assert_eq!(id_assigner.id_of(2).unwrap(), 1);
+    assert_eq!(id_assigner.id_of(30).unwrap(), 2);
+    assert!(id_assigner.id_of(40).is_err());
 }
