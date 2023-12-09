@@ -4,12 +4,12 @@ use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_ENTRIES: usize = 1024;
-    const MAX_START_END_NODES: usize = 32;
+    const MAX_START_NODES: usize = 32;
+    const END_NODE_ID: u16 = u16::MAX;
 
     let mut id_assigner = IdAssigner::<MAX_ENTRIES, u32>::new(0);
     let mut map = [(0, 0); MAX_ENTRIES];
-    let mut starting_nodes = ArrayStack::<MAX_START_END_NODES, u16>::new();
-    let mut end_nodes = ArrayStack::<MAX_START_END_NODES, u16>::new();
+    let mut starting_nodes = ArrayStack::<MAX_START_NODES, u16>::new();
 
     let (instructions, map_lines) = input.text.split_once("\n\n").ok_or_else(on_error)?;
 
@@ -27,21 +27,28 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 if str_count == 3 || (start_idx + 3 != idx) {
                     return Err("Invalid input".to_string());
                 }
-                let key = (u32::from(bytes[start_idx]) << 16)
-                    + (u32::from(bytes[start_idx + 1]) << 8)
-                    + u32::from(bytes[start_idx + 2]);
-                ids[str_count] = id_assigner.id_of(key)?;
-                if str_count == 0
-                    && bytes[2] == b'A'
-                    && !(input.is_part_one() && (bytes[0] != b'A' || bytes[1] != b'A'))
+                ids[str_count] = if bytes[start_idx + 2] == b'Z'
+                    && !(input.is_part_one()
+                        && (bytes[start_idx] != b'Z' || bytes[start_idx + 1] != b'Z'))
                 {
-                    starting_nodes.push(ids[str_count])?;
-                } else if str_count == 0
-                    && bytes[2] == b'Z'
-                    && !(input.is_part_one() && (bytes[0] != b'Z' || bytes[1] != b'Z'))
-                {
-                    end_nodes.push(ids[str_count])?;
-                }
+                    END_NODE_ID
+                } else {
+                    let key = (u32::from(bytes[start_idx]) << 16)
+                        + (u32::from(bytes[start_idx + 1]) << 8)
+                        + u32::from(bytes[start_idx + 2]);
+                    let id = id_assigner.id_of(key)?;
+
+                    if str_count == 0
+                        && bytes[start_idx + 2] == b'A'
+                        && !(input.is_part_one()
+                            && (bytes[start_idx] != b'A' || bytes[start_idx + 1] != b'A'))
+                    {
+                        starting_nodes.push(id)?;
+                    }
+
+                    id
+                };
+
                 str_count += 1;
                 start_idx = usize::MAX;
             }
@@ -49,29 +56,24 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         if str_count != 3 {
             return Err("Invalid input".to_string());
         }
-        map[ids[0] as usize] = (ids[1], ids[2]);
+        if ids[0] != u16::MAX {
+            map[ids[0] as usize] = (ids[1], ids[2]);
+        }
     }
 
-    let (starting_nodes, end_nodes) = (starting_nodes.slice(), end_nodes.slice());
-
     let mut result = 1;
-    'outer: for &starting_node in starting_nodes {
-        let mut current_pos = starting_node as usize;
-        let mut steps = 0;
-        for i in instructions
+    'outer: for &starting_node in starting_nodes.slice() {
+        let mut current_pos = starting_node;
+        for (step, i) in instructions
             .bytes()
             .cycle()
             .take(id_assigner.len() * id_assigner.len())
+            .enumerate()
         {
-            steps += 1;
-            let entry = map[current_pos];
-            current_pos = if i == b'L' {
-                entry.0 as usize
-            } else {
-                entry.1 as usize
-            };
-            if end_nodes.contains(&(current_pos as u16)) {
-                result = lcm(result, steps);
+            let entry = map[current_pos as usize];
+            current_pos = if i == b'L' { entry.0 } else { entry.1 };
+            if current_pos == END_NODE_ID {
+                result = lcm(result, (step + 1) as u64);
                 continue 'outer;
             }
         }
