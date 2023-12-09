@@ -112,8 +112,9 @@ impl SvgShape {
         self.elements.is_empty()
     }
 
-    pub fn line_to_absolute(mut self, x: Coordinate, y: Coordinate) -> Self {
-        self.elements.push(SvgPathElement::LineAbsolute((x, y)));
+    pub fn line_to_absolute<I: Into<Coordinate>>(mut self, x: I, y: I) -> Self {
+        self.elements
+            .push(SvgPathElement::LineAbsolute((x.into(), y.into())));
         self
     }
 
