@@ -35,14 +35,6 @@ impl<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone> IdAssigner<MAX_SIZE, H> 
         )
     }
 
-    pub fn get_id(&mut self, name: &H) -> Option<u16> {
-        if let Ok(idx) = self.id_map[0..(self.assigned_count as usize)].binary_search(name) {
-            Some(self.ids[idx])
-        } else {
-            None
-        }
-    }
-
     pub const fn len(&self) -> usize {
         self.assigned_count as usize
     }
