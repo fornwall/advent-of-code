@@ -3,38 +3,28 @@ use crate::common::u256::U256;
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<i64, String> {
-    let empty_expansion = input.part_values(2, 1_000_000);
-
-    let mut populated_rows = U256::default();
-    let mut populated_cols = U256::default();
+    let (mut rows, mut cols) = (U256::default(), U256::default());
     for (row_idx, row) in input.text.lines().enumerate() {
         for (col_idx, b) in row.bytes().enumerate() {
             if b == b'#' {
-                populated_rows.set_bit(row_idx);
-                populated_cols.set_bit(col_idx);
+                rows.set_bit(row_idx);
+                cols.set_bit(col_idx);
             }
         }
     }
 
     let mut galaxies = ArrayStack::<512, (u32, u32)>::new();
     let mut row_offset = 0;
+    let empty_expansion = input.part_values(1, 999_999);
     for (row_idx, row) in input.text.lines().enumerate() {
         let mut col_offset = 0;
         for (col_idx, b) in row.bytes().enumerate() {
             if b == b'#' {
                 galaxies.push((row_offset, col_offset))?;
             }
-            col_offset += if populated_cols.is_bit_set(col_idx) {
-                1
-            } else {
-                empty_expansion
-            };
+            col_offset += 1 + u32::from(!cols.is_bit_set(col_idx)) * empty_expansion;
         }
-        row_offset += if populated_rows.is_bit_set(row_idx) {
-            1
-        } else {
-            empty_expansion
-        };
+        row_offset += 1 + u32::from(!rows.is_bit_set(row_idx)) * empty_expansion;
     }
 
     let num_galaxies = galaxies.len();
