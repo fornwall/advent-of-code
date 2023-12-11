@@ -3,10 +3,15 @@ use crate::common::u256::U256;
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<i64, String> {
+    const MAX_GRID_SIZE: usize = 256;
+
     let (mut rows, mut cols) = (U256::default(), U256::default());
     for (row_idx, row) in input.text.lines().enumerate() {
         for (col_idx, b) in row.bytes().enumerate() {
             if b == b'#' {
+                if col_idx >= MAX_GRID_SIZE || row_idx >= MAX_GRID_SIZE {
+                    return Err(format!("Too big grid - max {MAX_GRID_SIZE} supported"));
+                }
                 rows.set_bit(row_idx);
                 cols.set_bit(col_idx);
             }
