@@ -4,6 +4,7 @@ use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<i64, String> {
     const MAX_GRID_SIZE: usize = 256;
+    const MAX_GALAXIES: usize = 512;
 
     let (mut rows, mut cols) = (U256::default(), U256::default());
     for (row_idx, row) in input.text.lines().enumerate() {
@@ -19,7 +20,7 @@ pub fn solve(input: &Input) -> Result<i64, String> {
     }
 
     let empty_expansion = input.part_values(1, 999_999);
-    let mut galaxies = ArrayStack::<512, (u32, u32)>::new();
+    let mut galaxies = ArrayStack::<MAX_GALAXIES, (u32, u32)>::new();
     let mut row_offset = 0;
     for (row_idx, row) in input.text.lines().enumerate() {
         let mut col_offset = 0;
