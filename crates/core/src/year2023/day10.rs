@@ -6,7 +6,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_GRID_SIZE: usize = 200;
     const MAX_STACK_SIZE: usize = 32;
 
-    let map = Map::parse(input.text.as_bytes())?;
+    let map = Map::parse(input.text.trim().as_bytes())?;
     if map.num_rows > MAX_GRID_SIZE || map.num_cols > MAX_GRID_SIZE {
         return Err(format!("Invalid input - max grid size is {MAX_GRID_SIZE}"));
     }
