@@ -1,3 +1,4 @@
+pub mod array_deque;
 pub mod array_stack;
 pub mod character_recognition;
 pub mod chunk_iterator;
