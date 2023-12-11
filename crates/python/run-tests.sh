@@ -3,6 +3,10 @@ set -e -u
 
 rm -Rf env
 python3 -m venv env
+
+# OSTYPE necessary in python 3.12.{0,1} due to https://github.com/python/cpython/issues/112252
+export OSTYPE=linux
+
 . env/bin/activate
 pip install -r requirements.txt
 python setup.py develop
