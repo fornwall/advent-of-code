@@ -3,8 +3,8 @@ use crate::common::u256::U256;
 use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
-    const MAX_GRID_SIZE: usize = 200;
-    const MAX_STACK_SIZE: usize = 32;
+    const MAX_GRID_SIZE: usize = 150;
+    const MAX_STACK_SIZE: usize = 4;
 
     let map = Map::parse(input.text.trim().as_bytes())?;
     if map.num_rows > MAX_GRID_SIZE || map.num_cols > MAX_GRID_SIZE {
