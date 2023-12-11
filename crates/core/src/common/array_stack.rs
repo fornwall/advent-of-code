@@ -1,9 +1,9 @@
-pub struct ArrayStack<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone + Default> {
+pub struct ArrayStack<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> {
     pub elements: [H; MAX_SIZE],
     len: usize,
 }
 
-impl<const MAX_SIZE: usize, H: Ord + Eq + Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
+impl<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
     pub fn new() -> Self {
         Self {
             elements: [Default::default(); MAX_SIZE],
