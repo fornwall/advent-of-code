@@ -76,7 +76,7 @@ fn count_alternatives(damaged: u128, unknown: u128, groups: &[u8]) -> u64 {
     // with bits set at positions up until the first damaged position
     // - note that we inserted an unset bit above.
     let mut alternatives = [0; 128];
-    (&mut alternatives[0..(damaged.trailing_zeroes() as usize)]).fill(1);
+    (&mut alternatives[0..(damaged.trailing_zeros() as usize)]).fill(1);
 
     // For each group that is necessary, go over all the positions
     // and carry over possibilities from the previous run at positions
