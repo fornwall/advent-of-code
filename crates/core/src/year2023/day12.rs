@@ -1,5 +1,6 @@
 use crate::common::array_stack::ArrayStack;
 use crate::input::{on_error, Input};
+use std::collections::HashMap;
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     let num_copies = input.part_values(1, 5);
@@ -7,14 +8,18 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
     for line in input.text.lines() {
         let (springs, numbers) = line.split_once(' ').ok_or_else(on_error)?;
-        let (mut set, mut unknown) = springs.bytes().enumerate().fold((0_u128, 0_u128), |(mut s, mut u), (idx, b)| {
-            if b == b'#' {
-                s |= 1 << idx;
-            } else if b == b'?' {
-                u |= 1 << idx;
-            }
-            (s, u)
-        });
+        let (mut set, mut unknown) =
+            springs
+                .bytes()
+                .enumerate()
+                .fold((0_u128, 0_u128), |(mut s, mut u), (idx, b)| {
+                    if b == b'#' {
+                        s |= 1 << idx;
+                    } else if b == b'?' {
+                        u |= 1 << idx;
+                    }
+                    (s, u)
+                });
         let mut nums = ArrayStack::<60, u8>::new();
         for num in numbers.split(',') {
             nums.push(num.parse::<u8>().map_err(|_| on_error())?)?;
@@ -41,8 +46,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             }
         }
 
-        let len = ((springs.len() +1) * num_copies) as u32 + 1 ;
-        sum += count_ways(0, len, set, 0, unknown, 0, nums.slice());
+        let len = ((springs.len() + 1) * num_copies) as u32 + 1;
+        let mut cache = HashMap::new();
+        sum += count_alternatives(&mut cache, 0, len, set, 0, unknown, 0, nums.slice());
     }
     Ok(sum)
 }
@@ -51,38 +57,81 @@ fn set_lowest_bits(n: u8) -> u128 {
     u128::MAX >> (u128::BITS as u16 - u16::from(n))
 }
 
-fn count_ways(bit_offset: u32, num_bits: u32, set: u128, set_streak: u32, unknown: u128, mut numbers_offset: usize, numbers: &[u8]) -> u64 {
-    if bit_offset == num_bits {
+fn count_alternatives(
+    cache: &mut HashMap<(u32, u32, usize), u64>,
+    bit_offset: u32,
+    num_bits: u32,
+    set: u128,
+    set_streak: u32,
+    unknown: u128,
+    mut numbers_offset: usize,
+    numbers: &[u8],
+) -> u64 {
+    let cache_entry = (bit_offset, set_streak, numbers_offset);
+    if let Some(val) = cache.get(&cache_entry) {
+        return *val;
+    }
+    let result = if bit_offset == num_bits {
         return u64::from(numbers_offset == numbers.len());
-    };
-
-    let is_set = set & (1 << bit_offset) != 0;
-    let is_unknown = unknown & (1 << bit_offset) != 0;
-
-    // Set in stone.
-    if is_set {
-        return count_ways(bit_offset + 1, num_bits, set, set_streak + 1, unknown, numbers_offset, numbers);
-    }
-
-    // Possibly set from unknown.
-    let initial = if is_unknown {
-        count_ways(bit_offset + 1, num_bits, set, set_streak + 1, unknown, numbers_offset, numbers)
     } else {
-        0
-    };
+        let is_set = set & (1 << bit_offset) != 0;
+        let is_unknown = unknown & (1 << bit_offset) != 0;
 
-    // Not set.
-    if set_streak != 0 {
-        if numbers_offset == numbers.len() {
-            return initial;
+        // Set in stone.
+        if is_set {
+            count_alternatives(
+                cache,
+                bit_offset + 1,
+                num_bits,
+                set,
+                set_streak + 1,
+                unknown,
+                numbers_offset,
+                numbers,
+            )
+        } else {
+            // Possibly set from unknown.
+            let initial = if is_unknown {
+                count_alternatives(
+                    cache,
+                    bit_offset + 1,
+                    num_bits,
+                    set,
+                    set_streak + 1,
+                    unknown,
+                    numbers_offset,
+                    numbers,
+                )
+            } else {
+                0
+            };
+
+            // Not set.
+            if set_streak != 0 {
+                if numbers_offset == numbers.len() {
+                    return initial;
+                }
+                let num = numbers[numbers_offset];
+                if u32::from(num) != set_streak {
+                    return initial;
+                }
+                numbers_offset += 1;
+            }
+            initial
+                + count_alternatives(
+                    cache,
+                    bit_offset + 1,
+                    num_bits,
+                    set,
+                    0,
+                    unknown,
+                    numbers_offset,
+                    numbers,
+                )
         }
-        let num = numbers[numbers_offset];
-        if u32::from(num) != set_streak {
-            return initial;
-        }
-        numbers_offset += 1;
-    }
-    initial + count_ways(bit_offset + 1, num_bits, set, 0, unknown, numbers_offset, numbers)
+    };
+    cache.insert(cache_entry, result);
+    result
 }
 
 #[test]
@@ -100,5 +149,5 @@ pub fn tests() {
 
     let real_input = include_str!("day12_input.txt");
     test_part_one_no_allocations!(real_input => 8419);
-    //test_part_two_no_allocations!(real_input => 0);
+    test_part_two_no_allocations!(real_input => 160_500_973_317_706);
 }
