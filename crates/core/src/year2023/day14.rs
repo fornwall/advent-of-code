@@ -3,7 +3,7 @@ use crate::input::Input;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-pub fn solve(input: &Input) -> Result<usize, String> {
+pub fn solve(input: &Input) -> Result<u64, String> {
     let mut moving = ArrayStack::<128, u128>::new();
     let mut fixed = ArrayStack::<128, u128>::new();
     let mut num_cols = 0;
@@ -31,13 +31,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         for x in 0..num_cols {
             move_dir(0, 1, x, 0, num_cols, moving.slice_mut(), fixed.slice());
         }
-        return Ok(moving
-            .slice()
-            .iter()
-            .rev()
-            .enumerate()
-            .map(|(idx, row)| (idx + 1) * row.count_ones() as usize)
-            .sum());
+        return Ok(total_load(moving.slice()));
     }
 
     let mut hashes = ArrayStack::<500, u64>::new();
@@ -87,13 +81,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             }
         }
         if remaining == 0 {
-            return Ok(moving
-                .slice()
-                .iter()
-                .rev()
-                .enumerate()
-                .map(|(idx, row)| (idx + 1) * row.count_ones() as usize)
-                .sum());
+            return Ok(total_load(moving.slice()));
         }
     }
 }
@@ -146,6 +134,15 @@ fn move_dir(
         x = new_x;
         y = new_y;
     }
+}
+
+fn total_load(moving: &[u128]) -> u64 {
+    moving
+        .iter()
+        .rev()
+        .enumerate()
+        .map(|(idx, row)| (idx + 1) as u64 * u64::from(row.count_ones()))
+        .sum()
 }
 
 fn calculate_hash(t: &[u128]) -> u64 {
