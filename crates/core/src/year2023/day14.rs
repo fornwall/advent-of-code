@@ -34,11 +34,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         return Ok(total_load(moving.slice()));
     }
 
-    let mut hashes = ArrayStack::<500, u64>::new();
+    let mut hashes = ArrayStack::<256, u64>::new();
     hashes.push(calculate_hash(moving.slice()))?;
 
-    let mut tortoise = 0;
-    let mut hare = 0;
     let mut remaining = 1_000_000_000;
     loop {
         for x in 0..num_cols {
@@ -70,16 +68,14 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             );
         }
         let hash = calculate_hash(moving.slice());
-        hashes.push(hash)?;
-        remaining -= 1;
-        if hare + 2 < hashes.len() && remaining != 0 {
-            tortoise += 1;
-            hare += 2;
-            if hashes.elements[tortoise] == hashes.elements[hare] {
-                let cycle_length = hare - tortoise;
+        for i in 0..hashes.len() {
+            if hashes.elements[i] == hash {
+                let cycle_length = hashes.len() - i;
                 remaining %= cycle_length;
             }
         }
+        hashes.push(hash)?;
+        remaining -= 1;
         if remaining == 0 {
             return Ok(total_load(moving.slice()));
         }
