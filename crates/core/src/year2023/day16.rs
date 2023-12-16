@@ -68,7 +68,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 Direction::Left => (max_x, 0, 0, 1),
                 Direction::Down => (0, 0, 1, 0),
             };
-            while entry_x >= 0 && entry_x < max_x && entry_y >= 0 && entry_y < max_y {
+            while entry_x >= 0 && entry_x <= max_x && entry_y >= 0 && entry_y <= max_y {
                 max = max.max(do_solve(
                     entry_x,
                     entry_y,
