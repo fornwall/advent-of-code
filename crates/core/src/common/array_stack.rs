@@ -1,10 +1,10 @@
 #[derive(Clone)]
-pub struct ArrayStack<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> {
+pub struct ArrayStack<const MAX_SIZE: usize, H: Copy + Clone + Default> {
     pub elements: [H; MAX_SIZE],
     len: usize,
 }
 
-impl<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
+impl<const MAX_SIZE: usize, H: Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
     pub fn new() -> Self {
         Self {
             elements: [Default::default(); MAX_SIZE],
@@ -16,6 +16,13 @@ impl<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> ArrayStack<MAX_SIZE,
         Self {
             elements: [initial; MAX_SIZE],
             len: 0,
+        }
+    }
+
+    pub fn with_len(len: usize) -> Self {
+        Self {
+            elements: [Default::default(); MAX_SIZE],
+            len,
         }
     }
 
@@ -51,6 +58,18 @@ impl<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> ArrayStack<MAX_SIZE,
         result
     }
 
+    pub fn pop(&mut self) -> Option<H> {
+        if self.len == 0 {
+            None
+        } else {
+            let result = self.elements[self.len - 1];
+            self.len -= 1;
+            Some(result)
+        }
+    }
+}
+
+impl<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
     pub fn retain<F>(&mut self, mut f: F)
     where
         F: FnMut(&H) -> bool,
