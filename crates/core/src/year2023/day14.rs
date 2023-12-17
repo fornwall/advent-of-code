@@ -91,12 +91,20 @@ fn move_dir(
     moving: &mut [u128],
     fixed: &[u128],
 ) {
-    let mut move_back_amount = if moving[y] & (1 << x) == 0 && fixed[y] & (1 << x) == 0 {
-        0
-    } else {
-        usize::MAX
-    };
+    let mut position_at = (x, y);
+
     loop {
+        if (moving[y] & (1 << x)) != 0 {
+            moving[y] &= !(1 << x);
+            moving[position_at.1] |= 1 << position_at.0;
+            position_at = (
+                (position_at.0 as i32 + x_dir) as usize,
+                (position_at.1 as i32 + y_dir) as usize,
+            );
+        } else if (fixed[y] & (1 << x)) != 0 {
+            position_at = ((x as i32 + x_dir) as usize, (y as i32 + y_dir) as usize);
+        }
+
         if (x_dir == -1 && x == 0)
             || (y_dir == -1 && y == 0)
             || (x_dir == 1 && x == num_cols - 1)
@@ -104,31 +112,8 @@ fn move_dir(
         {
             break;
         }
-        let new_x = (x as i32 + x_dir) as usize;
-        let new_y = (y as i32 + y_dir) as usize;
-
-        move_back_amount = move_back_amount.saturating_add(1);
-
-        let this_is_moving = (moving[new_y] & (1 << new_x)) != 0;
-        if this_is_moving {
-            if move_back_amount != usize::MAX {
-                let old_x = (new_x as i32 - x_dir * move_back_amount as i32) as usize;
-                let old_y = (new_y as i32 - y_dir * move_back_amount as i32) as usize;
-                moving[old_y] |= 1 << old_x;
-                moving[new_y] &= !(1 << new_x);
-                move_back_amount -= 1;
-            }
-        } else {
-            let this_is_fixed = (fixed[new_y] & (1 << new_x)) != 0;
-            if this_is_fixed {
-                move_back_amount = usize::MAX;
-            } else if move_back_amount == usize::MAX {
-                move_back_amount = 0;
-            }
-        }
-
-        x = new_x;
-        y = new_y;
+        x = (x as i32 + x_dir) as usize;
+        y = (y as i32 + y_dir) as usize;
     }
 }
 
