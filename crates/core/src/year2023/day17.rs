@@ -54,9 +54,6 @@ pub fn solve(input: &Input) -> Result<u16, String> {
     }
 
     while let Some((_, cost, x, y, steps)) = to_visit.pop() {
-        if usize::from(x) == map.num_cols - 1 && usize::from(y) == map.num_rows - 1 {
-            return Ok(cost);
-        }
         for turn in [0, 1, 2] {
             let multiplier = if turn != 0 && part2 { 4 } else { 1 };
             let new_num_steps = if turn == 0 {
@@ -100,6 +97,9 @@ pub fn solve(input: &Input) -> Result<u16, String> {
 
             if !visited.elements[array_offset].is_bit_set(nx_usize) {
                 visited.elements[array_offset].set_bit(nx_usize);
+                if nx_usize == map.num_cols - 1 && ny_usize == map.num_rows - 1 {
+                    return Ok(new_cost);
+                }
                 let new_cost_plus_heuristic = new_cost + map.heuristic(nx_usize, ny_usize);
                 to_visit.push((
                     new_cost_plus_heuristic,
