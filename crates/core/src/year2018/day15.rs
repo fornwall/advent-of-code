@@ -261,7 +261,7 @@ impl Board {
         if found.is_empty() {
             None
         } else {
-            found.sort_by(|a, b| {
+            found.sort_unstable_by(|a, b| {
                 a.0.cmp(&b.0)
                     .then(a.2.cmp(&b.2))
                     .then(a.1.cmp(&b.1))

@@ -38,7 +38,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         }
     }
 
-    points.sort_by(|a, b| a.4.cmp(&b.4));
+    points.sort_unstable_by(|a, b| a.4.cmp(&b.4));
     points.dedup_by(|a, b| a.4 == b.4);
     Ok(points.len())
 }

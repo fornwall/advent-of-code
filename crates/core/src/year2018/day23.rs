@@ -332,7 +332,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             inner_leaf.subdivide(&mut octree, &bots);
 
             // This could be faster
-            octree.leaves.sort_by(|a, b| {
+            octree.leaves.sort_unstable_by(|a, b| {
                 let a = a.borrow();
                 let b = b.borrow();
 

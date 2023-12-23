@@ -94,11 +94,11 @@ fn part2_nth(input_string: &str, nth: u32) -> Result<(i64, i64), String> {
 
     // Sort each group so that closest points are at end of vector:
     for points_on_line in points_grouped_by_direction.iter_mut() {
-        points_on_line.sort_by_key(|point| -(point.0 * point.0 + point.1 * point.1));
+        points_on_line.sort_unstable_by_key(|point| -(point.0 * point.0 + point.1 * point.1));
     }
 
     // Sort between groups in clockwise order:
-    points_grouped_by_direction.sort_by(|p1, p2| {
+    points_grouped_by_direction.sort_unstable_by(|p1, p2| {
         // Use atan2(x, y) instead of atan2(y, x) to start from y axis,
         // and negate value to get clockwise direction:
         // https://en.wikipedia.org/wiki/Atan2#/media/File:Atan2definition.svg
