@@ -15,6 +15,14 @@ impl U256 {
         }
     }
 
+    pub fn clear_bit(&mut self, offset: usize) {
+        if offset < 128 {
+            self.low &= !(1 << offset);
+        } else {
+            self.high &= !(1 << (offset - 128));
+        }
+    }
+
     pub const fn non_zero(&self) -> bool {
         self.low != 0 || self.high != 0
     }
