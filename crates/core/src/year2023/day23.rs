@@ -13,7 +13,14 @@ pub fn solve(input: &Input) -> Result<u16, String> {
 
     let src_idx = id_assigner.id_of((1, 0))?;
     work_queue.push((1, 0, 0, 0, 0, src_idx))?;
+    // Setting the destination node to be the last choice
+    // before the actual destination node (which is correct
+    // as a node can be only visited once, so if visiting
+    // the node neighbouring the actual destination node, one
+    // must go there next) decreases the nodes by 1 and saves
+    // execution time in the brute force solution.
     let mut destination_idx = 0;
+    let mut last_path_len = 0;
 
     while let Some((x, y, from_x, from_y, path_len, compact_src_idx)) = work_queue.pop() {
         let current_square = map.get(x as usize, y as usize);
@@ -42,9 +49,7 @@ pub fn solve(input: &Input) -> Result<u16, String> {
             possible_paths.push((new_x as u16, new_y as u16))?;
         }
 
-        let at_destination = x as usize == (map.num_cols - 2) && y as usize == (map.num_rows - 1);
-
-        let (new_compact_node_idx, new_path_len) = if possible_paths.len() > 1 || at_destination {
+        let (new_compact_node_idx, new_path_len) = if possible_paths.len() > 1 {
             // A new node in the compacted graph.
             let orig_len = id_assigner.len();
             let new_idx = id_assigner.id_of((x, y))?;
@@ -68,11 +73,6 @@ pub fn solve(input: &Input) -> Result<u16, String> {
                 }
             }
 
-            if at_destination {
-                destination_idx = new_idx;
-                continue;
-            }
-
             if visited_before {
                 continue;
             }
@@ -83,6 +83,11 @@ pub fn solve(input: &Input) -> Result<u16, String> {
         };
 
         while let Some((new_x, new_y)) = possible_paths.pop() {
+            if new_x as usize == (map.num_cols - 2) && new_y as usize == (map.num_rows - 1) {
+                destination_idx = new_compact_node_idx;
+                last_path_len = new_path_len;
+                continue;
+            }
             work_queue.push((new_x, new_y, x, y, new_path_len, new_compact_node_idx))?;
         }
     }
@@ -110,7 +115,7 @@ pub fn solve(input: &Input) -> Result<u16, String> {
         }
     }
 
-    Ok(longest)
+    Ok(longest + last_path_len)
 }
 
 struct Map<'a> {
