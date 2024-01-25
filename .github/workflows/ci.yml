@@ -368,10 +368,6 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
-    - name: Work around https://github.com/rustwasm/wasm-pack/issues/1263
-      run: |
-        mkdir /home/linuxbrew/.linuxbrew/bin/bin
-        cp /home/linuxbrew/.linuxbrew/bin/wasm-opt /home/linuxbrew/.linuxbrew/bin/bin/wasm-opt
     - name: Deploy to Cloudflare
       env:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
