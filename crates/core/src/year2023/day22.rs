@@ -28,7 +28,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     }
 
     // Sort in ascending order - from lowest brick to highest.
-    bricks.slice_mut().sort_by_key(|b| b.z1);
+    bricks.slice_mut().sort_unstable_by_key(|b| b.z1);
 
     // Settle bricks by letting them fall down until they
     // rest on a lower settled brick or the ground.
