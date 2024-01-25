@@ -68,6 +68,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             );
         }
         let hash = calculate_hash(moving.slice());
+        remaining -= 1;
         for i in 0..hashes.len() {
             if hashes.elements[i] == hash {
                 let cycle_length = hashes.len() - i;
@@ -75,7 +76,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             }
         }
         hashes.push(hash)?;
-        remaining -= 1;
         if remaining == 0 {
             return Ok(total_load(moving.slice()));
         }
@@ -152,4 +152,7 @@ O.#..O.#.#
     let real_input = include_str!("day14_input.txt");
     test_part_one_no_allocations!(real_input => 108_641);
     test_part_two_no_allocations!(real_input => 84_328);
+
+    let real_input = include_str!("day14_input_other.txt");
+    test_part_two_no_allocations!(real_input => 91_286);
 }
