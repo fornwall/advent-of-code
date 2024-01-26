@@ -98,10 +98,9 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     }
 
     player_scores
-        .iter()
+        .into_iter()
         .max()
         .ok_or_else(|| "No max value".to_string())
-        .map(|value| *value)
 }
 
 #[test]

@@ -8,8 +8,8 @@ pub fn solve(input: &Input) -> Result<Word, String> {
     let output = program.run_for_output()?;
     output
         .last()
+        .copied()
         .ok_or_else(|| "No output produced".to_string())
-        .map(|word| *word)
 }
 
 #[test]
