@@ -236,6 +236,10 @@ pub fn tests() {
     test_part_one_no_allocations!(test_input => 46);
     test_part_two_no_allocations!(test_input => 51);
 
+    let test_input = "|.........................................";
+    test_part_one_no_allocations!(test_input => 1);
+    test_part_two_no_allocations!(test_input => 42);
+
     let real_input = include_str!("day16_input.txt");
     test_part_one_no_allocations!(real_input => 6361);
     test_part_two_no_allocations!(real_input => 6701);
