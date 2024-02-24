@@ -13,12 +13,7 @@ pub fn solve(input: &Input) -> Result<u16, String> {
 
     let src_idx = id_assigner.id_of((1, 0))?;
     work_queue.push((1, 0, 0, 0, 0, src_idx))?;
-    // Setting the destination node to be the last choice
-    // before the actual destination node (which is correct
-    // as a node can be only visited once, so if visiting
-    // the node neighbouring the actual destination node, one
-    // must go there next) decreases the nodes by 1 and saves
-    // execution time in the brute force solution.
+
     let mut destination_idx = 0;
     let mut last_path_len = 0;
 
@@ -92,6 +87,16 @@ pub fn solve(input: &Input) -> Result<u16, String> {
         }
     }
 
+    // Avoid states blocking all entries into the destination:
+    let mut blocking_bitmask = 0_u64;
+    for (i, &(dest_connections, num_dest_connections)) in compacted_graph.iter().enumerate() {
+        for j in 0..num_dest_connections {
+            if dest_connections[j as usize].0 == destination_idx {
+                blocking_bitmask |= 1 << i;
+            }
+        }
+    }
+
     let mut longest = 0;
     let mut work_queue = ArrayStack::<1000, (u16, u64, u16)>::new();
     work_queue.push((src_idx, 1 << src_idx, 0))?;
@@ -104,7 +109,9 @@ pub fn solve(input: &Input) -> Result<u16, String> {
                 longest = longest.max(path_len + edge_len);
                 continue;
             }
-            if visited_bitmask & edge_destination_bit == 0 {
+            if visited_bitmask & edge_destination_bit == 0
+                && visited_bitmask & blocking_bitmask != blocking_bitmask
+            {
                 let new_visited_bitmask = visited_bitmask | edge_destination_bit;
                 work_queue.push((
                     edge_destination_idx,

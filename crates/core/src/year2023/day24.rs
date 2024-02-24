@@ -33,6 +33,7 @@ pub fn solve_range(input: &str, interval: RangeInclusive<i128>) -> Result<u64, S
 struct Coordinate {
     x: i128,
     y: i128,
+    #[allow(dead_code)]
     z: i128,
 }
 
