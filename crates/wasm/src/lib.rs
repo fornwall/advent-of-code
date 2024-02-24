@@ -4,7 +4,6 @@ extern crate wasm_bindgen;
 
 use advent_of_code::solve_raw;
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsValue;
 
 fn as_string(value: &JsValue) -> String {
     value.as_string().unwrap_or_else(|| {

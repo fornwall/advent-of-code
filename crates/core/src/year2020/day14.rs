@@ -27,9 +27,6 @@ type Memory = HashSet<u64, CustomBuildHasher>;
 trait BitMask {
     fn parse(input: &str) -> Self;
     fn apply(&self, memory: &mut Memory, address: u64, value: u64) -> Result<u64, String>;
-    fn too_slow(&self) -> bool {
-        false
-    }
 }
 
 #[derive(Copy, Clone)]
@@ -145,10 +142,6 @@ impl BitMask for BitMaskV2 {
             floating_counter |= self.floating_bitmask;
         }
         Ok(sum)
-    }
-
-    fn too_slow(&self) -> bool {
-        self.floating_bitmask.count_zeros() >= 10
     }
 }
 

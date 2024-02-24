@@ -1,7 +1,6 @@
 use crate::common::int_to_ascii::IntToAsciiContext;
 use crate::common::md5::Context;
 use crate::input::Input;
-use std::iter::FromIterator;
 
 pub fn solve(input: &Input) -> Result<String, String> {
     const MAX_INDEX: u32 = 100_000_000;

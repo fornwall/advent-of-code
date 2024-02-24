@@ -13,7 +13,6 @@ pub use script::*;
 pub use stroke::*;
 pub use style::*;
 pub use svg_use::*;
-pub use symbol::*;
 pub use transform::*;
 pub use view_box::*;
 
@@ -30,7 +29,6 @@ pub mod script;
 pub mod stroke;
 pub mod style;
 pub mod svg_use;
-pub mod symbol;
 pub mod transform;
 pub mod view_box;
 
