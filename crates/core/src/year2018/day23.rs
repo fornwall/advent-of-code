@@ -240,7 +240,7 @@ impl OctreeNode {
                 children: Vec::new(),
             }));
 
-            self.children.push(new_node.clone());
+            self.children.push(Rc::clone(&new_node));
             tree.leaves.push(new_node);
         }
     }
@@ -271,7 +271,7 @@ impl Octree {
         }));
 
         Self {
-            _root: root.clone(),
+            _root: Rc::clone(&root),
             leaves: vec![root],
         }
     }
@@ -313,7 +313,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                             < old_best.bounds.distance_from(origin)
                     {
                         // New best!
-                        best_leaf = Some(leaf.clone());
+                        best_leaf = Some(Rc::clone(&leaf));
                     }
                     continue;
                 }
@@ -321,7 +321,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             None => {
                 // Found our first candidate!
                 if inner_leaf.bounds.min == inner_leaf.bounds.max {
-                    best_leaf = Some(leaf.clone());
+                    best_leaf = Some(Rc::clone(&leaf));
                     continue;
                 }
             }
