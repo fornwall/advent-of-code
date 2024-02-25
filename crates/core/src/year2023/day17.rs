@@ -3,15 +3,16 @@ use crate::common::priority_queueu::PriorityQueue;
 use crate::common::u256::U256;
 use crate::input::{on_error, Input};
 
+const WORK_QUEUE_MAX_SIZE: usize = 40_000;
 const MAX_GRID_SIZE: usize = 192;
-// 2 bits for direction (north/east/south/west)
+// 2 bits (0b11) for direction (north/east/south/west)
 // PART1:
 // Amount in the range [1,3], encoded with:
 // 1 => 0b0, 2 => 0b1, 3 => 0b10
 // PART2:
 // Amount in the range [4,10], encoded with:
-// 1 => 0b0, 2 => 0b1, 3 => 0b10, .. 10 => 0b1001
-const DIRECTION_AND_AMOUNT_SIZE: usize = 0b10_0111;
+// 4 => 0b0, 5 => 0b1, 6 => 0b10, 7 => 0b11, 8 => 0b100, 9 => 0b101, 10 => 0b110
+const DIRECTION_AND_AMOUNT_SIZE: usize = 0b11_110;
 const VISITED_SIZE: usize = MAX_GRID_SIZE * DIRECTION_AND_AMOUNT_SIZE;
 
 #[allow(clippy::similar_names)]
@@ -24,7 +25,8 @@ pub fn solve(input: &Input) -> Result<u16, String> {
     }
 
     let mut visited = ArrayStack::<{ VISITED_SIZE }, U256>::with_len(VISITED_SIZE);
-    let mut to_visit = PriorityQueue::<10_000, (u16, u16, u8, u8, StepsInDirection)>::new();
+    let mut to_visit =
+        PriorityQueue::<{ WORK_QUEUE_MAX_SIZE }, (u16, u16, u8, u8, StepsInDirection)>::new();
 
     let initial = if part2 { 4_usize } else { 1 };
     for (x, y, direction) in [
@@ -35,9 +37,9 @@ pub fn solve(input: &Input) -> Result<u16, String> {
         let cost = u16::from(map.get(x, y))
             + u16::from(if part2 {
                 if x == 0 {
-                    map.get(x, y - 1) + map.get(x, y - 2) + map.get(x, y - 3)
+                    map.get(0, y - 1) + map.get(0, y - 2) + map.get(0, y - 3)
                 } else {
-                    map.get(x - 1, y) + map.get(x - 2, y) + map.get(x - 3, y)
+                    map.get(x - 1, 0) + map.get(x - 2, 0) + map.get(x - 3, 0)
                 }
             } else {
                 0
@@ -50,10 +52,20 @@ pub fn solve(input: &Input) -> Result<u16, String> {
             y as u8,
             steps_in_direction,
         ))?;
-        visited.elements[steps_in_direction.array_offset(y as i16)].set_bit(x);
     }
 
     while let Some((_, cost, x, y, steps)) = to_visit.pop() {
+        let array_offset = steps.array_offset(i16::from(y));
+        if visited.elements[array_offset].is_bit_set(x as usize) {
+            continue;
+        }
+
+        if x as usize == map.num_cols - 1 && y as usize == map.num_rows - 1 {
+            return Ok(cost);
+        }
+
+        visited.elements[array_offset].set_bit(x as usize);
+
         for turn in [0, 1, 2] {
             let multiplier = if turn != 0 && part2 { 4 } else { 1 };
             let new_num_steps = if turn == 0 {
@@ -84,7 +96,7 @@ pub fn solve(input: &Input) -> Result<u16, String> {
 
             let new_cost = cost
                 + u16::from(map.get(nx_usize, ny_usize))
-                + if part2 && multiplier == 4 {
+                + if multiplier == 4 {
                     (1..=3)
                         .map(|s| u16::from(map.get((x + dx * s) as usize, (y + dy * s) as usize)))
                         .sum()
@@ -93,13 +105,7 @@ pub fn solve(input: &Input) -> Result<u16, String> {
                 };
 
             let new_steps = StepsInDirection::new(new_num_steps, new_direction, part2);
-            let array_offset = new_steps.array_offset(ny);
-
-            if !visited.elements[array_offset].is_bit_set(nx_usize) {
-                visited.elements[array_offset].set_bit(nx_usize);
-                if nx_usize == map.num_cols - 1 && ny_usize == map.num_rows - 1 {
-                    return Ok(new_cost);
-                }
+            if !visited.elements[new_steps.array_offset(ny)].is_bit_set(nx_usize) {
                 let new_cost_plus_heuristic = new_cost + map.heuristic(nx_usize, ny_usize);
                 to_visit.push((
                     new_cost_plus_heuristic,
