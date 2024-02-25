@@ -75,7 +75,8 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         let delta1 = y1 - y0;
         let delta2 = y2 - y1;
 
-        y0 + num_reached_grids * delta1 + (num_reached_grids * (num_reached_grids - 1) / 2) * (delta2 - delta1)
+        y0 + num_reached_grids * delta1
+            + (num_reached_grids * (num_reached_grids - 1) / 2) * (delta2 - delta1)
     })
 }
 
