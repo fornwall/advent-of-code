@@ -56,7 +56,7 @@ jobs:
           python3 -m cibuildwheel --output-dir wheelhouse crates/python
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.arch }}-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
   release-core-docker-image:
@@ -135,7 +135,8 @@ jobs:
     - name: Download built wheels
       uses: actions/download-artifact@v4
       with:
-        name: wheels
+        pattern: wheels-*
+        merge-multiple: true
         path: dist
     - name: List files
       run: ls -lha dist
@@ -181,7 +182,7 @@ jobs:
       run: gradle test
     - uses: actions/upload-artifact@v4
       with:
-        name: jnilibs
+        name: jnilibs-${{ matrix.os }}
         path: ./crates/java/java-src/src/main/resources/*
 
   build-and-upload-man-page:
@@ -277,7 +278,8 @@ jobs:
     - name: Download JNI libraries
       uses: actions/download-artifact@v4
       with:
-        name: jnilibs
+        pattern: jnilibs-*
+        merge-multiple: true
         path: crates/java/java-src/src/main/resources/
     - name: Publish to Maven Central
       working-directory: crates/java/java-src
