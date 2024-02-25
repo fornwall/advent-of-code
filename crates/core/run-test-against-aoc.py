@@ -108,7 +108,7 @@ for year in years:
                             with open(output, "w") as outfile:
                                 outfile.write(input_data)
                             sys.exit(
-                                f"Incorrect! Expected={puzzle.answer_a}, got {result}. See {output}"
+                                f"Incorrect! Expected={existing_answer}, got {result}. See {output}"
                             )
                     except Exception:
                         if part == 1:
