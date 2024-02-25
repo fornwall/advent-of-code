@@ -20,6 +20,10 @@ os.environ["BROWSER"] = "true"
 
 verbose = "AOC_VERBOSE" in os.environ
 simd = "AOC_SIMD" in os.environ
+if "AOC_KEEP_GOING" in os.environ:
+    report_error = lambda x: print(x, file=sys.stderr)
+else:
+    report_error = sys.exit
 
 if "AOC_YEAR" in os.environ:
     years_string = os.environ["AOC_YEAR"]
@@ -107,7 +111,7 @@ for year in years:
                             output = f"failing-input-day-{year}-{day}-{part}.txt"
                             with open(output, "w") as outfile:
                                 outfile.write(input_data)
-                            sys.exit(
+                            report_error(
                                 f"Incorrect! Expected={existing_answer}, got {result}. See {output}"
                             )
                     except Exception:
@@ -120,4 +124,4 @@ for year in years:
                     with open(output, "w") as outfile:
                         outfile.write(input_data)
 
-                    sys.exit(f"Failed running - input data written to {output}")
+                    report_error(f"Failed running - input data written to {output}")
