@@ -311,7 +311,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: linux-aarch64-binary
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v2
         with:
           files: |
             advent-of-code-linux-aarch64.tar.xz
