@@ -1,4 +1,4 @@
-[![Build](https://github.com/fornwall/advent-of-code/workflows/Github%20CI/badge.svg)](https://github.com/fornwall/advent-of-code/actions?query=workflow%3A%22Github+CI%22)
+[![Build](https://github.com/fornwall/advent-of-code/actions/workflows/ci.yml/badge.svg)](https://github.com/fornwall/advent-of-code/actions/workflows/ci.yml)
 
 # Advent of Code solutions
 Solutions to [Advent of Code](https://adventofcode.com/) problems (2015-2023) in Rust.
