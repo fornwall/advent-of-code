@@ -1,1 +1,1 @@
-allowed-duplicate-crates = ["serde-wasm-bindgen", "hashbrown", "indexmap"]
+allowed-duplicate-crates = ["serde-wasm-bindgen", "hashbrown", "indexmap", "sync_wrapper", "bitflags"]
