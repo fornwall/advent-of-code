@@ -24,10 +24,10 @@ pub type KeyFrame = u32;
 #[derive(Debug)]
 enum Shape {
     /// Single triangle facing upwards. Corners:
-    /// TopLeft:     { x: -0.5, y:  0.5 }
-    /// TopRight:    { x:  0.5, y:  0.5 }
-    /// BottomLeft:  { x: -0.5, y: -0.5 }
-    /// BottomRight: { x:  0.5, y: -0.5 }
+    /// `TopLeft`:     { x: -0.5, y:  0.5 }
+    /// `TopRight`:    { x:  0.5, y:  0.5 }
+    /// `BottomLeft`:  { x: -0.5, y: -0.5 }
+    /// `BottomRight`: { x:  0.5, y: -0.5 }
     Cube,
     /// Circle inside cube (see Cube above).
     Circle,
@@ -36,9 +36,9 @@ enum Shape {
         points: Vec<Point3D>,
     },
     /// Single triangle facing upwards. Corners:
-    /// Top:         { x:  0.0, y:  0.5 }
-    /// BottomLeft:  { x: -0.5, y: -0.5 }
-    /// BottomRight: { x:  0.5, y: -0.5 }
+    /// `Top`:         { x:  0.0, y:  0.5 }
+    /// `BottomLeft`:  { x: -0.5, y: -0.5 }
+    /// `BottomRight`: { x:  0.5, y: -0.5 }
     Triangle,
     Triangles {
         triangles: Vec<Triangle>,

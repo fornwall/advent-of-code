@@ -69,11 +69,12 @@ where
                 new_possibilities
                     .last_mut()
                     .ok_or("No possibility to push to for |")?
-                    .push(current_positions);
-                current_positions = positions_at_start_of_branch
-                    .last_mut()
-                    .ok_or("No position at start of branch for |")?
-                    .clone();
+                    .push(current_positions.clone());
+                current_positions.clone_from(
+                    positions_at_start_of_branch
+                        .last_mut()
+                        .ok_or("No position at start of branch for |")?,
+                );
             }
             ')' => {
                 new_possibilities
