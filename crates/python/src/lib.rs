@@ -10,7 +10,7 @@ use pyo3::PyAny;
 
 use ::advent_of_code::solve_raw;
 
-fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &'a PyAny) -> String {
+fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &Bound<'a, PyAny>) -> String {
     if let Ok(value) = object.extract::<String>() {
         return value;
     }
@@ -37,7 +37,12 @@ fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &'a PyAny) -> String
 /// ValueError: If the input was invalid.
 #[pyfunction]
 #[pyo3(text_signature = "(year, day, part, input)")]
-pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<String> {
+pub fn solve<'py>(
+    year: &Bound<'py, PyAny>,
+    day: &Bound<'py, PyAny>,
+    part: &Bound<'py, PyAny>,
+    input: &str,
+) -> PyResult<String> {
     let year_value = try_to_string::<u16>(year);
     let day_value = try_to_string::<u8>(day);
     let part_value = try_to_string::<u8>(part);
@@ -61,7 +66,7 @@ pub fn solve(year: &PyAny, day: &PyAny, part: &PyAny, input: &str) -> PyResult<S
 /// >>> solve(year=2019, day=1, part=1, input='14')
 /// '2'
 #[pymodule]
-pub fn advent_of_code(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn advent_of_code(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(solve))?;
 
     Ok(())
