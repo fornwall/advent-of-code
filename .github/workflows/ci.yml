@@ -303,12 +303,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [benchmark, gist-mapping]
     runs-on: ubuntu-latest
-    # Permissions necessary for ${{ secrets.GITHUB_TOKEN }}
-    # to allow cloudflare/pages-action to create deployment:
-    # https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/
-    permissions:
-      contents: read
-      deployments: write
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
@@ -340,13 +334,11 @@ jobs:
     - name: Setup site to deploy
       run: make deploy-site
     - name: Deploy site to cloudflare
-      uses: cloudflare/pages-action@1
+      uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ secrets.CLOUDFLARE_PAGES_EDIT_API_TOKEN }}
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: aoc-fornwall-net
-        directory: crates/wasm/aoc.fornwall.net
-        gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        command: pages deploy crates/wasm/aoc.fornwall.net --project-name=aoc-fornwall-net
     - name: Install the Netlify CLI
       run: npm install netlify-cli -g
     - name: Deploy to Netlify
