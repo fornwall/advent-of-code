@@ -185,6 +185,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             layout: Some(&compute_pipeline_layout),
             module: &shader,
             entry_point: "propose_movement",
+            compilation_options: Default::default(),
         });
 
     let move_pipeline = gpu
@@ -194,6 +195,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             layout: Some(&compute_pipeline_layout),
             module: &shader,
             entry_point: "apply_movement",
+            compilation_options: Default::default(),
         });
 
     for round in 0..input.part_values(10, 1000) {
@@ -214,7 +216,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         pass_encoder.set_pipeline(&propose_pipeline);
         pass_encoder.set_bind_group(0, &compute_bind_group_from_0_to_1, &[]);
         let workgroup_width = 8;
-        let workgroup_count_x = MAX_SIZE as u32 / workgroup_width as u32;
+        let workgroup_count_x = MAX_SIZE as u32 / workgroup_width;
         let workgroup_count_y = workgroup_count_x;
         let workgroup_count_z = 1;
         pass_encoder.dispatch_workgroups(workgroup_count_x, workgroup_count_y, workgroup_count_z);
@@ -225,7 +227,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         pass_encoder.set_pipeline(&move_pipeline);
         pass_encoder.set_bind_group(0, &compute_bind_group_from_1_to_0, &[]);
         let workgroup_width = 8;
-        let workgroup_count_x = MAX_SIZE as u32 / workgroup_width as u32;
+        let workgroup_count_x = MAX_SIZE as u32 / workgroup_width;
         let workgroup_count_y = workgroup_count_x;
         let workgroup_count_z = 1;
         pass_encoder.dispatch_workgroups(workgroup_count_x, workgroup_count_y, workgroup_count_z);
