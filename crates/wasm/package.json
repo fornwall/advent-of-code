@@ -1,10 +1,11 @@
 {
+  "type": "module",
   "name": "advent-of-code-eslint-checker",
   "version": "1.0.0",
   "description": "Project to run eslint",
   "scripts": {
-    "check": "eslint . --ext .js && prettier --check .",
-    "fix": "eslint --fix **/*.js",
+    "check": "eslint . && prettier --check .",
+    "fix": "eslint --fix",
     "format": "prettier --write ."
   },
   "author": "",
