@@ -19,12 +19,6 @@ mod ffi {
 ///
 /// Raises:
 /// `ValueError`: If the input was invalid.
-fn solve(
-    year: u16,
-    day: u8,
-    part: u8,
-    input: &str,
-    #[cfg(feature = "visualization")] painter: PainterRef,
-) -> Result<String, String> {
+fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String, String> {
     advent_of_code::solve(year, day, part, input)
 }

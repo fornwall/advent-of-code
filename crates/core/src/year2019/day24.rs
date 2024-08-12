@@ -115,7 +115,7 @@ impl Grid {
         .count_ones()
     }
 
-    fn advance(&mut self, inner_grid: Self, outer_grid: Self) -> Self {
+    fn advance(self, inner_grid: Self, outer_grid: Self) -> Self {
         let mut new_value = 0_u32;
 
         for y in 0..5 {
@@ -167,7 +167,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
     for _minute in 0..MINUTES {
         for i in 1..(current_generation.len() - 1) {
-            let mut this_grid = current_generation[i];
+            let this_grid = current_generation[i];
             next_generation[i] =
                 this_grid.advance(current_generation[i - 1], current_generation[i + 1]);
         }

@@ -32,12 +32,10 @@ impl<'a, const MAX_SIZE: usize, H: Ord + Eq + ?Sized> IdAssigner<'a, MAX_SIZE, H
         )
     }
 
-    pub fn get_id(&mut self, name: &H) -> Option<u16> {
-        if let Ok(idx) = self.id_map[0..(self.assigned_count as usize)].binary_search(&name) {
-            Some(self.ids[idx])
-        } else {
-            None
-        }
+    pub fn get_id(&self, name: &H) -> Option<u16> {
+        self.id_map[0..(self.assigned_count as usize)]
+            .binary_search(&name)
+            .map_or(None, |idx| Some(self.ids[idx]))
     }
 
     pub const fn len(&self) -> usize {

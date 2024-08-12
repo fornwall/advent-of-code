@@ -136,8 +136,8 @@ struct AABB {
 
 impl AABB {
     const fn new() -> Self {
-        let min = Position::with_value(std::i32::MAX);
-        let max = Position::with_value(std::i32::MIN);
+        let min = Position::with_value(i32::MAX);
+        let max = Position::with_value(i32::MIN);
         Self { min, max }
     }
 

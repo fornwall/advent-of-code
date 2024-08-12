@@ -166,7 +166,7 @@ impl Registers {
         }
     }
 
-    fn reg(&mut self, index: u64) -> u64 {
+    const fn reg(&self, index: u64) -> u64 {
         self.values[index as usize]
     }
 

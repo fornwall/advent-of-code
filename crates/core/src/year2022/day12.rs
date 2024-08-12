@@ -55,7 +55,7 @@ impl Graph {
         ))
     }
 
-    fn height_at(&mut self, x: usize, y: usize) -> u8 {
+    fn height_at(&self, x: usize, y: usize) -> u8 {
         self.cells[y * self.width + x]
     }
 

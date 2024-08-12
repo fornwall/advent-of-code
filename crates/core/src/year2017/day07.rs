@@ -28,7 +28,7 @@ impl ProgramTree<'_> {
 }
 
 impl<'a> ProgramTree<'a> {
-    fn parse(input_string: &'a str) -> Result<ProgramTree, String> {
+    fn parse(input_string: &'a str) -> Result<Self, String> {
         let mut nodes = Vec::new();
         let mut name_to_node: HashMap<&str, ProgramId> = HashMap::new();
 

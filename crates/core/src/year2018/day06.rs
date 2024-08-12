@@ -36,7 +36,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
     let points = parse_input(input.text)?;
 
     let (left, top, right, bottom) = points.iter().fold(
-        (std::i32::MAX, std::i32::MAX, std::i32::MIN, std::i32::MIN),
+        (i32::MAX, i32::MAX, i32::MIN, i32::MIN),
         |(left, top, right, bottom), point| {
             (
                 cmp::min(left, point.x),
@@ -53,7 +53,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
         for y in top..=bottom {
             for x in left..=right {
-                let mut closest_distance = std::i32::MAX;
+                let mut closest_distance = i32::MAX;
                 let mut closest_point_id = -1;
 
                 for point in points.iter() {

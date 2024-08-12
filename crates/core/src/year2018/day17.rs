@@ -28,8 +28,8 @@ struct Grid {
 impl Grid {
     fn from(input_string: &str) -> Result<Self, String> {
         let mut points: Vec<(u16, u16)> = Vec::new();
-        let mut x_range = (std::u16::MAX, std::u16::MIN);
-        let mut y_range = (std::u16::MAX, std::u16::MIN);
+        let mut x_range = (u16::MAX, u16::MIN);
+        let mut y_range = (u16::MAX, u16::MIN);
 
         for line in input_string.lines() {
             let mut parts: Vec<&str> = line.split(", ").collect();

@@ -191,7 +191,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let first_wire_segments: Vec<LineSegment> =
         parse_wire_points(first_line).collect::<Result<_, _>>()?;
 
-    let mut best = std::u32::MAX;
+    let mut best = u32::MAX;
     let origin = Vector { x: 0, y: 0 };
 
     for line_segment in parse_wire_points(second_line) {

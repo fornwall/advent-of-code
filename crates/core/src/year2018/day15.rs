@@ -141,7 +141,7 @@ impl Board {
     }
 
     fn attack(&mut self, x: u32, y: u32, elf_target: bool) -> bool {
-        let mut lowest_hit_points = std::i32::MAX;
+        let mut lowest_hit_points = i32::MAX;
         let mut target_position = (0, 0);
 
         for (dx, dy) in [(0, -1_i32), (-1_i32, 0), (1, 0), (0, 1)] {
@@ -157,7 +157,7 @@ impl Board {
             }
         }
 
-        if lowest_hit_points != std::i32::MAX {
+        if lowest_hit_points != i32::MAX {
             let attack_damage = if elf_target { 3 } else { self.elf_attack_power };
 
             if let MapCell::Unit { hit_points, .. } =

@@ -36,11 +36,11 @@ pub fn solve(input: &Input) -> Result<String, String> {
         })
         .collect::<Result<_, String>>()?;
 
-    let mut previous_height = std::i32::MAX;
+    let mut previous_height = i32::MAX;
     let mut seconds = 0;
     loop {
-        let mut min_y = std::i32::MAX;
-        let mut max_y = std::i32::MIN;
+        let mut min_y = i32::MAX;
+        let mut max_y = i32::MIN;
         for point in &mut points {
             point.x += point.x_speed;
             point.y += point.y_speed;
@@ -61,7 +61,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
     }
 
     let mut occupied = HashSet::new();
-    let mut borders = (std::i32::MAX, std::i32::MIN, std::i32::MIN, std::i32::MAX);
+    let mut borders = (i32::MAX, i32::MIN, i32::MIN, i32::MAX);
     for point in &mut points {
         // Step back after last expanding step.
         point.x -= point.x_speed;
