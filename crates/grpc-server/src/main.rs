@@ -66,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let reflection_service = tonic_reflection::server::Builder::configure()
         .register_encoded_file_descriptor_set(tonic::include_file_descriptor_set!("advent"))
-        .build()?;
+        .build_v1()?;
 
     println!("Server listening on {addr}");
     Server::builder()
