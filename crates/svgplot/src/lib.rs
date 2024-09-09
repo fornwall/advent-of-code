@@ -131,7 +131,7 @@ impl SvgImage {
                 .unwrap();
         }
         self.common_attributes.write(&mut buffer);
-        buffer.write_all(&[b'>', b'\n']).unwrap();
+        buffer.write_all(b">\n").unwrap();
 
         let mut first = true;
         for (id, element) in &self.elements {

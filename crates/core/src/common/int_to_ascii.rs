@@ -22,8 +22,8 @@ impl IntToAsciiContext {
 #[test]
 fn to_ascii() {
     let mut context = IntToAsciiContext::new();
-    assert_eq!(context.ascii_bytes(1), &[b'1']);
-    assert_eq!(context.ascii_bytes(0), &[b'0']);
+    assert_eq!(context.ascii_bytes(1), b"1");
+    assert_eq!(context.ascii_bytes(0), b"0");
     assert_eq!(context.ascii_bytes(134), b"134");
     assert_eq!(context.ascii_bytes(4_294_967_295), b"4294967295");
 }

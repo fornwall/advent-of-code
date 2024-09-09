@@ -55,12 +55,11 @@ fn parse_input(input_string: &str) -> Result<ParsedInput, String> {
         let step_name = parts[7]
             .chars()
             .next()
-            .ok_or(format!("Invalid line: {line_number}"))?;
+            .ok_or_else(|| format!("Invalid line: {line_number}"))?;
         let depends_on = parts[1]
             .chars()
             .next()
-            .ok_or(format!("Invalid line: {line_number}"))?;
-
+            .ok_or_else(|| format!("Invalid line: {line_number}"))?;
         let step = step_map
             .entry(step_name)
             .or_insert_with(|| Step::new(step_name));

@@ -28,9 +28,7 @@ impl Moons {
         let mut positions = [[0; 3]; 4];
         for (i, line) in input.lines().enumerate() {
             let error_message = |_| format!("Invalid line: {}", i + 1);
-            let parts: Vec<&str> = line
-                .split(|c| c == '=' || c == ' ' || c == '>' || c == ',')
-                .collect();
+            let parts: Vec<&str> = line.split(['=', ' ', '>', ',']).collect();
 
             if parts.len() != 9 {
                 return Err(format!("Invalid line: {}", i + 1));

@@ -7,6 +7,7 @@ use advent::{ProblemInput, ProblemOutput};
 
 mod advent {
     #![allow(warnings)]
+    #![allow(clippy::derive_partial_eq_without_eq)]
     #![allow(clippy::future_not_send)]
     #![allow(clippy::missing_const_for_fn)]
     #![allow(clippy::similar_names)]

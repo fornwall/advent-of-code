@@ -101,9 +101,7 @@ impl Nanobot {
             .enumerate()
             .map(|(line_index, line)| {
                 let line_number = line_index + 1;
-                let parts: Vec<&str> = line
-                    .split(|c| c == '<' || c == '>' || c == ',' || c == '=')
-                    .collect();
+                let parts: Vec<&str> = line.split(['<', '>', ',', '=']).collect();
                 let error_message = || format!("Invalid input on line {line_number}");
                 if parts.len() != 8 {
                     return Err(error_message());

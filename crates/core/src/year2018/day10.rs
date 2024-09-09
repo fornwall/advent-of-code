@@ -17,7 +17,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         .map(|(line_index, line)| {
             let error = || format!("Invalid input at line {}", line_index + 1);
 
-            let parts: Vec<&str> = line.split(|c| c == '<' || c == '>' || c == ',').collect();
+            let parts: Vec<&str> = line.split(['<', '>', ',']).collect();
             if parts.len() < 6 || !line.starts_with("position=") {
                 return Err(error());
             }

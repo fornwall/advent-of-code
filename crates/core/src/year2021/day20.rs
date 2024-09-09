@@ -12,7 +12,7 @@ struct Image {
 }
 
 impl Image {
-    fn new(pixels: Vec<bool>) -> Self {
+    const fn new(pixels: Vec<bool>) -> Self {
         Self { pixels }
     }
 

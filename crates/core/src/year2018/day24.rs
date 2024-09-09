@@ -58,7 +58,7 @@ impl ArmyGroup {
             } else {
                 // "17 units each with 5390 hit points (weak to radiation, bludgeoning) with
                 // an attack that does 4507 fire damage at initiative 2".
-                let main_parts: Vec<&str> = line.split(|c| c == '(' || c == ')').collect();
+                let main_parts: Vec<&str> = line.split(['(', ')']).collect();
 
                 let mut weaknesses = Vec::new();
                 let mut immunities = Vec::new();

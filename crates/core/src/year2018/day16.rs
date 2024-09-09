@@ -47,7 +47,7 @@ impl ProblemInput {
             let after = line.starts_with("After:");
             if before || after {
                 let parts: Vec<u16> = line[9..]
-                    .split(|c| c == '[' || c == ']' || c == ',')
+                    .split(['[', ']', ','])
                     .filter_map(|s| {
                         if s.is_empty() {
                             None
