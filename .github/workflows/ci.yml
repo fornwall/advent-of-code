@@ -395,7 +395,7 @@ jobs:
         mkdir -p target/linux/amd64
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-server target/linux/amd64/
         docker buildx build --tag "${IMAGE_WITH_VERSION}" .
-        flyctl deploy --image "${IMAGE_WITH_VERSION}"
+        flyctl deploy --local-only --image "${IMAGE_WITH_VERSION}"
       if: github.ref == 'refs/heads/main'
 
   build-and-deploy-grpc-server:
@@ -418,5 +418,5 @@ jobs:
         mkdir -p target/linux/amd64
         cp ../../target/x86_64-unknown-linux-musl/release/advent-of-code-grpc-server target/linux/amd64/
         docker buildx build --tag "${IMAGE_WITH_VERSION}" .
-        flyctl deploy --image "${IMAGE_WITH_VERSION}"
+        flyctl deploy --local-only --image "${IMAGE_WITH_VERSION}"
       if: github.ref == 'refs/heads/main'
