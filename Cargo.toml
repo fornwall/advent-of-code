@@ -9,7 +9,7 @@ edition = "2021"
 homepage = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
 repository = "https://github.com/fornwall/advent-of-code"
-rust-version = "1.81.0"
+rust-version = "1.82.0"
 version = "2022.0.66"
 
 [profile.release]
