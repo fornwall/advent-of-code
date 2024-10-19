@@ -5,7 +5,7 @@ cargo build --release --target wasm32-unknown-unknown
 wasm-bindgen --target nodejs --out-dir target/nodejs ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm
 which wasm-opt
 wasm-opt --version
-wasm-opt -O3 -o target/nodejs/advent_of_code_wasm_bg.wasm-optimized target/nodejs/advent_of_code_wasm_bg.wasm
+wasm-opt --all-features --disable-gc -O3 -o target/nodejs/advent_of_code_wasm_bg.wasm-optimized target/nodejs/advent_of_code_wasm_bg.wasm
 mv target/nodejs/advent_of_code_wasm_bg.wasm-optimized target/nodejs/advent_of_code_wasm_bg.wasm
 
 cp README.md target/nodejs/
