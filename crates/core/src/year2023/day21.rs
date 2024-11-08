@@ -1,3 +1,4 @@
+use crate::common::array_deque::ArrayDeque;
 use crate::common::array_stack::ArrayStack;
 use crate::common::u256::U256;
 use crate::input::Input;
@@ -5,103 +6,122 @@ use crate::input::Input;
 const MAX_GRID_SIZE: usize = 192;
 
 type Grid = ArrayStack<MAX_GRID_SIZE, U256>;
+type Point = (i32, i32);
 
+/// Solution adapted from @maneatingape - https://github.com/maneatingape/advent-of-code-rust/blob/main/src/year2023/day21.rs
 pub fn solve(input: &Input) -> Result<u64, String> {
     // Bit set if cell is a rock, represented by a '#'.
     let mut rocks = ArrayStack::<MAX_GRID_SIZE, U256>::new();
-    // Bit set if cell is currently reachable, initially represented by a 'S'.
-    let mut reachable = ArrayStack::<MAX_GRID_SIZE, U256>::new();
     let mut grid_width = 0;
+    let mut start_position = None;
 
-    for row_str in input.text.lines() {
+    for (y, row_str) in input.text.lines().enumerate() {
         let mut rock_row = U256::default();
-        let mut reachable_row = U256::default();
         for (col_idx, col_byte) in row_str.bytes().enumerate() {
-            grid_width = col_idx + 1;
+            grid_width = col_idx as i32 + 1;
             match col_byte {
                 b'#' => {
                     rock_row.set_bit(col_idx);
                 }
                 b'S' => {
-                    reachable_row.set_bit(col_idx);
+                    start_position = Some((col_idx as i32, y as i32));
                 }
                 _ => {}
             }
         }
         rocks.push(rock_row)?;
-        reachable.push(reachable_row)?;
     }
 
-    Ok(if input.is_part_one() {
-        for _round in 0..64 {
-            let mut reachable_now = Grid::with_len(reachable.len());
-            for y in 1..rocks.len() {
-                for x in 1..grid_width {
-                    if !rocks.elements[y].is_bit_set(x)
-                        && (reachable.elements[y].is_bit_set(x - 1)
-                            || reachable.elements[y].is_bit_set(x + 1)
-                            || reachable.elements[y - 1].is_bit_set(x)
-                            || reachable.elements[y + 1].is_bit_set(x))
-                    {
-                        reachable_now.elements[y].set_bit(x);
-                    }
-                }
+    let Some(start_position) = start_position else {
+        return Err("No start position".into());
+    };
+
+    // Search from the center tile outwards.
+    let (even_inner, even_outer, odd_inner, odd_outer) =
+        bfs(&rocks, grid_width, &[start_position], 130)?;
+
+    if input.is_part_one() {
+        return Ok(even_inner);
+    }
+
+    let even_full = even_inner + even_outer;
+    let odd_full = odd_inner + odd_outer;
+    let remove_corners = odd_outer;
+
+    // Search from the 4 corners inwards.
+    let corners = [
+        (0, 0),
+        (grid_width - 1, 0),
+        (0, grid_width - 1),
+        (grid_width - 1, grid_width - 1),
+    ];
+    let (even_inner, ..) = bfs(&rocks, grid_width, &corners, 64)?;
+    let add_corners = even_inner;
+
+    // Sum the components of the diamond.
+    let n = 202300;
+    let first = n * n * even_full;
+    let second = (n + 1) * (n + 1) * odd_full;
+    let third = n * add_corners;
+    let fourth = (n + 1) * remove_corners;
+    let part_two = first + second + third - fourth;
+    Ok(part_two)
+}
+
+/// Breadth first search from any number of starting locations with a limit on maximum steps.
+fn bfs(
+    grid: &Grid,
+    grid_width: i32,
+    starts: &[Point],
+    limit: u32,
+) -> Result<(u64, u64, u64, u64), String> {
+    let mut grid = grid.clone();
+    let mut todo = ArrayDeque::<512, (Point, u32)>::new();
+
+    let mut even_inner = 0;
+    let mut even_outer = 0;
+    let mut odd_inner = 0;
+    let mut odd_outer = 0;
+
+    for &start in starts {
+        grid.elements[start.1 as usize].set_bit(start.0 as usize);
+        todo.push_back((start, 0))?;
+    }
+
+    while let Some((position, cost)) = todo.pop_front() {
+        // First split by odd or even parity then by distance from the starting point.
+        if cost % 2 == 1 {
+            if (position.0 - grid_width / 2).abs() + (position.1 - grid_width / 2).abs()
+                <= (grid_width / 2)
+            {
+                odd_inner += 1;
+            } else {
+                odd_outer += 1;
             }
-            std::mem::swap(&mut reachable_now, &mut reachable);
+        } else if cost <= 64 {
+            even_inner += 1;
+        } else {
+            even_outer += 1;
         }
-        u64::from(reachable.slice().iter().map(U256::count_ones).sum::<u32>())
-    } else {
-        // Assumption: Any non-reachable positions are single squares directly enclosed.
-        // Fill unreachable cells with rocks given the above assumption.
-        for y in 1..rocks.len() {
-            for x in 1..grid_width {
-                if rocks.elements[y].is_bit_set(x - 1)
-                    && rocks.elements[y].is_bit_set(x + 1)
-                    && rocks.elements[y - 1].is_bit_set(x)
-                    && rocks.elements[y + 1].is_bit_set(x)
+
+        if cost < limit {
+            for next in
+                [(0, -1), (0, 1), (-1, 0), (1, 0)].map(|o| (position.0 + o.0, position.1 + o.1))
+            {
+                if next.0 >= 0
+                    && next.0 < grid_width
+                    && next.1 >= 0
+                    && next.1 < grid_width
+                    && !grid.elements[next.1 as usize].is_bit_set(next.0 as usize)
                 {
-                    rocks.elements[y].set_bit(x);
+                    grid.elements[next.1 as usize].set_bit(next.0 as usize);
+                    todo.push_back((next, cost + 1))?;
                 }
             }
         }
-
-        let y0 = reachable_at_step(&rocks, grid_width, 1);
-        let y1 = reachable_at_step(&rocks, grid_width, 3);
-        let y2 = reachable_at_step(&rocks, grid_width, 5);
-
-        // Assumption: (26_501_365 - 65) / grid_width has no remainder.
-        let num_reached_grids = (26_501_365 - 65) / grid_width as u64;
-
-        let delta1 = y1 - y0;
-        let delta2 = y2 - y1;
-
-        y0 + num_reached_grids * delta1
-            + (num_reached_grids * (num_reached_grids - 1) / 2) * (delta2 - delta1)
-    })
-}
-
-fn reachable_at_step(rocks: &Grid, grid_width: usize, num_halves: usize) -> u64 {
-    let step = ((num_halves * grid_width) / 2) as i32;
-    let mut count = 0;
-    for dx in -step..=step {
-        let y_range = step - dx.abs();
-        for dy in (-y_range..=y_range).step_by(2) {
-            if is_clear(rocks, grid_width, 65 + dx, 65 + dy) {
-                count += 1;
-            }
-        }
     }
-    count
-}
 
-fn is_clear(rocks: &Grid, grid_width: usize, mut x: i32, mut y: i32) -> bool {
-    let grid_width = grid_width as i32;
-    let grid_height = rocks.len() as i32;
-
-    x = i32::from(x < 0) * grid_width + x % grid_width;
-    y = i32::from(y < 0) * grid_height + y % grid_height;
-
-    !rocks.elements[y as usize].is_bit_set(x as usize)
+    Ok((even_inner, even_outer, odd_inner, odd_outer))
 }
 
 #[test]
