@@ -41,9 +41,6 @@ fn main() -> Result<(), String> {
             match solve_raw(year, day, part, input.as_ref()) {
                 Ok(result) => {
                     if repeat == 1 {
-                        #[cfg(feature = "visualization")]
-                        println!("{result:?}");
-                        #[cfg(not(feature = "visualization"))]
                         println!("{result}");
                     }
                 }

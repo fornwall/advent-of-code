@@ -21,9 +21,13 @@ pub mod day20;
 pub mod day21;
 pub mod day22;
 pub mod day23;
+#[cfg(feature = "visualization")]
+pub mod day23_renderer;
 #[cfg(feature = "simd")]
 pub mod day23_simd;
 #[cfg(feature = "webgpu-compute")]
 pub mod day23_webgpu;
 pub mod day24;
+#[cfg(feature = "visualization")]
+pub mod day24_renderer;
 pub mod day25;

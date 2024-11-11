@@ -43,6 +43,7 @@ visualizerWorker.onmessage = (message) => {
       document.documentElement.removeEventListener("click", onClick);
       document.documentElement.style.cursor = "";
       spinner.style.display = "none";
+      console.log("MESSAGE DATA: ", message.data.answer);
       rendering.innerHTML = message.data.answer;
 
       svg = rendering.querySelector("svg");

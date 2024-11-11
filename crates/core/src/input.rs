@@ -3,6 +3,8 @@
 
 use std::cell::RefCell;
 
+pub type ResultType = String;
+
 #[derive(Copy, Clone)]
 pub enum Part {
     One,
@@ -13,7 +15,7 @@ pub struct Input<'a> {
     pub part: Part,
     pub text: &'a str,
     #[cfg(feature = "visualization")]
-    pub visualization: RefCell<crate::visualization::Visualization>,
+    pub visualization: RefCell<String>,
 }
 
 #[allow(single_use_lifetimes)]
@@ -42,7 +44,7 @@ impl<'a> Input<'a> {
             part: Part::One,
             text,
             #[cfg(feature = "visualization")]
-            visualization: RefCell::new(crate::visualization::Visualization::default()),
+            visualization: RefCell::new("".to_string()),
         }
     }
 
@@ -53,7 +55,7 @@ impl<'a> Input<'a> {
             part: Part::Two,
             text,
             #[cfg(feature = "visualization")]
-            visualization: RefCell::new(crate::visualization::Visualization::default()),
+            visualization: RefCell::new("".to_string()),
         }
     }
 }

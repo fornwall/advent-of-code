@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 #[cfg(feature = "visualization")]
-use crate::visualization::{Visualization, VisualizationEvent, VisualizationEventWithTime};
+use svgplot::{Coordinate, SvgColor, SvgImage, SvgPath, SvgScript, SvgShape, SvgStrokeLinecap};
 
 use crate::input::Input;
 
@@ -85,24 +85,14 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let (start_pos, destination_pos, mut graph) = Graph::parse(input.text)?;
 
     #[cfg(feature = "visualization")]
-    let mut visualization = Visualization::default();
-    //let mut svg = SvgImage::new().view_box((0, 0, graph.width as i64, graph.height as i64));
+    let mut svg = SvgImage::new().view_box((0, 0, graph.width as i64, graph.height as i64));
     #[cfg(feature = "visualization")]
     let mut current_render_step = 0;
     #[cfg(feature = "visualization")]
-    visualization.add_event(VisualizationEventWithTime {
-        key_frame: 0,
-        event: VisualizationEvent::OrthographicCamera {
-            left: 0.,
-            right: graph.width as f32,
-            top: 0.,
-            bottom: graph.height as f32,
-        },
-    });
-    //#[cfg(feature = "visualization")]
-    //let mut path_render_script = String::from("const pathsPerStep = ['");
+    let mut circles_render_script = String::from("const circlesPerStep = ['");
+    #[cfg(feature = "visualization")]
+    let mut path_render_script = String::from("const pathsPerStep = ['");
 
-    /*
     #[cfg(feature = "visualization")]
     {
         for draw_height in 0..26 {
@@ -157,7 +147,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 )),
         );
     }
-     */
 
     let mut to_visit = VecDeque::with_capacity(64);
     graph.mark_visited(destination_pos.0, destination_pos.1);
@@ -173,7 +162,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     graph.height_at(new_pos.0, new_pos.1) == 0
                 };
 
-                /*
                 #[cfg(feature = "visualization")]
                 {
                     if new_cost != current_render_step {
@@ -197,10 +185,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                             .data_string(),
                     );
                 }
-                 */
 
                 if at_goal {
-                    /*
                     #[cfg(feature = "visualization")]
                     {
                         let visited_path_id = svg.add_with_id(
@@ -221,15 +207,12 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         svg.add(SvgScript::new(format!(
                             "{circles_render_script}{path_render_script}"
                         )));
-                        input
-                            .visualization
-                            .replace(crate::input::Visualization::Svg(
-                                svg.data_attribute("steps".to_string(), format!("{new_cost}"))
-                                    .data_attribute("step-duration".to_string(), format!("{}", 100))
-                                    .to_svg_string(),
-                            ));
+                        input.visualization.replace(
+                            svg.data_attribute("steps".to_string(), format!("{new_cost}"))
+                                .data_attribute("step-duration".to_string(), format!("{}", 100))
+                                .to_svg_string(),
+                        );
                     }
-                     */
                     return Ok(new_cost);
                 }
                 to_visit.push_back((new_cost, new_pos));

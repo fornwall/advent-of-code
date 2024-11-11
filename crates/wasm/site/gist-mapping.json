@@ -1261,7 +1261,7 @@
     "12": {
       "gist": "ec808854320e09c83bf756c26f50a750",
       "raw_url": "https://gist.githubusercontent.com/fornwall/ec808854320e09c83bf756c26f50a750/raw/d6b9502ad850e918d1845034e4677746d294d7b9/year2023_day12.rs",
-      "visualization": false,
+      "visualization": true,
       "compiler_explorer": "Go7vPE985"
     },
     "14": {

@@ -37,8 +37,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     };
 
     // Search from the center tile outwards.
+    let num_steps = 130;
     let (even_inner, even_outer, odd_inner, odd_outer) =
-        bfs(&rocks, grid_width, &[start_position], 130)?;
+        bfs(&rocks, grid_width, &[start_position], num_steps)?;
 
     if input.is_part_one() {
         return Ok(even_inner);
@@ -58,14 +59,49 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     let (even_inner, ..) = bfs(&rocks, grid_width, &corners, 64)?;
     let add_corners = even_inner;
 
-    // Sum the components of the diamond.
-    let n = 202300;
-    let first = n * n * even_full;
-    let second = (n + 1) * (n + 1) * odd_full;
-    let third = n * add_corners;
-    let fourth = (n + 1) * remove_corners;
-    let part_two = first + second + third - fourth;
-    Ok(part_two)
+    let num_steps = 26501365;
+    //
+    let diamond_tile_width = (num_steps - start_position.1) as u64 / grid_width as u64;
+
+    // With diamond_tile_width=2:
+    //   O
+    //  OEO
+    // OEOEO
+    //  OEO
+    //   O
+    // => (diamond_tile_width being even)
+    // diamond_tile_width^2 even plots, (diamond_tile_width+1)^2 odd plots
+    let even_plots = diamond_tile_width * diamond_tile_width * even_full;
+    let odd_plots = (diamond_tile_width + 1) * (diamond_tile_width + 1) * odd_full;
+
+    //       ┌--┐
+    //       |◸◹|
+    //      ◢|  |◣
+    //    ┌--┼--┼--┐
+    //    |◸ |  | ◹|
+    //   ◢|  |  |  |◣
+    // ┌--┼--┼--┼--┼--┐
+    // |◸ |  |  |  | ◹|
+    // |◺ |  |  |  | ◿|
+    // └--┼--┼--┼--┼--┘
+    //   ◥|  |  |  |◤
+    //    |◺ |  | ◿|
+    //    └--┼--┼--┘
+    //      ◥|  |◤
+    //       |◺◿|
+    //       └--┘
+    //
+    // The total area is adjusted by:
+    // * Adding `n` extra even corners
+    //   ◤◥
+    //   ◣◢
+    // * Subtracting `n + 1` odd corners
+    //   ◸◹
+    //   ◺◿
+    let extra_even_corners = diamond_tile_width * add_corners;
+    let minus_odd_corners = (diamond_tile_width + 1) * remove_corners;
+
+    Ok(even_plots + odd_plots + extra_even_corners - minus_odd_corners)
 }
 
 /// Breadth first search from any number of starting locations with a limit on maximum steps.
@@ -78,10 +114,10 @@ fn bfs(
     let mut grid = grid.clone();
     let mut todo = ArrayDeque::<512, (Point, u32)>::new();
 
-    let mut even_inner = 0;
-    let mut even_outer = 0;
-    let mut odd_inner = 0;
-    let mut odd_outer = 0;
+    let mut even_inside = 0;
+    let mut even_outside = 0;
+    let mut odd_inside = 0;
+    let mut odd_outside = 0;
 
     for &start in starts {
         grid.elements[start.1 as usize].set_bit(start.0 as usize);
@@ -89,20 +125,14 @@ fn bfs(
     }
 
     while let Some((position, cost)) = todo.pop_front() {
-        // First split by odd or even parity then by distance from the starting point.
-        if cost % 2 == 1 {
-            if (position.0 - grid_width / 2).abs() + (position.1 - grid_width / 2).abs()
-                <= (grid_width / 2)
-            {
-                odd_inner += 1;
-            } else {
-                odd_outer += 1;
-            }
-        } else if cost <= 64 {
-            even_inner += 1;
-        } else {
-            even_outer += 1;
-        }
+        let is_odd = cost % 2 == 1;
+        let is_inside = cost <= (grid_width as u32 / 2);
+        *match (is_odd, is_inside) {
+            (true, true) => &mut odd_inside,
+            (true, false) => &mut odd_outside,
+            (false, true) => &mut even_inside,
+            (false, false) => &mut even_outside,
+        } += 1;
 
         if cost < limit {
             for next in
@@ -121,7 +151,7 @@ fn bfs(
         }
     }
 
-    Ok((even_inner, even_outer, odd_inner, odd_outer))
+    Ok((even_inside, even_outside, odd_inside, odd_outside))
 }
 
 #[test]

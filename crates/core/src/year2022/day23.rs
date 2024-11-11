@@ -1,14 +1,10 @@
-#[cfg(feature = "visualization")]
-#[cfg(not(feature = "simd"))]
-#[cfg(not(feature = "webgpu-compute"))]
-use crate::visualization::Visualization;
-
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
 use crate::input::Input;
 
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
+#[cfg(not(feature = "visualization"))]
 pub fn solve(input: &Input) -> Result<usize, String> {
     use crate::common::map_windows::MapWindowsIterator;
     use crate::common::u256::U256;
@@ -212,6 +208,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             self.bit_rows.iter().map(|x| x.count_ones() as usize).sum()
         }
     }
+
     let mut grid = ElfGrid::parse(input.text)?;
 
     if input.is_part_one() {
@@ -222,11 +219,15 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             .ok_or_else(|| "No solution found in 10,000 rounds".to_string())
     }
 }
+
 #[cfg(feature = "simd")]
 pub use super::day23_simd::solve;
 
 #[cfg(feature = "webgpu-compute")]
 pub use super::day23_webgpu::solve;
+
+#[cfg(feature = "visualization")]
+pub use super::day23_renderer::solve;
 
 #[test]
 pub fn tests() {

@@ -29,8 +29,6 @@ mod common;
 #[cfg_attr(test, macro_use)]
 mod input;
 mod mod_exp;
-#[cfg(feature = "visualization")]
-mod visualization;
 mod year2015;
 mod year2016;
 mod year2017;
@@ -42,7 +40,7 @@ mod year2022;
 mod year2023;
 
 #[cfg(feature = "visualization")]
-pub type ResultType = visualization::Visualization;
+pub type ResultType = String;
 
 #[cfg(not(feature = "visualization"))]
 pub type ResultType = String;
@@ -89,7 +87,7 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<ResultType, St
     }
 
     #[cfg(feature = "visualization")]
-    let visualization = std::cell::RefCell::new(visualization::Visualization::default());
+    let visualization = std::cell::RefCell::new("".to_string());
 
     let input = Input {
         part: if part == 1 { Part::One } else { Part::Two },

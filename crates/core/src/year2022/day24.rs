@@ -1,7 +1,7 @@
 use crate::input::Input;
 
 #[cfg(feature = "visualization")]
-use crate::visualization::Visualization;
+use super::day24_renderer::Renderer;
 
 pub fn solve(input: &Input) -> Result<i32, String> {
     const MAX_STEPS: usize = 10_000;
@@ -10,7 +10,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
     let mut valley = parse(input.text)?;
     let mut reachable = vec![0; valley.width];
     #[cfg(feature = "visualization")]
-    let mut visualization = crate::visualization::Visualization::default();
+    let mut renderer = Renderer::new(&reachable, &valley);
 
     let top_row_bitmask = 1;
     let bottom_row_bitmask = 1 << (valley.height - 1);
@@ -39,12 +39,16 @@ pub fn solve(input: &Input) -> Result<i32, String> {
             reachable.fill(0);
             remaining_trips -= 1;
 
-            //#[cfg(feature = "visualization")]
-            //renderer .reachable_per_step .push((reachable.clone(), !heading_down));
+            #[cfg(feature = "visualization")]
+            renderer
+                .reachable_per_step
+                .push((reachable.clone(), !heading_down));
 
             if remaining_trips == 0 {
                 #[cfg(feature = "visualization")]
-                input.visualization.replace(visualization);
+                input
+                    .visualization
+                    .replace(renderer.final_svg(&valley, minute));
                 return Ok(minute as i32 + 1);
             }
             continue;
@@ -65,8 +69,10 @@ pub fn solve(input: &Input) -> Result<i32, String> {
                 & valley.blizzards_left[x];
         }
 
-        //#[cfg(feature = "visualization")]
-        //renderer .reachable_per_step .push((reachable.clone(), heading_down));
+        #[cfg(feature = "visualization")]
+        renderer
+            .reachable_per_step
+            .push((reachable.clone(), heading_down));
     }
 
     Err(format!("No solution found in {MAX_STEPS} minutes"))
