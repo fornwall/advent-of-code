@@ -44,7 +44,7 @@ jobs:
           # shellcheck disable=SC2016
           export CIBW_ENVIRONMENT='PATH="$HOME"/.cargo/bin:"$PATH"'
           if [ "$(uname)" = Darwin ]; then
-            export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin"
+            export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin x86_64-apple-darwin"
             export CIBW_ARCHS_MACOS="universal2"
           fi
           python -m cibuildwheel --output-dir wheelhouse crates/python
