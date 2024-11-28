@@ -247,7 +247,7 @@ jobs:
     - run: rustup target add aarch64-apple-darwin
     - run: |
         cargo build --release
-        SDKROOT=$(xcrun -sdk "$MACOS_SDK" --show-sdk-path) MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk "$MACOS_SDK" --show-sdk-platform-version) cargo build --release --target=aarch64-apple-darwin
+        SDKROOT=$(xcrun -sdk "$MACOS_SDK" --show-sdk-path) MACOSX_DEPLOYMENT_TARGET=10.12 cargo build --release --target=aarch64-apple-darwin
         strip ../../target/release/advent-of-code
         strip ../../target/aarch64-apple-darwin/release/advent-of-code
         cp advent-of-code.1 ../../target/release
