@@ -326,7 +326,7 @@ jobs:
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-    - run: cargo binstall --no-confirm wasm-bindgen-cli
+    - run: cargo install wasm-bindgen-cli --git https://github.com/rustwasm/wasm-bindgen
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v4
       with:
