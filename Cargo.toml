@@ -38,3 +38,9 @@ cargo = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 }
 # Individual lints:
 new_without_default = "allow"
+
+[patch.crates-io]
+wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen" }
+wasm-bindgen-shared = { git = "https://github.com/rustwasm/wasm-bindgen" }
+wasm-bindgen-backend = { git = "https://github.com/rustwasm/wasm-bindgen" }
+wasm-bindgen-macro-support = { git = "https://github.com/rustwasm/wasm-bindgen" }
