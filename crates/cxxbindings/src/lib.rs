@@ -2,7 +2,7 @@
 mod ffi {
     #![allow(clippy::items_after_statements)]
     extern "Rust" {
-        pub unsafe fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String>;
+        pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<String>;
     }
 }
 

@@ -40,19 +40,13 @@ struct Item {
     armor: u16,
 }
 
-const fn divide_rounding_up(dividend: u16, divisor: u16) -> u16 {
-    (dividend + (divisor - 1)) / divisor
-}
-
 fn player_wins(player: &Stats, boss: &Stats) -> bool {
-    let player_rounds_to_win = divide_rounding_up(
-        boss.hit_points,
-        std::cmp::max(i32::from(player.damage) - i32::from(boss.armor), 1) as u16,
-    );
-    let boss_rounds_to_win = divide_rounding_up(
-        player.hit_points,
-        std::cmp::max(i32::from(boss.damage) - i32::from(player.armor), 1) as u16,
-    );
+    let player_rounds_to_win = boss
+        .hit_points
+        .div_ceil(std::cmp::max(i32::from(player.damage) - i32::from(boss.armor), 1) as u16);
+    let boss_rounds_to_win = player
+        .hit_points
+        .div_ceil(std::cmp::max(i32::from(boss.damage) - i32::from(player.armor), 1) as u16);
     player_rounds_to_win <= boss_rounds_to_win
 }
 

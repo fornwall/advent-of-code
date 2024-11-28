@@ -19,6 +19,7 @@ pub struct Input<'a> {
 }
 
 #[allow(single_use_lifetimes)]
+#[allow(clippy::needless_lifetimes)]
 impl<'a> Input<'a> {
     pub const fn is_part_one(&self) -> bool {
         matches!(self.part, Part::One)
