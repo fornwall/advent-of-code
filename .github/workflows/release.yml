@@ -44,6 +44,7 @@ jobs:
           # shellcheck disable=SC2016
           export CIBW_ENVIRONMENT='PATH="$HOME"/.cargo/bin:"$PATH"'
           if [ "$(uname)" = Darwin ]; then
+            export MACOSX_DEPLOYMENT_TARGET=10.12
             export CIBW_BEFORE_BUILD="$CIBW_BEFORE_BUILD && rustup target add aarch64-apple-darwin x86_64-apple-darwin"
             export CIBW_ARCHS_MACOS="universal2"
           fi
