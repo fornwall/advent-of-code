@@ -57,7 +57,7 @@ site-renderer-wasm:
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
 --download-bootstrap-css:
-	cd crates/wasm/site/static/ && curl -O https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css
+	cd crates/wasm/site/static/ && curl -O https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css
 
 site-pack: site-compute-wasm site-renderer-wasm --download-bootstrap-css
 	cd crates/wasm/site && \
