@@ -1366,5 +1366,127 @@
       "visualization": false,
       "compiler_explorer": "GGdMoeMMc"
     }
+  },
+  "2024": {
+    "19": {
+      "gist": "ecb32cfb3096ebce8b9ad39d28b01b0c",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/ecb32cfb3096ebce8b9ad39d28b01b0c/raw/eca067405eefa7176f451550da0f735526fe1b9f/year2024_day19.rs",
+      "compiler_explorer": "zjnfdoKTa",
+      "visualization": false
+    },
+    "17": {
+      "gist": "76c72670bd11de7b7a90101c7227006e",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/76c72670bd11de7b7a90101c7227006e/raw/cb5fbed0a3ef4bf9dd8a2ed894fa78138dad29f0/year2024_day17.rs",
+      "compiler_explorer": "svM89jcaa",
+      "visualization": false
+    },
+    "6": {
+      "gist": "85202666a799f0a98e11e9361030aa30",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/85202666a799f0a98e11e9361030aa30/raw/d3ffe301d08a487612fe14d165e622f7b6f7cea2/year2024_day6.rs",
+      "compiler_explorer": "b4sb87or1",
+      "visualization": false
+    },
+    "11": {
+      "gist": "86a94e2fa738fa4a7d629f131fb107b5",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/86a94e2fa738fa4a7d629f131fb107b5/raw/a8a18c545614930808a9e3ad5b5da43f255ca341/year2024_day11.rs",
+      "compiler_explorer": "G4v1onYbh",
+      "visualization": false
+    },
+    "16": {
+      "gist": "2ac67a1113421a0414caf4d79d66d177",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/2ac67a1113421a0414caf4d79d66d177/raw/86ccd90208d2d9aad5ad32d12e449b5a2f6cd5b8/year2024_day16.rs",
+      "compiler_explorer": "Gr7oY13cG",
+      "visualization": false
+    },
+    "8": {
+      "gist": "31d84978639c8f4918c7b0a5a2d8a5b2",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/31d84978639c8f4918c7b0a5a2d8a5b2/raw/e7d699a09d0fcf851737827f118f3e87dc8822f9/year2024_day8.rs",
+      "compiler_explorer": "oGGKvE6b1",
+      "visualization": false
+    },
+    "1": {
+      "gist": "aaf68fd8103781890952dde7905b1a5b",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/aaf68fd8103781890952dde7905b1a5b/raw/e45cd945fec1a12c119017770d6a84cd7274a6d0/year2024_day1.rs",
+      "compiler_explorer": "qvznEcsaf",
+      "visualization": false
+    },
+    "20": {
+      "gist": "7b6583565147f241105dc648e970679b",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/7b6583565147f241105dc648e970679b/raw/1628bc5d59b1887f53f316bd6b8692620ae9d62e/year2024_day20.rs",
+      "compiler_explorer": "Y7Y46j9YY",
+      "visualization": false
+    },
+    "12": {
+      "gist": "b0baf44779592d5c70b45f50785e4202",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/b0baf44779592d5c70b45f50785e4202/raw/9966c47c7a009d30347cdd23eb6ef5ca8463f821/year2024_day12.rs",
+      "compiler_explorer": "fzEPrWG9o",
+      "visualization": false
+    },
+    "15": {
+      "gist": "c844ce749772dc7f8156643753ee6f88",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/c844ce749772dc7f8156643753ee6f88/raw/9a3a42133b7a4a6435d36148287197e1559acc6f/year2024_day15.rs",
+      "compiler_explorer": "8Gh6s979W",
+      "visualization": false
+    },
+    "14": {
+      "gist": "b4c10a18308815b7bf245b126e67a56f",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/b4c10a18308815b7bf245b126e67a56f/raw/cb2ac75282eb67eb097ab469803e69890c5e8122/year2024_day14.rs",
+      "compiler_explorer": "v5aGWEeMe",
+      "visualization": false
+    },
+    "5": {
+      "gist": "eac3131d260d460ee9802efe4679c122",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/eac3131d260d460ee9802efe4679c122/raw/98dc355f97184f9ff6085c81b361a48450503b01/year2024_day5.rs",
+      "compiler_explorer": "TKM9Ghcas",
+      "visualization": false
+    },
+    "23": {
+      "gist": "cc7494229d00dd81e3b38b574302d974",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/cc7494229d00dd81e3b38b574302d974/raw/606c3727a2f2a992d71b879ec64cf0a677b6bbcb/year2024_day23.rs",
+      "compiler_explorer": "bEP6zjazb",
+      "visualization": false
+    },
+    "13": {
+      "gist": "4b2380789dca9cf602cea9ba07d6ed3e",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/4b2380789dca9cf602cea9ba07d6ed3e/raw/a1dfb550010c7541ac75bef296e1880504204c0a/year2024_day13.rs",
+      "compiler_explorer": "dzrn61s6o",
+      "visualization": false
+    },
+    "25": {
+      "gist": "3fcf7921933a47ca84440bf7bf3aa549",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/3fcf7921933a47ca84440bf7bf3aa549/raw/e659af59bfae87d7717fa5f067cd4309a6942712/year2024_day25.rs",
+      "compiler_explorer": "hG7dsEj59",
+      "visualization": false
+    },
+    "18": {
+      "gist": "48645f34562ad3dfac94ca3323661b66",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/48645f34562ad3dfac94ca3323661b66/raw/9415d529e7781c070b292f4ee18331e6ded98e74/year2024_day18.rs",
+      "compiler_explorer": "9job7WzPd",
+      "visualization": false
+    },
+    "21": {
+      "gist": "ec1ff2d581aa69f5648f448eec5719b7",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/ec1ff2d581aa69f5648f448eec5719b7/raw/374eb6f13ef21117f42fbf158784e8dca4132700/year2024_day21.rs",
+      "compiler_explorer": "z1aaWa1Mq",
+      "visualization": false
+    },
+    "22": {
+      "gist": "e9817a32e2988bf2f9b38ceb9efe2a27",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/e9817a32e2988bf2f9b38ceb9efe2a27/raw/d477f704a72380b63a7bf15da009852681d3c9e2/year2024_day22.rs",
+      "compiler_explorer": "Ebfj66eGx",
+      "visualization": false
+    },
+    "3": {
+      "gist": "84b4a1ae0fdacf266c6f5d395d20854d",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/84b4a1ae0fdacf266c6f5d395d20854d/raw/2ac5c9114b9fc54c178e7cf4a31d55ba3738a8d6/year2024_day3.rs",
+      "compiler_explorer": "oMvzxxvY4",
+      "visualization": false
+    },
+    "4": {
+      "gist": "acd28b736ed674ddec595b815debdbbf",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/acd28b736ed674ddec595b815debdbbf/raw/f792f99275f22ae45bef390136372c9f6e169e98/year2024_day4.rs",
+      "compiler_explorer": "64K7fP79s",
+      "visualization": false
+    }
   }
 }
