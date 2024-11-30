@@ -38,6 +38,7 @@ mod year2020;
 mod year2021;
 mod year2022;
 mod year2023;
+mod year2024;
 
 #[cfg(feature = "visualization")]
 pub type ResultType = String;
@@ -322,6 +323,31 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<ResultType, St
         (2023, 23) => to_stringer_input(year2023::day23::solve, &input),
         (2023, 24) => to_stringer_input(year2023::day24::solve, &input),
         (2023, 25) => to_stringer_input(year2023::day25::solve, &input),
+        (2024, 1) => to_stringer_input(year2024::day01::solve, &input),
+        (2024, 2) => to_stringer_input(year2024::day02::solve, &input),
+        (2024, 3) => to_stringer_input(year2024::day03::solve, &input),
+        (2024, 4) => to_stringer_input(year2024::day04::solve, &input),
+        (2024, 5) => to_stringer_input(year2024::day05::solve, &input),
+        (2024, 6) => to_stringer_input(year2024::day06::solve, &input),
+        (2024, 7) => to_stringer_input(year2024::day07::solve, &input),
+        (2024, 8) => to_stringer_input(year2024::day08::solve, &input),
+        (2024, 9) => to_stringer_input(year2024::day09::solve, &input),
+        (2024, 10) => to_stringer_input(year2024::day10::solve, &input),
+        (2024, 11) => to_stringer_input(year2024::day11::solve, &input),
+        (2024, 12) => to_stringer_input(year2024::day12::solve, &input),
+        (2024, 13) => to_stringer_input(year2024::day13::solve, &input),
+        (2024, 14) => to_stringer_input(year2024::day14::solve, &input),
+        (2024, 15) => to_stringer_input(year2024::day15::solve, &input),
+        (2024, 16) => to_stringer_input(year2024::day16::solve, &input),
+        (2024, 17) => to_stringer_input(year2024::day17::solve, &input),
+        (2024, 18) => to_stringer_input(year2024::day18::solve, &input),
+        (2024, 19) => to_stringer_input(year2024::day19::solve, &input),
+        (2024, 20) => to_stringer_input(year2024::day20::solve, &input),
+        (2024, 21) => to_stringer_input(year2024::day21::solve, &input),
+        (2024, 22) => to_stringer_input(year2024::day22::solve, &input),
+        (2024, 23) => to_stringer_input(year2024::day23::solve, &input),
+        (2024, 24) => to_stringer_input(year2024::day24::solve, &input),
+        (2024, 25) => to_stringer_input(year2024::day25::solve, &input),
         _ => Err(format!("Unsupported year={year}, day={day}, part={part}")),
     };
 
