@@ -184,8 +184,9 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             label: None,
             layout: Some(&compute_pipeline_layout),
             module: &shader,
-            entry_point: "propose_movement",
+            entry_point: Some("propose_movement"),
             compilation_options: Default::default(),
+            cache: None,
         });
 
     let move_pipeline = gpu
@@ -194,8 +195,9 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             label: None,
             layout: Some(&compute_pipeline_layout),
             module: &shader,
-            entry_point: "apply_movement",
+            entry_point: Some("apply_movement"),
             compilation_options: Default::default(),
+            cache: None,
         });
 
     for round in 0..input.part_values(10, 1000) {

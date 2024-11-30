@@ -47,7 +47,7 @@ pub fn setup() -> Result<Gpu, String> {
                 &wgpu::DeviceDescriptor {
                     required_features: wgpu::Features::empty(),
                     required_limits: wgpu::Limits::default(),
-                    label: None,
+                    ..Default::default()
                 },
                 None,
             )
