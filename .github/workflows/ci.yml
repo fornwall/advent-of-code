@@ -115,7 +115,7 @@ jobs:
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-    - run: cargo install wasm-bindgen-cli --git https://github.com/rustwasm/wasm-bindgen
+    - run: cargo binstall --no-confirm wasm-bindgen-cli
     - name: Test with Node ${{ matrix.node-version }}
       run: make node-package
 
@@ -368,7 +368,6 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - name: Install wasm-opt
       run: brew update && brew install binaryen
-    - run: cargo install wasm-bindgen-cli --git https://github.com/rustwasm/wasm-bindgen
     - name: Deploy to Cloudflare
       env:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
