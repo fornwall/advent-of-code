@@ -18,9 +18,6 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: ${{ matrix.rust }}
-    - uses: Homebrew/actions/setup-homebrew@master
-    - name: Install protobuf
-      run: brew install protobuf
     - name: Test and check (stable)
       run: |
         make COUNT_ALLOCATIONS=1 check
