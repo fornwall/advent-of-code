@@ -22,7 +22,7 @@ use std::fs::read_to_string;
 main_string  = ""
 
 for year in range(2024, 2025):
-    for day in range(1, 26):
+    for day in range(1, 2):
         for part in range(1, 2 if day == 25 else 3):
             problem_func = f"problem_{year}_{day}_{part}"
             if FILTER and not problem_func.startswith(FILTER):
