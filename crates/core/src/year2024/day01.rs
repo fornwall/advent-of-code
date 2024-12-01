@@ -11,9 +11,10 @@ pub fn solve(input: &Input) -> Result<u64, String> {
         right_list.push(r.parse().map_err(|_| on_error())?)?;
     }
 
+    right_list.slice_mut().sort_unstable();
+    left_list.slice_mut().sort_unstable();
+
     Ok(if input.is_part_one() {
-        right_list.slice_mut().sort_unstable();
-        left_list.slice_mut().sort_unstable();
         left_list
             .slice()
             .iter()
@@ -21,11 +22,24 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             .map(|(l, &r)| l.abs_diff(r))
             .sum::<u32>() as u64
     } else {
-        left_list
-            .slice()
-            .iter()
-            .map(|&l| u64::from(l) * right_list.slice().iter().filter(|&&r| r == l).count() as u64)
-            .sum::<u64>()
+        let mut similarity = 0;
+        let mut right_idx = 0;
+        let mut last_added = 0;
+        for (left_idx, &left_val) in left_list.slice().iter().enumerate() {
+            if left_idx > 0 && left_val == left_list.elements[left_idx - 1] {
+                similarity += last_added;
+            } else {
+                last_added = 0;
+                while right_idx < right_list.len() && left_val >= right_list.elements[right_idx] {
+                    if left_val == right_list.elements[right_idx] {
+                        similarity += left_val;
+                        last_added += left_val;
+                    }
+                    right_idx += 1;
+                }
+            }
+        }
+        similarity as u64
     })
 }
 
