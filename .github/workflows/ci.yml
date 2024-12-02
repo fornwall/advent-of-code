@@ -242,7 +242,7 @@ jobs:
       run: cargo tarpaulin --verbose --timeout 720 --out xml
       working-directory: crates/core
     - name: Upload to codecov.io
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         directory: crates/core
 
