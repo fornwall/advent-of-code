@@ -20,7 +20,7 @@ async fn main() {
         .route("/solve/:year/:day/:part", post(handle_post));
 
     let port = "8080";
-    println!("Running on port 8080");
+    println!("Running on port {port}");
     let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{port}"))
         .await
         .unwrap();
