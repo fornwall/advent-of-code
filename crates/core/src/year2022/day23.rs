@@ -231,6 +231,7 @@ pub use super::day23_renderer::solve;
 
 #[test]
 pub fn tests() {
+    #[cfg(any(feature = "simd", feature = "webgpu-compute"))]
     use crate::input::Input;
     use crate::input::{test_part_one, test_part_two};
 
