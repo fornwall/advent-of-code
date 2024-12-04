@@ -35,9 +35,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                                 let c2 = letter_board.at((x + p2.0 * mult, y + p2.1 * mult));
                                 if c2 == b'A' {
                                     let c3 = letter_board.at((x + p3.0 * mult, y + p3.1 * mult));
-                                    if c3 == b'S' {
-                                        num_xmas += 1;
-                                    }
+                                    num_xmas += u32::from(c3 == b'S');
                                 }
                             }
                         }
@@ -53,15 +51,13 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     let bottom_left = letter_board.at((x - 1, y + 1));
                     let top_right = letter_board.at((x + 1, y - 1));
                     let bottom_right = letter_board.at((x + 1, y + 1));
-                    if matches!(
+                    num_xmas += u32::from(matches!(
                         (top_left, bottom_left, top_right, bottom_right),
                         (b'M', b'M', b'S', b'S')
                             | (b'S', b'S', b'M', b'M')
                             | (b'M', b'S', b'M', b'S')
                             | (b'S', b'M', b'S', b'M')
-                    ) {
-                        num_xmas += 1;
-                    }
+                    ));
                 }
             }
         }
