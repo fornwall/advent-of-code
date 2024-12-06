@@ -87,9 +87,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     }
                     b'#' => {
                         current_direction_idx = (current_direction_idx + 1) % 4;
-                    }
-                    _ => {
-                        current_position = new_position;
                         if repeated_visit[current_direction_idx][current_position.1 as usize]
                             .is_bit_set(current_position.0 as usize)
                         {
@@ -98,6 +95,9 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         }
                         repeated_visit[current_direction_idx][current_position.1 as usize]
                             .set_bit(current_position.0 as usize);
+                    }
+                    _ => {
+                        current_position = new_position;
                     }
                 }
             }
