@@ -1,7 +1,5 @@
-use crate::{
-    common::array_stack::ArrayStack,
-    input::{on_error, Input},
-};
+use crate::common::array_stack::ArrayStack;
+use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     let mut sum = 0;
@@ -28,7 +26,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 fn is_possible(desired: u64, remaining: &[u64], concatenate: bool) -> bool {
     let Some((&last, remaining)) = remaining.split_last() else {
-       return false; 
+        return false;
     };
     if remaining.is_empty() {
         return desired == last;
