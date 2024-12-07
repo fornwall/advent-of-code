@@ -2,6 +2,7 @@ use crate::common::u256::U256;
 use crate::input::{on_error, Input};
 
 const DIRECTIONS: [(i32, i32); 4] = [(0, -1), (1, 0), (0, 1), (-1, 0)];
+const JUMP_MAP_WIDTH: usize = 192;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     let width = input
@@ -23,6 +24,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let mut visited = [U256::default(); 192];
     // Indexed by direction idx:
     let mut repeated_visit = [[U256::default(); 192]; 4];
+    // Indexed by direction idx - how many positions to jump if not obstacle placed:
+    let mut jump_map = [[u8::MAX; JUMP_MAP_WIDTH * JUMP_MAP_WIDTH]; 4];
 
     let mut current_direction_idx = 0;
     let mut current_position = (0, 0);
@@ -43,6 +46,9 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
     let mut num_loops = 0;
 
+    let mut current_jumps_len = 0;
+    let mut current_jumps_start_position = (0, 0);
+
     loop {
         let dir = DIRECTIONS[current_direction_idx];
         let new_position = (current_position.0 + dir.0, current_position.1 + dir.1);
@@ -51,6 +57,11 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 break;
             }
             b'#' => {
+                jump_map[current_direction_idx][current_jumps_start_position.1 as usize
+                    * JUMP_MAP_WIDTH
+                    + current_jumps_start_position.0 as usize] = current_jumps_len;
+                current_jumps_len = 0;
+
                 current_direction_idx = (current_direction_idx + 1) % 4;
                 repeated_visit[current_direction_idx][current_position.1 as usize]
                     .set_bit(current_position.0 as usize);
@@ -67,6 +78,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     placed_obstacles[new_position.1 as usize].set_bit(new_position.0 as usize);
                     if does_movements_repeat(
                         &grid,
+                        &mut jump_map,
                         &repeated_visit,
                         new_position,
                         current_position,
@@ -75,6 +87,10 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                         num_loops += 1;
                     }
                 }
+                if current_jumps_len == 0 {
+                    current_jumps_start_position = current_position;
+                }
+                current_jumps_len += 1;
                 current_position = new_position;
                 visited[current_position.1 as usize].set_bit(current_position.0 as usize);
             }
@@ -90,6 +106,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 fn does_movements_repeat(
     grid: &Grid,
+    jump_map: &mut [[u8; JUMP_MAP_WIDTH * JUMP_MAP_WIDTH]; 4],
     repeated_visit: &[[U256; 192]; 4],
     obstacle_position: (i32, i32),
     mut current_position: (i32, i32),
@@ -99,11 +116,22 @@ fn does_movements_repeat(
     repeated_visit[current_direction_idx][current_position.1 as usize]
         .set_bit(current_position.0 as usize);
 
+    let mut current_jumps_len = 0;
+    let mut current_jumps_start_position = (0, 0);
+
     loop {
         let dir = DIRECTIONS[current_direction_idx];
         let new_position = (current_position.0 + dir.0, current_position.1 + dir.1);
-        match (new_position == obstacle_position, grid.at(new_position)) {
+        let stopped_by_placed_obstacle = new_position == obstacle_position;
+
+        match (stopped_by_placed_obstacle, grid.at(new_position)) {
             (true, _) | (_, b'#') => {
+                if !stopped_by_placed_obstacle {
+                    jump_map[current_direction_idx][current_jumps_start_position.1 as usize
+                        * JUMP_MAP_WIDTH
+                        + current_jumps_start_position.0 as usize] = current_jumps_len;
+                }
+
                 current_direction_idx = (current_direction_idx + 1) % 4;
                 if repeated_visit[current_direction_idx][current_position.1 as usize]
                     .is_bit_set(current_position.0 as usize)
@@ -112,11 +140,38 @@ fn does_movements_repeat(
                 }
                 repeated_visit[current_direction_idx][current_position.1 as usize]
                     .set_bit(current_position.0 as usize);
+
+                let mut jump_len = jump_map[current_direction_idx]
+                    [current_position.1 as usize * JUMP_MAP_WIDTH + current_position.0 as usize];
+                if jump_len != u8::MAX {
+                    let jump_dir = DIRECTIONS[current_direction_idx];
+                    // Check if placed obstacle blocks jump:
+                    let dist = (
+                        obstacle_position.0 - current_position.0,
+                        obstacle_position.1 - current_position.1,
+                    );
+                    if (dist.0 == 0 || dist.1 == 0)
+                        && (dist.0.signum(), dist.1.signum())
+                            == (jump_dir.0.signum(), jump_dir.1.signum())
+                    {
+                        jump_len = (dist.0.abs() + dist.1.abs() - 1).min(jump_len as i32) as u8;
+                    }
+
+                    current_position = (
+                        current_position.0 + jump_dir.0 * jump_len as i32,
+                        current_position.1 + jump_dir.1 * jump_len as i32,
+                    );
+                }
+                current_jumps_len = 0;
             }
             (false, b'L') => {
                 return false;
             }
             _ => {
+                if current_jumps_len == 0 {
+                    current_jumps_start_position = current_position;
+                }
+                current_jumps_len += 1;
                 current_position = new_position;
             }
         }
