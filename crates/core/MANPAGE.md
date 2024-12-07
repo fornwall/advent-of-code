@@ -3,7 +3,7 @@
 NAME
 ====
 
-**advent-of-code** — CLI tool for solving Advent of Code problems
+**advent-of-code** — CLI for solving Advent of Code problems
 
 SYNOPSIS
 ========
@@ -36,7 +36,9 @@ EXAMPLES
 
 Solve the second part of the first day in 2022:
 
-:   advent-of-code 2022 1 2 < path/to/input-file.txt
+```sh
+advent-of-code 2022 1 2 < path/to/input-file.txt
+```
 
 BUGS
 ====
@@ -46,4 +48,4 @@ Bugs can be reported on GitHub: https://github.com/fornwall/advent-of-code/issue
 AUTHOR
 ======
 
-Fredrik Fornwall <fredrik@fornwall.net>
+Fredrik Fornwall &lt;fredrik@fornwall.net&gt;
