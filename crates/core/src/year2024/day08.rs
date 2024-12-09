@@ -1,7 +1,5 @@
-use crate::{
-    common::array_stack::ArrayStack,
-    input::{on_error, Input},
-};
+use crate::common::array_stack::ArrayStack;
+use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     let width = input
