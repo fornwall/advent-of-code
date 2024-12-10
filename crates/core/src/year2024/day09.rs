@@ -1,4 +1,5 @@
-use crate::{common::array_stack::ArrayStack, input::Input};
+use crate::common::array_stack::ArrayStack;
+use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<usize, String> {
     let mut checksum = 0;
