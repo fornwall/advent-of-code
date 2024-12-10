@@ -1,8 +1,8 @@
 use crate::common::array_stack::ArrayStack;
 use crate::input::Input;
 
-pub fn solve(input: &Input) -> Result<usize, String> {
-    let mut checksum = 0;
+pub fn solve(input: &Input) -> Result<u64, String> {
+    let mut checksum = 0_u64;
     let blocks = input.text.as_bytes();
 
     if input.is_part_one() {
@@ -20,7 +20,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                     let num_occupied_blocks = blocks[left_digit_offset] - b'0';
                     let file_id = left_digit_offset / 2;
                     for _ in 0..num_occupied_blocks {
-                        checksum += left_block_offset * file_id;
+                        checksum += left_block_offset as u64 * file_id as u64;
                         left_block_offset += 1;
                     }
                 }
@@ -34,7 +34,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             while blocks_to_move > 0 {
                 let can_place = blocks_to_move.min(left_num_free);
                 for _ in 0..can_place {
-                    checksum += left_block_offset * file_id;
+                    checksum += left_block_offset as u64 * file_id as u64;
                     left_block_offset += 1;
                     blocks_to_move -= 1;
                     left_num_free -= 1;
@@ -44,7 +44,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
                     let num_occupied_blocks = blocks[left_digit_offset] - b'0';
                     let file_id = left_digit_offset / 2;
                     for _ in 0..num_occupied_blocks {
-                        checksum += left_block_offset * file_id;
+                        checksum += left_block_offset as u64 * file_id as u64;
                         left_block_offset += 1;
                     }
                     left_digit_offset += 1;
@@ -108,7 +108,8 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
                 final_block_idx = free_block_idx;
             }
-            checksum += file_id * (final_block_idx..(final_block_idx + file_size)).sum::<usize>();
+            checksum += file_id as u64
+                * (final_block_idx..(final_block_idx + file_size)).sum::<usize>() as u64;
             free_blocks.pop();
         }
     }
