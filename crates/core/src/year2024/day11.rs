@@ -55,12 +55,12 @@ fn num_digits(number: u64) -> u32 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one, test_part_two};
 
     let test_input = "125 17";
-    test_part_one_no_allocations!(test_input => 55312);
+    test_part_one!(test_input => 55312);
 
     let real_input = include_str!("day11_input.txt");
-    test_part_one_no_allocations!(real_input => 220_722);
-    test_part_two_no_allocations!(real_input => 261_952_051_690_787);
+    test_part_one!(real_input => 220_722);
+    test_part_two!(real_input => 261_952_051_690_787);
 }
