@@ -220,10 +220,10 @@ fn find_match(matched_scans: &[Scan], scan_to_join: &Scan) -> Option<(Point, Sca
                 matched_scan
                     .fingerprints
                     .get(to_join_fingerprint)
-                    .map_or(false, |matched_pairs| {
-                        num_pairs_matching_fingerprint += to_join_pairs.len() * matched_pairs.len();
-                        true
+                    .inspect(|matched_pairs| {
+                        num_pairs_matching_fingerprint += to_join_pairs.len() * matched_pairs.len()
                     })
+                    .is_some()
             })
             .collect::<Vec<_>>();
 
