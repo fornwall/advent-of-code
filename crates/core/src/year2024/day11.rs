@@ -4,18 +4,22 @@ use crate::input::{on_error, Input};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     let mut stones = HashMap::with_capacity(4096);
+    let mut scratch = HashMap::with_capacity(stones.len());
     for s in input.text.split_ascii_whitespace() {
         let stone_value: u64 = s.parse().map_err(|_| on_error())?;
         *stones.entry(stone_value).or_insert(0) += 1;
     }
     for _ in 0..input.part_values(25, 75) {
-        stones = blink_evolve(stones);
+        (stones, scratch) = blink_evolve(stones, scratch);
     }
     Ok(stones.values().sum())
 }
 
-fn blink_evolve(stones: HashMap<u64, u64>) -> HashMap<u64, u64> {
-    let mut evolved = HashMap::with_capacity(stones.len());
+fn blink_evolve(
+    stones: HashMap<u64, u64>,
+    mut evolved: HashMap<u64, u64>,
+) -> (HashMap<u64, u64>, HashMap<u64, u64>) {
+    evolved.clear();
     for (&stone_value, &num_stones) in stones.iter() {
         if stone_value == 0 {
             // "If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1."
@@ -34,7 +38,7 @@ fn blink_evolve(stones: HashMap<u64, u64>) -> HashMap<u64, u64> {
             *evolved.entry(new_value).or_insert(0) += num_stones;
         }
     }
-    evolved
+    (evolved, stones)
 }
 
 fn split_if_even_num_digits(number: u64) -> Option<(u64, u64)> {
