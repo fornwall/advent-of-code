@@ -24,7 +24,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 struct Grid {
     width: usize,
-    cells: Vec<u8>,
+    cells: [u8; 75*75],
     robot_position: (i32, i32),
 }
 
@@ -33,7 +33,8 @@ impl Grid {
         let mut height = 0;
         let mut width = 0;
         let mut robot_position = (0, 0);
-        let mut cells = Vec::new();
+        let mut cells = [0_u8; 75*75];
+        let mut cells_size = 0;
         let width_multiplier = if part1 { 1 } else { 2 };
 
         for (line_idx, line) in input_string.lines().enumerate() {
@@ -48,15 +49,18 @@ impl Grid {
                     robot_position = (x as i32 * width_multiplier as i32, height as i32);
                 }
                 if part1 {
-                    cells.push(b);
+                    cells[cells_size] = b;
+                    cells_size += 1;
                 } else {
                     let (b1, b2) = match b {
                         b'@' => (b'@', b'.'),
                         b'O' => (b'[', b']'),
                         _ => (b, b),
                     };
-                    cells.push(b1);
-                    cells.push(b2);
+                    cells[cells_size] = b1;
+                    cells_size += 1;
+                    cells[cells_size] = b2;
+                    cells_size += 1;
                 }
             });
             height += 1;
