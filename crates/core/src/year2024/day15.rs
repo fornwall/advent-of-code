@@ -24,7 +24,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 struct Grid {
     width: usize,
-    cells: [u8; 75*75],
+    cells: [u8; 75 * 75],
     robot_position: (i32, i32),
 }
 
@@ -33,7 +33,7 @@ impl Grid {
         let mut height = 0;
         let mut width = 0;
         let mut robot_position = (0, 0);
-        let mut cells = [0_u8; 75*75];
+        let mut cells = [0_u8; 75 * 75];
         let mut cells_size = 0;
         let width_multiplier = if part1 { 1 } else { 2 };
 
@@ -50,7 +50,6 @@ impl Grid {
                 }
                 if part1 {
                     cells[cells_size] = b;
-                    cells_size += 1;
                 } else {
                     let (b1, b2) = match b {
                         b'@' => (b'@', b'.'),
@@ -60,8 +59,8 @@ impl Grid {
                     cells[cells_size] = b1;
                     cells_size += 1;
                     cells[cells_size] = b2;
-                    cells_size += 1;
                 }
+                cells_size += 1;
             });
             height += 1;
         }
@@ -81,7 +80,7 @@ impl Grid {
         })
     }
 
-    fn at(&self, position: (i32, i32)) -> u8 {
+    const fn at(&self, position: (i32, i32)) -> u8 {
         self.cells[position.1 as usize * self.width + position.0 as usize]
     }
 
