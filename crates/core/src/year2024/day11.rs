@@ -2,54 +2,70 @@ use std::collections::HashMap;
 
 use crate::input::{on_error, Input};
 
+// Based on https://github.com/maneatingape/advent-of-code-rust/blob/main/src/year2024/day11.rs
 pub fn solve(input: &Input) -> Result<u64, String> {
-    let mut stones = HashMap::with_capacity(4096);
-    let mut scratch = HashMap::with_capacity(stones.len());
+    let mut stone_evolution_by_idx = Vec::with_capacity(5000);
+    let mut stone_value_to_idx = HashMap::with_capacity(5000);
+    let mut stone_values_to_process = Vec::new();
+    let mut occurences_by_idx = [0_u64; 5000];
+
     for s in input.text.split_ascii_whitespace() {
         let stone_value: u64 = s.parse().map_err(|_| on_error())?;
-        *stones.entry(stone_value).or_insert(0) += 1;
+        let indices_len = stone_value_to_idx.len() as u16;
+        let index = *stone_value_to_idx.entry(stone_value).or_insert_with(|| {
+            stone_values_to_process.push(stone_value);
+            indices_len
+        });
+        occurences_by_idx[index as usize] += 1;
     }
+
     for _ in 0..input.part_values(25, 75) {
-        (stones, scratch) = blink_evolve(stones, scratch);
-    }
-    Ok(stones.values().sum())
-}
+        let mut next_stone_values_to_process = Vec::with_capacity(200);
+        let mut next_occurences_by_idx = [0; 5000];
 
-fn blink_evolve(
-    stones: HashMap<u64, u64>,
-    mut evolved: HashMap<u64, u64>,
-) -> (HashMap<u64, u64>, HashMap<u64, u64>) {
-    evolved.clear();
-    for (&stone_value, &num_stones) in stones.iter() {
-        if stone_value == 0 {
-            // "If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1."
-            *evolved.entry(1).or_insert(0) += num_stones;
-        } else if let Some((left_value, right_value)) = split_if_even_num_digits(stone_value) {
-            // "If the stone is engraved with a number that has an even number of digits, it is replaced by two stones.
-            // The left half of the digits are engraved on the new left stone, and the right half of the digits are
-            // engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become
-            // stones 10 and 0.)."
-            *evolved.entry(left_value).or_insert(0) += num_stones;
-            *evolved.entry(right_value).or_insert(0) += num_stones;
-        } else {
-            // "If none of the other rules apply, the stone is replaced by a new stone; the old stone's number
-            // multiplied by 2024 is engraved on the new stone.""
-            let new_value = stone_value * 2024;
-            *evolved.entry(new_value).or_insert(0) += num_stones;
+        let mut index_of = |stone_value| {
+            let size = stone_value_to_idx.len() as u16;
+            *stone_value_to_idx.entry(stone_value).or_insert_with(|| {
+                next_stone_values_to_process.push(stone_value);
+                size
+            })
+        };
+
+        for &stone_value in stone_values_to_process.iter() {
+            let (left, right) = evolve_stone(stone_value);
+            stone_evolution_by_idx.push((index_of(left), right.map(&mut index_of)));
         }
+
+        for (&(first_idx, second_idx), amount) in
+            stone_evolution_by_idx.iter().zip(occurences_by_idx)
+        {
+            next_occurences_by_idx[first_idx as usize] += amount;
+            if let Some(second_idx) = second_idx {
+                next_occurences_by_idx[second_idx as usize] += amount;
+            }
+        }
+
+        occurences_by_idx = next_occurences_by_idx;
+        stone_values_to_process = next_stone_values_to_process;
     }
-    (evolved, stones)
+
+    Ok(occurences_by_idx.iter().sum())
 }
 
-fn split_if_even_num_digits(number: u64) -> Option<(u64, u64)> {
-    let num_digits = num_digits(number);
+fn evolve_stone(stone_value: u64) -> (u64, Option<u64>) {
+    let num_digits = num_digits(stone_value);
     if num_digits % 2 == 0 {
         let raised = 10_u64.pow(num_digits / 2);
-        let left_value = number / raised;
-        let right_value = number % raised;
-        Some((left_value, right_value))
+        let left_value = stone_value / raised;
+        let right_value = stone_value % raised;
+        (left_value, Some(right_value))
     } else {
-        None
+        let new_stone_value = if stone_value == 0 {
+            1
+        } else {
+            stone_value * 2024
+        };
+        (new_stone_value, None)
     }
 }
 
