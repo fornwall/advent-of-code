@@ -43,6 +43,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     let mut costs = [[u32::MAX; MAX_GRID_SIZE * MAX_GRID_SIZE]; 4];
     let mut to_visit =
         PriorityQueue::<{ WORK_QUEUE_MAX_SIZE }, (u32, (i16, i16), Direction)>::new();
+
+    costs[Direction::East.idx()][(start_location.1 * grid.width + start_location.0) as usize] = 0;
     to_visit.push((0, start_location, Direction::East)).unwrap();
 
     let mut lowest_end_cost = u32::MAX;
@@ -88,7 +90,11 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         Direction::South,
         Direction::West,
     ] {
-        to_visit.push_back((lowest_end_cost as i32, end_location, direction));
+        if costs[direction.idx()][(end_location.1 * grid.width + end_location.0) as usize]
+            != u32::MAX
+        {
+            to_visit.push_back((lowest_end_cost as i32, end_location, direction));
+        }
     }
 
     while let Some((cost, position, direction)) = to_visit.pop_front() {
@@ -98,9 +104,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             (cost - 1000, position, direction.rotate(false)),
         ] {
             let seen_cost = costs[next_direction.idx()]
-                [(next_position.1 * grid.width + next_position.0) as usize]
-                as i32;
-            if next_cost == seen_cost {
+                [(next_position.1 * grid.width + next_position.0) as usize];
+            if seen_cost != u32::MAX && next_cost == seen_cost as i32 {
                 visited[next_position.1 as usize].set_bit(next_position.0 as usize);
                 to_visit.push_back((next_cost, next_position, next_direction));
                 costs[next_direction.idx()]
@@ -196,6 +201,14 @@ pub fn tests() {
 ###############";
     test_part_one_no_allocations!(test_input => 7036);
     test_part_two_no_allocations!(test_input => 45);
+    let test_input = "#######
+###..E#
+###..##
+##....#
+##..###
+#S.####
+#######";
+    test_part_two_no_allocations!(test_input => 12);
 
     let real_input = include_str!("day16_input.txt");
     test_part_one_no_allocations!(real_input => 90_440);
