@@ -1,5 +1,4 @@
-use std::collections::VecDeque;
-
+use crate::common::array_deque::ArrayDeque;
 use crate::common::{priority_queueu::PriorityQueue, u256::U256};
 use crate::input::{on_error, Input};
 
@@ -81,7 +80,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     }
 
     let mut visited = [U256::default(); MAX_GRID_SIZE];
-    let mut to_visit = VecDeque::new();
+    let mut to_visit = ArrayDeque::<128, (i32, (i16, i16), Direction)>::new();
 
     visited[end_location.1 as usize].set_bit(end_location.0 as usize);
     for direction in [
@@ -93,7 +92,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         if costs[direction.idx()][(end_location.1 * grid.width + end_location.0) as usize]
             != u32::MAX
         {
-            to_visit.push_back((lowest_end_cost as i32, end_location, direction));
+            to_visit.push_back((lowest_end_cost as i32, end_location, direction))?;
         }
     }
 
@@ -107,7 +106,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 [(next_position.1 * grid.width + next_position.0) as usize];
             if seen_cost != u32::MAX && next_cost == seen_cost as i32 {
                 visited[next_position.1 as usize].set_bit(next_position.0 as usize);
-                to_visit.push_back((next_cost, next_position, next_direction));
+                to_visit.push_back((next_cost, next_position, next_direction))?;
                 costs[next_direction.idx()]
                     [(next_position.1 * grid.width + next_position.0) as usize] = u32::MAX;
             }
