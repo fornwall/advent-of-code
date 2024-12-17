@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
+use crate::common::array_stack::ArrayStack;
 use crate::input::{on_error, Input};
 
 // Based on https://github.com/maneatingape/advent-of-code-rust/blob/main/src/year2024/day11.rs
 pub fn solve(input: &Input) -> Result<u64, String> {
-    let mut stone_evolution_by_idx = Vec::with_capacity(5000);
+    let mut stone_evolution_by_idx = ArrayStack::<5000, (u16, Option<u16>)>::new();
     let mut stone_value_to_idx = HashMap::with_capacity(5000);
     let mut stone_values_to_process = Vec::new();
     let mut occurences_by_idx = [0_u64; 5000];
@@ -33,11 +34,11 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
         for &stone_value in stone_values_to_process.iter() {
             let (left, right) = evolve_stone(stone_value);
-            stone_evolution_by_idx.push((index_of(left), right.map(&mut index_of)));
+            stone_evolution_by_idx.push((index_of(left), right.map(&mut index_of)))?;
         }
 
         for (&(first_idx, second_idx), amount) in
-            stone_evolution_by_idx.iter().zip(occurences_by_idx)
+            stone_evolution_by_idx.slice().iter().zip(occurences_by_idx)
         {
             next_occurences_by_idx[first_idx as usize] += amount;
             if let Some(second_idx) = second_idx {
