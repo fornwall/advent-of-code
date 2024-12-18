@@ -53,9 +53,9 @@ fn shortest_path(grid: &[[bool; 71]; 71]) -> Option<i32> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one, test_part_two};
 
     let real_input = include_str!("day18_input.txt");
-    test_part_one_no_allocations!(real_input => "360".to_string());
-    test_part_two_no_allocations!(real_input => "58,62".to_string());
+    test_part_one!(real_input => "360".to_string());
+    test_part_two!(real_input => "58,62".to_string());
 }
