@@ -39,12 +39,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
         ) != (3, 0)
         {
             return Err("Program does not end with 'jnz 0'".to_string());
-        } else if (
-            computer.program[computer.program.len() - 4],
-            computer.program[computer.program.len() - 3],
-        ) != (0, 3)
-        {
-            return Err("Second to last instruction is not 'adv 3'".to_string());
         }
 
         // Program ends with:
