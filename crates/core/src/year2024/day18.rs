@@ -17,9 +17,9 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
         if input.is_part_one() {
             if count == 1023 {
-                return Ok(format!("{}", shortest_path(&grid)?));
+                return Ok(format!("{}", shortest_path(&grid).ok_or_else(on_error)?));
             }
-        } else if count >= 1024 && shortest_path(&grid).is_err() {
+        } else if count >= 1024 && shortest_path(&grid).is_none() {
             return Ok(format!("{},{}", x, y));
         }
     }
@@ -27,14 +27,14 @@ pub fn solve(input: &Input) -> Result<String, String> {
     Err("No solution found".to_string())
 }
 
-fn shortest_path(grid: &[[bool; 71]; 71]) -> Result<i32, String> {
+fn shortest_path(grid: &[[bool; 71]; 71]) -> Option<i32> {
     let mut visited = [[false; 71]; 71];
     let mut to_visit = ArrayDeque::<1024, (i32, (i8, i8))>::new();
-    to_visit.push_back((0, (0, 0)))?;
+    to_visit.push_back((0, (0, 0))).ok()?;
 
     while let Some((cost, (x, y))) = to_visit.pop_front() {
         if (x, y) == (70, 70) {
-            return Ok(cost);
+            return Some(cost);
         }
         if visited[y as usize][x as usize] {
             continue;
@@ -43,12 +43,12 @@ fn shortest_path(grid: &[[bool; 71]; 71]) -> Result<i32, String> {
         for (dx, dy) in [(0, -1), (1, 0), (0, 1), (-1, 0)] {
             let (nx, ny) = (x + dx, y + dy);
             if (0..71).contains(&nx) && (0..71).contains(&ny) && !grid[ny as usize][nx as usize] {
-                to_visit.push_back((cost + 1, (nx, ny)))?;
+                to_visit.push_back((cost + 1, (nx, ny))).ok()?;
             }
         }
     }
 
-    Err("No path found".to_string())
+    None
 }
 
 #[test]

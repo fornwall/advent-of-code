@@ -61,15 +61,16 @@ pub fn solve(input: &Input) -> Result<String, String> {
         // And the second to last last output can only have bits 0..6 bits set (as A>>3 twice is zero).
         // So starting from the last instruction we can determine which of the 0..3 lowest bits can give the desired last instruction output,
         // then determine the next bits 3..6 which gives the second to last output, and so on.
-        //let mut stack = ArrayStack::<32, (usize, usize)>::new();
-        let mut stack = ArrayDeque::<320, (usize, usize)>::new();
-        stack.push_back((computer.program.len(), 0))?;
+        let mut stack = ArrayDeque::<320, (u64, u64)>::new();
+        stack.push_back((computer.program.len() as u64, 0))?;
         while let Some((offset_from_end, register_a_bits_so_far)) = stack.pop_front() {
             for first_three_bits in 0..=0b111 {
                 let register_a_next_three_bits = (register_a_bits_so_far << 3) | first_three_bits;
-                computer.registers[0] = register_a_next_three_bits as u64;
+                computer.registers[0] = register_a_next_three_bits;
                 computer.instruction_pointer = 0;
-                if computer.run_for_output() == Some(computer.program[offset_from_end - 1] as u64) {
+                if computer.run_for_output()
+                    == Some(computer.program[offset_from_end as usize - 1] as u64)
+                {
                     if offset_from_end - 1 == 0 {
                         return Ok(format!("{}", register_a_next_three_bits));
                     }
@@ -151,16 +152,16 @@ impl Computer<'_> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one, test_part_two};
 
     let test_input = "Register A: 729
 Register B: 0
 Register C: 0
 
 Program: 0,1,5,4,3,0";
-    test_part_one_no_allocations!(test_input => "4,6,3,5,6,3,5,2,1,0".to_string());
+    test_part_one!(test_input => "4,6,3,5,6,3,5,2,1,0".to_string());
 
     let real_input = include_str!("day17_input.txt");
-    test_part_one_no_allocations!(real_input => "3,7,1,7,2,1,0,6,3".to_string());
-    test_part_two_no_allocations!(real_input => "37221334433268".to_string());
+    test_part_one!(real_input => "3,7,1,7,2,1,0,6,3".to_string());
+    test_part_two!(real_input => "37221334433268".to_string());
 }
