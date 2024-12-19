@@ -1,17 +1,24 @@
 use crate::input::{on_error, Input};
 
-const NUM_NODES: usize = 1024;
+const MAX_TRIE_NODES: usize = 1024;
+const MAX_DESIGN_LEN: usize = 64;
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     let (patterns, designs) = input.text.split_once("\n\n").ok_or_else(on_error)?;
 
-    let trie = patterns.split(", ").collect::<Trie>();
+    let trie = Trie::try_from_iter(patterns.split(", "))?;
 
     let ceil = input.part_values(1, u64::MAX);
-    Ok(designs
+    designs
         .lines()
-        .map(|design| trie.count(design).min(ceil))
-        .sum())
+        .map(|design| {
+            if design.len() > MAX_DESIGN_LEN {
+                Err(format!("Too long design - max {MAX_DESIGN_LEN} supported"))
+            } else {
+                Ok(trie.count(design).min(ceil))
+            }
+        })
+        .sum()
 }
 
 #[derive(Clone, Copy)]
@@ -21,7 +28,7 @@ struct TrieNode {
 }
 
 struct Trie {
-    nodes: [TrieNode; NUM_NODES],
+    nodes: [TrieNode; MAX_TRIE_NODES],
     num_allocated: u16,
 }
 
@@ -31,36 +38,38 @@ impl Default for Trie {
             nodes: [TrieNode {
                 continuations: [u16::MAX; 5],
                 terminal: false,
-            }; NUM_NODES],
+            }; MAX_TRIE_NODES],
             num_allocated: 1,
         }
     }
 }
 
-impl<'a> FromIterator<&'a str> for Trie {
-    fn from_iter<T: IntoIterator<Item = &'a str>>(iter: T) -> Self {
+impl Trie {
+    fn try_from_iter<'a, I: Iterator<Item = &'a str>>(iter: I) -> Result<Self, String> {
         let mut trie = Self::default();
         for word in iter {
-            trie.add(word);
+            trie.add(word)?;
         }
-        trie
+        Ok(trie)
     }
-}
 
-impl Trie {
-    fn add(&mut self, word: &str) {
+    fn add(&mut self, word: &str) -> Result<(), String> {
         let mut current_node = &mut self.nodes[0];
         for b in word.bytes() {
             let child_node_idx = Self::map_to_range(b);
             let mut child_idx = current_node.continuations[child_node_idx as usize];
             if child_idx == u16::MAX {
                 child_idx = self.num_allocated;
+                if child_idx as usize >= MAX_TRIE_NODES {
+                    return Err("Too many patterns".to_string());
+                }
                 current_node.continuations[child_node_idx as usize] = child_idx;
                 self.num_allocated += 1;
             }
             current_node = &mut self.nodes[child_idx as usize];
         }
         current_node.terminal = true;
+        Ok(())
     }
 
     const fn map_to_range(color: u8) -> u8 {
@@ -75,34 +84,26 @@ impl Trie {
     }
 
     fn count(&self, pattern: &str) -> u64 {
-        let mut cache = [u64::MAX; NUM_NODES];
-        self.count_worker(pattern, &mut cache, 0)
-    }
+        let pattern = pattern.as_bytes();
+        let mut endings_at = [0; MAX_DESIGN_LEN];
 
-    fn count_worker(&self, towel: &str, cache: &mut [u64; NUM_NODES], offset: usize) -> u64 {
-        if cache[offset] != u64::MAX {
-            return cache[offset];
-        }
-        let mut current_node = &self.nodes[0];
-        let mut result = 0;
-        for (internal_offset, b) in towel.bytes().skip(offset).enumerate() {
-            let child_offset = Self::map_to_range(b);
-            let child_idx = current_node.continuations[child_offset as usize];
-            if child_idx == u16::MAX {
-                break;
-            }
-            current_node = &self.nodes[child_idx as usize];
-            if current_node.terminal {
-                let new_offset = offset + internal_offset + 1;
-                if new_offset == towel.len() {
-                    result += 1;
-                } else {
-                    result += self.count_worker(towel, cache, new_offset);
+        for start in 0..pattern.len() {
+            let num_starts = if start == 0 { 1 } else { endings_at[start - 1] };
+            if num_starts > 0 {
+                let mut current_node = &self.nodes[0];
+
+                for end in start..pattern.len() {
+                    let child_offset = Self::map_to_range(pattern[end]);
+                    let child_idx = current_node.continuations[child_offset as usize];
+                    if child_idx == u16::MAX {
+                        break;
+                    }
+                    current_node = &self.nodes[child_idx as usize];
+                    endings_at[end] += u64::from(current_node.terminal) * num_starts;
                 }
             }
         }
-        cache[offset] = result;
-        result
+        endings_at[pattern.len() - 1]
     }
 }
 
@@ -111,9 +112,9 @@ pub fn tests() {
     use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
 
     let mut trie = Trie::default();
-    trie.add("wub");
-    trie.add("wuu");
-    trie.add("bbb");
+    trie.add("wub").unwrap();
+    trie.add("wuu").unwrap();
+    trie.add("bbb").unwrap();
     assert_eq!(trie.count("wub"), 1);
     assert_eq!(trie.count("wuu"), 1);
     assert_eq!(trie.count("bbb"), 1);
