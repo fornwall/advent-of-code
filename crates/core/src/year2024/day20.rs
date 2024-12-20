@@ -81,13 +81,10 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
         // Cheat:
         for dx in -diamond_size..=diamond_size {
-            for dy in -diamond_size..=diamond_size {
+            for dy in (dx.abs() - diamond_size)..=(diamond_size - dx.abs()) {
                 let manhattan_distance = dx.abs() + dy.abs();
-                if (dx, dy) == (0, 0) || (manhattan_distance > diamond_size) {
-                    continue;
-                }
                 let cheat = (position.0 + dx, position.1 + dy);
-                if grid.at(cheat) != b'#' && costs[cheat.1 as usize][cheat.0 as usize] != u16::MAX {
+                if grid.at(cheat) != b'#' {
                     if let Some(gain) = costs[cheat.1 as usize][cheat.0 as usize]
                         .checked_sub(cost + manhattan_distance as u16)
                     {
