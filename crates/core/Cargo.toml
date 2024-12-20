@@ -36,7 +36,7 @@ webgpu-compute = ["bytemuck", "pollster", "wgpu"]
 allocation-counter = { version = "0", optional = true }
 bytemuck = { version = "1", optional = true }
 pollster = { version = "0", optional = true }
-svgplot = { version = "2024.18.0", path = "../svgplot", optional = true }
+svgplot = { version = "2024.19.0", path = "../svgplot", optional = true }
 wgpu = { version = "23", optional = true }
 
 [dev-dependencies]
