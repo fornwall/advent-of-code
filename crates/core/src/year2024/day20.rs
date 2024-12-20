@@ -40,9 +40,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         return Err("No end location".to_string());
     }
 
-    let mut to_visit = ArrayDeque::<{ WORK_QUEUE_MAX_SIZE }, (u16, (i16, i16))>::new();
     let mut costs = [[u16::MAX; MAX_GRID_SIZE]; MAX_GRID_SIZE];
-
+    let mut to_visit = ArrayDeque::<{ WORK_QUEUE_MAX_SIZE }, (u16, (i16, i16))>::new();
     to_visit.push_back((0, start_location))?;
 
     while let Some((cost, position)) = to_visit.pop_front() {
@@ -58,38 +57,26 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
     }
 
+    // Second pass to find cheats:
     let diamond_size: i16 = input.part_values(2, 20);
-
-    // Second pass to find cheats
-    let mut visited = [[false; MAX_GRID_SIZE]; MAX_GRID_SIZE];
-    let mut to_visit = ArrayDeque::<{ WORK_QUEUE_MAX_SIZE }, (i16, i16)>::new();
-    to_visit.push_back(start_location)?;
     let mut num_great_cheats = 0;
-
-    while let Some(position) = to_visit.pop_front() {
-        if visited[position.1 as usize][position.0 as usize] {
-            continue;
-        }
-        let cost = costs[position.1 as usize][position.0 as usize];
-        visited[position.1 as usize][position.0 as usize] = true;
-        for (dx, dy) in [(0, -1), (1, 0), (0, 1), (-1, 0)] {
-            let next = (position.0 + dx, position.1 + dy);
-            if grid.at(next) != b'#' {
-                to_visit.push_back(next)?;
+    for y in 1..(grid.width - 1) {
+        for x in 1..(grid.width - 1) {
+            let cost = costs[y as usize][x as usize];
+            if cost == u16::MAX {
+                continue;
             }
-        }
-
-        // Cheat:
-        for dx in -diamond_size..=diamond_size {
-            for dy in (dx.abs() - diamond_size)..=(diamond_size - dx.abs()) {
-                let manhattan_distance = dx.abs() + dy.abs();
-                let cheat = (position.0 + dx, position.1 + dy);
-                if grid.at(cheat) != b'#' {
-                    if let Some(gain) = costs[cheat.1 as usize][cheat.0 as usize]
-                        .checked_sub(cost + manhattan_distance as u16)
-                    {
-                        if gain >= 100 {
-                            num_great_cheats += 1;
+            for dy in -diamond_size..=diamond_size {
+                for dx in (dy.abs() - diamond_size)..=(diamond_size - dy.abs()) {
+                    let manhattan_distance = dx.abs() + dy.abs();
+                    let cheat = (x + dx, y + dy);
+                    if grid.at(cheat) != b'#' {
+                        if let Some(gain) = costs[cheat.1 as usize][cheat.0 as usize]
+                            .checked_sub(cost + manhattan_distance as u16)
+                        {
+                            if gain >= 100 {
+                                num_great_cheats += 1;
+                            }
                         }
                     }
                 }
