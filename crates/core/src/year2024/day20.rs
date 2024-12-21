@@ -24,20 +24,15 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     }
 
     let mut start_location = (0, 0);
-    let mut end_location = (0, 0);
     for y in 0..grid.width {
         for x in 0..grid.width {
-            match grid.at((x, y)) {
-                b'S' => start_location = (x, y),
-                b'E' => end_location = (x, y),
-                _ => {}
+            if grid.at((x, y)) == b'S' {
+                start_location = (x, y);
             }
         }
     }
     if start_location == (0, 0) {
         return Err("No start location".to_string());
-    } else if end_location == (0, 0) {
-        return Err("No end location".to_string());
     }
 
     let mut costs = [[u16::MAX; MAX_GRID_SIZE]; MAX_GRID_SIZE];
