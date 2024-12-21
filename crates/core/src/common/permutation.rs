@@ -15,7 +15,7 @@ fn all_permutations_internal<F, T>(
 where
     F: FnMut(&[T]) -> Result<(), String>,
 {
-    if size == 1 {
+    if size <= 1 {
         return on_permutation(sequence);
     }
 
