@@ -157,7 +157,7 @@ fn slice_to_u64(slice: &[u8]) -> u64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one, test_part_two};
     for key in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A'] {
         assert!(KeypadType::Numeric.contains(KeypadType::Numeric.location_of(key as u8)));
     }
@@ -170,9 +170,9 @@ pub fn tests() {
 179A
 456A
 379A";
-    test_part_one_no_allocations!(test_input => 126_384);
+    test_part_one!(test_input => 126_384);
 
     let real_input = include_str!("day21_input.txt");
-    test_part_one_no_allocations!(real_input => 138_764);
-    test_part_two_no_allocations!(real_input => 169_137_886_514_152);
+    test_part_one!(real_input => 138_764);
+    test_part_two!(real_input => 169_137_886_514_152);
 }
