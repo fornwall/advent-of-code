@@ -1,18 +1,67 @@
-use crate::input::Input;
+use crate::{common::array_stack::ArrayStack, input::Input};
 
-pub const fn solve(_input: &Input) -> Result<u32, String> {
-    Ok(0)
+pub fn solve(input: &Input) -> Result<u32, String> {
+    let mut patterns = ArrayStack::<1024, u64>::new();
+    let mut result = 0;
+    for pattern in input.text.split("\n\n") {
+        let pattern = pattern
+            .trim_ascii()
+            .bytes()
+            .enumerate()
+            .fold(0, |acc, (i, c)| acc | u64::from(c == b'#') << i);
+        for &y in patterns.slice() {
+            result += u32::from(pattern & y == 0);
+        }
+        patterns.push(pattern)?;
+    }
+    Ok(result)
 }
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::test_part_one_no_allocations;
 
-    let test_input = "";
-    test_part_one_no_allocations!(test_input => 0);
-    test_part_two_no_allocations!(test_input => 0);
+    let test_input = "#####
+.####
+.####
+.####
+.#.#.
+.#...
+.....
+
+#####
+##.##
+.#.##
+...##
+...#.
+...#.
+.....
+
+.....
+#....
+#....
+#...#
+#.#.#
+#.###
+#####
+
+.....
+.....
+#.#..
+###..
+###.#
+###.#
+#####
+
+.....
+.....
+.....
+#....
+#.#..
+#.#.#
+#####";
+    test_part_one_no_allocations!(test_input => 3);
 
     let real_input = include_str!("day25_input.txt");
-    test_part_one_no_allocations!(real_input => 0);
-    test_part_two_no_allocations!(real_input => 0);
+    test_part_one_no_allocations!(real_input => 3107);
 }
