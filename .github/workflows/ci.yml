@@ -66,6 +66,7 @@ jobs:
     - run: rustc --version
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install wasmtime
+    - run: rustup target add wasm32-wasip1
     - run: cargo test --target=wasm32-wasip1 -- --nocapture
       working-directory: crates/core
 
