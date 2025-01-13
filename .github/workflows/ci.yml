@@ -66,8 +66,7 @@ jobs:
     - run: rustc --version
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install wasmtime
-    - run: cargo install cargo-wasi
-    - run: cargo wasi test -- --nocapture
+    - run: cargo test --target=wasm32-wasip1 -- --nocapture
       working-directory: crates/core
 
   test-c-and-cxx-bindings:
