@@ -42,17 +42,17 @@ check-site:
 
 site-compute-wasm:
 	cd crates/wasm && \
-	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" cargo +nightly build $(WASM_BUILD_PROFILE) --target wasm32-wasip1 --features simd && \
+	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" cargo +nightly build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features simd && \
 	rm -Rf site/generated && \
-	$(WASM_BINDGEN) --out-dir site/generated ../../target/wasm32-wasip1/$(WASM_DIR)/advent_of_code_wasm.wasm && \
+	$(WASM_BINDGEN) --out-dir site/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
 site-renderer-wasm:
 	cd crates/wasm && \
 	RUSTFLAGS="-C target-feature=$(WASM_TARGET_FEATURES)" \
-		cargo build $(WASM_BUILD_PROFILE) --target wasm32-wasip1 --features visualization && \
-	$(WASM_BINDGEN) --out-dir site/show/generated ../../target/wasm32-wasip1/$(WASM_DIR)/advent_of_code_wasm.wasm && \
+		cargo build $(WASM_BUILD_PROFILE) --target wasm32-unknown-unknown --features visualization && \
+	$(WASM_BINDGEN) --out-dir site/show/generated ../../target/wasm32-unknown-unknown/$(WASM_DIR)/advent_of_code_wasm.wasm && \
 	cd site/show/generated && \
 	$(WASM_OPT) -o advent_of_code_wasm_bg.wasm advent_of_code_wasm_bg.wasm
 
@@ -110,7 +110,7 @@ install-nightly:
 	rustup component add --toolchain $(NIGHTLY_TOOLCHAIN) rust-src
 
 install-wasm-bindgen:
-	rustup target add wasm32-wasip1
+	rustup target add wasm32-unknown-unknown
 	cargo install wasm-bindgen-cli
 
 netlify: node-package
