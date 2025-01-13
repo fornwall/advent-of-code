@@ -96,7 +96,7 @@ fn from_num(num: u16) -> String {
     format!("{first_char}{second_char}")
 }
 
-fn starts_with_t(num: u16) -> bool {
+const fn starts_with_t(num: u16) -> bool {
     let first_char = (num / 26) as u8 + b'a';
     first_char == b't'
 }
