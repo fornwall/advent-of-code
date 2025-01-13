@@ -62,7 +62,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
       with:
-        targets: wasm32-wasi
+        targets: wasm32-wasip1
     - run: rustc --version
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install wasmtime
