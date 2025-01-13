@@ -1,4 +1,5 @@
-use crate::{common::array_stack::ArrayStack, input::Input};
+use crate::common::array_stack::ArrayStack;
+use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     let mut patterns = ArrayStack::<1024, u64>::new();
