@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e -u
 
-cargo build --release --target wasm32-unknown-unknown
-wasm-bindgen --target nodejs --out-dir target/nodejs ../../target/wasm32-unknown-unknown/release/advent_of_code_wasm.wasm
+cargo build --release --target wasm32-wasip1
+wasm-bindgen --target nodejs --out-dir target/nodejs ../../target/wasm32-wasip1/release/advent_of_code_wasm.wasm
 which wasm-opt
 wasm-opt --version
 wasm-opt --all-features --disable-gc -O3 -o target/nodejs/advent_of_code_wasm_bg.wasm-optimized target/nodejs/advent_of_code_wasm_bg.wasm
