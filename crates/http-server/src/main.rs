@@ -17,7 +17,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(handle_get))
-        .route("/solve/:year/:day/:part", post(handle_post));
+        .route("/solve/{year}/{day}/{part}", post(handle_post));
 
     let port = "8080";
     println!("Running on port {port}");
