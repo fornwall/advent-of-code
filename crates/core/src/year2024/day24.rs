@@ -1,10 +1,5 @@
-use crate::{
-    common::{
-        array_stack::ArrayStack,
-        id_assigner::{self, IdAssigner},
-    },
-    input::Input,
-};
+use crate::common::id_assigner::IdAssigner;
+use crate::input::Input;
 
 type Wire = u16;
 
@@ -51,11 +46,9 @@ impl Device {
                 let mut from_parts = from.split(' ');
                 let p1_wire_name = from_parts.next().unwrap();
                 let p1_wire_id = id_assigner.id_of(p1_wire_name).unwrap();
-                add_z_if(p1_wire_name, p1_wire_id);
                 let op_type = from_parts.next().unwrap();
                 let p2_wire_name = from_parts.next().unwrap();
                 let p2_wire_id = id_assigner.id_of(p2_wire_name).unwrap();
-                add_z_if(p2_wire_name, p2_wire_id);
                 let to_wire_id = id_assigner.id_of(to).unwrap();
                 add_z_if(to, to_wire_id);
                 wire_values[to_wire_id as usize] = match op_type {
