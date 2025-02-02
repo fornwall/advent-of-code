@@ -52,7 +52,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     if input.is_part_one() {
         let set_bits_at_position = &mut [0; 16][0..num_bits];
         for line in input.text.lines() {
-            if line.bytes().len() != num_bits {
+            if line.len() != num_bits {
                 return Err("All lines does not have equal length".to_string());
             }
             for (idx, byte) in line.bytes().rev().enumerate() {
