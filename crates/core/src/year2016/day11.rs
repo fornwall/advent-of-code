@@ -11,7 +11,7 @@ struct Floor {
 }
 
 impl Floor {
-    fn add_item(&mut self, chip: bool, isotope_id: u8) {
+    const fn add_item(&mut self, chip: bool, isotope_id: u8) {
         let bit_mask = 1 << isotope_id;
         if chip {
             self.microchips |= bit_mask;
@@ -20,7 +20,7 @@ impl Floor {
         }
     }
 
-    fn remove_item(&mut self, chip: bool, isotope_id: u8) {
+    const fn remove_item(&mut self, chip: bool, isotope_id: u8) {
         let bit_mask = !(1 << isotope_id);
         if chip {
             self.microchips &= bit_mask;

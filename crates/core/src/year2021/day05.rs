@@ -14,7 +14,7 @@ impl Board {
         }
     }
 
-    fn claim_square(&mut self, x: i32, y: i32) {
+    const fn claim_square(&mut self, x: i32, y: i32) {
         let bit_idx = x as usize + y as usize * 1000;
         let array_idx = bit_idx / 64;
         let local_bit = 1 << (bit_idx % 64);

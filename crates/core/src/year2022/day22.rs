@@ -60,7 +60,7 @@ impl CubeSide {
         !self.grid[y as usize * Self::SIZE + x as usize]
     }
 
-    fn set_wall(&mut self, x: usize, y: usize) {
+    const fn set_wall(&mut self, x: usize, y: usize) {
         self.grid[y * Self::SIZE + x] = true;
     }
 }

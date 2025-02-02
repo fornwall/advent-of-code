@@ -23,7 +23,7 @@ impl<const MAX_SIZE: usize, H: Eq + Copy + Clone + Default> ArrayDeque<MAX_SIZE,
         Ok(())
     }
 
-    pub fn pop_front(&mut self) -> Option<H> {
+    pub const fn pop_front(&mut self) -> Option<H> {
         if self.head == self.tail {
             return None;
         }

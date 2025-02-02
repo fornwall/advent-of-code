@@ -27,16 +27,16 @@ impl Vector {
         self.x < 0 || self.y < 0 || self.x > 1000 || self.y > 1000
     }
 
-    fn add(&mut self, other: Self) {
+    const fn add(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
     }
-    fn turn_left(&mut self) {
+    const fn turn_left(&mut self) {
         let tmp = self.x;
         self.x = self.y;
         self.y = -tmp;
     }
-    fn turn_right(&mut self) {
+    const fn turn_right(&mut self) {
         let tmp = self.x;
         self.x = -self.y;
         self.y = tmp;

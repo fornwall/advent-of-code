@@ -7,7 +7,7 @@ pub struct U256 {
 }
 
 impl U256 {
-    pub fn set_bit(&mut self, offset: usize) {
+    pub const fn set_bit(&mut self, offset: usize) {
         if offset < 128 {
             self.low |= 1 << offset;
         } else {

@@ -15,7 +15,7 @@ impl Stack {
         }
     }
 
-    fn push(&mut self, value: u64) {
+    const fn push(&mut self, value: u64) {
         self.data[self.size] = value;
         self.size += 1;
     }

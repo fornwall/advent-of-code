@@ -43,7 +43,7 @@ impl<const MAX_SIZE: usize, H: Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
         &mut self.elements[0..self.len]
     }
 
-    pub fn clear(&mut self) {
+    pub const fn clear(&mut self) {
         self.len = 0;
     }
 
@@ -52,13 +52,13 @@ impl<const MAX_SIZE: usize, H: Copy + Clone + Default> ArrayStack<MAX_SIZE, H> {
     }
 
     #[allow(clippy::unwrap_used)]
-    pub fn pop_unwrap(&mut self) -> H {
+    pub const fn pop_unwrap(&mut self) -> H {
         let result = self.elements[self.len - 1];
         self.len -= 1;
         result
     }
 
-    pub fn pop(&mut self) -> Option<H> {
+    pub const fn pop(&mut self) -> Option<H> {
         if self.len == 0 {
             None
         } else {

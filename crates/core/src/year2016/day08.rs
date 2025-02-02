@@ -12,7 +12,7 @@ impl Screen {
         self.pixels[y * Self::WIDTH + x]
     }
 
-    fn set_pixel(&mut self, x: usize, y: usize, on: bool) {
+    const fn set_pixel(&mut self, x: usize, y: usize, on: bool) {
         self.pixels[y * Self::WIDTH + x] = on;
     }
 

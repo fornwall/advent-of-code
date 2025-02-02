@@ -1,8 +1,7 @@
-use std::collections::BTreeSet;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use crate::common::array_stack::ArrayStack;
-use crate::input::{on_error, Input};
+use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<String, String> {
     let mut nodes = HashMap::<u16, Vec<u16>>::with_capacity(1_000);

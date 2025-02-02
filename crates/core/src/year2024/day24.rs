@@ -85,7 +85,7 @@ impl Device {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::test_part_one_no_allocations;
 
     let test_input = "x00: 1
 x01: 1

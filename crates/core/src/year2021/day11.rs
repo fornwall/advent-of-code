@@ -61,7 +61,7 @@ impl Board {
         self.cells[x + (y * Self::WIDTH)]
     }
 
-    fn set(&mut self, x: usize, y: usize, value: u8) {
+    const fn set(&mut self, x: usize, y: usize, value: u8) {
         self.cells[x + (y * Self::WIDTH)] = value;
     }
 

@@ -20,7 +20,7 @@ impl Device {
         }
     }
 
-    fn on_cycle(&mut self, value_to_add: i32) {
+    const fn on_cycle(&mut self, value_to_add: i32) {
         if ((self.cycle - 1) % 40).abs_diff(self.register_x) <= 1 {
             self.screen[(self.cycle - 1) as usize] = true;
         }
