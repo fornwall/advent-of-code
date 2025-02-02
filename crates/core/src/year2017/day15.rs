@@ -35,7 +35,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         .map(|(line_index, line)| {
             let last_word = line
                 .split(' ')
-                .last()
+                .next_back()
                 .ok_or_else(|| "Empty line".to_string())?;
             last_word.parse::<u64>().map_err(|parse_error| {
                 format!(
