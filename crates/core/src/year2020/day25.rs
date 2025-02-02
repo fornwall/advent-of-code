@@ -39,22 +39,19 @@ fn babystep_giantstep(public_key: u32) -> Option<u32> {
     //    FACTOR := BASE^(SQRT_MODULO_MINUS_ONE * (MODULO - 2)) % MODULO
     // is the multiplicative inverse of `BASE` raised with SQRT_MODULO_MINUS_ONE,
     // so `BASE^-SQRT_MODULO_MINUS_ONE (mod p)`
-
-    if let Err(value) = (0..SQRT_MODULO_MINUS_ONE).try_fold(public_key, |state, giant_step| {
-        baby_table.get(&state).map_or_else(
-            // No entry - continue with new state `(state * FACTOR) % MODULO`:
-            || Ok(((u64::from(state) * FACTOR) % MODULO) as u32),
-            // We have found x in `BASE ^ x % MODULO = state`, where
-            //   state = (public_key * FACTOR ^ giant_step) % MODULO.
-            // Multiply with `SQRT_MODULO_MINUS_ONE` (of which is `FACTOR` is
-            // the multiplicative inverse) `giant_step` times to get back `public_key`.
-            |x| Err(giant_step * SQRT_MODULO_MINUS_ONE + x),
-        )
-    }) {
-        Some(value)
-    } else {
-        None
-    }
+    (0..SQRT_MODULO_MINUS_ONE)
+        .try_fold(public_key, |state, giant_step| {
+            baby_table.get(&state).map_or_else(
+                // No entry - continue with new state `(state * FACTOR) % MODULO`:
+                || Ok(((u64::from(state) * FACTOR) % MODULO) as u32),
+                // We have found x in `BASE ^ x % MODULO = state`, where
+                //   state = (public_key * FACTOR ^ giant_step) % MODULO.
+                // Multiply with `SQRT_MODULO_MINUS_ONE` (of which is `FACTOR` is
+                // the multiplicative inverse) `giant_step` times to get back `public_key`.
+                |x| Err(giant_step * SQRT_MODULO_MINUS_ONE + x),
+            )
+        })
+        .err()
 }
 
 pub fn solve(input: &Input) -> Result<u64, String> {
