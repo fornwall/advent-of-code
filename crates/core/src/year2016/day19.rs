@@ -17,9 +17,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         Ok(with_lsb_added)
     } else {
         // TODO: From https://pastebin.com/Zm7tLbAe, understand
-        // TODO: Use a common divide_rounding_up() function?
-        let mut v1: VecDeque<u32> = (1..(n + 1) / 2 + 1).collect();
-        let mut v2: VecDeque<u32> = ((n + 1) / 2 + 1..(n + 1)).collect();
+        let mut v1: VecDeque<u32> = (1..n.div_ceil(2) + 1).collect();
+        let mut v2: VecDeque<u32> = (n.div_ceil(2) + 1..(n + 1)).collect();
         loop {
             if v2.len() >= v1.len() {
                 v2.pop_front();
