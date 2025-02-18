@@ -1,5 +1,4 @@
 use crate::input::Input;
-use std::collections::VecDeque;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     let n = u32::from(
@@ -16,20 +15,13 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         let with_lsb_added = (with_msb_cleared << 1) | 1;
         Ok(with_lsb_added)
     } else {
-        // TODO: From https://pastebin.com/Zm7tLbAe, understand
-        let mut v1: VecDeque<u32> = (1..n.div_ceil(2) + 1).collect();
-        let mut v2: VecDeque<u32> = (n.div_ceil(2) + 1..(n + 1)).collect();
-        loop {
-            if v2.len() >= v1.len() {
-                v2.pop_front();
-                if v2.is_empty() {
-                    return Ok(v1[0]);
-                }
-            } else {
-                v1.pop_back();
-            }
-            v1.push_back(v2.pop_front().ok_or("Internal error: Empty v2")?);
-            v2.push_back(v1.pop_front().ok_or("Internal error: Empty v1")?);
+        let power_three = 3_u32.pow(n.ilog(3));
+        if n == power_three {
+            Ok(n)
+        } else if n - power_three <= power_three {
+            Ok(n - power_three)
+        } else {
+            Ok(2 * n - 3 * power_three)
         }
     }
 }
