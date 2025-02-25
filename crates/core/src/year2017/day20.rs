@@ -47,14 +47,14 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                     None
                 } else {
                     let new_speed = (
-                        particle.1 .0 + particle.2 .0,
-                        particle.1 .1 + particle.2 .1,
-                        particle.1 .2 + particle.2 .2,
+                        particle.1.0 + particle.2.0,
+                        particle.1.1 + particle.2.1,
+                        particle.1.2 + particle.2.2,
                     );
                     let new_position = (
-                        particle.0 .0 + new_speed.0,
-                        particle.0 .1 + new_speed.1,
-                        particle.0 .2 + new_speed.2,
+                        particle.0.0 + new_speed.0,
+                        particle.0.1 + new_speed.1,
+                        particle.0.2 + new_speed.2,
                     );
                     let new_acceleration = particle.2;
                     Some((new_position, new_speed, new_acceleration))
@@ -68,12 +68,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             .iter()
             .enumerate()
             .fold((0, i32::MAX), |acc, (idx, particle)| {
-                let dist = particle.0 .0.abs() + particle.0 .1.abs() + particle.0 .2.abs();
-                if dist < acc.1 {
-                    (idx, dist)
-                } else {
-                    acc
-                }
+                let dist = particle.0.0.abs() + particle.0.1.abs() + particle.0.2.abs();
+                if dist < acc.1 { (idx, dist) } else { acc }
             })
             .0 as u32)
     } else {

@@ -1,5 +1,5 @@
 use advent_of_code::solve;
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, criterion_group, criterion_main};
 use std::fs::read_to_string;
 
 pub fn criterion_benchmark(c: &mut Criterion) {

@@ -1,4 +1,4 @@
-use crate::common::character_recognition::{recognize, CHAR_HEIGHT, CHAR_WIDTH};
+use crate::common::character_recognition::{CHAR_HEIGHT, CHAR_WIDTH, recognize};
 use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<String, String> {

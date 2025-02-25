@@ -21,9 +21,9 @@ impl U256 {
 
     pub const fn is_bit_set(&self, offset: usize) -> bool {
         if offset < 128 {
-            (self.low & 1 << offset) != 0
+            (self.low & (1 << offset)) != 0
         } else {
-            (self.high & 1 << (offset - 128)) != 0
+            (self.high & (1 << (offset - 128))) != 0
         }
     }
 

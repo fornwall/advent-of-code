@@ -39,11 +39,7 @@ impl Parser {
             b'*' => self.multiplication_precedence,
             b'(' => {
                 // '(' has lowest precedence when top of stack:
-                if top_of_stack {
-                    0
-                } else {
-                    4
-                }
+                if top_of_stack { 0 } else { 4 }
             }
             _ => 3,
         }

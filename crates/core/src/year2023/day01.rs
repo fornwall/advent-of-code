@@ -13,7 +13,7 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
 
     let mut bits = 0_u64;
     for byte in line.bytes() {
-        bits = bits << 8 | u64::from(byte);
+        bits = (bits << 8) | u64::from(byte);
 
         let (m1, m2, m3) = if part2 {
             (0x00ff_ffff, 0xffff_ffff, 0xff_ffff_ffff)

@@ -1,7 +1,7 @@
 use crate::common::array_deque::ArrayDeque;
 use crate::common::priority_queueu::PriorityQueue;
 use crate::common::u256::U256;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 const MAX_GRID_SIZE: usize = 142;
 const WORK_QUEUE_MAX_SIZE: usize = 8000;

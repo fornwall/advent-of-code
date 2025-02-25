@@ -56,11 +56,7 @@ fn modular_multiplicative_inverse(a: i128, m: i128) -> Option<i128> {
     // we finally need to make positive if necessary.
     let ExtendedEuclidResult { gcd, x, .. } = extended_euclid(a, m);
     if gcd == 1 {
-        if x > 0 {
-            Some(x)
-        } else {
-            Some(x + m)
-        }
+        if x > 0 { Some(x) } else { Some(x + m) }
     } else {
         None
     }

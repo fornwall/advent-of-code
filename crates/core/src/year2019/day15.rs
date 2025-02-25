@@ -15,7 +15,7 @@ fn instruction_for_direction(direction: (i32, i32)) -> Result<Word, String> {
             return Err(format!(
                 "Invalid direction ({},{})",
                 direction.0, direction.1
-            ))
+            ));
         }
     })
 }

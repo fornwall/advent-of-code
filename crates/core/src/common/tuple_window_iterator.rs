@@ -37,11 +37,7 @@ where
 {
     fn len(&self) -> usize {
         let result = usize::from(self.first_item.is_some()) + self.iterator.len();
-        if result > 0 {
-            result - 1
-        } else {
-            result
-        }
+        if result > 0 { result - 1 } else { result }
     }
 }
 

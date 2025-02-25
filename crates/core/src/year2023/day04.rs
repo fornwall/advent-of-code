@@ -1,4 +1,4 @@
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_WINNING_NUMBERS: usize = 16;

@@ -1,7 +1,7 @@
 use crate::common::array_stack::ArrayStack;
 use crate::common::priority_queueu::PriorityQueue;
 use crate::common::u256::U256;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 const WORK_QUEUE_MAX_SIZE: usize = 40_000;
 const MAX_GRID_SIZE: usize = 192;
@@ -173,13 +173,13 @@ impl StepsInDirection {
             debug_assert!(num_steps > 3);
             debug_assert!(num_steps <= 10);
             Self {
-                bits: (num_steps - 4) << 2 | (direction as u8),
+                bits: ((num_steps - 4) << 2) | (direction as u8),
             }
         } else {
             debug_assert!(num_steps > 0);
             debug_assert!(num_steps <= 3);
             Self {
-                bits: (num_steps - 1) << 2 | (direction as u8),
+                bits: ((num_steps - 1) << 2) | (direction as u8),
             }
         }
     }

@@ -1,4 +1,4 @@
-use crate::common::character_recognition::{recognize, CHAR_HEIGHT};
+use crate::common::character_recognition::{CHAR_HEIGHT, recognize};
 use crate::input::Input;
 
 struct Screen {

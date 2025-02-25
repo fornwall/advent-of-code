@@ -5,11 +5,11 @@ resolver = "2"
 
 [workspace.package]
 authors = ["Fredrik Fornwall <fredrik@fornwall.net>"]
-edition = "2021"
+edition = "2024"
 homepage = "https://github.com/fornwall/advent-of-code"
 license = "MIT"
 repository = "https://github.com/fornwall/advent-of-code"
-rust-version = "1.84.1"
+rust-version = "1.85.0"
 version = "2024.21.0"
 
 [profile.release]

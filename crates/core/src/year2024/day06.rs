@@ -1,5 +1,5 @@
 use crate::common::u256::U256;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 const DIRECTIONS: [(i32, i32); 4] = [(0, -1), (1, 0), (0, 1), (-1, 0)];
 const JUMP_MAP_WIDTH: usize = 192;

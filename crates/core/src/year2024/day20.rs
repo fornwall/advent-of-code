@@ -1,6 +1,6 @@
 use crate::{
     common::array_deque::ArrayDeque,
-    input::{on_error, Input},
+    input::{Input, on_error},
 };
 
 const MAX_GRID_SIZE: usize = 150;

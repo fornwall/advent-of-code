@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::common::permutation::all_permutations;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     let mut result = 0;

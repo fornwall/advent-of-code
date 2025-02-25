@@ -86,7 +86,7 @@ impl Crates {
         self.stack_sizes
             .iter()
             .enumerate()
-            .filter(|(_stack_idx, &stack_size)| stack_size > 0)
+            .filter(|&(_stack_idx, &stack_size)| stack_size > 0)
             .map(|(stack_idx, &stack_size)| {
                 self.stacks[stack_idx * Self::MAX_STACK_SIZE + usize::from(stack_size - 1)] as char
             })

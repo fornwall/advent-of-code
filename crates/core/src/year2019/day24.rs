@@ -59,7 +59,7 @@ impl Grid {
                             _ => None,
                         })
                 })
-                .fold(0, |value, (x, y)| value | 1 << ((y * 5) + x)),
+                .fold(0, |value, (x, y)| value | (1 << ((y * 5) + x))),
         })
     }
 

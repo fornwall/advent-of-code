@@ -1,10 +1,10 @@
 use axum::body::Body;
 use axum::{
+    Router,
     extract::Path,
     http::StatusCode,
     response::Response,
     routing::{get, post},
-    Router,
 };
 use std::collections::HashMap;
 

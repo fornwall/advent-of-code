@@ -262,7 +262,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
                     // Upper row of 2x2:
                     current_2_tiles.push(Tile2 {
-                        bits: (tile3_parts[0].bits & 0b11 | (tile3_parts[0].bits & 0b11000) >> 1)
+                        bits: ((tile3_parts[0].bits & 0b11)
+                            | ((tile3_parts[0].bits & 0b11000) >> 1))
                             as u8,
                     });
                     current_2_tiles.push(Tile2 {

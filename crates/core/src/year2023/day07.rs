@@ -1,5 +1,5 @@
 use crate::common::array_stack::ArrayStack;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_HANDS: usize = 1024;
@@ -56,7 +56,7 @@ impl Hand {
         let hand_strength = ((max_of_one + 4) - bitset.count_ones()).min(7);
 
         Ok(Self {
-            bits: u64::from(cards) << 32 | u64::from(hand_strength) << 52 | u64::from(bid),
+            bits: (u64::from(cards) << 32) | (u64::from(hand_strength) << 52) | u64::from(bid),
         })
     }
 

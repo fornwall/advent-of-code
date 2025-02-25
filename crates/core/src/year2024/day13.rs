@@ -1,4 +1,4 @@
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<i64, String> {
     let offset = input.part_values(0, 10_000_000_000_000);

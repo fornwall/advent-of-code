@@ -1,4 +1,4 @@
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const HASH_BASE: u32 = 18;

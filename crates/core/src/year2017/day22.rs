@@ -1,6 +1,6 @@
 use crate::input::Input;
-use std::collections::hash_map::Entry;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 enum NodeFlag {

@@ -1,6 +1,6 @@
 use crate::{
     common::array_stack::ArrayStack,
-    input::{on_error, Input},
+    input::{Input, on_error},
 };
 
 pub fn solve(input: &Input) -> Result<u32, String> {

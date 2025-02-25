@@ -1,6 +1,6 @@
 use crate::common::array_deque::ArrayDeque;
 use crate::common::u256::U256;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_GRID_SIZE: usize = 150;

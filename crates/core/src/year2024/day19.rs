@@ -1,4 +1,4 @@
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 const MAX_TRIE_NODES: usize = 1024;
 const MAX_DESIGN_LEN: usize = 64;

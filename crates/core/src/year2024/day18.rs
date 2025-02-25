@@ -1,6 +1,6 @@
 use crate::common::array_deque::ArrayDeque;
 use crate::common::priority_queueu::PriorityQueue;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<String, String> {
     let mut grid = [[u16::MAX; 71]; 71];

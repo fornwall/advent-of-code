@@ -2,11 +2,11 @@
 
 use core::fmt::Display;
 
+use pyo3::FromPyObject;
+use pyo3::PyAny;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use pyo3::FromPyObject;
-use pyo3::PyAny;
 
 use ::advent_of_code::solve_raw;
 

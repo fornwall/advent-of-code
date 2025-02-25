@@ -1,6 +1,6 @@
 use advent_of_code::solve;
 use std::convert::TryInto;
-use tonic::{transport::Server, Code, Request, Response, Status};
+use tonic::{Code, Request, Response, Status, transport::Server};
 
 use advent::solver_server::{Solver, SolverServer};
 use advent::{ProblemInput, ProblemOutput};

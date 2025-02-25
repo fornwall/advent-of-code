@@ -46,11 +46,7 @@ where
         let result = usize::from(self.first_item.is_some())
             + usize::from(self.second_item.is_some())
             + self.iterator.len();
-        if result > 0 {
-            result - 2
-        } else {
-            result
-        }
+        if result > 0 { result - 2 } else { result }
     }
 }
 

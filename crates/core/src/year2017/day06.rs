@@ -1,6 +1,6 @@
 use crate::input::Input;
-use std::collections::hash_map::Entry;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     const MAX_ITERATIONS: u32 = 1_000_000;

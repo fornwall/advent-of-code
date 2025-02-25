@@ -9,7 +9,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             .trim_ascii()
             .bytes()
             .enumerate()
-            .fold(0, |acc, (i, c)| acc | u64::from(c == b'#') << i);
+            .map(|(i, c)| u64::from(c == b'#') << i)
+            .sum();
         for &y in patterns.slice() {
             result += u32::from(pattern & y == 0);
         }

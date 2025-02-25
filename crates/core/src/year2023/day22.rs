@@ -1,6 +1,6 @@
 use crate::common::array_deque::ArrayDeque;
 use crate::common::array_stack::ArrayStack;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 use std::cmp::Ordering;
 
 pub fn solve(input: &Input) -> Result<u32, String> {

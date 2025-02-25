@@ -15,7 +15,7 @@ use std::ffi::CString;
 ///
 /// Returns:
 /// The computed answer as text.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn advent_of_code_solve(
     year: u16,
     day: u8,

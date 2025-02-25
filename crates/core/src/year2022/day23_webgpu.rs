@@ -111,54 +111,54 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             });
 
     let create_bind_group = |from_buffer, to_buffer, bind_group_name| {
-        gpu.device.create_bind_group({
-            &wgpu::BindGroupDescriptor {
-                layout: &bind_group_layout,
-                entries: &[
-                    wgpu::BindGroupEntry {
-                        binding: 0,
-                        resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
-                            buffer: from_buffer,
-                            offset: 0,
-                            size: None,
-                        }),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 1,
-                        resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
-                            buffer: to_buffer,
-                            offset: 0,
-                            size: None,
-                        }),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 2,
-                        resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
-                            buffer: &size_buffer,
-                            offset: 0,
-                            size: None,
-                        }),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 3,
-                        resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
-                            buffer: &moved_buffer,
-                            offset: 0,
-                            size: None,
-                        }),
-                    },
-                    wgpu::BindGroupEntry {
-                        binding: 4,
-                        resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
-                            buffer: &rule_buffer,
-                            offset: 0,
-                            size: None,
-                        }),
-                    },
-                ],
-                label: Some(bind_group_name),
-            }
-        })
+        let entries = [
+            wgpu::BindGroupEntry {
+                binding: 0,
+                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                    buffer: from_buffer,
+                    offset: 0,
+                    size: None,
+                }),
+            },
+            wgpu::BindGroupEntry {
+                binding: 1,
+                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                    buffer: to_buffer,
+                    offset: 0,
+                    size: None,
+                }),
+            },
+            wgpu::BindGroupEntry {
+                binding: 2,
+                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                    buffer: &size_buffer,
+                    offset: 0,
+                    size: None,
+                }),
+            },
+            wgpu::BindGroupEntry {
+                binding: 3,
+                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                    buffer: &moved_buffer,
+                    offset: 0,
+                    size: None,
+                }),
+            },
+            wgpu::BindGroupEntry {
+                binding: 4,
+                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                    buffer: &rule_buffer,
+                    offset: 0,
+                    size: None,
+                }),
+            },
+        ];
+        let descriptor = wgpu::BindGroupDescriptor {
+            layout: &bind_group_layout,
+            label: Some(bind_group_name),
+            entries: &entries,
+        };
+        gpu.device.create_bind_group(&descriptor)
     };
 
     let compute_bind_group_from_0_to_1 =

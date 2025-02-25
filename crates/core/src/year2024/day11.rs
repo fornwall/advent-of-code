@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::common::array_stack::ArrayStack;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 // Based on https://github.com/maneatingape/advent-of-code-rust/blob/main/src/year2024/day11.rs
 pub fn solve(input: &Input) -> Result<u64, String> {

@@ -190,7 +190,7 @@ impl Board {
             return;
         }
 
-        if let MapCell::Unit { ref mut even, .. } = self.at(x, y) {
+        if let MapCell::Unit { even, .. } = self.at(x, y) {
             *even = !*even;
         }
 

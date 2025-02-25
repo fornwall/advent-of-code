@@ -25,7 +25,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
     let mut data_pos_to_seat_idx = vec![0; data.len()];
     let mut seats_counter = 0;
-    for (idx, &c) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+    for (idx, &c) in data.iter().enumerate().filter(|&(_, &c)| c != b'.') {
         if c != b'L' {
             return Err("Invalid input - only 'L', '.' and '\n' expected".to_string());
         }
@@ -38,7 +38,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
     let mut seats = vec![false; seats_counter + 1];
     let mut to_visit = (0..seats_counter as u16).collect::<Vec<u16>>();
     let mut visibility_map = Vec::with_capacity(seats_counter);
-    for (idx, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+    for (idx, _) in data.iter().enumerate().filter(|&(_, &c)| c != b'.') {
         let x = (idx as i32) % cols;
         let y = (idx as i32) / cols;
         let mut visibility_entry = [seats_counter as u16; 8];

@@ -21,7 +21,10 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
     for (line_idx, line) in input.text.lines().enumerate() {
         let on_error = || {
-            format!("Line {}: Invalid input - expected N|S|E|W followd by i32, or R|L followed by 90|180|270", line_idx + 1)
+            format!(
+                "Line {}: Invalid input - expected N|S|E|W followd by i32, or R|L followed by 90|180|270",
+                line_idx + 1
+            )
         };
 
         if line.len() < 2 {

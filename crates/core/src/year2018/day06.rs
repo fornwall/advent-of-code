@@ -83,7 +83,7 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
         let max = id_to_count
             .iter()
-            .max_by_key(|(_, &value)| value)
+            .max_by_key(|&(_, &value)| value)
             .ok_or("No solution found")?;
         Ok(*max.1)
     } else {

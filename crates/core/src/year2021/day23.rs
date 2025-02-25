@@ -1,7 +1,7 @@
 use std::cmp::Reverse;
-use std::collections::hash_map::Entry;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 use std::fmt::{Debug, Formatter, Write};
 
 use Amphipod::{Amber, Bronze, Copper, Desert};
@@ -120,7 +120,7 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
         } else {
             let bit_idx = Self::BITS_PER_ROOM as u8 * room_idx;
             Some(Amphipod::from_idx(
-                (self.storage >> (bit_idx + room_depth * 2) & 0b11) as u8,
+                ((self.storage >> (bit_idx + room_depth * 2)) & 0b11) as u8,
             ))
         }
     }

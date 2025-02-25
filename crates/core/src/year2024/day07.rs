@@ -1,5 +1,5 @@
 use crate::common::array_stack::ArrayStack;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u64, String> {
     let mut sum = 0;

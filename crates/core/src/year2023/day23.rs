@@ -1,6 +1,6 @@
 use crate::common::array_stack::ArrayStack;
 use crate::common::id_assigner_copy::IdAssigner;
-use crate::input::{on_error, Input};
+use crate::input::{Input, on_error};
 
 pub fn solve(input: &Input) -> Result<u16, String> {
     const MAX_COMPACTED_GRAPH_LEN: usize = 60;

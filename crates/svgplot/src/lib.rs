@@ -177,12 +177,14 @@ fn test() {
         (0, 0, (0xFF, 0xFF, 0xFF)),
     ] {
         let id = image.add_with_id(
-            SvgGroup::with_elements(vec![SvgRect::default()
-                .x(offset_x)
-                .y(offset_y)
-                .width(100)
-                .height(100)
-                .fill(SvgColor::Rgb(color.0, color.1, color.2))])
+            SvgGroup::with_elements(vec![
+                SvgRect::default()
+                    .x(offset_x)
+                    .y(offset_y)
+                    .width(100)
+                    .height(100)
+                    .fill(SvgColor::Rgb(color.0, color.1, color.2)),
+            ])
             .style("opacity: 0"),
         );
         if color.0 == 0xff {

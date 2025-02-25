@@ -1,11 +1,11 @@
 #![allow(clippy::expect_used)]
 #![allow(clippy::panic)]
 use advent_of_code::solve;
+use jni::JNIEnv;
 use jni::objects::{JClass, JString};
 use jni::sys::jstring;
-use jni::JNIEnv;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
     mut env: JNIEnv,
     _class: JClass,
