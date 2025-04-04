@@ -373,7 +373,7 @@ jobs:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         CLOUDFLARE_ACCOUNT_ID: c494646a87f38a82ce35ea24edaada52
       working-directory: crates/worker
-      run: npx wrangler publish
+      run: npx wrangler deploy
 
   build-and-deploy-http-server:
     runs-on: ubuntu-latest
