@@ -61,12 +61,12 @@ impl Cart {
         }
     }
 
-    fn advance(&mut self) -> bool {
+    const fn advance(&mut self) -> bool {
         self.position.add(self.direction);
         self.position.is_outside_track()
     }
 
-    fn on_enter(&mut self, piece: &TrackPiece) {
+    const fn on_enter(&mut self, piece: &TrackPiece) {
         match *piece {
             TrackPiece::TopRight | TrackPiece::BottomLeft => {
                 self.direction = Vector {

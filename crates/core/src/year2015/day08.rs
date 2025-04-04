@@ -9,7 +9,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         if !(line.starts_with('"') && line.ends_with('"') && line.len() >= 2) {
             return Err("Invalid input - not surrounded by quotes".to_string());
         }
-        let line = &line[1..line.len() - 1].as_bytes();
+        let line = &line.as_bytes()[1..line.len() - 1];
 
         let mut idx = 0;
         // In part 2, 6 is for starting and trailing quote:
