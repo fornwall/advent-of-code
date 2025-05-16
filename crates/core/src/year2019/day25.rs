@@ -214,6 +214,7 @@ pub fn solve(input: &Input) -> Result<SolutionType, String> {
     for i in 1..=(1 << carried_items.len()) {
         let gray_code = i ^ (i >> 1);
 
+        #[allow(clippy::manual_contains)]
         if too_heavy.iter().any(|&heavy| heavy & gray_code == heavy)
             || too_light.iter().any(|&light| light | gray_code == light)
         {

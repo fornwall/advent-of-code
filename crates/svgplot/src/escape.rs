@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 pub fn escape_xml(input: &str) -> Cow<str> {
-    for (i, ch) in input.chars().enumerate() {
+    for (i, ch) in input.char_indices() {
         if xml_escape_char(ch).is_some() {
             let mut escaped_string = String::with_capacity(input.len());
             escaped_string.push_str(&input[..i]);

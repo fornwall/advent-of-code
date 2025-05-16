@@ -52,7 +52,7 @@ pub fn setup() -> Result<Gpu, String> {
                 None,
             )
             .await
-            .map_err(|e| format!("request_device failed: {}", e))?;
+            .map_err(|e| format!("request_device failed: {e}"))?;
 
         Ok(Gpu {
             instance,

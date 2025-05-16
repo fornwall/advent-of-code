@@ -12,7 +12,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
         );
 
         if !(0..71).contains(&x) && !(0..71).contains(&y) {
-            return Err(format!("Coordinate out of bounds: {},{}", x, y));
+            return Err(format!("Coordinate out of bounds: {x},{y}"));
         }
         grid[y][x] = count as u16;
 

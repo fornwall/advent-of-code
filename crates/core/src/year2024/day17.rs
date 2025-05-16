@@ -66,7 +66,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
                     == Some(computer.program[offset_from_end as usize - 1] as u64)
                 {
                     if offset_from_end - 1 == 0 {
-                        return Ok(format!("{}", register_a_next_three_bits));
+                        return Ok(format!("{register_a_next_three_bits}"));
                     }
                     stack.push_back((offset_from_end - 1, register_a_next_three_bits))?;
                 }

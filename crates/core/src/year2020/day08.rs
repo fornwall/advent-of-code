@@ -73,7 +73,7 @@ impl Computer {
         Ok(())
     }
 
-    pub fn has_exited(&self) -> bool {
+    pub const fn has_exited(&self) -> bool {
         self.instruction_pointer < 0 || self.instruction_pointer >= self.instructions.len() as Word
     }
 }

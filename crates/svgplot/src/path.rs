@@ -107,7 +107,7 @@ impl SvgShape {
         }
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         // If it contains the single initial move command.
         self.elements.is_empty()
     }
