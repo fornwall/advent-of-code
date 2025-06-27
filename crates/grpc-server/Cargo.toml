@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 advent-of-code = { path = "../core" }
-prost = "*"
+prost = "0.13"
 tokio = { version = "*", features = ["macros", "rt-multi-thread"]}
 tonic = "*"
 tonic-reflection = "*"
