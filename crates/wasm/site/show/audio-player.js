@@ -16,7 +16,7 @@ export function AudioPlayer(...urlList) {
     this.buffers = await Promise.all(promises);
   };
 
-  (this.play = (soundId) => {
+  ((this.play = (soundId) => {
     if (!this.buffers) return;
     this.context.resume(); // For safari
     const source = this.context.createBufferSource();
@@ -42,5 +42,5 @@ export function AudioPlayer(...urlList) {
       // osc.connect(this.mediaStreamDestination);
       // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaStreamDestination
       return this.mediaStreamDestination.stream;
-    });
+    }));
 }
