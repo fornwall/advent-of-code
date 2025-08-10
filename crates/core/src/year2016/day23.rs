@@ -11,12 +11,11 @@ fn factorial(num: Word) -> Word {
 pub fn solve(input: &Input) -> Result<Word, String> {
     let mut computer = Computer::parse(input.text)?;
     let register_a_value = input.part_values(7, 12);
-    if computer.instructions.len() > 20 {
-        if let Instruction::Copy(ValueOrRegister::Value(a), _) = computer.instructions[19] {
-            if let Instruction::Jump(ValueOrRegister::Value(b), _) = computer.instructions[20] {
-                return Ok(a * b + factorial(register_a_value));
-            }
-        }
+    if computer.instructions.len() > 20
+        && let Instruction::Copy(ValueOrRegister::Value(a), _) = computer.instructions[19]
+        && let Instruction::Jump(ValueOrRegister::Value(b), _) = computer.instructions[20]
+    {
+        return Ok(a * b + factorial(register_a_value));
     }
 
     computer.registers[0] = register_a_value;

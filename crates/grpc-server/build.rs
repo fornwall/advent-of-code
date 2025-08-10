@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // buffers modules. This is required for implementing gRPC Server Reflection":
     let descriptor_path = PathBuf::from(env::var("OUT_DIR")?).join("advent.bin");
 
-    tonic_build::configure()
+    tonic_prost_build::configure()
         .file_descriptor_set_path(descriptor_path)
         .compile_protos(&[proto_file.as_path()], &[root.as_path()])?;
 

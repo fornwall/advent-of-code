@@ -65,14 +65,12 @@ pub fn solve(input: &Input) -> Result<u32, String> {
                 for dx in (dy.abs() - diamond_size)..=(diamond_size - dy.abs()) {
                     let manhattan_distance = dx.abs() + dy.abs();
                     let cheat = (x + dx, y + dy);
-                    if grid.at(cheat) != b'#' {
-                        if let Some(gain) = costs[cheat.1 as usize][cheat.0 as usize]
+                    if grid.at(cheat) != b'#'
+                        && let Some(gain) = costs[cheat.1 as usize][cheat.0 as usize]
                             .checked_sub(cost + manhattan_distance as u16)
-                        {
-                            if gain >= 100 {
-                                num_great_cheats += 1;
-                            }
-                        }
+                        && gain >= 100
+                    {
+                        num_great_cheats += 1;
                     }
                 }
             }

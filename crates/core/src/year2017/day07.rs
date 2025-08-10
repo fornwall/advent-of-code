@@ -117,23 +117,21 @@ fn fixup_weight(program_id: ProgramId, tree: &ProgramTree) -> Option<u32> {
                     (acc.0, weight)
                 }
             })
-        {
-            if let Some(&child_id) = program
+            && let Some(&child_id) = program
                 .children
                 .iter()
                 .find(|&&p| tree.total_weight(p) == lone_weight)
-            {
-                return fixup_weight(child_id, tree).or_else(|| {
-                    let total_weight = tree.total_weight(child_id);
-                    let child = &tree.nodes[child_id];
-                    Some(desired_weight - (total_weight - child.weight))
-                });
-            }
+        {
+            return fixup_weight(child_id, tree).or_else(|| {
+                let total_weight = tree.total_weight(child_id);
+                let child = &tree.nodes[child_id];
+                Some(desired_weight - (total_weight - child.weight))
+            });
         }
-    } else if !program.children.is_empty() {
-        if let Some(value) = fixup_weight(program.children[0], tree) {
-            return Some(value);
-        }
+    } else if !program.children.is_empty()
+        && let Some(value) = fixup_weight(program.children[0], tree)
+    {
+        return Some(value);
     }
     None
 }

@@ -210,10 +210,10 @@ impl<const SIDE_ROOM_SIZE: usize> SearchState<SIDE_ROOM_SIZE> {
             return true;
         }
         for i in 0..occupancy {
-            if let Some(amphipod_in_room) = self.get_at_room(amphipod as u8, i) {
-                if amphipod != amphipod_in_room {
-                    return false;
-                }
+            if let Some(amphipod_in_room) = self.get_at_room(amphipod as u8, i)
+                && amphipod != amphipod_in_room
+            {
+                return false;
             }
         }
         true

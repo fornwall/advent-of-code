@@ -3,14 +3,14 @@ use crate::input::Input;
 
 pub fn solve(input: &Input) -> Result<u32, String> {
     let computer = Computer::parse(input.text)?;
-    if let Instruction::Copy(ValueOrRegister::Value(a), _register) = computer.instructions[1] {
-        if let Instruction::Copy(ValueOrRegister::Value(b), _register) = computer.instructions[2] {
-            let start_value = a * b;
-            for initial_value in 1..1000 {
-                let value = start_value + initial_value;
-                if format!("{value:b}").replace("10", "").is_empty() {
-                    return Ok(initial_value as u32);
-                }
+    if let Instruction::Copy(ValueOrRegister::Value(a), _register) = computer.instructions[1]
+        && let Instruction::Copy(ValueOrRegister::Value(b), _register) = computer.instructions[2]
+    {
+        let start_value = a * b;
+        for initial_value in 1..1000 {
+            let value = start_value + initial_value;
+            if format!("{value:b}").replace("10", "").is_empty() {
+                return Ok(initial_value as u32);
             }
         }
     }

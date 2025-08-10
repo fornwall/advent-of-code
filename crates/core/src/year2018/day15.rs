@@ -131,10 +131,10 @@ impl Board {
 
         for y in 0..self.height {
             for x in 0..self.width {
-                if let MapCell::Unit { even, elf, .. } = *self.at(x, y) {
-                    if even == even_round {
-                        self.attack_or_move_towards(x, y, !elf);
-                    }
+                if let MapCell::Unit { even, elf, .. } = *self.at(x, y)
+                    && even == even_round
+                {
+                    self.attack_or_move_towards(x, y, !elf);
                 }
             }
         }
@@ -149,11 +149,11 @@ impl Board {
             if let MapCell::Unit {
                 hit_points, elf, ..
             } = self.at(target_x as u32, target_y as u32)
+                && *elf == elf_target
+                && *hit_points < lowest_hit_points
             {
-                if *elf == elf_target && *hit_points < lowest_hit_points {
-                    lowest_hit_points = *hit_points;
-                    target_position = (target_x, target_y);
-                }
+                lowest_hit_points = *hit_points;
+                target_position = (target_x, target_y);
             }
         }
 

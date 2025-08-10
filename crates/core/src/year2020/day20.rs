@@ -148,29 +148,27 @@ impl Tile {
                     && current.edges[3].matching.is_none() == (x == 0)
                 {
                     let mut possible = true;
-                    if x != 0 {
-                        if let Some(tile_to_left) = composed_image.get(&(x - 1, y)) {
-                            if Some(tile_to_left.id) != current.edges[3].matching {
-                                possible = false;
-                            }
-                        }
+                    if x != 0
+                        && let Some(tile_to_left) = composed_image.get(&(x - 1, y))
+                        && Some(tile_to_left.id) != current.edges[3].matching
+                    {
+                        possible = false;
                     }
-                    if y != 0 {
-                        if let Some(tile_above) = composed_image.get(&(x, y - 1)) {
-                            if Some(tile_above.id) != current.edges[0].matching {
-                                possible = false;
-                            }
-                        }
+                    if y != 0
+                        && let Some(tile_above) = composed_image.get(&(x, y - 1))
+                        && Some(tile_above.id) != current.edges[0].matching
+                    {
+                        possible = false;
                     }
-                    if let Some(tile_to_right) = composed_image.get(&(x + 1, y)) {
-                        if Some(tile_to_right.id) != current.edges[1].matching {
-                            possible = false;
-                        }
+                    if let Some(tile_to_right) = composed_image.get(&(x + 1, y))
+                        && Some(tile_to_right.id) != current.edges[1].matching
+                    {
+                        possible = false;
                     }
-                    if let Some(tile_below) = composed_image.get(&(x, y + 1)) {
-                        if Some(tile_below.id) != current.edges[2].matching {
-                            possible = false;
-                        }
+                    if let Some(tile_below) = composed_image.get(&(x, y + 1))
+                        && Some(tile_below.id) != current.edges[2].matching
+                    {
+                        possible = false;
                     }
                     if possible {
                         return Ok(current);

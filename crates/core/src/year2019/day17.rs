@@ -283,11 +283,11 @@ fn find_subseq_covering(seq: &[String], subseqs: &[&[String]]) -> Option<VecDequ
         Some(VecDeque::new())
     } else {
         for (i, subseq) in subseqs.iter().enumerate() {
-            if seq.starts_with(subseq) {
-                if let Some(mut subfind) = find_subseq_covering(&seq[subseq.len()..], subseqs) {
-                    subfind.push_front(i);
-                    return Some(subfind);
-                }
+            if seq.starts_with(subseq)
+                && let Some(mut subfind) = find_subseq_covering(&seq[subseq.len()..], subseqs)
+            {
+                subfind.push_front(i);
+                return Some(subfind);
             }
         }
 
@@ -318,10 +318,10 @@ fn find_covering_subsequences(
     let mut subsequences: Vec<&[String]> = fill_subsequences(seq, num_subsequences, Vec::new())?;
 
     while !subsequences[0].is_empty() {
-        if let Some(covering) = find_subseq_covering(seq, &subsequences) {
-            if !subsequences.iter().any(|s| s.join(",").len() > 20) {
-                return Some((subsequences, covering));
-            }
+        if let Some(covering) = find_subseq_covering(seq, &subsequences)
+            && !subsequences.iter().any(|s| s.join(",").len() > 20)
+        {
+            return Some((subsequences, covering));
         }
 
         while !subsequences.is_empty() {

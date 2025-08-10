@@ -47,7 +47,7 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
             }
             .unwrap();
 
-            let mut headers = Headers::new();
+            let headers = Headers::new();
             headers.append("Access-Control-Allow-Origin", "*").unwrap();
             Ok(response.with_headers(headers))
         })

@@ -78,15 +78,14 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             hasher.compute()
         };
 
-        if let Some(triplet_value) = first_triplet(&current_hash) {
-            if hash_cache
+        if let Some(triplet_value) = first_triplet(&current_hash)
+            && hash_cache
                 .iter()
                 .any(|hash| contains_five_in_a_row(hash, triplet_value))
-            {
-                valid_key_count += 1;
-                if valid_key_count == 64 {
-                    return Ok(index as u32);
-                }
+        {
+            valid_key_count += 1;
+            if valid_key_count == 64 {
+                return Ok(index as u32);
             }
         }
 

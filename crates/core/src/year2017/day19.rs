@@ -45,11 +45,11 @@ pub fn solve(input: &Input) -> Result<String, String> {
                             current_position.0 + new_direction.0,
                             current_position.1 + new_direction.1,
                         );
-                        if let Some(&c) = map.get(&adjacent) {
-                            if c == b'|' || c == b'-' {
-                                direction = new_direction;
-                                continue 'outer_loop;
-                            }
+                        if let Some(&c) = map.get(&adjacent)
+                            && (c == b'|' || c == b'-')
+                        {
+                            direction = new_direction;
+                            continue 'outer_loop;
                         }
                     }
                 }

@@ -63,29 +63,30 @@ fn parse_point(s: &str) -> Option<(u16, u16)> {
 pub fn solve(input: &Input) -> Result<u32, String> {
     let mut board = Board::new();
     for line in input.text.lines() {
-        if let Some((from, to)) = line.split_once(" -> ") {
-            if let Some((from_x, from_y)) = parse_point(from) {
-                if let Some((to_x, to_y)) = parse_point(to) {
-                    if from_x < 1000 && from_y < 1000 && to_x < 1000 && to_y < 1000 {
-                        let is_straight_line = (from_x == to_x) || (from_y == to_y);
-                        let is_diagonal = (i32::from(from_x) - i32::from(to_x)).abs()
-                            == (i32::from(from_y) - i32::from(to_y)).abs();
+        if let Some((from, to)) = line.split_once(" -> ")
+            && let Some((from_x, from_y)) = parse_point(from)
+            && let Some((to_x, to_y)) = parse_point(to)
+            && from_x < 1000
+            && from_y < 1000
+            && to_x < 1000
+            && to_y < 1000
+        {
+            let is_straight_line = (from_x == to_x) || (from_y == to_y);
+            let is_diagonal = (i32::from(from_x) - i32::from(to_x)).abs()
+                == (i32::from(from_y) - i32::from(to_y)).abs();
 
-                        match (is_straight_line, is_diagonal, input.is_part_two()) {
-                            (false, false, _) => {
-                                return Err(format!(
-                                    "Line is neither straight nor diagonal: {from_x},{from_y} -> {to_x},{to_y}"
-                                ));
-                            }
-                            (true, _, _) | (_, true, true) => {
-                                board.add_line(from_x, from_y, to_x, to_y);
-                            }
-                            (false, true, false) => {}
-                        }
-                        continue;
-                    }
+            match (is_straight_line, is_diagonal, input.is_part_two()) {
+                (false, false, _) => {
+                    return Err(format!(
+                        "Line is neither straight nor diagonal: {from_x},{from_y} -> {to_x},{to_y}"
+                    ));
                 }
+                (true, _, _) | (_, true, true) => {
+                    board.add_line(from_x, from_y, to_x, to_y);
+                }
+                (false, true, false) => {}
             }
+            continue;
         }
         return Err(
             "Input is not in the format 'x1,y1 -> x2,y2' with values in the range [0,1000]"
