@@ -1,6 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = [
+#   "aocd",
+# ]
+# ///
 
-# Uses https://pypi.org/project/advent-of-code-data/
 import json
 import os
 import subprocess
