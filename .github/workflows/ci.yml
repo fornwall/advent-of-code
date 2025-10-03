@@ -173,7 +173,7 @@ jobs:
         delimiter="$(openssl rand -hex 8)"
         { echo "body<<$delimiter"; echo "$body"; echo "$delimiter"; } >> "$GITHUB_OUTPUT"
     - name: Post commit comment
-      uses: peter-evans/commit-comment@v3
+      uses: peter-evans/commit-comment@v4
       with:
         body: ${{ steps.get-comment-body.outputs.body }}
 
