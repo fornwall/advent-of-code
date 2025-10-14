@@ -97,7 +97,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
@@ -250,7 +250,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
       - name: Check js
@@ -308,7 +308,7 @@ jobs:
       with:
         toolchain: nightly
         targets: wasm32-unknown-unknown
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
@@ -351,7 +351,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: 'lts/*'
         registry-url: 'https://registry.npmjs.org'
