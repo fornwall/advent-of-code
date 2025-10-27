@@ -55,7 +55,7 @@ jobs:
           CIBW_BEFORE_BUILD: "python3 -m pip install setuptools_rust"
         run: |
           python3 -m cibuildwheel --output-dir wheelhouse crates/python
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: wheels-${{ matrix.arch }}-${{ matrix.os }}
           path: ./wheelhouse/*.whl
@@ -181,7 +181,7 @@ jobs:
     - name: Test java
       working-directory: crates/java/java-src
       run: gradle test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: jnilibs-${{ matrix.os }}
         path: ./crates/java/java-src/src/main/resources/*
@@ -193,7 +193,7 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install pandoc
     - run: make man-page
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: man-page
         path: target/man/advent-of-code.1
@@ -222,12 +222,12 @@ jobs:
         cd ../../aarch64-unknown-linux-musl/release && tar cfJ advent-of-code-linux-aarch64.tar.xz advent-of-code advent-of-code.1 && mv ./*.tar.xz ../../../
       working-directory: crates/core
     - name: Upload Linux x86_64 binary
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: linux-x86_64-binary
         path: advent-of-code-linux-x86_64.tar.xz
     - name: Upload Linux aarch64 binary
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: linux-aarch64-binary
         path: advent-of-code-linux-aarch64.tar.xz
@@ -257,12 +257,12 @@ jobs:
         cd ../aarch64-apple-darwin/release && tar cfJ advent-of-code-mac-aarch64.tar.xz advent-of-code advent-of-code.1 && mv advent-of-code-mac-aarch64.tar.xz ../../../
       working-directory: crates/core
     - name: Upload mac x86_64 binary
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: mac-x86_64-binary
         path: advent-of-code-mac-x86_64.tar.xz
     - name: Upload mac aarch64 binary
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: mac-aarch64-binary
         path: advent-of-code-mac-aarch64.tar.xz
