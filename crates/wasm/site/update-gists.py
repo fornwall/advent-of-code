@@ -204,7 +204,7 @@ for (dirpath, dirnames, filenames) in os.walk("../../core/src/"):
         src = replace_include_str(dirpath, src)
 
         # Finally format source code:
-        src = subprocess.run(['rustfmt'], stdout=subprocess.PIPE, input=src, encoding='utf-8', check=True).stdout
+        src = subprocess.run(['rustfmt', '--edition', '2024'], stdout=subprocess.PIPE, input=src, encoding='utf-8', check=True).stdout
 
         year_str = str(year)
         day_str = str(day)
