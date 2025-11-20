@@ -229,6 +229,7 @@ impl Cube {
 
     fn step_forward(&mut self, steps: u8, mut direction: Direction) -> Direction {
         #![allow(clippy::panic)]
+        #![allow(clippy::useless_let_if_seq)]
         let mut delta = direction.delta();
         for _step in 0..steps {
             let mut new_position = (

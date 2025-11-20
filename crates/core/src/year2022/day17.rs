@@ -57,7 +57,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                             (current_rock_count - last_seen_rock_drop_iteration) as u64;
                         let remaining_rocks = target_rocks_count - current_rock_count as u64;
 
-                        if remaining_rocks % rocks_per_cycle == 0 {
+                        if remaining_rocks.is_multiple_of(rocks_per_cycle) {
                             let remaining_cycles = remaining_rocks / rocks_per_cycle;
                             let highest_rock_growth = grid.highest_rock - last_seen_highest_rock;
                             return Ok(grid.highest_rock as u64

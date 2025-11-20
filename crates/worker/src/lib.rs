@@ -11,9 +11,10 @@ fn log_request(req: &Request) {
         req.path(),
         req.cf()
             .map_or((0., 0.), |cf| cf.coordinates().unwrap_or_default()),
-        req.cf().map_or("?".into(), |cf| cf
-            .region()
-            .unwrap_or_else(|| "unknown region".into()))
+        req.cf().map_or_else(
+            || "?".into(),
+            |cf| cf.region().unwrap_or_else(|| "unknown region".into())
+        )
     );
 }
 

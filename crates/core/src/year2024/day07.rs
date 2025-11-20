@@ -33,7 +33,7 @@ fn is_possible(desired: u64, remaining: &[u64], concatenate: bool) -> bool {
     }
 
     if (desired > last && is_possible(desired - last, remaining, concatenate))
-        || (desired % last == 0 && is_possible(desired / last, remaining, concatenate))
+        || (desired.is_multiple_of(last) && is_possible(desired / last, remaining, concatenate))
     {
         return true;
     } else if concatenate && desired > last {
@@ -44,7 +44,7 @@ fn is_possible(desired: u64, remaining: &[u64], concatenate: bool) -> bool {
         // desired = remaining * pow + last
         // =>
         // (desired - last) / pow = remaining
-        if ((desired - last) % pow) == 0
+        if (desired - last).is_multiple_of(pow)
             && is_possible((desired - last) / pow, remaining, concatenate)
         {
             return true;

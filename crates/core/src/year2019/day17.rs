@@ -121,18 +121,18 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
     let mut robot_direction = Direction::Up;
     let mut robot_position: (i32, i32) = (0, 0);
-    for y in 0..map.len() {
-        for x in 0..map[0].len() {
-            if map[y][x] == b'^' {
+    for (y, row) in map.iter().enumerate() {
+        for (x, &tile) in row.iter().enumerate() {
+            if tile == b'^' {
                 robot_direction = Direction::Up;
                 robot_position = (x as i32, y as i32);
-            } else if map[y][x] == b'v' {
+            } else if tile == b'v' {
                 robot_direction = Direction::Down;
                 robot_position = (x as i32, y as i32);
-            } else if map[y][x] == b'<' {
+            } else if tile == b'<' {
                 robot_direction = Direction::Left;
                 robot_position = (x as i32, y as i32);
-            } else if map[y][x] == b'>' {
+            } else if tile == b'>' {
                 robot_direction = Direction::Right;
                 robot_position = (x as i32, y as i32);
             }

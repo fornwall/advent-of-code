@@ -87,7 +87,7 @@ impl Computer {
                     instruction_pointer += offset;
                 }
                 Some(&Instruction::JumpIfEven(register, offset)) => {
-                    instruction_pointer += if self.registers[register as usize] % 2 == 0 {
+                    instruction_pointer += if self.registers[register as usize].is_multiple_of(2) {
                         offset
                     } else {
                         1

@@ -132,18 +132,13 @@ impl Grid<'_> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
 enum Direction {
+    #[default]
     North = 0,
     East = 1,
     South = 2,
     West = 3,
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Self::North
-    }
 }
 
 impl Direction {

@@ -179,7 +179,7 @@ fn recognize_letter(
 }
 
 pub fn recognize(bytes: &[bool]) -> Result<String, String> {
-    if bytes.len() % (CHAR_WIDTH * CHAR_HEIGHT) != 0 {
+    if !bytes.len().is_multiple_of(CHAR_WIDTH * CHAR_HEIGHT) {
         return Err(format!(
             "Input length is not a multiple of {}",
             CHAR_WIDTH * CHAR_HEIGHT

@@ -189,18 +189,13 @@ fn do_solve(
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Default, Debug)]
 enum Direction {
+    #[default]
     Up,
     Right,
     Down,
     Left,
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Self::Right
-    }
 }
 
 impl Direction {

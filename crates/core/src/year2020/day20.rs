@@ -147,6 +147,7 @@ impl Tile {
                     && current.edges[2].matching.is_none() == (y + 1 == composed_image_width)
                     && current.edges[3].matching.is_none() == (x == 0)
                 {
+                    #[allow(clippy::useless_let_if_seq)]
                     let mut possible = true;
                     if x != 0
                         && let Some(tile_to_left) = composed_image.get(&(x - 1, y))

@@ -117,9 +117,8 @@ fn most_geodes_opened(blueprint: &Blueprint, minutes: u32) -> u32 {
             }
 
             let mut new_state = state;
-            for j in 0..4 {
-                new_state.ores[j] = new_state.ores[j]
-                    + state.robots[j] * (minutes_before_resources_obtained + 1)
+            for (j, ore) in new_state.ores.iter_mut().enumerate() {
+                *ore = *ore + state.robots[j] * (minutes_before_resources_obtained + 1)
                     - blueprint[robot_to_build_idx][j];
             }
             new_state.minutes_remaining -= minutes_before_resources_obtained + 1;

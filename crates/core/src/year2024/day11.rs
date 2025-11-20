@@ -55,7 +55,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 fn evolve_stone(stone_value: u64) -> (u64, Option<u64>) {
     let num_digits = num_digits(stone_value);
-    if num_digits % 2 == 0 {
+    if num_digits.is_multiple_of(2) {
         let raised = 10_u64.pow(num_digits / 2);
         let left_value = stone_value / raised;
         let right_value = stone_value % raised;

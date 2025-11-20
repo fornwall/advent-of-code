@@ -6,7 +6,7 @@ const PIXELS_WIDE: usize = NUM_LETTERS * CHAR_WIDTH;
 const LAYER_SIZE: usize = PIXELS_WIDE * CHAR_HEIGHT;
 
 pub fn solve(input: &Input) -> Result<String, String> {
-    if input.text.len() % LAYER_SIZE != 0 {
+    if !input.text.len().is_multiple_of(LAYER_SIZE) {
         return Err(format!(
             "Invalid input - expected to be multiple of layer size ({LAYER_SIZE})"
         ));

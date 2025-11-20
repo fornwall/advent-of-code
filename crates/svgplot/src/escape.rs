@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-pub fn escape_xml(input: &str) -> Cow<str> {
+pub fn escape_xml(input: &str) -> Cow<'_, str> {
     for (i, ch) in input.char_indices() {
         if xml_escape_char(ch).is_some() {
             let mut escaped_string = String::with_capacity(input.len());

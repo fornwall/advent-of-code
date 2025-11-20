@@ -10,7 +10,9 @@ use pyo3::wrap_pyfunction;
 
 use ::advent_of_code::solve_raw;
 
-fn try_to_string<'a, T: Display + FromPyObject<'a>>(object: &Bound<'a, PyAny>) -> String {
+fn try_to_string<'a, T: Display + FromPyObject<'a, 'a>>(
+    object: &'a pyo3::Bound<'a, pyo3::PyAny>,
+) -> String {
     if let Ok(value) = object.extract::<String>() {
         return value;
     }

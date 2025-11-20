@@ -121,18 +121,13 @@ pub fn solve(input: &Input) -> Result<u16, String> {
     Err("No solution found".to_string())
 }
 
-#[derive(Copy, Clone, PartialOrd, PartialEq)]
+#[derive(Copy, Clone, Default, PartialOrd, PartialEq)]
 enum Direction {
+    #[default]
     Up = 0,
     Right,
     Down,
     Left,
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Self::Right
-    }
 }
 
 impl Direction {
@@ -206,7 +201,7 @@ impl<'a> Map<'a> {
             .iter()
             .position(|&b| b == b'\n')
             .ok_or_else(on_error)?;
-        if (bytes.len() + 1) % (num_cols + 1) != 0 {
+        if !(bytes.len() + 1).is_multiple_of(num_cols + 1) {
             return Err(on_error());
         }
         let num_rows = (bytes.len() + 1) / (num_cols + 1);

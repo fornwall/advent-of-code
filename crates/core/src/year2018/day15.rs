@@ -127,7 +127,7 @@ impl Board {
     fn perform_round(&mut self) {
         self.round += 1;
         self.full_round = true;
-        let even_round = self.round % 2 == 0;
+        let even_round = self.round.is_multiple_of(2);
 
         for y in 0..self.height {
             for x in 0..self.width {

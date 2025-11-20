@@ -137,7 +137,7 @@ impl<'a> Map<'a> {
             .iter()
             .position(|&b| b == b'\n')
             .ok_or_else(on_error)?;
-        if (bytes.len() + 1) % (num_cols + 1) != 0 {
+        if !(bytes.len() + 1).is_multiple_of(num_cols + 1) {
             return Err(on_error());
         }
         let num_rows = (bytes.len() + 1) / (num_cols + 1);
