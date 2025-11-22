@@ -24,7 +24,7 @@ if [ "$UNAME" = "Darwin" ]; then
 	echo YYYYYYYYYYYYYY
 	xcodebuild -showsdks
 	echo OOOOOOOOOOOOOO
-  : ${MACOS_SDK:="macosx16.4"}
+  : ${MACOS_SDK:="macosx26.1"}
   SDKROOT=`xcrun -sdk $MACOS_SDK --show-sdk-path` \
     MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $MACOS_SDK --show-sdk-platform-version) \
     cargo $BUILD_COMMAND --target=aarch64-apple-darwin
