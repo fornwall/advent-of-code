@@ -1,4 +1,4 @@
-% ADVENT-OF-CODE(1) Version 2024.23.0
+% ADVENT-OF-CODE(1) Version 2024.24.0
 
 NAME
 ====
