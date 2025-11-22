@@ -21,7 +21,7 @@ if [ "$UNAME" = "Darwin" ]; then
       java-src/src/main/resources/libadvent_of_code_java_x86_64.dylib
 
   # See xcodebuild -showsdks:
-  : ${MACOS_SDK:="macosx11.1"}
+  : ${MACOS_SDK:="macosx16.4"}
   SDKROOT=`xcrun -sdk $MACOS_SDK --show-sdk-path` \
     MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk $MACOS_SDK --show-sdk-platform-version) \
     cargo $BUILD_COMMAND --target=aarch64-apple-darwin

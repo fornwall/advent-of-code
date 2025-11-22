@@ -11,7 +11,7 @@ jobs:
       # Note that we want to build only for a single python version
       # since we're targeting abi3. Sync changes with setup.cfg and
       # the "abi3-pyXX" PyO3 feature in Cargo.toml
-      CIBW_SKIP: "cp36-* cp37-* cp38-* cp310-* cp311-* pp* *i686 *win32"
+      CIBW_SKIP: "cp36-* cp39-* cp310-* cp311-* cp313-* cp314-* *i686 *win32"
       CIBW_ARCHS_LINUX: ${{matrix.arch}}
     runs-on: ${{ matrix.os }}
     strategy:
