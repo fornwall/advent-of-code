@@ -119,9 +119,7 @@ function onWorkerMessage(e) {
       outputElement.classList.remove("alert-danger");
     }
     outputElement.textContent =
-      (isInternalError ? "⚠ Internal Error ⚠\n\n" : "") +
-      output +
-      extraOutput;
+      (isInternalError ? "⚠ Internal Error ⚠\n\n" : "") + output + extraOutput;
     outputElement.scrollIntoView();
     outputElement.classList.add("blink");
     outputElement.focus();
