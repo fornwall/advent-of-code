@@ -38,6 +38,14 @@ impl<'a, const MAX_SIZE: usize, H: Ord + Eq + ?Sized> IdAssigner<'a, MAX_SIZE, H
             .map_or(None, |idx| Some(self.ids[idx]))
     }
 
+    pub fn original_value_of(&self, id_to_lookup: u16) -> Option<&'a H> {
+        self.ids
+            .iter()
+            .enumerate()
+            .find(|&(_, &id)| id == id_to_lookup)
+            .map(|(idx, _)| self.id_map[idx])
+    }
+
     pub const fn len(&self) -> usize {
         self.assigned_count as usize
     }
