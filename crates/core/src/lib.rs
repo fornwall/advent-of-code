@@ -39,6 +39,7 @@ mod year2021;
 mod year2022;
 mod year2023;
 mod year2024;
+mod year2025;
 
 #[cfg(feature = "visualization")]
 pub type ResultType = String;
@@ -348,6 +349,18 @@ pub fn solve(year: u16, day: u8, part: u8, input: &str) -> Result<ResultType, St
         (2024, 23) => to_stringer_input(year2024::day23::solve, &input),
         (2024, 24) => to_stringer_input(year2024::day24::solve, &input),
         (2024, 25) => to_stringer_input(year2024::day25::solve, &input),
+        (2025, 1) => to_stringer_input(year2025::day01::solve, &input),
+        (2025, 2) => to_stringer_input(year2025::day02::solve, &input),
+        (2025, 3) => to_stringer_input(year2025::day03::solve, &input),
+        (2025, 4) => to_stringer_input(year2025::day04::solve, &input),
+        (2025, 5) => to_stringer_input(year2025::day05::solve, &input),
+        (2025, 6) => to_stringer_input(year2025::day06::solve, &input),
+        (2025, 7) => to_stringer_input(year2025::day07::solve, &input),
+        (2025, 8) => to_stringer_input(year2025::day08::solve, &input),
+        (2025, 9) => to_stringer_input(year2025::day09::solve, &input),
+        (2025, 10) => to_stringer_input(year2025::day10::solve, &input),
+        (2025, 11) => to_stringer_input(year2025::day11::solve, &input),
+        (2025, 12) => to_stringer_input(year2025::day12::solve, &input),
         _ => Err(format!("Unsupported year={year}, day={day}, part={part}")),
     };
 
