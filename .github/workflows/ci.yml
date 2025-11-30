@@ -57,7 +57,7 @@ jobs:
     - uses: Homebrew/actions/setup-homebrew@master
     - run: brew install wasmtime
     - run: rustup target add wasm32-wasip1
-    - run: apt-get update && apt-get install -y gcc-multilib
+    - run: sudo apt-get update && sudo apt-get install -y gcc-multilib
     - run: cargo test --target=wasm32-wasip1 -- --nocapture
       working-directory: crates/core
 
