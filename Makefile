@@ -111,7 +111,7 @@ install-nightly:
 
 install-wasm-bindgen:
 	rustup target add wasm32-unknown-unknown
-	cargo install wasm-bindgen-cli
+	cargo install wasm-bindgen-cli --version 0.2.105
 
 netlify: node-package
 	cd crates/wasm/functions && \
