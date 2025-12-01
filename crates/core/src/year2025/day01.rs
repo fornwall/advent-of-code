@@ -4,7 +4,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     let mut dial_pointing_at = 50;
     let mut times_pointing_at_zero = 0;
     for (line_idx, line) in input.text.lines().enumerate() {
-        let first_char = line.as_bytes().get(0);
+        let first_char = line.as_bytes().first();
         let direction = match first_char {
             Some(b'L') => -1,
             Some(b'R') => 1,
