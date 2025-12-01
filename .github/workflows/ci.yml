@@ -106,7 +106,7 @@ jobs:
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-    - run: cargo binstall --no-confirm --version 0.2.105 wasm-bindgen-cli
+    - run: cargo binstall --no-confirm wasm-bindgen-cli
     - name: Test with Node ${{ matrix.node-version }}
       run: make node-package
 
@@ -317,7 +317,7 @@ jobs:
     - name: Install wasm-opt
       run: brew update && brew install binaryen
     - run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-    - run: cargo binstall --no-confirm --version 0.2.105 wasm-bindgen-cli
+    - run: cargo binstall --no-confirm wasm-bindgen-cli
     - name: Download new gist-mapping.json
       uses: actions/download-artifact@v5
       with:
