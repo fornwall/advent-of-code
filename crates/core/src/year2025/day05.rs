@@ -1,6 +1,6 @@
-use crate::input::{Input, on_error};
+use crate::input::Input;
 
-pub fn solve(input: &Input) -> Result<u64, String> {
+pub fn solve(_input: &Input) -> Result<u64, String> {
     Err("Not yet implemented".to_string())
 }
 
@@ -13,7 +13,7 @@ pub fn tests() {
     test_part_one_no_allocations!(test_input => 0);
     test_part_two_no_allocations!(test_input => 0);
 
-    let real_input = include_str!("day01_input.txt");
+    let real_input = include_str!("day05_input.txt");
     test_part_one_no_allocations!(real_input => 0);
     test_part_two_no_allocations!(real_input => 0);
 }
