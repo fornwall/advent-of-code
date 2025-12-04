@@ -1522,27 +1522,27 @@
   "2025": {
     "8": {
       "gist": "85a26d4ac11f0b2c092ba323f76413fb",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/85a26d4ac11f0b2c092ba323f76413fb/raw/186b06aa13e65dbcc9b69dae44401c3b3290b734/year2025_day8.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/85a26d4ac11f0b2c092ba323f76413fb/raw/bd2954347d3cea780b966a3ded3e19d9cf985bf0/year2025_day8.rs",
       "visualization": false,
-      "compiler_explorer": "zM9MjYfWz"
+      "compiler_explorer": "6bzvK15Yz"
     },
     "11": {
       "gist": "cd2dfb3fe1d592a4479a1882c2b96188",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/cd2dfb3fe1d592a4479a1882c2b96188/raw/4d5cb08641d784892d11726c367155c46473d8f3/year2025_day11.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/cd2dfb3fe1d592a4479a1882c2b96188/raw/9bfe62d1061759485ea02909e1d36391da3a000e/year2025_day11.rs",
       "visualization": false,
-      "compiler_explorer": "1szEo5qhn"
+      "compiler_explorer": "cr5PoYvW3"
     },
     "7": {
       "gist": "beec8c43b7faab46c5bb4410d6f0556e",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/beec8c43b7faab46c5bb4410d6f0556e/raw/9e2457c6f2fbf63362297def2993ac08dfeb46e4/year2025_day7.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/beec8c43b7faab46c5bb4410d6f0556e/raw/0b2b4e5f45b7676948416e2f8816ae52de882a81/year2025_day7.rs",
       "visualization": false,
-      "compiler_explorer": "j8KEMcz4h"
+      "compiler_explorer": "743q5s5fM"
     },
     "9": {
       "gist": "0201633e577c58d396c35cc0f38bd57c",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/0201633e577c58d396c35cc0f38bd57c/raw/27864930f2e2810712098a2e56cbc65c545231a7/year2025_day9.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/0201633e577c58d396c35cc0f38bd57c/raw/0072287c0ddb10e7df668d5f37dd831b314e8872/year2025_day9.rs",
       "visualization": false,
-      "compiler_explorer": "o94Mzavda"
+      "compiler_explorer": "jPbrP5xnn"
     },
     "4": {
       "gist": "ea55af596effc1b5affb4df1a59e41ba",
@@ -1552,15 +1552,15 @@
     },
     "12": {
       "gist": "1736ccae376ff493b7fe54a38efa16a9",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/1736ccae376ff493b7fe54a38efa16a9/raw/106fd6fc9f55571bc81cc17879d97d7b4fd4f103/year2025_day12.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/1736ccae376ff493b7fe54a38efa16a9/raw/8655540e236c2a5430d3b8662f5a2b3a27dd1164/year2025_day12.rs",
       "visualization": false,
-      "compiler_explorer": "3ro4a3YK6"
+      "compiler_explorer": "anobn9Pc6"
     },
     "6": {
       "gist": "a6b9c19002786384fac95f5c21170910",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/a6b9c19002786384fac95f5c21170910/raw/b0b4ae4fb91f7c7c43b496612ac854ca06d0b6c0/year2025_day6.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/a6b9c19002786384fac95f5c21170910/raw/e89e20ced2dacd39f999b78bc957a03cf7278d7c/year2025_day6.rs",
       "visualization": false,
-      "compiler_explorer": "n8YnjP7eo"
+      "compiler_explorer": "1Kbr6K1Wq"
     },
     "3": {
       "gist": "229c3aca4b507fdebf2eb200e5b9e4af",
@@ -1582,15 +1582,15 @@
     },
     "5": {
       "gist": "0ca6324258711d00d8152a07dfcacc3b",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/0ca6324258711d00d8152a07dfcacc3b/raw/093c1b19dea24a0df3e054e9b9d1f1311ee19999/year2025_day5.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/0ca6324258711d00d8152a07dfcacc3b/raw/11d0656113c78126b3ec5fb2790116762efa41f9/year2025_day5.rs",
       "visualization": false,
-      "compiler_explorer": "5sPjob7qe"
+      "compiler_explorer": "17hWcaeT3"
     },
     "10": {
       "gist": "c023cf71a4f67b22aa076b596df198d5",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/c023cf71a4f67b22aa076b596df198d5/raw/51659dd81c19b7f844e012262bc4c1df78401703/year2025_day10.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/c023cf71a4f67b22aa076b596df198d5/raw/cdddf068f362cc46079ec872d6b6c8ae7deb3b02/year2025_day10.rs",
       "visualization": false,
-      "compiler_explorer": "5jjbM1WWc"
+      "compiler_explorer": "414Go4jeq"
     }
   }
 }
