@@ -24,6 +24,7 @@ async function main() {
     await fetch("https://fornwall.net/aoc/tests.json")
   ).json();
   const yearDays = tests.years.find((y) => y.year == year).days;
+  const lastDay = year < 2025 ? 25 : 12;
   const tbody = document.querySelector("tbody");
 
   const worker = new Worker(new URL("../worker-wasm.js", import.meta.url), {
@@ -53,7 +54,7 @@ async function main() {
           alert(message);
         }
 
-        if (e.data.day == 25) {
+        if (e.data.day == lastDay) {
           const totalTime = times
             .map((d) => d.executionTime)
             .reduce((a, b) => a + b, 0);
@@ -108,7 +109,7 @@ async function main() {
             data.parents.push(yearLabel);
             data.values.push(dayTime);
             for (let part = 1; part <= 2; part++) {
-              if (day === 25 && part === 2) continue;
+              if (day === lastDay && part === 2) continue;
               const partTime = times.filter(
                 (d) => d.day == day && d.part == part,
               )[0].executionTime;
@@ -139,7 +140,7 @@ async function main() {
     for (const day of yearDays) {
       const input = day.input;
       for (let part = 1; part < 3; part++) {
-        if (!(day.day == 25 && part == 2)) {
+        if (!(day.day == lastDay && part == 2)) {
           worker.postMessage({ year, day: day.day, part, input });
           if (day.day == 1 && part == 1) {
             worker.postMessage({ year, day: day.day, part, input });
