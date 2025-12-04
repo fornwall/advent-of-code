@@ -25,32 +25,24 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 3 => part_two && x % /* all digits same */ 111 == 0,
                 4 => {
                     x % /* two digits repeated twice */ 01_01 == 0
-                        || (part_two && x % /* all digits same */ 11_11 == 0)
                 }
-                5 => part_two && x % /* one digit repated five times */ 11111 == 0,
+                5 => part_two && x % /* all digits same */ 11111 == 0,
                 6 => {
                     x % /* three digits repeated twice */ 001_001 == 0
-                        || (part_two
-                            && (x % /* two digits repeated three times */ 01_01_01 == 0
-                                || x % /* all digits same */ 111_111 == 0))
+                        || (part_two && (x % /* two digits repeated three times */ 01_01_01 == 0))
                 }
                 7 => part_two && x % /* all digits same */ 1_111_111 == 0,
                 8 => {
                     x % /* four digits repeated twice */ 0001_0001 == 0
-                        || (part_two
-                            && (x % /* two digits repeated four times */ 01_01_01_01 == 0
-                                || x % /* all digits same */ 1111_1111 == 0))
+                        || (part_two && (x % /* two digits repeated four times */ 01_01_01_01 == 0))
                 }
                 9 => {
-                    part_two
-                        && (x % /* three digits repeated thrice */ 001_001_001 == 0
-                            || x % /* all digits same */111_111_111 == 0)
+                    part_two && (x % /* three digits repeated thrice */ 001_001_001 == 0)
                 }
                 10 => {
                     x % /* five digits repeated twice */ 00001_00001 == 0
                         || (part_two
-                            && (x % /* three digits repeated thrice */ 101_010_101 == 0
-                                || x % /* all digits same */1_111_111_111 == 0))
+                            && (x % /* two digits repeated five times */ 01_01_01_01_01 == 0))
                 }
                 _ => {
                     return Err(format!("Number too large: {}", x));
