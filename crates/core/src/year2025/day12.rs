@@ -1,7 +1,7 @@
 use crate::input::Input;
 
-pub fn solve(_input: &Input) -> Result<u64, String> {
-    Err("Not yet implemented".to_string())
+pub const fn solve(_input: &Input) -> Result<u64, String> {
+    Ok(0)
 }
 
 #[test]
