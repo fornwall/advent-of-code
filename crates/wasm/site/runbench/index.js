@@ -99,7 +99,7 @@ async function main() {
             sort: false,
           };
 
-          for (let day = 1; day < 26; day++) {
+          for (let day = 1; day <= lastDay; day++) {
             const dayLabel = `Day ${day}`;
             const dayTime = times
               .filter((d) => d.day == day)
