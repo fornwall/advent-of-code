@@ -6,6 +6,10 @@ async function main() {
     alert(e.message);
   });
 
+  document.getElementById("rerun-button").addEventListener("click", (e) => {
+    window.location.reload();
+  });
+
   const year = parseInt(
     new URLSearchParams(window.location.search).get("year") || "2025",
   );
