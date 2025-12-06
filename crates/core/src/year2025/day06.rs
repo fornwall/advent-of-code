@@ -11,6 +11,14 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     let mut column_widths = ArrayStack::<MAX_COLUMNS, usize>::new();
     let mut column_offsets = ArrayStack::<MAX_COLUMNS, usize>::new();
 
+    // Protect against trimmed inputs:
+    let max_line_len = input
+        .text
+        .lines()
+        .map(|line| line.len())
+        .max()
+        .ok_or_else(on_error)?;
+
     for (line_idx, line) in input.text.lines().rev().enumerate() {
         if line_idx == 0 {
             // First line: determine column widths and offsets
@@ -34,7 +42,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                     }
                 }
             }
-            column_widths.push(line.len() - last_offset)?;
+            column_widths.push(max_line_len - last_offset)?;
         } else {
             if input.is_part_two() {
                 break;
@@ -111,10 +119,14 @@ pub fn tests() {
  45 64  387 23 
   6 98  215 314
 *   +   *   +  ";
-    test_part_one_no_allocations!(test_input => 4_277_556);
-    test_part_two_no_allocations!(test_input => 3_263_827);
 
-    let real_input = include_str!("day06_input.txt");
-    test_part_one_no_allocations!(real_input => 6_343_365_546_996);
-    test_part_two_no_allocations!(real_input => 11_136_895_955_912);
+    for trim in [true, false] {
+        let test_input = if trim { test_input.trim() } else { test_input };
+        test_part_one_no_allocations!(test_input => 4_277_556);
+        test_part_two_no_allocations!(test_input => 3_263_827);
+
+        let real_input = include_str!("day06_input.txt");
+        test_part_one_no_allocations!(real_input => 6_343_365_546_996);
+        test_part_two_no_allocations!(real_input => 11_136_895_955_912);
+    }
 }
