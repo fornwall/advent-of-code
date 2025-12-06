@@ -31,7 +31,7 @@ impl Gpu {
 
 pub fn setup() -> Result<Gpu, String> {
     async fn setup_async() -> Result<Gpu, String> {
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::default());
+        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::default());
 
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
@@ -40,17 +40,14 @@ pub fn setup() -> Result<Gpu, String> {
                 force_fallback_adapter: false,
             })
             .await
-            .ok_or("No GPU: request_adapter failed")?;
+            .map_err(|e| format!("WGPU: Requesting adapter failed: {e}"))?;
 
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    required_features: wgpu::Features::empty(),
-                    required_limits: wgpu::Limits::default(),
-                    ..Default::default()
-                },
-                None,
-            )
+            .request_device(&wgpu::DeviceDescriptor {
+                required_features: wgpu::Features::empty(),
+                required_limits: wgpu::Limits::default(),
+                ..Default::default()
+            })
             .await
             .map_err(|e| format!("request_device failed: {e}"))?;
 
