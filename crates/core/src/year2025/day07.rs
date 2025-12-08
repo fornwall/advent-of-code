@@ -17,10 +17,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
     let mut num_splits = 0;
     for line in input.text.lines().skip(1) {
-        for (x, char) in line.bytes().enumerate() {
-            let is_split_point = char == b'^';
+        for (x, _) in line.bytes().enumerate().filter(|(_, c)| *c == b'^') {
             let num_timelines_here = num_timelines_at_x[x];
-            if num_timelines_here > 0 && is_split_point {
+            if num_timelines_here > 0 {
                 num_splits += 1;
                 num_timelines_at_x[x - 1] += num_timelines_here;
                 num_timelines_at_x[x] = 0;
