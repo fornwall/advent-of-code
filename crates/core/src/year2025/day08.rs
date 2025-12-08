@@ -36,8 +36,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     for (lower_idx, lower_point) in points.slice().iter().enumerate() {
         for (higher_idx, higher_point) in points.slice().iter().enumerate().skip(lower_idx + 1) {
             let distance = lower_point.distance_from(higher_point);
-            distances
-                .push((distance, lower_idx, higher_idx));
+            distances.push((distance, lower_idx, higher_idx));
         }
     }
 

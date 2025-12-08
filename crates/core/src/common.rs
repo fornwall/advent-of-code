@@ -8,7 +8,6 @@ pub mod highest_values;
 pub mod id_assigner;
 pub mod id_assigner_copy;
 pub mod int_to_ascii;
-#[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
 #[cfg(not(feature = "visualization"))]
 pub mod map_windows;
