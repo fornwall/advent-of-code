@@ -21,7 +21,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             let num_digits = num_digits(x);
             let is_invalid_id = match num_digits {
                 1 => false,
-                2 => x % /* one digits repeated twice */ 1_1 == 0,
+                2 => x % /* one digit repeated twice */ 1_1 == 0,
                 3 => part_two && x % /* all digits same */ 111 == 0,
                 4 => {
                     x % /* two digits repeated twice */ 01_01 == 0
