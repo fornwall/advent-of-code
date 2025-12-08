@@ -4,6 +4,7 @@ pub mod character_recognition;
 pub mod chunk_iterator;
 #[cfg(feature = "webgpu-compute")]
 pub mod gpu;
+pub mod highest_values;
 pub mod id_assigner;
 pub mod id_assigner_copy;
 pub mod int_to_ascii;

@@ -1,17 +1,17 @@
-use std::collections::HashSet;
-
-pub struct DisjointSet {
-    elements: Vec<i32>,
+pub struct DisjointSet<const MAX_SIZE: usize> {
+    pub elements: [i32; MAX_SIZE],
+    num_groups: usize,
 }
 
-impl DisjointSet {
-    pub fn new(size: usize) -> Self {
+impl<const MAX_SIZE: usize> DisjointSet<MAX_SIZE> {
+    pub const fn new(len: usize) -> Self {
         Self {
-            elements: vec![-1; size],
+            elements: [-1; MAX_SIZE],
+            num_groups: len,
         }
     }
 
-    pub fn find(&mut self, index: usize) -> usize {
+    pub const fn find(&mut self, index: usize) -> usize {
         // Find root:
         let mut root_index = index;
         loop {
@@ -38,12 +38,12 @@ impl DisjointSet {
         root_index
     }
 
-    pub fn join(&mut self, i: usize, j: usize) {
+    pub const fn join(&mut self, i: usize, j: usize) -> bool {
         let root1 = self.find(i);
         let root2 = self.find(j);
 
         if root1 == root2 {
-            return;
+            return false;
         }
 
         let r1 = self.elements[root1];
@@ -57,25 +57,24 @@ impl DisjointSet {
             self.elements[root2] += r1;
             self.elements[root1] = root2 as i32;
         }
+
+        self.num_groups -= 1;
+        true
     }
 
-    pub fn size(&mut self, i: usize) -> usize {
+    pub const fn size(&mut self, i: usize) -> usize {
         let root = self.find(i);
         -self.elements[root] as usize
     }
 
-    pub fn num_groups(&mut self) -> usize {
-        let mut set = HashSet::new();
-        for i in 0..self.elements.len() {
-            set.insert(self.find(i));
-        }
-        set.len()
+    pub const fn num_groups(&self) -> usize {
+        self.num_groups
     }
 }
 
 #[test]
 fn test_disjoint_set() {
-    let mut set = DisjointSet::new(10);
+    let mut set = DisjointSet::<100>::new(10);
     assert_eq!(1, set.size(0));
     assert_eq!(10, set.num_groups());
 

@@ -33,7 +33,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
     Ok(if input.is_part_one() {
         used_counter as u32
     } else {
-        let mut disjoint_set = DisjointSet::new(used_counter);
+        let mut disjoint_set = DisjointSet::<16392>::new(used_counter);
         for ((x, y), &this_set) in location_to_set_identifier.iter() {
             // Since coordinates are stored in an ordered set we only need to consider
             // neighbors to the right and below:
