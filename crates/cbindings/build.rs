@@ -3,22 +3,15 @@ extern crate cbindgen;
 use std::env;
 use std::path::PathBuf;
 
-use cbindgen::Config;
-
 fn main() {
     #![allow(clippy::unwrap_used, clippy::expect_used)]
 
     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let generated_header_path = target_dir().join("advent-of-code.h");
 
-    let config = Config {
-        cpp_compat: true,
-        ..Default::default()
-    };
-
     cbindgen::Builder::new()
         .with_crate(crate_dir)
-        .with_config(config)
+        .with_cpp_compat(true)
         .with_include_guard("ADVENT_OF_CODE_H")
         .with_language(cbindgen::Language::C)
         .generate()

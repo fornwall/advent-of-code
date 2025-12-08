@@ -1,11 +1,7 @@
 #[cfg(not(feature = "simd"))]
 #[cfg(not(feature = "webgpu-compute"))]
-use crate::input::Input;
-
-#[cfg(not(feature = "simd"))]
-#[cfg(not(feature = "webgpu-compute"))]
 #[cfg(not(feature = "visualization"))]
-pub fn solve(input: &Input) -> Result<usize, String> {
+pub fn solve(input: &crate::input::Input) -> Result<usize, String> {
     use crate::common::map_windows::MapWindowsIterator;
     use crate::common::u256::U256;
 
@@ -231,7 +227,6 @@ pub use super::day23_renderer::solve;
 
 #[test]
 pub fn tests() {
-    #[cfg(any(feature = "simd", feature = "webgpu-compute"))]
     use crate::input::Input;
     use crate::input::{test_part_one, test_part_two};
 

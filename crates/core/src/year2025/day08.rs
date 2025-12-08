@@ -1,5 +1,4 @@
 use crate::common::highest_values::HighestValues;
-use std::collections::BTreeMap;
 
 use crate::common::array_stack::ArrayStack;
 use crate::input::{Input, on_error};
@@ -33,21 +32,18 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         points.push(point)?;
     }
 
-    let mut distances = BTreeMap::new();
+    let mut distances = Vec::with_capacity(points.len() * points.len());
     for (lower_idx, lower_point) in points.slice().iter().enumerate() {
         for (higher_idx, higher_point) in points.slice().iter().enumerate().skip(lower_idx + 1) {
             let distance = lower_point.distance_from(higher_point);
-            if distances
-                .insert(distance, (lower_idx, higher_idx))
-                .is_some()
-            {
-                return Err(format!("Duplicated distance: {}", distance));
-            }
+            distances
+                .push((distance, lower_idx, higher_idx));
         }
     }
 
+    distances.sort_unstable_by(|a, b| a.0.cmp(&b.0));
     let mut connections_made = 0;
-    for (lower_point, higher_point) in distances.into_values() {
+    for &(_, lower_point, higher_point) in distances.iter() {
         if circuits.join(lower_point, higher_point)
             && input.is_part_two()
             && circuits.num_groups() == 1
@@ -70,7 +66,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             return Ok(biggest_groups.values.iter().product::<u64>() as u32);
         }
     }
-    Ok(0)
+    Err("Could not find solution".to_string())
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -90,7 +86,7 @@ impl Point {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one, test_part_two};
 
     let test_input = "162,817,812
 57,618,57
@@ -112,9 +108,9 @@ pub fn tests() {
 862,61,35
 984,92,344
 425,690,689";
-    test_part_two_no_allocations!(test_input => 25272);
+    test_part_two!(test_input => 25272);
 
     let real_input = include_str!("day08_input.txt");
-    test_part_one_no_allocations!(real_input => 123_930);
-    test_part_two_no_allocations!(real_input => 27_338_688);
+    test_part_one!(real_input => 123_930);
+    test_part_two!(real_input => 27_338_688);
 }
