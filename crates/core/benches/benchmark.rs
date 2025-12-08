@@ -4,9 +4,9 @@ use std::fs::read_to_string;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     #![allow(clippy::unwrap_used)]
-    for year in 2015..=2024 {
+    for year in 2015..=2025 {
         let start_day = 1;
-        let end_day = 25;
+        let end_day = if year >= 2025 { 12 } else { 25 };
         for day in start_day..=end_day {
             let input_path = format!("src/year{year}/day{day:02}_input.txt");
             let input = read_to_string(input_path).unwrap();
