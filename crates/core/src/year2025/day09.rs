@@ -147,7 +147,7 @@ impl Rectangle {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one, test_part_two};
 
     let test_input = "7,1
 11,1
@@ -157,10 +157,10 @@ pub fn tests() {
 2,5
 2,3
 7,3";
-    test_part_one_no_allocations!(test_input => 50);
-    test_part_two_no_allocations!(test_input => 24);
+    test_part_one!(test_input => 50);
+    test_part_two!(test_input => 24);
 
     let real_input = include_str!("day09_input.txt");
-    test_part_one_no_allocations!(real_input => 4_763_040_296);
-    test_part_two_no_allocations!(real_input => 1_396_494_456);
+    test_part_one!(real_input => 4_763_040_296);
+    test_part_two!(real_input => 1_396_494_456);
 }
