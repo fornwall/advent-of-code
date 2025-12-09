@@ -10,17 +10,9 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     let mut last_point = None;
 
     for line in input.text.lines() {
-        let mut parts = line.split(',');
-        let x = parts
-            .next()
-            .ok_or_else(on_error)?
-            .parse::<u32>()
-            .map_err(|_| on_error())?;
-        let y = parts
-            .next()
-            .ok_or_else(on_error)?
-            .parse::<u32>()
-            .map_err(|_| on_error())?;
+        let (x_str, y_str) = line.split_once(',').ok_or_else(on_error)?;
+        let x = x_str.parse::<u32>().map_err(|_| on_error())?;
+        let y = y_str.parse::<u32>().map_err(|_| on_error())?;
         let point = Point { x, y };
         points.push(point)?;
         if let Some(last_point) = last_point {
