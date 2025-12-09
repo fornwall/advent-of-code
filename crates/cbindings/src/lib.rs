@@ -1,5 +1,3 @@
-extern crate libc;
-
 use libc::c_char;
 
 use std::ffi::CStr;

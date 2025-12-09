@@ -16,14 +16,3 @@ message ProblemInput {
 message ProblemOutput {
   string answer = 1;
 }
-
-message ErrorResponse {
-  string description = 1;
-}
-
-message Response {
-  oneof response {
-    ProblemOutput output = 1;
-    ErrorResponse error = 2;
-  }
-}
