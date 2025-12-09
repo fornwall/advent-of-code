@@ -6,31 +6,13 @@ use crate::{
 pub fn solve(input: &Input) -> Result<u64, String> {
     const MAX_POINTS: usize = 1000;
     let mut points = ArrayStack::<MAX_POINTS, Point>::new();
-    let mut boundary = ArrayStack::<MAX_POINTS, Line>::new();
-    let mut last_point = None;
 
     for line in input.text.lines() {
         let (x_str, y_str) = line.split_once(',').ok_or_else(on_error)?;
         let x = x_str.parse::<u32>().map_err(|_| on_error())?;
         let y = y_str.parse::<u32>().map_err(|_| on_error())?;
-        let point = Point { x, y };
-        points.push(point)?;
-        if let Some(last_point) = last_point {
-            boundary.push(Line {
-                start: last_point,
-                end: point,
-            })?;
-        }
-        last_point = Some(point);
+        points.push(Point { x, y })?;
     }
-    if points.len() < 4 {
-        return Err("Not enough points to form a rectangle".to_string());
-    }
-    // "The list wraps, so the first red tile is also connected to the last red tile":
-    boundary.push(Line {
-        start: points.elements[points.len() - 1],
-        end: points.elements[0],
-    })?;
 
     if input.is_part_one() {
         points
@@ -42,31 +24,35 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                     .slice()
                     .iter()
                     .skip(lower_idx + 1)
-                    .map(|higher_point| lower_point.rectangle_size(higher_point))
+                    .map(|&higher_point| lower_point.rectangle_size(higher_point))
             })
             .max()
             .ok_or_else(|| "No rectangle found".to_string())
     } else {
-        let mut areas = Vec::new();
-        for (lower_idx, lower_point) in points.slice().iter().enumerate() {
-            areas.extend(
-                points
-                    .slice()
-                    .iter()
-                    .skip(lower_idx + 1)
-                    .map(|higher_point| {
-                        (
-                            lower_point.rectangle_size(higher_point),
-                            Rectangle::from_exclusive(*lower_point, *higher_point),
-                        )
-                    }),
-            );
+        let mut boundary = ArrayStack::<MAX_POINTS, Line>::new();
+        for i in 0..points.len() {
+            let p1 = points.elements[i];
+            let p2 = points.elements[(i + 1) % points.len()];
+            boundary.push(Line { start: p1, end: p2 })?;
         }
-        areas.sort_unstable_by(|a, b| b.0.cmp(&a.0));
-        areas
-            .iter()
-            .find_map(|(area, rect)| rect.any_line_touches(boundary.slice()).then_some(*area))
-            .ok_or_else(|| "No rectangle found inside perimeter".to_string())
+
+        let mut highest_area = 0;
+        for (lower_idx, &lower_point) in points.slice().iter().enumerate() {
+            for &higher_point in points.slice().iter().skip(lower_idx + 1) {
+                let this_area = lower_point.rectangle_size(higher_point);
+                if this_area > highest_area {
+                    let rect = Rectangle::from_exclusive(lower_point, higher_point);
+                    if !boundary
+                        .slice()
+                        .iter()
+                        .any(|line| line.is_inside_rect(&rect))
+                    {
+                        highest_area = this_area;
+                    }
+                }
+            }
+        }
+        Ok(highest_area)
     }
 }
 
@@ -77,7 +63,7 @@ struct Point {
 }
 
 impl Point {
-    fn rectangle_size(&self, opposing: &Self) -> u64 {
+    fn rectangle_size(&self, opposing: Self) -> u64 {
         (u64::from(self.x).abs_diff(u64::from(opposing.x)) + 1)
             * (u64::from(self.y).abs_diff(u64::from(opposing.y)) + 1)
     }
@@ -131,9 +117,6 @@ impl Rectangle {
                 y: p1.y.max(p2.y) - 1,
             },
         }
-    }
-    fn any_line_touches(&self, lines: &[Line]) -> bool {
-        !lines.iter().any(|line| line.is_inside_rect(self))
     }
 }
 
