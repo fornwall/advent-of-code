@@ -1,7 +1,7 @@
 [![Build](https://github.com/fornwall/advent-of-code/actions/workflows/ci.yml/badge.svg)](https://github.com/fornwall/advent-of-code/actions/workflows/ci.yml)
 
 # Advent of Code solutions
-Solutions to [Advent of Code](https://adventofcode.com/) problems (2015-2024) in Rust.
+Solutions to [Advent of Code](https://adventofcode.com/) problems (2015-2025) in Rust.
 
 For learning and demonstration purposes, this repository contains additional resources building on the solutions:
 
