@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use crate::{
     common::array_stack::ArrayStack,
     input::{Input, on_error},
@@ -29,26 +31,57 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             .max()
             .ok_or_else(|| "No rectangle found".to_string())
     } else {
-        let mut boundary = ArrayStack::<MAX_POINTS, Line>::new();
+        //let mut boundary = ArrayStack::<MAX_POINTS, Line>::new();
+        let mut horizontal_lines_by_y = BTreeMap::new();
+        let mut vertical_lines_by_x = BTreeMap::new();
         for i in 0..points.len() {
             let p1 = points.elements[i];
             let p2 = points.elements[(i + 1) % points.len()];
-            boundary.push(Line { start: p1, end: p2 })?;
+            if p1.x == p2.x {
+                vertical_lines_by_x
+                    .entry(p1.x)
+                    .or_insert_with(Vec::new)
+                    .push(Line { start: p1, end: p2 });
+            } else {
+                horizontal_lines_by_y
+                    .entry(p1.y)
+                    .or_insert_with(Vec::new)
+                    .push(Line { start: p1, end: p2 });
+            }
         }
 
         let mut highest_area = 0;
         for (lower_idx, &lower_point) in points.slice().iter().enumerate() {
-            for &higher_point in points.slice().iter().skip(lower_idx + 1) {
+            'higher: for &higher_point in points.slice().iter().skip(lower_idx + 1) {
                 let this_area = lower_point.rectangle_size(higher_point);
                 if this_area > highest_area {
                     let rect = Rectangle::from_exclusive(lower_point, higher_point);
-                    if !boundary
-                        .slice()
-                        .iter()
-                        .any(|line| line.is_inside_rect(&rect))
-                    {
-                        highest_area = this_area;
+                    if rect.upper_left.y > rect.lower_right.y {
+                        continue 'higher;
                     }
+                    for (_, lines) in
+                        horizontal_lines_by_y.range(rect.upper_left.y..=rect.lower_right.y)
+                    {
+                        for line in lines {
+                            if line.is_inside_rect(&rect) {
+                                continue 'higher;
+                            }
+                        }
+                    }
+                    if rect.upper_left.x > rect.lower_right.x {
+                        continue 'higher;
+                    }
+                    for (_, lines) in
+                        vertical_lines_by_x.range(rect.upper_left.x..=rect.lower_right.x)
+                    {
+                        for line in lines {
+                            if line.is_inside_rect(&rect) {
+                                //println!("  blocked by line {:?}", line);
+                                continue 'higher;
+                            }
+                        }
+                    }
+                    highest_area = this_area;
                 }
             }
         }
@@ -56,7 +89,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     }
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Debug)]
 struct Point {
     x: u32,
     y: u32,
@@ -69,7 +102,7 @@ impl Point {
     }
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Debug)]
 struct Line {
     #[allow(dead_code)]
     start: Point,
@@ -100,6 +133,7 @@ impl Line {
     }
 }
 
+#[derive(Debug)]
 struct Rectangle {
     upper_left: Point,
     lower_right: Point,
