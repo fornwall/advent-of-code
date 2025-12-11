@@ -305,15 +305,15 @@ fn solve_integer_linear_programming_branch_and_bound(
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
+    use crate::input::{test_part_one_no_allocations, test_part_two};
 
     let test_input = "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
 [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
 [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}";
     test_part_one_no_allocations!(test_input => 7);
-    test_part_two_no_allocations!(test_input => 33);
+    test_part_two!(test_input => 33);
 
     let real_input = include_str!("day10_input.txt");
     test_part_one_no_allocations!(real_input => 524);
-    test_part_two_no_allocations!(real_input => 21_696);
+    test_part_two!(real_input => 21_696);
 }
