@@ -1,7 +1,8 @@
 use crate::common::tuple_window_iterator::TupleWindowIteratorExt;
 use std::collections::HashMap;
 
-use crate::{common::id_assigner, input::Input};
+use crate::common::id_assigner;
+use crate::input::Input;
 
 const MAX_SIZE: usize = 1024;
 
