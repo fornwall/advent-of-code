@@ -31,7 +31,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             .max()
             .ok_or_else(|| "No rectangle found".to_string())
     } else {
-        //let mut boundary = ArrayStack::<MAX_POINTS, Line>::new();
         let mut horizontal_lines_by_y = BTreeMap::new();
         let mut vertical_lines_by_x = BTreeMap::new();
         for i in 0..points.len() {
@@ -41,12 +40,18 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 vertical_lines_by_x
                     .entry(p1.x)
                     .or_insert_with(Vec::new)
-                    .push(Line { start: p1, end: p2 });
+                    .push(Line {
+                        start: p1.y.min(p2.y),
+                        end: p1.y.max(p2.y),
+                    });
             } else {
                 horizontal_lines_by_y
                     .entry(p1.y)
                     .or_insert_with(Vec::new)
-                    .push(Line { start: p1, end: p2 });
+                    .push(Line {
+                        start: p1.x.min(p2.x),
+                        end: p1.x.max(p2.x),
+                    });
             }
         }
 
@@ -63,7 +68,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                         horizontal_lines_by_y.range(rect.upper_left.y..=rect.lower_right.y)
                     {
                         for line in lines {
-                            if line.is_inside_rect(&rect) {
+                            if line.is_inside_rect_horizontal(&rect) {
                                 continue 'higher;
                             }
                         }
@@ -75,8 +80,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                         vertical_lines_by_x.range(rect.upper_left.x..=rect.lower_right.x)
                     {
                         for line in lines {
-                            if line.is_inside_rect(&rect) {
-                                //println!("  blocked by line {:?}", line);
+                            if line.is_inside_rect_vertical(&rect) {
                                 continue 'higher;
                             }
                         }
@@ -105,31 +109,17 @@ impl Point {
 #[derive(Clone, Copy, Default, Debug)]
 struct Line {
     #[allow(dead_code)]
-    start: Point,
+    start: u32,
     #[allow(dead_code)]
-    end: Point,
+    end: u32,
 }
 
 impl Line {
-    // Note: Inclusive ranges.
-    fn is_inside_rect(&self, rect: &Rectangle) -> bool {
-        if self.start.x == self.end.x {
-            // vertical line
-            if !(rect.upper_left.x..=rect.lower_right.x).contains(&self.start.x) {
-                return false;
-            }
-            let line_low_y = self.start.y.min(self.end.y) + 1;
-            let line_high_y = self.start.y.max(self.end.y);
-            line_low_y <= rect.lower_right.y && line_high_y >= rect.upper_left.y
-        } else {
-            // horizontal line
-            if !(rect.upper_left.y..=rect.lower_right.y).contains(&self.start.y) {
-                return false;
-            }
-            let line_low_x = self.start.x.min(self.end.x) + 1;
-            let line_high_x = self.start.x.max(self.end.x);
-            line_low_x <= rect.lower_right.x && line_high_x >= rect.upper_left.x
-        }
+    const fn is_inside_rect_horizontal(&self, rect: &Rectangle) -> bool {
+        self.start < rect.lower_right.x && self.end > rect.upper_left.x
+    }
+    const fn is_inside_rect_vertical(&self, rect: &Rectangle) -> bool {
+        self.start < rect.lower_right.y && self.end > rect.upper_left.y
     }
 }
 

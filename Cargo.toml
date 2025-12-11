@@ -28,7 +28,6 @@ codegen-units = 1
 
 [workspace.lints.rust]
 deprecated = { level = "deny", priority = -1 }
-unused = { level = "deny", priority = -1 }
 single_use_lifetimes = "warn"
 unused_lifetimes = { level = "deny", priority = -1 }
 trivial_numeric_casts = "forbid"
