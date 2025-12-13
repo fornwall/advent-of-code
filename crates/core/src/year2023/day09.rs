@@ -28,8 +28,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "0 3 6 9 12 15
 1 3 6 10 15 21
 10 13 16 21 30 45";

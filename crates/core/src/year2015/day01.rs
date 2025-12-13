@@ -19,8 +19,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day01_input.txt");
     test_part_one!(real_input => 280);
     test_part_two!(real_input => 1797);

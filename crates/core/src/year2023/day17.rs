@@ -227,8 +227,6 @@ impl<'a> Map<'a> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let steps_in_direction = StepsInDirection::new(2, Direction::Down, false);
     assert_eq!(steps_in_direction.num_steps(false), 2);
     assert!(steps_in_direction.direction() == Direction::Down);

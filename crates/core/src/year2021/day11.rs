@@ -106,8 +106,6 @@ impl Board {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "5483143223
 2745854711
 5264556173

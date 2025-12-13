@@ -50,8 +50,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example_input = "London to Dublin = 464
 London to Belfast = 518
 Dublin to Belfast = 141";

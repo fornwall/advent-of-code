@@ -51,8 +51,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "30373
 25512
 65332

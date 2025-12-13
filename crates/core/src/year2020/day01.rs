@@ -59,8 +59,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
-
     test_part_one!("1721\n979\n366\n299\n675\n1456" => 514_579);
     test_part_one_error!("" => "No 2 expenses sum to 2020");
     test_part_one_error!("1" => "No 2 expenses sum to 2020");

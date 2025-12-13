@@ -52,8 +52,6 @@ pub fn solve(input: &Input) -> Result<i64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "R 6 (#70c710)
 D 5 (#0dc571)
 L 2 (#5713f0)

@@ -171,8 +171,6 @@ fn flow(input: &InputStruct, start: usize, end: usize) -> usize {
 
 #[test]
 pub fn tests() {
-    use crate::input::test_part_one;
-
     let real_input = include_str!("day25_input.txt");
     test_part_one!(real_input => 543_564);
 }

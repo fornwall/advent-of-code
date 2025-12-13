@@ -124,8 +124,6 @@ fn count_alternatives(damaged: u128, unknown: u128, groups: &[u8]) -> u64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     test_part_one_no_allocations!("#.....??... 1,1" => 2);
 
     let test_input = "???.### 1,1,3

@@ -145,8 +145,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example_part_one = "class: 1-3 or 5-7
 row: 6-11 or 33-44
 seat: 13-40 or 45-50

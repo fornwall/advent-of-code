@@ -60,8 +60,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     let example = "6,10
 0,14
 9,10

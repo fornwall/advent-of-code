@@ -96,8 +96,6 @@ fn test_set_bits() {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "00100
 11110
 10110

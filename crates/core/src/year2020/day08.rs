@@ -149,8 +149,6 @@ pub fn solve(input: &Input) -> Result<Word, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "nop +0
 acc +1
 jmp +4

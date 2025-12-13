@@ -39,8 +39,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     assert_eq!(read_string(b"1"), b"11".to_vec());
     assert_eq!(read_string(b"11"), b"21".to_vec());
     assert_eq!(read_string(b"1211"), b"111221".to_vec());

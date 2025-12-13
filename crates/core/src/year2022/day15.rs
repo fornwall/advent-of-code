@@ -219,8 +219,6 @@ const fn intersection_of(ascending_origin_x: i32, descending_origin_x: i32) -> P
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day15_input.txt");
     test_part_one!(real_input => 5_240_818);
     test_part_two!(real_input => 13_213_086_906_101);

@@ -110,8 +110,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day16_input.txt");
     test_part_one!(real_input => "iabmedjhclofgknp".to_string());
     test_part_two!(real_input => "oildcmfeajhbpngk".to_string());

@@ -51,8 +51,6 @@ fn decimal_to_snafu(mut decimal: i64) -> String {
 
 #[test]
 pub fn tests() {
-    use crate::input::test_part_one;
-
     let test_input = "1=-0-2
 12111
 2=0=

@@ -109,8 +109,6 @@ impl Trie {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let mut trie = Trie::default();
     trie.add("wub").unwrap();
     trie.add("wuu").unwrap();

@@ -451,8 +451,6 @@ pub fn test_flip() {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "Tile 2311:
 ..##.#..#.
 ##..#.....

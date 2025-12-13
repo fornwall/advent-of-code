@@ -117,8 +117,6 @@ pub fn solve(input: &Input) -> Result<ChemicalAmount, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("9 ORE => 2 A
 8 ORE => 3 B
 7 ORE => 5 C

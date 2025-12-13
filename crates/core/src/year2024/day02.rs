@@ -51,8 +51,6 @@ fn is_safe<I: Iterator<Item = i8>>(iter: I) -> bool {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "7 6 4 2 1
 1 2 7 8 9
 9 7 6 2 1

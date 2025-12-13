@@ -113,8 +113,6 @@ impl BitSet {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let mut b = BitSet::new();
     assert!(!b.contains(5));
     assert!(b.insert(0));

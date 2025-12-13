@@ -91,8 +91,6 @@ fn label_value(label: &[u8]) -> u32 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "HASH";
     test_part_one_no_allocations!(test_input => 52);
     let test_input = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";

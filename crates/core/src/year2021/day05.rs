@@ -98,8 +98,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "0,9 -> 5,9
 8,0 -> 0,8
 9,4 -> 3,4

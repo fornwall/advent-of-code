@@ -64,7 +64,6 @@ fn does_presents_fit(
 
 #[test]
 pub fn tests() {
-    use crate::input::test_part_one_no_allocations;
     let real_input = include_str!("day12_input.txt");
     test_part_one_no_allocations!(real_input => 440);
 }

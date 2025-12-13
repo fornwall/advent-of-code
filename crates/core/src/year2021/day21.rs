@@ -135,8 +135,6 @@ fn play_game_part_2(game: Game, outcome_cache: &mut [GameOutcome]) -> GameOutcom
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "Player 1 starting position: 4
 Player 2 starting position: 8";
     test_part_one!(example => 739_785);

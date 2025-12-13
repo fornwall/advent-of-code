@@ -89,8 +89,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::test_part_one;
-
     let example = "5764801\n17807724";
     test_part_one!(example => 14_897_079);
     let real_input = include_str!("day25_input.txt");

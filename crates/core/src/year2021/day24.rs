@@ -319,8 +319,6 @@ type InputBlocks = [InputBlock; NUM_DIGITS_IN_MODEL_NUMBER];
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day24_input.txt");
     test_part_one!(real_input => 99_299_513_899_971);
     test_part_two!(real_input => 93_185_111_127_911);

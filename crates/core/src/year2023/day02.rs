@@ -47,8 +47,6 @@ fn score_game(game_str: &str, part1: bool) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let real_input = include_str!("day02_input.txt");
     test_part_one_no_allocations!(real_input => 3035);
     test_part_two_no_allocations!(real_input => 66027);

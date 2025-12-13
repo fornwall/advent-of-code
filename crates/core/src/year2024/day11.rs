@@ -76,8 +76,6 @@ fn num_digits(number: u64) -> u32 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "125 17";
     test_part_one!(test_input => 55312);
 

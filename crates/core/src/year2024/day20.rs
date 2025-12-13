@@ -97,8 +97,6 @@ impl Grid<'_> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let real_input = include_str!("day20_input.txt");
     test_part_one_no_allocations!(real_input => 1338);
     test_part_two_no_allocations!(real_input => 975_376);

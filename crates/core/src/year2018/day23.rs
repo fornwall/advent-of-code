@@ -204,7 +204,7 @@ struct OctreeNode {
     level: u8,
     max_possible: usize,
     bounds: AABB,
-    children: Vec<Rc<RefCell<OctreeNode>>>,
+    children: Vec<Rc<RefCell<Self>>>,
 }
 
 impl OctreeNode {
@@ -366,8 +366,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!(
             "pos=<0,0,0>, r=4
 pos=<1,0,0>, r=1

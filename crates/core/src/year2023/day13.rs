@@ -52,8 +52,6 @@ fn is_reflection(bits: &[u32], cols_to_left: usize, expected_smudges: u32) -> bo
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "#.##..##.
 ..#.##.#.
 ##......#

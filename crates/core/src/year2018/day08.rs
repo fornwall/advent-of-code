@@ -61,8 +61,6 @@ fn evaluate_node(
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2" => 138);
     test_part_two!("2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2" => 66);
 

@@ -74,8 +74,6 @@ fn evolve(grid: &[bool], grid_ng: &mut [bool], width: usize, height: usize) -> u
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "..@@.@@@@.
 @@@.@.@.@@
 @@@@@.@.@@

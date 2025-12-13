@@ -344,8 +344,6 @@ fn find_covering_subsequences(
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     assert_eq!(
         part1_map(
             "..#..........

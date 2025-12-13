@@ -108,8 +108,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = ".#.\n..#\n###";
     test_part_one!(example => 112);
     test_part_two!(example => 848);

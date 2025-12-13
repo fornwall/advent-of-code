@@ -64,8 +64,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("abba[mnop]qrst" => 1);
     test_part_one!("abcd[bddb]xyyx" => 0);
     test_part_one!("aaaa[qwer]tyui" => 0);

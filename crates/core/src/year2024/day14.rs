@@ -80,8 +80,6 @@ fn parse_it<'a, I: Iterator<Item = &'a str>>(it: &mut I) -> Result<i8, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let real_input = include_str!("day14_input.txt");
     test_part_one_no_allocations!(real_input => 226_236_192);
     test_part_two_no_allocations!(real_input => 8_168);

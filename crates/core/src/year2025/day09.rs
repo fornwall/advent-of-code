@@ -146,8 +146,6 @@ impl Rectangle {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "7,1
 11,1
 11,7

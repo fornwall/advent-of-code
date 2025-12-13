@@ -105,8 +105,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("9 players; last marble is worth 25 points" => 32);
     test_part_one!("10 players; last marble is worth 1618 points" => 8317);
     test_part_one!("13 players; last marble is worth 7999 points" => 146_373);

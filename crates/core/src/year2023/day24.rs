@@ -192,8 +192,6 @@ pub fn part2(input: &[[i64; 6]]) -> i128 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let real_input = include_str!("day24_input.txt");
     test_part_one_no_allocations!(real_input => 21_679);
     test_part_two_no_allocations!(real_input => 566_914_635_762_564);

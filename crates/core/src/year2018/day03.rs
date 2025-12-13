@@ -99,7 +99,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
     test_part_one!(
             "#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4

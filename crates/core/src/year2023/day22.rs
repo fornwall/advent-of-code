@@ -123,8 +123,6 @@ impl Brick {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "1,0,1~1,2,1
 0,0,2~2,0,2
 0,2,3~2,2,3

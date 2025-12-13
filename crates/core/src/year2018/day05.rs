@@ -39,8 +39,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("aA"=>0);
     test_part_one!("abBA" => 0);
     test_part_one!("abAB" => 4);

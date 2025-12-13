@@ -305,8 +305,6 @@ pub fn test_packet_parsing() {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two, test_part_two_error};
-
     let real_input = include_str!("day16_input.txt");
 
     test_part_one!("8A004A801A8002F478" => 16);

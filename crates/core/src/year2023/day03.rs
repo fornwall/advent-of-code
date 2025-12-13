@@ -82,8 +82,6 @@ fn parse_num_at(str: &[u8], idx: usize) -> Option<u16> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     assert_eq!(parse_num_at(b"a123", 1), Some(123));
     assert_eq!(parse_num_at(b"a123", 2), Some(123));
     assert_eq!(parse_num_at(b"a123", 3), Some(123));

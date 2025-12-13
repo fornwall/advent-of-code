@@ -53,8 +53,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("abc" => "18f47a30".to_string());
     test_part_two!("abc" => "05ace8e3".to_string());
 

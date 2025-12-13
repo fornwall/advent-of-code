@@ -2,7 +2,7 @@ use crate::common::character_recognition::{CHAR_HEIGHT, recognize};
 use crate::input::Input;
 
 struct Screen {
-    pixels: [bool; Screen::WIDTH * CHAR_HEIGHT],
+    pixels: [bool; Self::WIDTH * CHAR_HEIGHT],
 }
 
 impl Screen {
@@ -90,8 +90,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day08_input.txt");
     test_part_one!(real_input => "128".to_string());
     test_part_two!(real_input => "EOARGPHYAO".to_string());

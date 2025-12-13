@@ -36,10 +36,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{
-        test_part_one_error, test_part_one_no_allocations, test_part_two_no_allocations,
-    };
-
     let test_input = "2-4,6-8
 2-3,4-5
 5-7,7-9

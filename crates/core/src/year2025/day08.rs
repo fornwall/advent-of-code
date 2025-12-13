@@ -85,8 +85,6 @@ impl Point {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "162,817,812
 57,618,57
 906,360,560

@@ -420,8 +420,6 @@ impl Amphipod {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "#############
 #...........#
 ###B#C#B#D###

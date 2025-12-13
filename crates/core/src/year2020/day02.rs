@@ -56,8 +56,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
-
     test_part_one!("1-3 a: abcde\n1-3 b: cdefg\n2-9 c: ccccccccc" => 2);
     test_part_two!("1-3 a: abcde\n1-3 b: cdefg\n2-9 c: ccccccccc" => 1);
 

@@ -162,8 +162,6 @@ const fn add(a: (i32, i32), b: (i32, i32)) -> (i32, i32) {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "########
 #..O.O.#
 ##@.O..#

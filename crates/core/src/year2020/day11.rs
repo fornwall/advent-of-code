@@ -116,8 +116,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "L.LL.LL.LL
 LLLLLLL.LL
 L.L.L..L..

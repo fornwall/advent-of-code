@@ -212,8 +212,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!(
             "Before: [3, 2, 1, 1]
 9 2 1 2

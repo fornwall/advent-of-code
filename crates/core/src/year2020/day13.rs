@@ -171,8 +171,6 @@ pub fn solve(input: &Input) -> Result<i128, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "939\n7,13,x,x,59,x,31,19";
     test_part_one!(example => 295);
     test_part_two!(example => 1_068_781);

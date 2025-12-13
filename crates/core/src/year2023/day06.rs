@@ -55,8 +55,6 @@ fn parse_digits(s: &str) -> f64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "Time:      7  15   30\nDistance:  9  40  200";
     test_part_one_no_allocations!(test_input => 288);
     test_part_two_no_allocations!(test_input => 71503);

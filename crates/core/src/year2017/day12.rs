@@ -32,8 +32,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!(
             "0 <-> 2
 1 <-> 1

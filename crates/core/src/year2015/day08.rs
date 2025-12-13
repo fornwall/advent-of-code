@@ -47,8 +47,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("\"\"" => 2);
     test_part_one!("\"abc\"" => 2);
     test_part_one!("\"aaa\\\"aaa\"" => 3);

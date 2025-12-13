@@ -18,7 +18,7 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 struct CaveMap {
     /// Indexed by start node id, and mapping to bitset of connected caves.
-    connections: [u16; CaveMap::MAX_SIZE],
+    connections: [u16; Self::MAX_SIZE],
     /// Bitset of which caves are big.
     big_caves: u16,
     start_cave_identifier: u8,
@@ -143,8 +143,6 @@ impl CaveMap {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "start-A
 start-b
 A-c

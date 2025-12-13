@@ -38,8 +38,6 @@ pub fn solve(input: &Input) -> Result<Frequency, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("+1\n-2\n+3\n+1" => 3);
     test_part_one!("+1\n+1\n+1" => 3);
     test_part_one!("+1\n+1\n-2" => 0);

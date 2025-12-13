@@ -14,7 +14,6 @@ pub fn solve(input: &Input) -> Result<Word, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
     let input = include_str!("day05_input.txt");
     test_part_one!(input => 15_097_178);
     test_part_two!(input => 1_558_663);

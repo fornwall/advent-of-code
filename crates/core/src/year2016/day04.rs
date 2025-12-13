@@ -73,8 +73,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let real_input = include_str!("day04_input.txt");
 
     test_part_one_no_allocations!(real_input => 245_102);

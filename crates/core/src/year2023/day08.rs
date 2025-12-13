@@ -98,8 +98,6 @@ const fn lcm(a: u64, b: u64) -> u64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "RL
 
 AAA = (BBB, CCC)

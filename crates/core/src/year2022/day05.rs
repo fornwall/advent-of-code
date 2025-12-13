@@ -142,8 +142,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     let test_input = "    [D]
 [N] [C]
 [Z] [M] [P]

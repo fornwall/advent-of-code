@@ -132,8 +132,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "1 + 2 * 3 + 4 * 5 + 6";
     test_part_one!(example => 71);
     test_part_two!(example => 231);

@@ -55,8 +55,6 @@ fn is_possible(desired: u64, remaining: &[u64], concatenate: bool) -> bool {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "190: 10 19
 3267: 81 40 27
 83: 17 5

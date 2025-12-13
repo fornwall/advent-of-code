@@ -132,8 +132,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("^WNE$" => 3);
     test_part_one!("^ENWWW(NEEE|SSE(EE|N))$" => 10);
     test_part_one!("^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$" => 18);

@@ -234,7 +234,6 @@ pub use super::day23_webgpu::solve;
 #[test]
 pub fn tests() {
     use crate::input::Input;
-    use crate::input::{test_part_one, test_part_two};
 
     let test_input = "....#..
 ..###.#

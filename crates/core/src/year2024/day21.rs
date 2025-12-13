@@ -157,7 +157,6 @@ fn slice_to_u64(slice: &[u8]) -> u64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
     for key in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A'] {
         assert!(KeypadType::Numeric.contains(KeypadType::Numeric.location_of(key as u8)));
     }

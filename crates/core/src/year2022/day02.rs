@@ -26,8 +26,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "A Y\nB X\nC Z";
     test_part_one_no_allocations!(test_input => 15);
 

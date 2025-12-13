@@ -279,8 +279,6 @@ fn find_match(matched_scans: &[Scan], scan_to_join: &Scan) -> Option<(Point, Sca
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "--- scanner 0 ---
 404,-588,-901
 528,-643,409

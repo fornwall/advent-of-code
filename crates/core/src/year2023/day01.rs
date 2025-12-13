@@ -47,8 +47,6 @@ fn calibration_value(line: &str, part2: bool) -> u32 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "1abc2
 pqr3stu8vwx
 a1b2c3d4e5f

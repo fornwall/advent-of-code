@@ -155,8 +155,6 @@ fn next_token<I: Iterator<Item = u8>>(it: &mut Peekable<I>, coerced_to_list: &mu
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "[1,1,3,1,1]
 [1,1,5,1,1]
 

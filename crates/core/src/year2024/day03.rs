@@ -49,8 +49,6 @@ fn add_multiplications(input: &str) -> u32 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))";
     test_part_one_no_allocations!(test_input => 161);
     let test_input = "xmul(1000,4)";

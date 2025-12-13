@@ -125,8 +125,6 @@ const MAX_LENGTH: usize = 10_000;
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     let test_input = "1\n2\n-3\n3\n-2\n0\n4";
     test_part_one!(test_input => 3);
     test_part_two!(test_input => 1_623_178_306);

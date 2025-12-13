@@ -28,8 +28,6 @@ pub fn solve(input: &Input) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("5" => 3);
     test_part_two!("5" => 2);
 

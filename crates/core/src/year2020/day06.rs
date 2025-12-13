@@ -48,8 +48,6 @@ pub fn solve(input: &Input) -> Result<AnswersBitSet, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     test_part_one_no_allocations!("abc\n\nabc" => 6);
 
     let real_input = include_str!("day06_input.txt");

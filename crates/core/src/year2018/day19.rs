@@ -41,8 +41,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!(
             "#ip 0
 seti 5 0 1

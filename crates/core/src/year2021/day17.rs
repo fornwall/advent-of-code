@@ -99,8 +99,6 @@ fn probes_ends_in_trench(
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let example = "target area: x=20..30, y=-10..-5";
     test_part_one!(example => 45);
     test_part_two!(example => 112);

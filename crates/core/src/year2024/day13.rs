@@ -43,8 +43,6 @@ fn parse_it<'a, I: Iterator<Item = &'a str>>(it: &mut I) -> Result<i64, String> 
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "Button A: X+94, Y+34
 Button B: X+22, Y+67
 Prize: X=8400, Y=5400

@@ -95,8 +95,6 @@ fn adjacent(point: (i32, i32, i32)) -> impl Iterator<Item = (i32, i32, i32)> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "1,1,1\n2,1,1";
     test_part_one!(test_input => 10);
     test_part_two!(test_input => 10);

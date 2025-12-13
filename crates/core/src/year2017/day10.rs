@@ -61,7 +61,6 @@ pub fn knot_hash(input: &str, part1: bool) -> Result<String, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
     let real_input = include_str!("day10_input.txt");
     test_part_one!(real_input => "62238".to_string());
     test_part_two!(real_input => "2b0c9cc0449507a0db3babd57ad9e8d8".to_string());

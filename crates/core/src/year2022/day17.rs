@@ -136,8 +136,6 @@ impl Grid {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two, test_part_two_error};
-
     let test_input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
     test_part_one!(test_input => 3068);
     test_part_two!(test_input => 1_514_285_714_288);

@@ -53,8 +53,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("ADVENT" => 6);
     test_part_one!("A(1x5)BC" => 7);
     test_part_one!("(3x3)XYZ" => 9);

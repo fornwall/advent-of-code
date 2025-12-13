@@ -110,8 +110,6 @@ fn intersect_intervals(interval_a: Interval, interval_b: Interval) -> [Option<In
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     assert_eq!(intersect_intervals((1, 10), (20, 30)), [None, None, None]);
     assert_eq!(
         intersect_intervals((1, 10), (1, 10)),

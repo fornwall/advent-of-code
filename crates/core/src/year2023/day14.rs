@@ -134,8 +134,6 @@ fn calculate_hash(t: &[u128]) -> u64 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let test_input = "O....#....
 O.OO#....#
 .....##...

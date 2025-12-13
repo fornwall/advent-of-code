@@ -102,8 +102,6 @@ const fn starts_with_t(num: u16) -> bool {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     assert_eq!("ab", from_num(to_num(b"ab")));
     assert_eq!("yz", from_num(to_num(b"yz")));
 

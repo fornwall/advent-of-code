@@ -22,10 +22,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{
-        test_part_one_error, test_part_one_no_allocations, test_part_two_no_allocations,
-    };
-
     let test_input = "mjqjpqmgbljsphdztnvjfqwrcgsmlb";
     test_part_one_no_allocations!(test_input => 7);
     test_part_two_no_allocations!(test_input => 19);

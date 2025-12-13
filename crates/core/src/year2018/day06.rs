@@ -106,8 +106,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!(
             "1, 1
 1, 6

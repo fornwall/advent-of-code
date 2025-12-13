@@ -82,8 +82,6 @@ fn card_char_to_num(card: u8, jokers: bool) -> Result<u32, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     #[allow(clippy::unwrap_used)]
     fn assert_hand_strength(s: &str, expected: u64) {
         let hand = Hand::parse(s, true).unwrap();

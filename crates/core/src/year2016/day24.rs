@@ -133,8 +133,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("###########\n#0.1.....2#\n#.#######.#\n#4.......3#\n###########" => 14);
 
     let real_input = include_str!("day24_input.txt");

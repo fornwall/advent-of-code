@@ -385,8 +385,6 @@ pub fn tile_tests() {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day21_input.txt");
     test_part_one!(real_input => 142);
     test_part_two!(real_input => 1_879_071);

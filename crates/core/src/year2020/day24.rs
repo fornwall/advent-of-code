@@ -85,8 +85,6 @@ pub fn solve(input: &Input) -> Result<u64, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("esew" => 1);
     test_part_one!("esew\nesew" => 0);
     test_part_one!("esew\nnwwswee" => 2);

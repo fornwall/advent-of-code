@@ -42,8 +42,6 @@ pub fn solve(input: &Input) -> Result<usize, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2";
     test_part_one!(test_input => 13);
     test_part_two!(test_input => 1);

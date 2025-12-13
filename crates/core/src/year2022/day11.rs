@@ -155,8 +155,6 @@ struct Item {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "Monkey 0:
   Starting items: 79, 98
   Operation: new = old * 19

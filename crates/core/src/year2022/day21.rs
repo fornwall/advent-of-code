@@ -236,8 +236,6 @@ fn is_to_deep(actions: &[MonkeyAction], id: u16, depth: usize) -> bool {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
-
     let test_input = "root: pppw + sjmn
 dbpl: 5
 cczh: sllz + lgvd

@@ -59,8 +59,6 @@ pub fn solve(input: &Input) -> Result<JoltageAmount, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     let example = "16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4";
     test_part_one!(example => 35);
     test_part_two!(example => 8);

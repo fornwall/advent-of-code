@@ -132,8 +132,6 @@ fn parse(input: &str) -> Result<Valley, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two, test_part_two_error};
-
     let test_input = "#.######
 #>>.<^<#
 #.<..<<#

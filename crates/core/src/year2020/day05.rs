@@ -66,8 +66,6 @@ pub fn solve(input: &Input) -> Result<SeatId, String> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let real_input = include_str!("day05_input.txt");
     test_part_one!(real_input => 828);
     test_part_two!(real_input => 565);

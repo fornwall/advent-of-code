@@ -170,8 +170,6 @@ impl SnailfishNumber {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     test_part_one!("[[1,2],[[3,4],5]]" => 143);
     test_part_one!("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]" => 1384);
     test_part_one!("[[[[1,1],[2,2]],[3,3]],[4,4]]" => 445);

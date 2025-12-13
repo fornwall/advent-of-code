@@ -300,8 +300,6 @@ pub fn solve(input: &Input) -> Result<i32, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     test_part_one_error!("GE" => "No line in input");
     test_part_one_error!("GE\n" => "Map does not have a wall at edges");
 

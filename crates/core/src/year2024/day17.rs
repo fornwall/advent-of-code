@@ -146,8 +146,6 @@ impl Computer<'_> {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one, test_part_two};
-
     let test_input = "Register A: 729
 Register B: 0
 Register C: 0

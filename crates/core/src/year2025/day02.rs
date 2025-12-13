@@ -60,8 +60,6 @@ fn num_digits(integer: u64) -> u32 {
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     assert_eq!(num_digits(0), 1);
     assert_eq!(num_digits(1), 1);
     assert_eq!(num_digits(9), 1);

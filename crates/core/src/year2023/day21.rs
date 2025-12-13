@@ -156,8 +156,6 @@ fn bfs(
 
 #[test]
 pub fn tests() {
-    use crate::input::{test_part_one_no_allocations, test_part_two_no_allocations};
-
     let real_input = include_str!("day21_input.txt");
     test_part_one_no_allocations!(real_input => 3773);
     test_part_two_no_allocations!(real_input => 625_628_021_226_274);

@@ -99,8 +99,6 @@ pub fn solve(input: &Input) -> Result<String, String> {
 
 #[test]
 fn tests() {
-    use crate::input::{test_part_one, test_part_one_error, test_part_two};
-
     test_part_one!("18" => "33,45".into());
     test_part_one!("42" => "21,61".into());
     test_part_two!("18" => "90,269,16".into());
