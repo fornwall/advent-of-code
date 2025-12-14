@@ -70,7 +70,7 @@ pub fn solve(input: &Input) -> Result<String, String> {
                 .ok_or_else(|| format!("Wire name lookup failed: {wire_id}"))?;
             incorrect_names.push(original_value);
         }
-        incorrect_names.sort();
+        incorrect_names.sort_unstable();
         Ok(incorrect_names.join(","))
     }
 }
