@@ -204,7 +204,7 @@ y02: 0
 x00 AND y00 -> z00
 x01 XOR y01 -> z01
 x02 OR y02 -> z02";
-    test_part_one_no_allocations!(test_input => "4".to_string());
+    test_part_one!(test_input => "4".to_string());
     let test_input = "x00: 1
 x01: 0
 x02: 1
@@ -252,10 +252,9 @@ y03 OR x01 -> nrd
 hwm AND bqk -> z03
 tgd XOR rvg -> z12
 tnw OR pbm -> gnj";
-    test_part_one_no_allocations!(test_input => "2024".to_string());
-    //test_part_two_no_allocations!(test_input => 0);
+    test_part_one!(test_input => "2024".to_string());
 
     let real_input = include_str!("day24_input.txt");
-    test_part_one_no_allocations!(real_input => "65740327379952".to_string());
-    test_part_two_no_allocations!(real_input => "bgs,pqc,rjm,swt,wsv,z07,z13,z31".to_string());
+    test_part_one!(real_input => "65740327379952".to_string());
+    test_part_two!(real_input => "bgs,pqc,rjm,swt,wsv,z07,z13,z31".to_string());
 }
