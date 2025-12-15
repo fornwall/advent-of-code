@@ -134,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download built wheels
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         pattern: wheels-*
         merge-multiple: true
@@ -207,7 +207,7 @@ jobs:
     - run: cargo install cross
     - name: Install aarch64 strip
       run: sudo apt-get update && sudo apt-get -y install binutils-aarch64-linux-gnu
-    - uses: actions/download-artifact@v5
+    - uses: actions/download-artifact@v7
       with:
         name: man-page
         path: crates/core
@@ -238,7 +238,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - uses: dtolnay/rust-toolchain@stable
-    - uses: actions/download-artifact@v5
+    - uses: actions/download-artifact@v7
       with:
         name: man-page
         path: crates/core
@@ -277,7 +277,7 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
     - name: Download JNI libraries
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         pattern: jnilibs-*
         merge-multiple: true
@@ -300,16 +300,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: mac-x86_64-binary
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: mac-aarch64-binary
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: linux-x86_64-binary
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: linux-aarch64-binary
       - uses: softprops/action-gh-release@v2
