@@ -136,7 +136,7 @@ jobs:
       run: ./run-iai-benchmark.py > ${{ matrix.tested-commit }}-baseline.json
       working-directory: crates/core
     - name: Upload benchmark
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.tested-commit }}-benchmark
         path: crates/core/${{ matrix.tested-commit }}-baseline.json
@@ -180,7 +180,7 @@ jobs:
     - name: Fuzz with AFL
       run: AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_BENCH_UNTIL_CRASH=1 make fuzz-afl
     - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         path: ./crates/fuzzing-afl/target/fuzz-findings/default/crashes
         name: fuzzing-crashes-afl
@@ -197,7 +197,7 @@ jobs:
       run: timeout 1800s make fuzz-libfuzzer
       continue-on-error: true
     - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         path: crates/fuzzing-libfuzzer/fuzz/artifacts/fuzz_target/
         name: fuzzing-crashes-libfuzzer
@@ -216,7 +216,7 @@ jobs:
         # See https://github.com/google/honggfuzz/blob/master/docs/USAGE.md
         HFUZZ_RUN_ARGS: "--timeout 10 --run_time 1800 --exit_upon_crash"
     - name: Upload crashes found by fuzzing
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         path: crates/fuzzing-hfuzz/hfuzz_workspace/advent-of-code-fuzzing-hfuzz/*.fuzz
         name: fuzzing-crashes-honggfuzz
@@ -285,7 +285,7 @@ jobs:
           git push
         fi
     - name: Upload new gist-mapping.json
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: gist-mapping
         path: crates/wasm/site/gist-mapping.json
