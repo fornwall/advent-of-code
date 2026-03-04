@@ -32,7 +32,7 @@ jobs:
         name: Setup python
         with:
           python-version: '3.x'
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
         if: ${{ matrix.arch == 'aarch64' }}
         name: Set up QEMU
       - name: Install cibuildwheel
@@ -67,7 +67,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - run: cargo install cross
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4
     - name: Login to docker hub
@@ -337,7 +337,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - run: cargo install cross
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4
     - name: Login to docker hub
@@ -370,7 +370,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - run: cargo install cross
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4
     - name: Login to docker hub
