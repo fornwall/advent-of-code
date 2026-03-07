@@ -303,6 +303,8 @@ jobs:
   github-release:
     needs: [build-and-upload-linux-brew-binaries, build-and-upload-mac-brew-binaries]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v8
