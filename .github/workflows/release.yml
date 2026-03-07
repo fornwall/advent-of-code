@@ -5,6 +5,11 @@ on:
     tags:
       - "*.*.*"
 
+# https://docs.npmjs.com/trusted-publishers
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   build-python-wheels:
     env:
