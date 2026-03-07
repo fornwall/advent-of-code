@@ -7,7 +7,7 @@ plugins {
 
 java {
     group = "net.fornwall"
-    version = "2025.2.1"
+    version = "2025.3.0"
     sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
     withJavadocJar()
     withSourcesJar()
