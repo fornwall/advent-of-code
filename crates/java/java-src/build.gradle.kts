@@ -25,6 +25,7 @@ dependencies {
 tasks {
     test {
         useJUnitPlatform()
+        jvmArgs = listOf("--enable-native-access=ALL-UNNAMED")
     }
 }
 

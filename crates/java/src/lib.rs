@@ -3,6 +3,7 @@
 use advent_of_code::solve;
 use jni::EnvUnowned;
 use jni::errors::ThrowRuntimeExAndDefault;
+use jni::jni_str;
 use jni::objects::{JClass, JString};
 use jni::strings::JNIString;
 use jni::sys::jstring;
@@ -27,19 +28,16 @@ pub extern "system" fn Java_net_fornwall_aoc_Solver_solve(
                             .new_string(output)
                             .expect("Unable to create output string")
                             .into_raw());
-                        //.new_string(output) .expect("Unable to create output string") .into_raw();
                     }
                     Err(msg) => msg,
                 },
                 Err(message) => message,
             };
 
-            let class_name = JNIString::from("net/fornwall/aoc/SolverException");
+            let class_name = jni_str!("net/fornwall/aoc/SolverException");
             let s = JNIString::from(exception_message);
-            env.throw_new(class_name, &s)
-                .expect("Unable to throw exception");
+            env.throw_new(class_name, &s)?;
             Ok(::std::ptr::null_mut())
-            //Ok(JObject::null().into())
         })
         .resolve::<ThrowRuntimeExAndDefault>()
 }
