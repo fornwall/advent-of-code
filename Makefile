@@ -9,7 +9,7 @@ endif
 WASM_DIR = debug
 WASM_OPT = wasm-opt --all-features --disable-gc
 WASM_BINDGEN = wasm-bindgen --target web --weak-refs --reference-types
-WASM_TARGET_FEATURES = "+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext,+simd128,+reference-types"
+WASM_TARGET_FEATURES = "+relaxed-simd"
 ifeq ($(WASM_RELEASE),1)
   WASM_BUILD_PROFILE = --release
   WASM_DIR = release
