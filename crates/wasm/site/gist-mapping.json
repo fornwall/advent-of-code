@@ -1218,9 +1218,9 @@
   "2023": {
     "16": {
       "gist": "c0323b2106814c12e39ba1164d2fd44d",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/c0323b2106814c12e39ba1164d2fd44d/raw/1bcaad063d24015e4044b27d174034c1c302a1f9/year2023_day16.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/c0323b2106814c12e39ba1164d2fd44d/raw/7b3dfecdcc63dd50ab082a9df2b8fe91cbaec33b/year2023_day16.rs",
       "visualization": false,
-      "compiler_explorer": "vKxTo3oq7"
+      "compiler_explorer": "Mffv8fvGc"
     },
     "20": {
       "gist": "581bfe48b3941a1fe5614111819706f3",
@@ -1230,9 +1230,9 @@
     },
     "13": {
       "gist": "2bc7edd1247e826ac706473372fa55d5",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/2bc7edd1247e826ac706473372fa55d5/raw/06081854f4b12703660926ebf73248ec8ae7bb9b/year2023_day13.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/2bc7edd1247e826ac706473372fa55d5/raw/296ead2dac663e3152ce7fb2d12db2d6968edcf2/year2023_day13.rs",
       "visualization": false,
-      "compiler_explorer": "5MaGYYo6o"
+      "compiler_explorer": "qjooEGaK6"
     },
     "19": {
       "gist": "184657ca290839aaa8ff79e649d63c8a",
@@ -1242,9 +1242,9 @@
     },
     "4": {
       "gist": "3d5cddbbce2d0c9c30fb6cdeb71fcb25",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/3d5cddbbce2d0c9c30fb6cdeb71fcb25/raw/25d11c330c5877d0aa16ffe911b21fb8e4da787f/year2023_day4.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/3d5cddbbce2d0c9c30fb6cdeb71fcb25/raw/021a596257fe47713e24ff205b4be5e8fd69a0b8/year2023_day4.rs",
       "visualization": false,
-      "compiler_explorer": "KxEMj9ecP"
+      "compiler_explorer": "rG5daE6zP"
     },
     "9": {
       "gist": "e10e09ec6b7b459a5f6a42a420f2e1e0",
@@ -1254,63 +1254,63 @@
     },
     "11": {
       "gist": "eaec08996ea8f792db99c706d2ae9fc7",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/eaec08996ea8f792db99c706d2ae9fc7/raw/73916592e203820978d3cb3f5116028e79027df6/year2023_day11.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/eaec08996ea8f792db99c706d2ae9fc7/raw/acca47c59ef531a714780d04df59a1852b1b5fde/year2023_day11.rs",
       "visualization": false,
-      "compiler_explorer": "vqndadjhc"
+      "compiler_explorer": "e9f9Psoh1"
     },
     "12": {
       "gist": "ec808854320e09c83bf756c26f50a750",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/ec808854320e09c83bf756c26f50a750/raw/73f09d2f82002d952f18198fc3885ced6265ac65/year2023_day12.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/ec808854320e09c83bf756c26f50a750/raw/120f6206d3105d25c4aba2c0f44ec1bca02e658c/year2023_day12.rs",
       "visualization": false,
-      "compiler_explorer": "9E8PnqP4K"
+      "compiler_explorer": "rd7KabTc5"
     },
     "14": {
       "gist": "f2356c54afc1ee3a8473b18e9c427146",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/f2356c54afc1ee3a8473b18e9c427146/raw/4d934d03e0648a7ffe0ac5d2700ba9cb37f514f7/year2023_day14.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/f2356c54afc1ee3a8473b18e9c427146/raw/cd6c473e89a1f5145769e8e6f3e82412d29f8dea/year2023_day14.rs",
       "visualization": false,
-      "compiler_explorer": "nPjPqea44"
+      "compiler_explorer": "ohzEceoKK"
     },
     "25": {
       "gist": "216fefabc46523107c483397e83dc809",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/216fefabc46523107c483397e83dc809/raw/bcc0eb878257b1fbae3e23c0d4a0aa69c1f63c88/year2023_day25.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/216fefabc46523107c483397e83dc809/raw/3349dc3c9c680f77a1c8e842ea9dadde57eea3c0/year2023_day25.rs",
       "visualization": false,
-      "compiler_explorer": "zfE5GdasG"
+      "compiler_explorer": "G7dqzsYM1"
     },
     "1": {
       "gist": "d8c8a9009dd504ccccd3c12466103568",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/d8c8a9009dd504ccccd3c12466103568/raw/ea14f480f70b2c748070471fcca76338d4d67aee/year2023_day1.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/d8c8a9009dd504ccccd3c12466103568/raw/a01d7d7a8b3f039074b84dbd1e93c2703b5e98f9/year2023_day1.rs",
       "visualization": false,
-      "compiler_explorer": "r1qvfP3rT"
+      "compiler_explorer": "Tbz5Wo9f4"
     },
     "3": {
       "gist": "0fe83bcfe5a89e933d15d650277de035",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/0fe83bcfe5a89e933d15d650277de035/raw/327ebe4434a97e264de62ad1d52d8dbbbeae4cd8/year2023_day3.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/0fe83bcfe5a89e933d15d650277de035/raw/053c67c888a1e0484b1bf79770cdbcfd3a030863/year2023_day3.rs",
       "visualization": false,
-      "compiler_explorer": "M38arn8hb"
+      "compiler_explorer": "TMhYn3GsE"
     },
     "18": {
       "gist": "88cdedda98e9a5919c391187e134eeae",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/88cdedda98e9a5919c391187e134eeae/raw/409d5a3807443106dd0993410a3a4f3f1d04ab97/year2023_day18.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/88cdedda98e9a5919c391187e134eeae/raw/33bdaea6b261ab30765fb6c294e7a3507b3aabd4/year2023_day18.rs",
       "visualization": false,
-      "compiler_explorer": "P6snKG4j3"
+      "compiler_explorer": "Gx3Yehfzz"
     },
     "2": {
       "gist": "8090851f8f7cb7a5b74bfbd014d76906",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/8090851f8f7cb7a5b74bfbd014d76906/raw/77e79b7e939624b407203cd32e3b9e7f58a43b78/year2023_day2.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/8090851f8f7cb7a5b74bfbd014d76906/raw/ee826a03af53b02c2006bc86d9a9a4f31f543408/year2023_day2.rs",
       "visualization": false,
-      "compiler_explorer": "nzP9nhY5f"
+      "compiler_explorer": "ovTn9Gbo4"
     },
     "5": {
       "gist": "87199c6c04d0565a03066a997b0f4a79",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/87199c6c04d0565a03066a997b0f4a79/raw/46698a59da1bca4f10865d1263317673abd4f0e9/year2023_day5.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/87199c6c04d0565a03066a997b0f4a79/raw/50cead0ccfcc1127f207e47489caf5bfbdffb0ec/year2023_day5.rs",
       "visualization": false,
-      "compiler_explorer": "3fzcfhqxG"
+      "compiler_explorer": "GWsrKojfK"
     },
     "23": {
       "gist": "0f2792b98cb5e1d20d53578641814274",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/0f2792b98cb5e1d20d53578641814274/raw/2b66d2a0b25619e778b02174be18f8cbc6617316/year2023_day23.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/0f2792b98cb5e1d20d53578641814274/raw/3bd5edd8254efc4f8f9ae1785871345304603c6f/year2023_day23.rs",
       "visualization": false,
-      "compiler_explorer": "qEvjGP9cM"
+      "compiler_explorer": "zTK1svPrf"
     },
     "7": {
       "gist": "fdd54c0e6fe21149a229ea88ce7d6790",
@@ -1320,9 +1320,9 @@
     },
     "6": {
       "gist": "9ba487ad3cc297b5cc07651ed6fbd356",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/9ba487ad3cc297b5cc07651ed6fbd356/raw/4aa8c8cafa6a7d3a84d92cdd1aff539de0e16da8/year2023_day6.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/9ba487ad3cc297b5cc07651ed6fbd356/raw/9ea43ae40ab503ce0275df71c3fd1ea65c3188ce/year2023_day6.rs",
       "visualization": false,
-      "compiler_explorer": "oMG6nxzE6"
+      "compiler_explorer": "4MrTTPhEh"
     },
     "17": {
       "gist": "47b5a2c878bffc88adf82a203cd196b6",
@@ -1332,15 +1332,15 @@
     },
     "10": {
       "gist": "3e561ea2aed53b0a767a0e80e0790a68",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/3e561ea2aed53b0a767a0e80e0790a68/raw/c365be0f3309b60f7d276bde4f2e61b2f8ba64c7/year2023_day10.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/3e561ea2aed53b0a767a0e80e0790a68/raw/e0bfc1d2b9ce8e9b6f851f4f86cb7432a31ca5f8/year2023_day10.rs",
       "visualization": false,
-      "compiler_explorer": "bG8j84o7d"
+      "compiler_explorer": "1YvdcEG1Y"
     },
     "15": {
       "gist": "8e9bebd0053388711badb24be997e4b0",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/8e9bebd0053388711badb24be997e4b0/raw/27126295a7634d92ba243bd6c71d3674591887a0/year2023_day15.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/8e9bebd0053388711badb24be997e4b0/raw/70055c410c8db61ce7e334453e1ef44389fb331b/year2023_day15.rs",
       "visualization": false,
-      "compiler_explorer": "jWKb4fY14"
+      "compiler_explorer": "PMWbzKxar"
     },
     "24": {
       "gist": "e19cf65db9691c33c49a9d492e99face",
@@ -1350,9 +1350,9 @@
     },
     "22": {
       "gist": "754734985cb968d453baa7186f48eedc",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/754734985cb968d453baa7186f48eedc/raw/126b2bdfdb2e672384d1e448d820618f97d40301/year2023_day22.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/754734985cb968d453baa7186f48eedc/raw/9d9740899d5bb892c1474757494a9c9f99107115/year2023_day22.rs",
       "visualization": false,
-      "compiler_explorer": "xKaa1oExY"
+      "compiler_explorer": "7rvr1YWPd"
     },
     "8": {
       "gist": "88ac37dcf12669f54690842f3edcd8cd",
@@ -1522,9 +1522,9 @@
   "2025": {
     "8": {
       "gist": "85a26d4ac11f0b2c092ba323f76413fb",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/85a26d4ac11f0b2c092ba323f76413fb/raw/2e2a18f00016948c53c5d35cba760ece36cc1a37/year2025_day8.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/85a26d4ac11f0b2c092ba323f76413fb/raw/fa095b778307be58fcf81270b72b3b1790c36add/year2025_day8.rs",
       "visualization": false,
-      "compiler_explorer": "bGehW5nsY"
+      "compiler_explorer": "ssfr4z81G"
     },
     "11": {
       "gist": "cd2dfb3fe1d592a4479a1882c2b96188",
@@ -1534,15 +1534,15 @@
     },
     "7": {
       "gist": "beec8c43b7faab46c5bb4410d6f0556e",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/beec8c43b7faab46c5bb4410d6f0556e/raw/737d87b2382f60f95524c003bdd9294108b4b905/year2025_day7.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/beec8c43b7faab46c5bb4410d6f0556e/raw/185a5b76fe6663ad9e2a323dd9619920de60225f/year2025_day7.rs",
       "visualization": false,
-      "compiler_explorer": "Wahv115Mh"
+      "compiler_explorer": "PfMGzxv7z"
     },
     "9": {
       "gist": "0201633e577c58d396c35cc0f38bd57c",
-      "raw_url": "https://gist.githubusercontent.com/fornwall/0201633e577c58d396c35cc0f38bd57c/raw/1f24838a3d8f93c96717093dab56e9f912c7d16e/year2025_day9.rs",
+      "raw_url": "https://gist.githubusercontent.com/fornwall/0201633e577c58d396c35cc0f38bd57c/raw/6e233f9a15c2476adb9db5f47af28c69e248f966/year2025_day9.rs",
       "visualization": false,
-      "compiler_explorer": "WG91jfEd7"
+      "compiler_explorer": "3ov3c51bd"
     },
     "4": {
       "gist": "ea55af596effc1b5affb4df1a59e41ba",
