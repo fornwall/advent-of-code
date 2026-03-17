@@ -70,13 +70,10 @@ pub fn solve(input: &Input) -> Result<String, String> {
             }
         }
 
-        let mut result = String::new();
         largest[0..largest_len].sort_unstable();
-        let mut first = true;
-        for &n in &largest[0..largest_len] {
-            if first {
-                first = false;
-            } else {
+        let mut result = String::new();
+        for (i, &n) in largest[0..largest_len].iter().enumerate() {
+            if i > 0 {
                 result.push(',');
             }
             result.push_str(&from_num(n));

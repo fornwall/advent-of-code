@@ -31,27 +31,21 @@ pub fn solve(input: &Input) -> Result<u64, String> {
             .max()
             .ok_or_else(|| "No rectangle found".to_string())
     } else {
-        let mut horizontal_lines_by_y = BTreeMap::new();
-        let mut vertical_lines_by_x = BTreeMap::new();
+        let mut horizontal_lines_by_y: BTreeMap<u32, Vec<Line>> = BTreeMap::new();
+        let mut vertical_lines_by_x: BTreeMap<u32, Vec<Line>> = BTreeMap::new();
         for i in 0..points.len() {
             let p1 = points.elements[i];
             let p2 = points.elements[(i + 1) % points.len()];
             if p1.x == p2.x {
-                vertical_lines_by_x
-                    .entry(p1.x)
-                    .or_insert_with(Vec::new)
-                    .push(Line {
-                        start: p1.y.min(p2.y),
-                        end: p1.y.max(p2.y),
-                    });
+                vertical_lines_by_x.entry(p1.x).or_default().push(Line {
+                    start: p1.y.min(p2.y),
+                    end: p1.y.max(p2.y),
+                });
             } else {
-                horizontal_lines_by_y
-                    .entry(p1.y)
-                    .or_insert_with(Vec::new)
-                    .push(Line {
-                        start: p1.x.min(p2.x),
-                        end: p1.x.max(p2.x),
-                    });
+                horizontal_lines_by_y.entry(p1.y).or_default().push(Line {
+                    start: p1.x.min(p2.x),
+                    end: p1.x.max(p2.x),
+                });
             }
         }
 
