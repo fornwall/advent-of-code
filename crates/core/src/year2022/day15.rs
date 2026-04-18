@@ -93,7 +93,7 @@ fn solve_part_1(sensors: &[Sensor]) -> u64 {
     let mut not_possible_positions_count = 0;
     let mut last_interval = (i32::MIN + 1, i32::MIN);
 
-    not_possible_intervals.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+    not_possible_intervals.sort_unstable_by_key(|a| a.0);
 
     for interval in not_possible_intervals {
         if interval.0 <= last_interval.1 && interval.1 >= last_interval.0 {

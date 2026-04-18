@@ -54,6 +54,7 @@ struct State {
     robots: [u32; 4],
 }
 
+#[allow(clippy::manual_checked_ops)]
 fn most_geodes_opened(blueprint: &Blueprint, minutes: u32) -> u32 {
     let max_costs: [_; 4] = array::from_fn(|resource_idx| {
         if resource_idx == 3 {

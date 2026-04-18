@@ -86,28 +86,23 @@ impl Program {
     pub fn optimize(&mut self) {
         for (line, instruction) in self.instructions.iter_mut().enumerate() {
             match instruction.opcode {
-                Opcode::Addi => {
-                    if instruction.a as u8 == self.instruction_pointer_index {
-                        instruction.opcode = Opcode::Seti;
-                        instruction.a = line as u64 + instruction.b;
-                        instruction.b = 0; // ignored
-                    }
+                Opcode::Addi if instruction.a as u8 == self.instruction_pointer_index => {
+                    instruction.opcode = Opcode::Seti;
+                    instruction.a = line as u64 + instruction.b;
+                    instruction.b = 0; // ignored
                 }
-                Opcode::Mulr => {
+                Opcode::Mulr
                     if instruction.a as u8 == self.instruction_pointer_index
-                        && instruction.b as u8 == self.instruction_pointer_index
-                    {
-                        instruction.opcode = Opcode::Seti;
-                        instruction.a = line as u64 * line as u64;
-                        instruction.b = 0; // ignored
-                    }
+                        && instruction.b as u8 == self.instruction_pointer_index =>
+                {
+                    instruction.opcode = Opcode::Seti;
+                    instruction.a = line as u64 * line as u64;
+                    instruction.b = 0; // ignored
                 }
-                Opcode::Muli => {
-                    if instruction.a as u8 == self.instruction_pointer_index {
-                        instruction.opcode = Opcode::Seti;
-                        instruction.a = line as u64 * instruction.b;
-                        instruction.b = 0; // ignored
-                    }
+                Opcode::Muli if instruction.a as u8 == self.instruction_pointer_index => {
+                    instruction.opcode = Opcode::Seti;
+                    instruction.a = line as u64 * instruction.b;
+                    instruction.b = 0; // ignored
                 }
                 _ => {}
             }

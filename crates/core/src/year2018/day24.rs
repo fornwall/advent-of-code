@@ -193,7 +193,7 @@ fn execute_battle(mut groups: Vec<ArmyGroup>) -> Vec<ArmyGroup> {
 
         // Attacking.
         let mut any_killed_units = false;
-        groups.sort_unstable_by(|a, b| b.initiative.cmp(&a.initiative));
+        groups.sort_unstable_by_key(|b| std::cmp::Reverse(b.initiative));
         for i in 0..groups.len() {
             let (attacking_group_id, is_alive, effective_power, attack_type) = {
                 let g = &groups[i];

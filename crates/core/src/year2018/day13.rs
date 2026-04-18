@@ -175,8 +175,7 @@ impl Track {
 
     fn find_position(&mut self, part1: bool) -> Result<Vector, String> {
         for _ in 0..Self::MAX_TICKS {
-            self.carts
-                .sort_unstable_by(|a, b| a.position.cmp(&b.position));
+            self.carts.sort_unstable_by_key(|a| a.position);
 
             let mut cart_idx = 0;
             'outer: while cart_idx < self.carts.len() {

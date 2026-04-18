@@ -40,7 +40,7 @@ pub fn solve(input: &Input) -> Result<u32, String> {
         }
     }
 
-    distances.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+    distances.sort_unstable_by_key(|a| a.0);
     let mut connections_made = 0;
     for &(_, lower_point, higher_point) in distances.iter() {
         if circuits.join(lower_point, higher_point)

@@ -16,12 +16,10 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             (false, b'<') => {
                 inside_garbage = true;
             }
-            (false, b'{') => {
-                if input.is_part_one() {
-                    let this_score = 1 + stack.last().unwrap_or(&0);
-                    stack.push(this_score);
-                    result += this_score;
-                }
+            (false, b'{') if input.is_part_one() => {
+                let this_score = 1 + stack.last().unwrap_or(&0);
+                stack.push(this_score);
+                result += this_score;
             }
             (false, b'}') => {
                 stack.pop();
@@ -32,10 +30,8 @@ pub fn solve(input: &Input) -> Result<u32, String> {
             (true, b'>') => {
                 inside_garbage = false;
             }
-            (true, _) => {
-                if input.is_part_two() {
-                    result += 1;
-                }
+            (true, _) if input.is_part_two() => {
+                result += 1;
             }
             _ => {}
         }

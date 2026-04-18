@@ -69,7 +69,7 @@ impl Board {
             return Err("Empty input".into());
         }
 
-        let mut board = Self {
+        let board = Self {
             width,
             height,
             cells,
@@ -100,7 +100,11 @@ impl Board {
         Ok(board)
     }
 
-    fn at(&mut self, x: u32, y: u32) -> &mut MapCell {
+    fn at(&self, x: u32, y: u32) -> &MapCell {
+        &self.cells[(x + self.width * y) as usize]
+    }
+
+    fn at_mut(&mut self, x: u32, y: u32) -> &mut MapCell {
         &mut self.cells[(x + self.width * y) as usize]
     }
 
@@ -161,7 +165,7 @@ impl Board {
             let attack_damage = if elf_target { 3 } else { self.elf_attack_power };
 
             if let MapCell::Unit { hit_points, .. } =
-                self.at(target_position.0 as u32, target_position.1 as u32)
+                self.at_mut(target_position.0 as u32, target_position.1 as u32)
             {
                 *hit_points -= attack_damage;
                 if *hit_points <= 0 {
@@ -190,7 +194,7 @@ impl Board {
             return;
         }
 
-        if let MapCell::Unit { even, .. } = self.at(x, y) {
+        if let MapCell::Unit { even, .. } = self.at_mut(x, y) {
             *even = !*even;
         }
 
@@ -235,23 +239,21 @@ impl Board {
                         found.push((cost, visiting_x, visiting_y, visiting.3, visiting.4));
                         found_cost = cost;
                     }
-                    MapCell::Open => {
-                        if !self.visited[(x + y * self.height) as usize] {
-                            self.visited[(x + y * self.height) as usize] = true;
-                            let first_x: u32;
-                            let first_y: u32;
-                            if visiting_x == sx && visiting_y == sy {
-                                // Initial step.
-                                first_x = x;
-                                first_y = y;
-                            } else {
-                                // Propagate initial step.
-                                first_x = visiting.3;
-                                first_y = visiting.4;
-                            };
-
-                            to_visit.push_back((cost, x, y, first_x, first_y));
+                    MapCell::Open if !self.visited[(x + y * self.height) as usize] => {
+                        self.visited[(x + y * self.height) as usize] = true;
+                        let first_x: u32;
+                        let first_y: u32;
+                        if visiting_x == sx && visiting_y == sy {
+                            // Initial step.
+                            first_x = x;
+                            first_y = y;
+                        } else {
+                            // Propagate initial step.
+                            first_x = visiting.3;
+                            first_y = visiting.4;
                         };
+
+                        to_visit.push_back((cost, x, y, first_x, first_y));
                     }
                     _ => {}
                 }
