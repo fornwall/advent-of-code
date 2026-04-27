@@ -37,7 +37,7 @@ allocation-counter = { version = "0", optional = true }
 bytemuck = { version = "1", optional = true }
 pollster = { version = "0", optional = true }
 svgplot = { version = "2025.6.0", path = "../svgplot", optional = true }
-wgpu = { version = "28", optional = true }
+wgpu = { version = "29", optional = true }
 
 [dev-dependencies]
 iai = { git = "https://github.com/fornwall/iai.git" }
