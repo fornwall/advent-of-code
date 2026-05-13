@@ -331,7 +331,7 @@ jobs:
     - name: Setup site to deploy
       run: make deploy-site
     - name: Deploy site to cloudflare
-      uses: cloudflare/wrangler-action@v3
+      uses: cloudflare/wrangler-action@v4
       with:
         apiToken: ${{ secrets.CLOUDFLARE_PAGES_EDIT_API_TOKEN }}
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
