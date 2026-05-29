@@ -129,7 +129,7 @@ fn simplex(lhs: &[Vec<f64>], c: &[f64]) -> (f64, Option<Vec<f64>>) {
                 }
                 for j in 0..n + 2 {
                     if j != s {
-                        d[i][j] -= d[r][j] * d[i][s] * k;
+                        d[i][j] = (d[r][j] * d[i][s]).mul_add(-k, d[i][j]);
                     }
                 }
             }
@@ -237,7 +237,7 @@ fn simplex(lhs: &[Vec<f64>], c: &[f64]) -> (f64, Option<Vec<f64>>) {
         }
         let mut sum_val = 0.0;
         for i in 0..n {
-            sum_val += c[i] * x[i];
+            sum_val = c[i].mul_add(x[i], sum_val);
         }
         return (sum_val, Some(x));
     }
