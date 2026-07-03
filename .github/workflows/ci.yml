@@ -82,7 +82,10 @@ jobs:
         python-version: ['3.12', '3.x']
     steps:
     - uses: actions/checkout@v7
-    - uses: dtolnay/rust-toolchain@stable
+    # No explicit toolchain setup: the build reads rust-toolchain and installs
+    # the pinned toolchain itself. Adding dtolnay/rust-toolchain@stable on top
+    # caused a rustup component conflict (clippy / bin/cargo-clippy) when the
+    # pinned toolchain was then installed during the build.
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
