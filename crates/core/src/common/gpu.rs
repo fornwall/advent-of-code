@@ -31,13 +31,16 @@ impl Gpu {
 
 pub fn setup() -> Result<Gpu, String> {
     async fn setup_async() -> Result<Gpu, String> {
-        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::default());
+        let instance = wgpu::Instance::new(
+            wgpu::InstanceDescriptor::new_without_display_handle_from_env(),
+        );
 
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::HighPerformance,
                 compatible_surface: None,
                 force_fallback_adapter: false,
+                ..Default::default()
             })
             .await
             .map_err(|e| format!("WGPU: Requesting adapter failed: {e}"))?;

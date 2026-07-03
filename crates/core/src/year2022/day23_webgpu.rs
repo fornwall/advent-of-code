@@ -174,7 +174,7 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         gpu.device
             .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: None,
-                bind_group_layouts: &[&bind_group_layout],
+                bind_group_layouts: &[Some(&bind_group_layout)],
                 immediate_size: 0,
             });
 
@@ -253,7 +253,9 @@ pub fn solve(input: &Input) -> Result<usize, String> {
             let moved_staging_buffer_slice = moved_staging_buffer.slice(..);
             moved_staging_buffer_slice.map_async(wgpu::MapMode::Read, Result::unwrap);
             gpu.instance.poll_all(true);
-            let r = moved_staging_buffer_slice.get_mapped_range();
+            let r = moved_staging_buffer_slice
+                .get_mapped_range()
+                .map_err(|e| format!("get_mapped_range failed: {e}"))?;
             let moved_data: &[u32] = bytemuck::cast_slice(&r);
             if moved_data[0] == 0 {
                 return Ok(round + 1);
@@ -284,7 +286,9 @@ pub fn solve(input: &Input) -> Result<usize, String> {
         let debug_slice: wgpu::BufferSlice<'_> = debug_buffer.slice(..);
         debug_slice.map_async(wgpu::MapMode::Read, Result::unwrap);
         gpu.instance.poll_all(true);
-        let r = debug_slice.get_mapped_range();
+        let r = debug_slice
+            .get_mapped_range()
+            .map_err(|e| format!("get_mapped_range failed: {e}"))?;
         let debug_data: &[u32] = bytemuck::cast_slice(&r);
         let (min_x, max_x, min_y, max_y) = debug_data.iter().enumerate().fold(
             (usize::MAX, usize::MIN, usize::MAX, usize::MIN),
