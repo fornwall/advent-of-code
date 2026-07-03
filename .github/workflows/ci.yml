@@ -167,6 +167,9 @@ jobs:
         delimiter="$(openssl rand -hex 8)"
         { echo "body<<$delimiter"; echo "$body"; echo "$delimiter"; } >> "$GITHUB_OUTPUT"
     - name: Post commit comment
+      # Skip on forks and Dependabot PRs, where GITHUB_TOKEN is read-only and
+      # cannot create commit comments.
+      if: github.event.pull_request.head.repo.full_name == github.repository
       uses: peter-evans/commit-comment@v4
       with:
         body: ${{ steps.get-comment-body.outputs.body }}
