@@ -42,10 +42,11 @@ pub fn solve(input: &Input) -> Result<u64, String> {
     }
 
     if input.is_part_two() {
+        // Only tiles adjacent to a black tile can be black next day, so it is enough
+        // to count black neighbours and rebuild the set from those candidates.
+        let mut adjacent_blacks_count = HashMap::new();
         for _day in 1..=100 {
-            let mut adjacent_blacks_count = HashMap::new();
-            let mut new_black_tiles = black_tiles.clone();
-
+            adjacent_blacks_count.clear();
             for &black_tile in black_tiles.iter() {
                 for diff in [(2, 0), (1, -1), (-1, -1), (-2, 0), (-1, 1), (1, 1)] {
                     let adjacent_location = (black_tile.0 + diff.0, black_tile.1 + diff.1);
@@ -53,30 +54,20 @@ pub fn solve(input: &Input) -> Result<u64, String> {
                 }
             }
 
-            for location in black_tiles.iter() {
-                if !adjacent_blacks_count.contains_key(location) {
-                    // "Any black tile with zero or more than 2 black tiles immediately
-                    // adjacent to it is flipped to white."
-                    // We only do the first check here.
-                    new_black_tiles.remove(location);
-                }
-            }
-
+            let mut new_black_tiles = HashSet::with_capacity(black_tiles.len());
             for (&location, &adjacent_blacks) in adjacent_blacks_count.iter() {
+                // "Any black tile with zero or more than 2 black tiles immediately
+                // adjacent to it is flipped to white." (black tiles with zero black
+                // neighbours are not in the count map, so they are dropped implicitly.)
+                // "Any white tile with exactly 2 black tiles immediately adjacent to
+                // it is flipped to black."
                 let is_black = black_tiles.contains(&location);
-                if is_black && adjacent_blacks > 2 {
-                    // "Any black tile with zero or more than 2 black tiles immediately
-                    // adjacent to it is flipped to white."
-                    // We only do the second check here.
-                    new_black_tiles.remove(&location);
-                } else if !is_black && adjacent_blacks == 2 {
-                    // "Any white tile with exactly 2 black tiles immediately adjacent
-                    // to it is flipped to black."
+                if adjacent_blacks == 2 || (adjacent_blacks == 1 && is_black) {
                     new_black_tiles.insert(location);
                 }
             }
 
-            std::mem::swap(&mut black_tiles, &mut new_black_tiles);
+            black_tiles = new_black_tiles;
         }
     }
 
