@@ -87,7 +87,7 @@ jobs:
     # caused a rustup component conflict (clippy / bin/cargo-clippy) when the
     # pinned toolchain was then installed during the build.
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Test with Python ${{ matrix.python-version }}
@@ -157,7 +157,7 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: old-benchmark
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       with:
         python-version: '3.x'
     - name: Format commit comment
@@ -269,7 +269,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       with:
           python-version: '3.x'
     - name: Install requests
@@ -308,7 +308,7 @@ jobs:
       deployments: write
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       with:
         python-version: '3.x'
     - uses: dtolnay/rust-toolchain@stable
